@@ -79,6 +79,11 @@ class SignatureType(models.Model):
 	"""Stores the list of possible signature types for the map tool. Custom signature types may be added at will."""
 	shortname = models.CharField(max_length = 6)
 	longname = models.CharField(max_length = 100)
+	# sleepersite and escalatable are used to track wormhole comabt sites.
+	# sleepersite = true should give a "Rats cleared" option
+	# escalatable = true should cause escalation tracking to kick in in C5/6
+	sleeprsite = models.BooleanField()
+	escalatable = models.BooleanField()
 
 	def __unicode__(self):
 		"""Returns short name as unicode representation"""
@@ -89,6 +94,11 @@ class Signature(models.Model):
 	system = models.ForeignKey(System, related_name="signatures")
 	sigtype = models.ForeignKey(SignatureType, related_name="sigs")
 	sigid = models.CharField(max_length = 10)
+	#ratscleared and lastescalated are used to track wormhole combat sites.
+	#ratscleared is the DateTime that sleepers were cleared initially
+	#lastescalated is the last time the site was escalated (if applicable)
+	ratscleared = models.DateTimeField(null=True, blank=True)
+	lastescalated = models.DateTimeField(null=True, blank=True)
 
 	def __unicode__(self):
 		"""Returns sig ID as unicode representation"""
