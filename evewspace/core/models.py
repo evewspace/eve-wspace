@@ -77,3 +77,45 @@ class SystemData(models.Model):
 	class Meta:
 		db_table = 'mapSolarSystems'
 
+class StarbaseResourcePurpose(models.Model):
+	"""Core model for SDD invControlTowerResourcePurpose table."""
+	purpose = models.IntegerField(primary_key=True)
+	purposeText = models.CharField(max_length=100, blank=True, null=True)
+
+	def __unicode__(self):
+		return self.purposeText
+	
+	class Meta:
+		db_table = 'invControlTowerResourcePurposes'
+
+class StarbaseResource(models.Model):
+	"""Core model for SDD invStarbaseResources table. Maps tower types 
+	to their fuel"""
+	towerType = models.ForeignKey(Type, related_name='posesfueled', db_column='controlTowerTypeID', primary_key=True)
+	resourceType = models.ForeignKey(Type, related_name='posfuel', db_column='resourceTypeID')
+	purpose = models.ForeignKey(StarbaseResourcePurpose, related_name='usedby', db_column='purpose', blank=True, null=True)
+	quantity = models.IntegerField(blank=True, null=True, db_column='quantity')
+	minSecurityLevel = models.FloatField(blank=True, null=True, db_column='minSecurityLevel')
+	
+	def __unicode__(self):
+		return '%s %s' % (self.towerType.name, self.resourceType.name)
+	
+	class Meta:
+		db_table = 'invControlTowerResources'
+
+class Location(models.Model):
+	"""Core model for SDD mapDenormalize table that generic locations map to."""
+	itemid = models.BigIntegerField(primary_key=True, db_column='itemID')
+	typeid = models.ForeignKey(Type, null=True, blank=True, related_name='mapentries', db_column='typeID')
+	system = models.ForeignKey(SystemData, null=True, blank=True, related_name='mapentries', db_column='solarSystemID')
+	constellation = models.ForeignKey(Constellation, null=True, blank=True, related_name='mapentries', db_column='constellationID')
+	region = models.ForeignKey(Region, null=True, blank=True, related_name='mapentries', db_column='regionID')
+	orbitparent = models.ForeignKey('Location', null=True, blank=True, related_name='satellites', db_column='orbitID')
+	name = models.CharField(max_length=100, null=True, blank=True, db_column='itemName')
+	x = models.FloatField(null=True, blank=True, db_column='x')
+	y = models.FloatField(null=True, blank=True, db_column='y')
+	z = models.FloatField(null=True, blank=True, db_column='z')
+	security = models.FloatField(null=True, blank=True, db_column='security')
+	class Meta:
+		db_table='mapDenormalize'
+
