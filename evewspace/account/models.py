@@ -5,11 +5,18 @@ from django.db.models.signals import post_save
 
 # Create your models here.
 
+class PlayTime(models.Model):
+	"""PlayTime represents a choice of play times for use in several forms."""
+	fromtime = models.TimeField()
+	totime = models.TimeField()
+	
+
 class UserProfile(models.Model):
 	"""UserProfile defines custom fields tied to each User record in the Django auth DB."""
 	user = models.ForeignKey(User, unique = True)
 	jabberid = models.EmailField(blank = True, null=True)
 	defaultmap = models.ForeignKey(Map, related_name = "defaultusers", blank=True, null=True)
+	playtimes = models.ManyToManyField(PlayTime)
 
 class GroupProfile(models.Model):
 	"""GroupProfile defines custom fields tied to each Group record."""
