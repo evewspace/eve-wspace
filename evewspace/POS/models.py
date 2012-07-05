@@ -12,13 +12,13 @@ class POS(models.Model):
 	corpname = models.CharField(max_length=100)
 	corpticker = models.CharField(max_length=10)
 	alliancename = models.CharField(max_length=100)
-	allianceticker = models.CharField(max_lenght=10)
+	allianceticker = models.CharField(max_length=10)
 	corpid = models.BigIntegerField(null=True, blank=True)
 	#If posname is null, views should return towertype.name
 	posname = models.CharField(max_length=100, null=True, blank=True)
 	fitting = models.TextField()
 	#Using CCP's status codes here for sanity with API checks
-	status = models.IntegerField(choices = (0, 'Unanchored'), (1, 'Anchored'), (2, 'Onlining'), (3, 'Reinforced'), (4, 'Online'))
+	status = models.IntegerField(choices = ((0, 'Unanchored'), (1, 'Anchored'), (2, 'Onlining'), (3, 'Reinforced'), (4, 'Online')))
 
 	#This should be the time the tower exits RF
 	rftime = models.DateTimeField(null=True, blank=True)
@@ -29,7 +29,7 @@ class POS(models.Model):
 
 class CorpPOS(POS):
 	"""A corp-controlled POS with manager and password data."""
-	manager = models.ForeignKey(User, null=True, blank=True, related_name='poses'
+	manager = models.ForeignKey(User, null=True, blank=True, related_name='poses')
 	password = models.CharField(max_length=100)
 	description = models.TextField(null=True, blank=True)
 
