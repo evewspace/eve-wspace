@@ -1,5 +1,5 @@
 from django.db import models
-from evewspace.core.models import SystemData, Type, StarbaseResource, StarbaseResourcePurpose, Location
+from evewspace.core.models import Type, Location
 from django.contrib.auth.models import User
 
 class Alliance(models.Model):
@@ -26,9 +26,9 @@ class Corporation(models.Model):
 class POS(models.Model):
 	"""Represents a POS somewhere in space."""
 	#This location should always reference a moon from mapDenormalize
-	location = models.OneToOneKey(Location, related_name="pos", primary_key=True)
+	location = models.OneToOneField(Location, related_name="pos", primary_key=True)
 	towertype = models.ForeignKey(Type, related_name="inspace")
-	corporation = models.ForeignKey(Cororation, related_name="poses")
+	corporation = models.ForeignKey(Corporation, related_name="poses")
 	posname = models.CharField(max_length=100, blank=True)
 	fitting = models.TextField()
 	#Using CCP's status codes here for sanity with API checks
@@ -66,10 +66,10 @@ class POSApplication(models.Model):
 	#Once it is approved, we will fill in these two to tie the records together
 	approved = models.DateTimeField(blank=True, null=True)
 	posrecord = models.ForeignKey(CorpPOS, blank=True, null=True, related_name='application')
-	
+
 	class Meta:
 		permissions = (('can_close_pos_app', 'Can dispose of corp POS applications.'),)
-	
+
 	def __unicode__(self):
 		return 'Applicant: %s  Tower: %s' % (self.applicant.name, self.towertype.name)
 
