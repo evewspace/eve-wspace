@@ -1,31 +1,52 @@
 from django.db import models
 from evewspace.core.models import SystemData, Type, StarbaseResource, StarbaseResourcePurpose, Location
 from django.contrib.auth.models import User
-# Create your models here.
+
+class Alliance(models.Model):
+	"""Represents an alliance, data pulled from api"""
+	id = models.BigIntegerField(primary_key=True)
+	name = models.CharField(max_length=100)
+	shortname = models.CharField(max_length=100)
+	executor = models.ForeignKey('Corporation', related_name='+')
+
+	def __unicode__(self):
+		return self.name
+
+class Corporation(models.Model):
+	"""Represents a corporation, data pulled from api"""
+	id = models.BigIntegerField(primary_key=True)
+	name = models.CharField(max_length=100)
+	ticker = models.CharField(max_length=100)
+	alliance = models.ForeignKey(Alliance, null=True, blank=True, related_name='member_corps')
+	member_count = models.IntegerField()
+
+	def __unicode__(self):
+		return self.name
 
 class POS(models.Model):
 	"""Represents a POS somewhere in space."""
 	#This location should always reference a moon from mapDenormalize
-	location = models.ForeignKey(Location, related_name="pos", primary_key=True)
+	location = models.OneToOneKey(Location, related_name="pos", primary_key=True)
 	towertype = models.ForeignKey(Type, related_name="inspace")
-	#Store this data (hopefully auto-populated from API by view) because it is expensive to get and we might not always be able to auto-resolve
-	corpname = models.CharField(max_length=100)
-	corpticker = models.CharField(max_length=10)
-	alliancename = models.CharField(max_length=100)
-	allianceticker = models.CharField(max_length=10)
-	corpid = models.BigIntegerField(null=True, blank=True)
-	#If posname is null, views should return towertype.name
-	posname = models.CharField(max_length=100, null=True, blank=True)
+	corporation = models.ForeignKey(Cororation, related_name="poses")
+	posname = models.CharField(max_length=100, blank=True)
 	fitting = models.TextField()
 	#Using CCP's status codes here for sanity with API checks
 	status = models.IntegerField(choices = ((0, 'Unanchored'), (1, 'Anchored'), (2, 'Onlining'), (3, 'Reinforced'), (4, 'Online')))
 
 	#This should be the time the tower exits RF
+	#TODO: add a validator to make sure this is only set if status = 3 (Reinforced)
 	rftime = models.DateTimeField(null=True, blank=True)
 	updated = models.DateTimeField()
 
 	def __unicode__(self):
 		return self.location.name
+
+	#overide save to implement posname defaulting to towertype.name
+	def save(self, *args, **kwargs):
+		if not self.posname:
+			self.posname = self.towertype.name
+		super(POS, self).save(*args, **kwargs)
 
 class CorpPOS(POS):
 	"""A corp-controlled POS with manager and password data."""
@@ -52,7 +73,7 @@ class POSApplication(models.Model):
 	def __unicode__(self):
 		return 'Applicant: %s  Tower: %s' % (self.applicant.name, self.towertype.name)
 
-class POSVotes(models.Model):
+class POSVote(models.Model):
 	"""Represents a vote on a personal POS application."""
 	application = models.ForeignKey(POSApplication, related_name='votes')
 	voter = models.ForeignKey(User, related_name='posvotes')
