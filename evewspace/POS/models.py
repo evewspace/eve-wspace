@@ -90,7 +90,7 @@ class POSApplication(models.Model):
 		permissions = (('can_close_pos_app', 'Can dispose of corp POS applications.'),)
 
 	def __unicode__(self):
-		return 'Applicant: %s  Tower: %s' % (self.applicant.name, self.towertype.name)
+		return 'Applicant: %s  Tower: %s' % (self.applicant.username, self.towertype.name)
 
 class POSVote(models.Model):
 	"""Represents a vote on a personal POS application."""
