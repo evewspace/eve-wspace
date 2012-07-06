@@ -56,5 +56,11 @@ class AppResponse(models.Model):
 	question = models.ForeignKey(AppQuestion, related_name='responses')
 	response = models.TextField(blank=True, null=True)
 
+class StandigsRequirement(models.Model):
+	"""Represents a standing to be checked against applications."""
+	entity = models.CharField(max_length=100)
+	#If standing is null and we have a requirement record, we can interpret this as requiring no standing
+	standing = models.FloatField(blank=True, null=True)
+	entitytype = models.IntegerField(choices=((0,'Corporation'), (1,'Faction')))
 
 
