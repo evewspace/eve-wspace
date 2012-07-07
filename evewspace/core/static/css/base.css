@@ -1,3 +1,4 @@
+/* Base Div Settings */
 .header
 {
 	padding: 20px;
@@ -25,4 +26,78 @@
 	text-align: center;
 	padding: 20px;
 	height: 1%;
+}
+
+/*Navigation Bar*/
+
+#nav {
+	margin: 0;
+	padding: 7px 6px 0;
+	height: 1em;
+	line-height:100%;
+	float: left;
+	position: relative;
+	left:30%;
+	text-align: center; 
+}
+#nav li {
+	margin: 0 auto;
+	list-style: none;
+	float: left;
+	background-color: none; }
+
+#nav li a {
+	display: block;
+	padding: 15px 30px;
+	background-color: #8b8b8b;
+	color: #e7e5e5;
+	text-decoration: none; 
+	-webkit-border-radius: 1.6em;
+	-moz-border-radius: 1.6em;
+	text-shadow: 0 1px 1px rgba(0,0,0,.3);
+}
+
+#nav li ul {
+	display: none; 
+	width: 10em; /* Width to help Opera out */
+	background-color: none;
+	-webkit-border-radius: 1.6em;
+	-moz-border-radius: 1.6em:}
+
+#nav li:hover ul {
+	display: block;
+	position: absolute;
+	margin: 0;
+	padding: 0; 
+	color: #444;
+	border-top: solid 1px #f8f8f8;
+	-webkit-box-shadow: 0 1px 1px rgba(0,0,0,.2);
+	-moz-box-shadow: 0 1px 1px rgba(0,0,0,.2);
+	text-shadow: 0 1px 0 rgba(255,255,255,.8);}
+
+#nav li:hover li {
+	float: none; }
+
+#nav li:hover li a {
+	background-color: #e7e5e5;
+	border-top: solid 1px #f8f8f8;
+	color: #000; }
+
+#nav li li a:hover {
+	background-color: #f8f8f8; }
+
+#nav li ul:first-child > a {
+	-webkit-border-top-left-radius: 9px;
+	-moz-border-radius-topleft: 9px;
+	-webkit-border-top-right-radius: 9px;
+	-moz-border-radius-topright: 9px;
+}
+#nav li ul:first-child > ul {
+	border-top: none;
+}
+#nav li ul:last-child > a {
+	-webkit-border-bottom-left-radius: 9px;
+	-moz-border-radius-bottomleft: 9px;
+	-webkit-border-bottom-right-radius: 9px;
+	-moz-border-radius-bottomright: 9px;
 }
