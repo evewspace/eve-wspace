@@ -1,0 +1,28 @@
+.header
+{
+	padding: 20px;
+}
+
+.navdiv
+{
+	float:left;
+	width: 100%;
+}
+
+.contenthead
+{
+	padding: 10px;
+}
+
+.content
+{
+	clear: left;
+	padding: 20px;
+}
+
+.footer
+{
+	text-align: center;
+	padding: 20px;
+	height: 1%;
+}
