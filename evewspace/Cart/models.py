@@ -14,7 +14,7 @@ class ShoppingCart(models.Model):
 		permissions = (("can_cart", "Use the cart system."),)
 
 	def __unicode__(self):
-		return u"User: %s  Items: %s  Cost: %s ISK" % (self.user.name, self.itemcount, self.totalcost)
+		return u"User: %s  Items: %s  Cost: %s ISK" % (self.user.username, self.itemcount, self.totalcost)
 
 class CartItem(models.Model):
 	cart = models.ForeignKey(ShoppingCart, related_name="items")
@@ -41,7 +41,7 @@ class Request(models.Model):
 		permissions = (("can_view_requests", "View others' requests."),)
 
 	def __unicode__(self):
-		return u"User: %s Corp: %s" % (self.originuser.name, self.corprequest)
+		return u"User: %s Corp: %s" % (self.originuser.username, self.corprequest)
 
 class RequestItem(models.Model):
 	request = models.ForeignKey(Request, related_name="items")

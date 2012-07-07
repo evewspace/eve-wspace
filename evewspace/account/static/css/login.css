@@ -1,0 +1,46 @@
+/* Hide the base divs we aren't using. */
+#baseHeadDiv
+{
+	visibility: hidden;
+	padding: 0px;
+}
+
+#baseNavDiv
+{
+	visibility: hidden;
+	padding: 0px;
+}
+
+#baseContentHeadDiv
+{
+	text-align: center;
+}
+
+.logInBox
+{
+	color: #C8C8C8;
+	background-image: url('../images/logInPnl.png');
+	background-repeat: repeat;
+	margin-left: auto;
+	margin-right: auto;
+	border-radius:20px;
+	-webkit-border-radius: 20px;
+	max-width: 300px;
+	border: thin solid #CDCDCD;
+	padding: 10px 0px 10px 20px;
+	text-align: center;
+}
+
+body
+{
+	background-position: center top;
+	background-image: url('../images/loginbgr.jpg');
+	background-repeat: no-repeat;
+	background-color: #000000;
+
+	min-width: 1000px;
+	color: #C8C8C8;
+
+	padding:0;
+	margin:0;
+}

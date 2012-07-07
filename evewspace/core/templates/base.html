@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+
+	<head>
+		<title>{% block title %} Eve W-Space {% endblock %}</title>
+		<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
+		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css" />
+		{% block scripts %}{%endblock%}
+		{% block head %}{%endblock%}
+	</head>
+
+	<body>
+	<!-- Header block is rendered before the nav bar. Contentheader is rendered after -->
+		<!-- Divs have both class and id so that base CSS can use classes and child templates can override this with id selectors -->
+		<div id="baseHeadDiv" class="header">
+			{%block header%}{%endblock%}
+		</div>
+
+		<div id="baseNavdiv" class="navdiv">
+			<ul id="nav">
+				{%block navigation %}{%endblock%}
+			</ul>
+		</div>
+
+		<div id="baseContentHeadDiv" class="contenthead">
+			{%block contentheader %}{%endblock%}
+		</div>
+	
+		<div id="baseContentDiv" class="content">
+			{%block content %}{%endblock%}
+		</div>
+
+		<div id="baseFooterDiv" class="footer">
+			{%block footer %}{%endblock%}
+		</div>
+
+	</body>
+
+</html>
