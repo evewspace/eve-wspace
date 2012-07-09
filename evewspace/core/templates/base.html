@@ -9,14 +9,14 @@
 		{% block head %}{%endblock%}
 	</head>
 
-	<body>
+	<body onload="CCPEVE.requestTrust('{{SITE_URL}}')">
 	<!-- Header block is rendered before the nav bar. Contentheader is rendered after -->
 		<!-- Divs have both class and id so that base CSS can use classes and child templates can override this with id selectors -->
 		<div id="baseHeadDiv" class="header">
 			{%block header%}{%endblock%}
 		</div>
 
-		<div id="baseNavdiv" class="navdiv">
+		<div id="baseNavDiv" class="navdiv">
 			<ul id="nav">
 				{% include "map_nav.html" %}
 				{% include "sitetracker_nav.html" %}

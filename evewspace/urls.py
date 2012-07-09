@@ -13,6 +13,7 @@ urlpatterns = patterns('',
 
 	# Uncomment the admin/doc line below to enable admin documentation:
 	# url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+	url(r'^$', 'evewspace.core.views.home_view', name='index'),
 	url(r'^account/', include('evewspace.account.urls')),
 	# Uncomment the next line to enable the admin:
 	 url(r'^sekrit/', include(admin.site.urls)),

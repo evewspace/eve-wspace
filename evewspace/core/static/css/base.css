@@ -8,6 +8,7 @@
 {
 	float:left;
 	width: 100%;
+	padding: 0px 0px 10px 0px;
 }
 
 .contenthead
@@ -35,9 +36,9 @@
 	padding: 7px 6px 0;
 	height: 1em;
 	line-height:100%;
-	float: left;
-	position: relative;
-	left:30%;
+	
+	
+	
 	text-align: center; 
 }
 #nav li {

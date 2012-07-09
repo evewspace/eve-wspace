@@ -132,6 +132,8 @@ INSTALLED_APPS = (
 )
 
 AUTH_PROFILE_MODULE = 'account.UserProfile'
+import django.conf.global_settings as DEFAULT_SETTINGS
+TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + ('core.context_processors.site',)
 
 # ejabberd auth gateway log settings
 
