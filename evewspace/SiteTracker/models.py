@@ -15,7 +15,7 @@ class Fleet(models.Model):
 		permissions = (("can_sitetracker", "Use the Site Tracker system."),)
 
 	def __unicode__(self):
-		return u"Map: %s Boss: %s  Started: %s  Ended: %s" %(self.map.name, self.boss.name, self.started, self.ended)
+		return u"Map: %s Boss: %s  Started: %s  Ended: %s" %(self.map.name, self.boss.username, self.started, self.ended)
 
 class SiteType(models.Model):
 	"""Represents a type of site that can be credited."""

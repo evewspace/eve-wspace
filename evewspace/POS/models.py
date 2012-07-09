@@ -29,8 +29,8 @@ class POS(models.Model):
 	location = models.OneToOneField(Location, related_name="pos", primary_key=True)
 	towertype = models.ForeignKey(Type, related_name="inspace")
 	corporation = models.ForeignKey(Corporation, related_name="poses")
-	posname = models.CharField(max_length=100, blank=True)
-	fitting = models.TextField()
+	posname = models.CharField(max_length=100, blank=True, null=True)
+	fitting = models.TextField(blank=True, null=True)
 	#Using CCP's status codes here for sanity with API checks
 	status = models.IntegerField(choices = ((0, 'Unanchored'), (1, 'Anchored'), (2, 'Onlining'), (3, 'Reinforced'), (4, 'Online')))
 
@@ -38,6 +38,25 @@ class POS(models.Model):
 	#TODO: add a validator to make sure this is only set if status = 3 (Reinforced)
 	rftime = models.DateTimeField(null=True, blank=True)
 	updated = models.DateTimeField()
+
+	def clean(self):
+		from django.core.exceptions import ValidationError
+		if not self.location:
+			raise ValidationError('Location is required.')
+		if not self.towertype:
+			raise ValidationError('Tower Type is required.')
+		if not self.corporation:
+			raise ValidationError('Corporation is required.')
+		if not self.posname:
+			self.posname = self.towertype.name
+		if not self.status:
+			raise ValidationError('Status is required.')
+		if rftime and status != 3:
+			rftime = None
+		if not updated:
+			import datetime
+			updated = datetime.datetime.utcnow()
+
 
 	def __unicode__(self):
 		return self.location.name
@@ -71,7 +90,7 @@ class POSApplication(models.Model):
 		permissions = (('can_close_pos_app', 'Can dispose of corp POS applications.'),)
 
 	def __unicode__(self):
-		return 'Applicant: %s  Tower: %s' % (self.applicant.name, self.towertype.name)
+		return 'Applicant: %s  Tower: %s' % (self.applicant.username, self.towertype.name)
 
 class POSVote(models.Model):
 	"""Represents a vote on a personal POS application."""
