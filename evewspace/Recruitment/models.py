@@ -16,6 +16,7 @@ class Application(models.Model):
 	timestamp = models.DateTimeField()
 	interests = models.ManyToManyField(Interest)
 	killboard = models.CharField(max_length=100)
+	#closetime = None indicates that the application is still open
 	closetime = models.DateTimeField(blank=True, null=True)
 	disposition = models.IntegerField(choices=((0,'Duplicate'), (1,'Accepted'), (2,'Rejected'), (3, 'Deferred')))
 	intelclear = models.DateTimeField()
