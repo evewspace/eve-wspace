@@ -22,6 +22,9 @@ class Application(models.Model):
 	intelclear = models.DateTimeField()
 	standingsclear = models.BooleanField()
 
+	class Meta:
+		permissions = (('can_recruit', 'Can view applications'),)
+
 	def __unicode__(self):
 		return 'Applicant: %s Status: %s' % (self.applicant.name, self.disposition)
 

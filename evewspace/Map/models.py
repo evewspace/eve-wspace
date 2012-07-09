@@ -44,7 +44,7 @@ class Map(models.Model):
 	explicitperms = models.BooleanField()
 
 	class Meta:
-		permissions = (("map_restricted", "Require excplicit access to maps."),)
+		permissions = (("map_unrestricted", "Do not require excplicit access to maps."),)
 
 	def __unicode__(self):
 		"""Returns name of Map as unicode representation."""
