@@ -27,7 +27,10 @@ class Corporation(models.Model):
 class POS(models.Model):
 	"""Represents a POS somewhere in space."""
 	#This location should always reference a moon from mapDenormalize
-	location = models.OneToOneField(Location, related_name="pos", primary_key=True)
+	#location = models.OneToOneField(Location, related_name="pos", primary_key=True)
+	system = models.ForeignKey(System, related_name="poses")
+	planet = models.IntegerField()
+	moon   = models.IntegerField()
 	towertype = models.ForeignKey(Type, related_name="inspace")
 	corporation = models.ForeignKey(Corporation, related_name="poses")
 	posname = models.CharField(max_length=100, blank=True, null=True)
