@@ -1,0 +1,9 @@
+{% if perms.Jabber.can_jabber %}
+<li><a href="#">Jabber</a><ul>
+	<li> <a href="#">Send Ping</a></li>
+	<li> <a href="#">My Groups</a></li>
+	{% if perms.Jabber.jabber_admin %}
+	<li><a href="#">Jabber Admin</a></li>
+	{% endif %}
+	</ul></li>
+{% endif %}

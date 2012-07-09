@@ -1,0 +1,11 @@
+{% if perms.API.key_required %}
+<li><a href="#">API</a><ul>
+	<li><a href="#">My API Keys</a></li>
+	{% if perms.API.audit_keys %}
+		<li><a href="#">Audit API Keys</a></li>
+	{% endif %}
+	{% if perms.API.view_full_data or perms.API.view_limited_data %}
+		<li><a href="#">API Data Viewer</a></li>
+	{% endif %}
+	</ul></li>
+{% endif %}
