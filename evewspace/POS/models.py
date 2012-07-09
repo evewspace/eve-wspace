@@ -1,5 +1,6 @@
 from django.db import models
 from evewspace.core.models import Type, Location
+from Map.models import System
 from django.contrib.auth.models import User
 
 class Alliance(models.Model):
@@ -43,7 +44,7 @@ class POS(models.Model):
 		from django.core.exceptions import ValidationError
 		#XXX: commenting this out for now as it's in save() (and clean is
 		#really there to catch errors in what has been input, not to handle
-		#defaulting things) this should really only be in only one of save or clean
+		#defaulting things) this should really be in only one of save or clean
 		#if not self.posname:
 		#	self.posname = self.towertype.name
 		if rftime and status != 3:
