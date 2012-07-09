@@ -1,0 +1,19 @@
+<li id="pos{{pos.pk}}" class="poslistitem">
+	<div class="poslist_header" style="position:relative">
+		<span class="planetlabel">Planet </span>
+		<span class="planetno">{{pos.planet}}</span>
+		<span class="moonlabel">Moon </span>
+		<span class="moonno">{{pos.moon}}</span>
+		<span class="possize">{{pos.size[0]}}</span>
+		<span class="buttons"><!--button images go here --></span>
+	</div>
+	<div class="poslist_main">
+		<span class="poslist_icon"><!-- add image here --></span>
+		<div class"poslist_info">
+			<a href="http://eve-kill.net/?a=corp_detail&crp_id={{pos.corporation.id}}" class="killboard_link">{{pos.corporation.name}}</a>
+			<span class="poslist_ticker">[{pos.corporation.ticker}}]</span><br />
+			<span class="poslist_posname">{{pos.posname}}</span>
+		</div>
+	</div>
+</li>
+

@@ -1,5 +1,6 @@
 from django.db import models
 from evewspace.core.models import Type, Location
+from Map.models import System
 from django.contrib.auth.models import User
 
 class Alliance(models.Model):
@@ -26,7 +27,10 @@ class Corporation(models.Model):
 class POS(models.Model):
 	"""Represents a POS somewhere in space."""
 	#This location should always reference a moon from mapDenormalize
-	location = models.OneToOneField(Location, related_name="pos", primary_key=True)
+	#location = models.OneToOneField(Location, related_name="pos", primary_key=True)
+	system = models.ForeignKey(System, related_name="poses")
+	planet = models.IntegerField()
+	moon   = models.IntegerField()
 	towertype = models.ForeignKey(Type, related_name="inspace")
 	corporation = models.ForeignKey(Corporation, related_name="poses")
 	posname = models.CharField(max_length=100, blank=True, null=True)
@@ -41,18 +45,13 @@ class POS(models.Model):
 
 	def clean(self):
 		from django.core.exceptions import ValidationError
-		if not self.location:
-			raise ValidationError('Location is required.')
-		if not self.towertype:
-			raise ValidationError('Tower Type is required.')
-		if not self.corporation:
-			raise ValidationError('Corporation is required.')
-		if not self.posname:
-			self.posname = self.towertype.name
-		if not self.status:
-			raise ValidationError('Status is required.')
+		#XXX: commenting this out for now as it's in save() (and clean is
+		#really there to catch errors in what has been input, not to handle
+		#defaulting things) this should really be in only one of save or clean
+		#if not self.posname:
+		#	self.posname = self.towertype.name
 		if rftime and status != 3:
-			rftime = None
+			raise ValidationError("A POS cannot have an rftime unless it is reinforced")
 		if not updated:
 			import datetime
 			updated = datetime.datetime.utcnow()
