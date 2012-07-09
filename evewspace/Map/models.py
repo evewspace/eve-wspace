@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import User, Group
 from evewspace.core.models import SystemData
 
 # Create your models here.
@@ -119,4 +119,12 @@ class MapPermission(models.Model):
 	view = models.BooleanField()
 	change = models.BooleanField()
 
+class MapLog(models.Model):
+	"""Represents an action that has taken place on a map (e.g. adding a signature). This is used for pushing updates since last page load to clients."""
+	map = models.ForeignKey(Map, related_name="logentries")
+	user = models.ForeignKey(User, related_name="maplogs")
+	timestamp = models.DateTimeField(auto_now_add=True)
+	action = models.CharField(max_length=255)
 
+	def __unicode__(self):
+		return "Map: %s  User: %s  Action: %s  Time: %s" % (self.map.name, self.user.username, self.action, self.timestamp)
