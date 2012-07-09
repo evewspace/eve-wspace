@@ -119,3 +119,9 @@ class Location(models.Model):
 	class Meta:
 		db_table='mapDenormalize'
 
+class LocationWormholeClass(models.Model):
+	"""Core model for SDD mapLocationWormholeClasses used to generate system tables."""
+	location = models.ForeignKey(Location, primary_key=True, related_name="whclass", db_column='locationID')
+	sysclass = models.IntegerField(null=True, blank=True, db_column='wormholeClassID')
+	class Meta:
+		db_table='mapLocationWormholeClasses'
