@@ -3,24 +3,36 @@
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css" />
 {% endblock %}
+{% block scripts %}
+<script src="{{STATIC_URL}}js/jquery.collapse.js"></script>
+<script src="{{STATIC_URL}}js/jquery.cookie.js"></script>
+<script>
+	$(function() {
+	    $(".homecollapse").collapse();
+	    });
+</script>
+{% endblock %}
 {% block header %}
-<img src="{{STATIC_URL}}images/webtitle.png">
+<img src="{{STATIC_URL}}images/webtitle.png" />
 {% endblock %}
 {% block contentheader %} <h2> Welcome, {{user.username}}!</h2> {% endblock %}
 {% block content%} 
-<div class="homegridleft">
-<br />
-{% load posstatus %}
-<h3>My POSes:</h3><br/>
-{% myposstatus user %}
-<h3>Corp POSes:</h3><br />
-{% corpposstatus user %}
-<br />
-<h2>Claims Status</h2>
+<div class="homegridleft homecollapse">
+	{% load posstatus %}
+	<h3 class="active">My POSes:</h3>
+	<div>
+		{% myposstatus user %}
+	</div>
+	<h3>Corp POSes:</h3>
+	<div>
+		{% corpposstatus user %}
+	</div>
+
+	<h2>Claims Status</h2>
 </div>
-<div class="homegridright">
-<h2>Upcoming Events</h2>
-<br />
-<h2>Cart Status</h2>
+<div class="homegridright homecollapse">
+	<h2>Upcoming Events</h2>
+	<br />
+	<h2>Cart Status</h2>
 </div>
 {%endblock%}
