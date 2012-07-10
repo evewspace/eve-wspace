@@ -9,13 +9,14 @@ register = template.Library()
 @register.inclusion_tag("apicalendar.html")
 def upcomingevents(user):
 	#Get api character that corresponds with user's name, otherwise default to first
+	subject=None
 	for key in user.apikeys.all():
 		for char in key.characters.all():
 			if char.name.lower() == user.username.lower():
 				subject = char
-	if not char:
+	if not subject:
 		try:
-			char = user.apikeys.all()[0].characters.all()[0]
+			subject = user.apikeys.all()[0].characters.all()[0]
 		except:
 			return {'error':'No API Key was found.'}
 	
@@ -23,7 +24,7 @@ def upcomingevents(user):
 	api = eveapi.EVEAPIConnection(cacheHandler=handler)
 	auth = api.auth(keyID=char.apikey.keyid, vCode=char.apikey.vcode)
 	try:
-		result = auth.char.UpcomingCalendarEvents(characterID=char.charid)
+		result = auth.char.UpcomingCalendarEvents(characterID=subject.charid)
 		return {'events':result.upcomingEvents}
 	except eveapi.Error:
 		return {'error':'Your API Key does not allow calendar access.'}
