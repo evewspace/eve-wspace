@@ -1,9 +1,10 @@
 from django import template
 from lib.eveapi import eveapi
 from API import utils as handler
+from API.utils import timestamp_to_datetime
 from API.models import *
 from django.contrib.auth.models import User
-
+import datetime
 register = template.Library()
 
 @register.inclusion_tag("apicalendar.html")
@@ -25,6 +26,7 @@ def upcomingevents(user):
 	auth = api.auth(keyID=char.apikey.keyid, vCode=char.apikey.vcode)
 	try:
 		result = auth.char.UpcomingCalendarEvents(characterID=subject.charid)
+		result.upcomingEvents.SortBy('eventDate')
 		return {'events':result.upcomingEvents}
 	except eveapi.Error:
 		return {'error':'Your API Key does not allow calendar access.'}
@@ -32,4 +34,7 @@ def upcomingevents(user):
 @register.inclusion_tag("apicalendar_detail.html")
 def eventdetail(event):
 	return {'event':event}
-	
+
+@register.simple_tag()
+def timestamp(timestamp):
+	return timestamp_to_datetime(timestamp).strftime("%Y-%m-%d %H:%M:%S")
