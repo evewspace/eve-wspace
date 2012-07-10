@@ -31,8 +31,10 @@
 	<h2>Claims Status</h2>
 </div>
 <div class="homegridright homecollapse">
-	<h2>Upcoming Events</h2>
-	<br />
+	{% load apicalendar %}
+	<h3>Calendar:</h3>
+	<div>
+		{% upcomingevents user %}
 	<h2>Cart Status</h2>
 </div>
 {%endblock%}

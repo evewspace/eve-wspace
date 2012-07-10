@@ -1,0 +1,13 @@
+<ul>
+	{% if not error %}
+		{% load apicalendar %}
+		{% for e in events %}
+			{% eventdetail e %}
+		{% empty %}
+			<li>No events were found.</li>
+		{% endfor %}
+	{% else %}
+		<li>{{error}}</li>
+	{% endif %}
+			
+</ul>
