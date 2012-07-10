@@ -71,9 +71,13 @@ class CorpPOS(POS):
 	manager = models.ForeignKey(User, null=True, blank=True, related_name='poses')
 	password = models.CharField(max_length=100)
 	description = models.TextField(null=True, blank=True)
+	#Let's store the CCP Item ID for the tower here to make API lookup easier
+	#If it is null, then we are not tracking this POS via API
+	apiitemid = models.BigIntegerField(null=True, blank=True)
 
 	class Meta:
-		permissions = (('can_see_pos_pw', 'Can see corp POS passwords.'),)
+		permissions = (('can_see_pos_pw', 'Can see corp POS passwords.'),
+		('can_see_all_pos', 'Sees all corp POSes regardless of manager.'),)
 
 class POSApplication(models.Model):
 	"""Represents an application for a personal POS."""
