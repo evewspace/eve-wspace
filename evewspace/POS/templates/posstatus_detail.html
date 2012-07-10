@@ -1,0 +1,25 @@
+<li id="pos{{pos.pos.pk}}" class="posstatusitem">
+	<div class="posstatus_header" style="position:relative">
+		<span class="posstatus_systemlabel"></span>
+		<span class="posstatus_system">{{pos.pos.system}} </span>
+		<span class="posstatus_planetlabel"></span>
+		<span class="posstatus_planetno">{{pos.pos.planet}}</span>
+		<span class="posstatus_moonlabel"> - Moon </span>
+		<span class="posstatus_moonno">{{pos.pos.moon}}</span>
+		<span class="posstatus_postype">{{pos.pos.towertype.name}}</span>
+	</div>
+	<div class="posstatus_main">
+		<div class="posstatus_info">
+		{% load coretags %}
+			{% if pos.status.generalSettings.allowAllianceMembers = 1 %}
+				<span class="posstatus_permission">Alliance Allowed</span><br />
+			{% endif %}
+			{% if pos.status.generalSettings.allowCorporationMembers = 1 %}
+				<span class="posstatus_permission">Corporation Allowed</span><br />
+			{% endif %}
+			{% for f in pos.status.fuel %}
+				<span class="posstatus_fuel">{% typename f.typeID %} : {{f.quantity}}</span><br />
+			{% endfor %}
+		</div>
+	</div>
+</li>

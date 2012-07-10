@@ -1,0 +1,8 @@
+{% load posstatus %}
+<ul>
+{% for p in posstatus %}
+	{% posstatusdetails p %}
+{% empty %}
+	<li>You have no towers.</li>
+{% endfor %}
+</ul>
