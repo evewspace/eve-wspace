@@ -79,6 +79,7 @@ class POSApplication(models.Model):
 	"""Represents an application for a personal POS."""
 	applicant = models.ForeignKey(User, null=True, blank=True, related_name='posapps')
 	towertype = models.ForeignKey(Type, null=True, blank=True, related_name='posapps')
+	residents = models.ManyToManyField(User)
 	normalfit = models.TextField()
 	siegefit = models.TextField()
 	#Once it is approved, we will fill in these two to tie the records together
