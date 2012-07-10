@@ -130,6 +130,9 @@ INSTALLED_APPS = (
 	# Uncomment the next line to enable admin documentation:
 	# 'django.contrib.admindocs',
 )
+#Corp API Key
+API_CORP_KEY_ID=325904
+API_CORP_KEY_VCODE='bbR0lFKHULzUuh7luVJlz22VUl4T4SkZmMLeveunrMcZxPdbwZqMXMffnUXvaRHF'
 
 AUTH_PROFILE_MODULE = 'account.UserProfile'
 import django.conf.global_settings as DEFAULT_SETTINGS
