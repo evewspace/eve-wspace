@@ -9,6 +9,7 @@ class APIKey(models.Model):
 	vcode = models.CharField(max_length = 100)
 	valid = models.BooleanField()
 	lastvalidated = models.DateTimeField()
+	proxykey = models.CharField(max_length = 100, null=True, blank=True)
 
 	class Meta:
 		permissions = (("add_keys", "Add API keys for others."), 
