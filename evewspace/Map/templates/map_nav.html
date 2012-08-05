@@ -1,3 +1,6 @@
 <li><a href="#">Map</a><ul>
-	{# TODO: Implement TemplateTag to populate map list here. #}
+		{% load mapnav %}
+		{% mapnavlist user %}
+		<li><a href="#">Add Map</a></li>
+		<li><a href="#">Configure Maps</a></li>
 	</ul></li>
