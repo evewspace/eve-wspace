@@ -5,10 +5,9 @@ register = template.Library()
 
 @register.simple_tag()
 def typename(typeid):
-	try:
-		return Type.objects.get(id=typeid).name
-	except Type.DoesNotExist:
-		return ''
-	except Type.MultipleObjectsReturned:
-		return ''
-	
+    try:
+        return Type.objects.get(id=typeid).name
+    except Type.DoesNotExist:
+        return ''
+    except Type.MultipleObjectsReturned:
+        return ''

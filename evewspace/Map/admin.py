@@ -1,8 +1,8 @@
-from evewspace.Map.models import *
+from Map.models import *
 from django.contrib import admin
 
 class SystemAdmin(admin.ModelAdmin):
-	fields = ['occupied', 'info']
+    fields = ['occupied', 'info']
 
 admin.site.register(System, SystemAdmin)
 admin.site.register(Map)

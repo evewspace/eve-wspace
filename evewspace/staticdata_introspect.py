@@ -878,4 +878,3 @@ class Warcombatzones(models.Model):
     description = models.CharField(max_length=1500, blank=True)
     class Meta:
         db_table = u'warCombatZones'
-

@@ -1,4 +1,4 @@
-##   protocol.py 
+##   protocol.py
 ##
 ##   Copyright (C) 2003-2005 Alexey "Snake" Nezhdanov
 ##
@@ -15,7 +15,7 @@
 # $Id: protocol.py,v 1.60 2009/04/07 11:14:28 snakeru Exp $
 
 """
-Protocol module contains tools that is needed for processing of 
+Protocol module contains tools that is needed for processing of
 xmpp-related data structures.
 """
 
@@ -180,7 +180,7 @@ remote-server-timeout -- 504 -- wait -- A remote server or service specified as 
 resource-constraint -- 500 -- wait -- The server or recipient lacks the system resources necessary to service the request.
 service-unavailable -- 503 -- cancel -- The server or recipient does not currently provide the requested service.
 subscription-required -- 407 -- auth -- The requesting entity is not authorized to access the requested service because a subscription is required.
-undefined-condition -- 500 --  -- 
+undefined-condition -- 500 --  --
 unexpected-request -- 400 -- wait -- The recipient or server understood the request but was not expecting it at this time (e.g., the request was out of order)."""
 sasl_error_conditions="""
 aborted --  --  -- The receiving entity acknowledges an <abort/> element sent by the initiating entity; sent in reply to the <abort/> element.
@@ -507,7 +507,7 @@ class Presence(Protocol):
         """Returns the status code of the presence (for groupchat)"""
         return self._muc_getItemAttr('status','code')
 
-class Iq(Protocol): 
+class Iq(Protocol):
     """ XMPP Iq object - get/set dialog mechanism. """
     def __init__(self, typ=None, queryNS=None, attrs={}, to=None, frm=None, payload=[], xmlns=NS_CLIENT, node=None):
         """ Create Iq object. You can specify type, query namespace
@@ -586,7 +586,7 @@ class Error(Protocol):
 
 class DataField(Node):
     """ This class is used in the DataForm class to describe the single data item.
-        If you are working with jabber:x:data (XEP-0004, XEP-0068, XEP-0122) 
+        If you are working with jabber:x:data (XEP-0004, XEP-0068, XEP-0122)
         then you will need to work with instances of this class. """
     def __init__(self,name=None,value=None,typ=None,required=0,label=None,desc=None,options=[],node=None):
         """ Create new data field of specified name,value and type.
