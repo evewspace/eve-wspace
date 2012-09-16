@@ -1,6 +1,6 @@
 <li><a href="#">Map</a><ul>
 		{% load mapnav %}
 		{% mapnavlist user %}
-		<li><a href="#">Add Map</a></li>
+        <li><a href="{% url Map.views.create_map %}">Add Map</a></li>
 		<li><a href="#">Configure Maps</a></li>
 	</ul></li>

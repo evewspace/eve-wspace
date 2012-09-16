@@ -1,3 +1,3 @@
-{% for map in maplist %}
-<li><a href="#">{{map.name}}</a></li>
+{% for map in maps %}
+<li><a href="{% url Map.views.get_map map.pk %}">{{map.name}}</a></li>
 {% endfor %}

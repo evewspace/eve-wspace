@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from core.models import SystemData
+from django.forms import ModelForm
 
 # Create your models here.
 
@@ -49,7 +50,7 @@ class WSystem(System):
 class Map(models.Model):
     """Stores the maps available in the map tool. root relates to System model."""
     name = models.CharField(max_length = 100, unique = True)
-    root = models.ForeignKey(System, related_name="rootmaps")
+    root = models.ForeignKey(System, related_name="root")
     # Maps with explicitperms = True require an explicit permission entry to access.
     explicitperms = models.BooleanField()
 
@@ -66,8 +67,9 @@ class MapSystem(models.Model):
     map = models.ForeignKey(Map, related_name="systems")
     system = models.ForeignKey(System, related_name="maps")
     friendlyname = models.CharField(max_length = 10)
-    interesttime = models.DateTimeField()
-    parentsystem = models.ForeignKey('self', related_name="childsystems")
+    interesttime = models.DateTimeField(null=True, blank=True)
+    parentsystem = models.ForeignKey('self', related_name="childsystems", 
+            null=True, blank=True)
 
     def __unicode__(self):
         return "system %s in map %s" % (self.system.name, self.map.name)
@@ -82,8 +84,10 @@ class Wormhole(models.Model):
     map = models.ForeignKey(Map, related_name='wormholes')
     top = models.ForeignKey(MapSystem, related_name='child_wormholes')
     top_type = models.ForeignKey(WormholeType, related_name='+')
+    top_bubbled = models.NullBooleanField(null=True, blank=True)
     bottom = models.ForeignKey(MapSystem, null=True, related_name='parent_wormholes') 
     bottom_type = models.ForeignKey(WormholeType, related_name='+')
+    bottom_bubbled = models.NullBooleanField(null=True, blank=True)
     time_status = models.IntegerField(choices = ((0, "Fine"), (1, "End of Life")))
     mass_status = models.IntegerField(choices = ((0, "No Shrink"), 
         (1, "First Shrink"), (2, "Critical")))
@@ -128,8 +132,8 @@ class MapPermission(models.Model):
     """Relates a user group to it's map permissions. Non-restricted groups will have change access to all maps."""
     group = models.ForeignKey(Group, related_name="mappermissions")
     map = models.ForeignKey(Map, related_name="grouppermissions")
-    view = models.BooleanField()
-    change = models.BooleanField()
+    access = models.IntegerField(choices=((0,'No Access'),
+        (1,'View Only'), (2,'View / Change')))
 
 
 class MapLog(models.Model):
@@ -145,3 +149,8 @@ class MapLog(models.Model):
     def __unicode__(self):
         return "Map: %s  User: %s  Action: %s  Time: %s" % (self.map.name, self.user.username, 
                 self.action, self.timestamp)
+
+# Model Forms
+class MapForm(ModelForm):
+    class Meta:
+        model = Map

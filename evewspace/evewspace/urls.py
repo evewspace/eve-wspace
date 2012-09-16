@@ -15,6 +15,7 @@ urlpatterns = patterns('',
         # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
         url(r'^$', 'core.views.home_view', name='index'),
         url(r'^account/', include('account.urls')),
+        url(r'^map/', include('Map.urls')),
         # Uncomment the next line to enable the admin:
          url(r'^sekrit/', include(admin.site.urls)),
 )

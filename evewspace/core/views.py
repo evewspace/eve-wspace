@@ -14,7 +14,7 @@ def home_view(request):
 
     if profile.defaultmap:
         #Redirect to the proper map
-        return redirect(profile.defaultmap)
+        return redirect(Map.views.get_map, args=[request, profile.defaultmap.pk])
 
     #No default map is set, so let's display the home page.
 

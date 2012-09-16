@@ -3,7 +3,9 @@
 
 	<head>
 		<title>{% block title %} Eve W-Space {% endblock %}</title>
-		<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui.js"></script>
+        <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/vader/vader.css" />
 		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css" />
 		{% block scripts %}{%endblock%}
 		{% block head %}{%endblock%}

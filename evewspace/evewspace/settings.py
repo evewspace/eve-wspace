@@ -85,7 +85,10 @@ STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
-
+# Use the wadofstuff JSON serializer
+SERIALIZATION_MODULES = {
+            'json': 'wadofstuff.django.serializers.json'
+}
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '^28avlv8e$sky_08pu926q^+b5&4&5&+ob7ma%v(tn$bg#=&k4'
 
