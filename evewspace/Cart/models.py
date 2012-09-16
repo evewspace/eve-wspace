@@ -14,7 +14,9 @@ class ShoppingCart(models.Model):
         permissions = (("can_cart", "Use the cart system."),)
 
     def __unicode__(self):
-        return u"User: %s  Items: %s  Cost: %s ISK" % (self.user.username, self.itemcount, self.totalcost)
+        return u"User: %s  Items: %s  Cost: %s ISK" % (self.user.username, 
+                self.itemcount, self.totalcost)
+
 
 class CartItem(models.Model):
     cart = models.ForeignKey(ShoppingCart, related_name="items")
@@ -23,7 +25,9 @@ class CartItem(models.Model):
     unitcost = models.BigIntegerField()
 
     def __unicode__(self):
-        return u"Item: %s  Qty:  %s  Unit Cost:  %s" % (self.item.name, self.qty, self.unitcost)
+        return u"Item: %s  Qty:  %s  Unit Cost:  %s" % (self.item.name, 
+                self.qty, self.unitcost)
+
 
 class Request(models.Model):
     originuser = models.ForeignKey(User, related_name="cartrequests")
@@ -43,6 +47,7 @@ class Request(models.Model):
     def __unicode__(self):
         return u"User: %s Corp: %s" % (self.originuser.username, self.corprequest)
 
+
 class RequestItem(models.Model):
     request = models.ForeignKey(Request, related_name="items")
     item = models.ForeignKey(Type, related_name="request_entries")
@@ -50,4 +55,5 @@ class RequestItem(models.Model):
     unitcost = models.BigIntegerField()
 
     def __unicode__(self):
-        return u"Item: %s  Qty:  %s  Unit Cost:  %s" % (self.item.name, self.qty, self.unitcost)
+        return u"Item: %s  Qty:  %s  Unit Cost:  %s" % (self.item.name, self.qty,
+                self.unitcost)

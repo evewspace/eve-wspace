@@ -3,6 +3,7 @@ from core.models import Type, Location
 from Map.models import System
 from django.contrib.auth.models import User
 
+
 class Alliance(models.Model):
     """Represents an alliance, data pulled from api"""
     id = models.BigIntegerField(primary_key=True)
@@ -12,6 +13,7 @@ class Alliance(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 class Corporation(models.Model):
     """Represents a corporation, data pulled from api"""
@@ -24,10 +26,9 @@ class Corporation(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class POS(models.Model):
     """Represents a POS somewhere in space."""
-    #This location should always reference a moon from mapDenormalize
-    #location = models.OneToOneField(Location, related_name="pos", primary_key=True)
     system = models.ForeignKey(System, related_name="poses")
     planet = models.IntegerField()
     moon   = models.IntegerField()
@@ -36,7 +37,8 @@ class POS(models.Model):
     posname = models.CharField(max_length=100, blank=True, null=True)
     fitting = models.TextField(blank=True, null=True)
     #Using CCP's status codes here for sanity with API checks
-    status = models.IntegerField(choices = ((0, 'Unanchored'), (1, 'Anchored'), (2, 'Onlining'), (3, 'Reinforced'), (4, 'Online')))
+    status = models.IntegerField(choices = ((0, 'Unanchored'), (1, 'Anchored'),
+        (2, 'Onlining'), (3, 'Reinforced'), (4, 'Online')))
 
     #This should be the time the tower exits RF
     #TODO: add a validator to make sure this is only set if status = 3 (Reinforced)
@@ -45,11 +47,6 @@ class POS(models.Model):
 
     def clean(self):
         from django.core.exceptions import ValidationError
-        #XXX: commenting this out for now as it's in save() (and clean is
-        #really there to catch errors in what has been input, not to handle
-        #defaulting things) this should really be in only one of save or clean
-        #if not self.posname:
-        #       self.posname = self.towertype.name
         if rftime and status != 3:
             raise ValidationError("A POS cannot have an rftime unless it is reinforced")
         if not updated:
@@ -66,6 +63,7 @@ class POS(models.Model):
             self.posname = self.towertype.name
         super(POS, self).save(*args, **kwargs)
 
+
 class CorpPOS(POS):
     """A corp-controlled POS with manager and password data."""
     manager = models.ForeignKey(User, null=True, blank=True, related_name='poses')
@@ -78,6 +76,7 @@ class CorpPOS(POS):
     class Meta:
         permissions = (('can_see_pos_pw', 'Can see corp POS passwords.'),
         ('can_see_all_pos', 'Sees all corp POSes regardless of manager.'),)
+
 
 class POSApplication(models.Model):
     """Represents an application for a personal POS."""
@@ -95,6 +94,7 @@ class POSApplication(models.Model):
 
     def __unicode__(self):
         return 'Applicant: %s  Tower: %s' % (self.applicant.username, self.towertype.name)
+
 
 class POSVote(models.Model):
     """Represents a vote on a personal POS application."""

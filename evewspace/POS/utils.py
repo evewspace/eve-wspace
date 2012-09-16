@@ -2,12 +2,17 @@ from django.conf import settings
 from models import CorpPOS
 from lib.eveapi import eveapi
 from API import utils as handler
+
+
 def add_status_info(poses):
-    """Accepts a list of corp poses and returns a list of POSes with status information attached.
+    """Accepts a list of corp poses and returns a list of POSes with 
+    status information attached.
+
     A posstatus object has the following attributes:
     itemid: the POS item id
     pos: POS object processed
     status: Status retrieved
+
     """
     class posstatus:
         def __init__(self, pos, status):

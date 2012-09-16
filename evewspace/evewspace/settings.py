@@ -67,6 +67,10 @@ STATIC_URL = '/static/'
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
+# Change the default login behavior
+LOGIN_URL = '/account/login'
+LOGIN_REDIRECT_URL ='/'
+
 # Additional locations of static files
 STATICFILES_DIRS = (
         # Put strings here, like "/home/html/static" or "C:/www/django/static".

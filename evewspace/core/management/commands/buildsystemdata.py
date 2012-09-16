@@ -12,15 +12,19 @@ class Command(NoArgsCommand):
         for system in basedata:
             #self.stdout.write('Processing system: %s' % (system.name))
             try:
-                sysclass = LocationWormholeClass.objects.get(location = system.region.id).sysclass
+                sysclass = LocationWormholeClass.objects.get(location=system.region.id).sysclass
                 if sysclass > 6:
-                    newdata = KSystem(sov='', sysclass=sysclass, lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc), info='', occupied='')
+                    newdata = KSystem(sov='', sysclass=sysclass, 
+                            lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc), 
+                            info='', occupied='')
                     for field in system._meta.fields:
                         setattr(newdata, field.attname, getattr(system, field.attname))
                     newdata.systemdata_ptr = system
                     newdata.save()
                 else:
-                    newdata = WSystem(static1=None, static2=None, sysclass=sysclass, lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc), info='', occupied='')
+                    newdata = WSystem(static1=None, static2=None, sysclass=sysclass, 
+                            lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc), 
+                            info='', occupied='')
                     for field in system._meta.fields:
                         setattr(newdata, field.attname, getattr(system, field.attname))
                     newdata.systemdata_ptr = system
@@ -33,7 +37,7 @@ class Command(NoArgsCommand):
         for system in basedata:
             try:
                 sysclass = LocationWormholeClass.objects.get(location = system.id).sysclass
-                lowsec = KSystem.objects.get(name = system.name)
+                lowsec = KSystem.objects.get(name=system.name)
                 lowsec.sysclass = sysclass
                 lowsec.save()
             except LocationWormholeClass.DoesNotExist:

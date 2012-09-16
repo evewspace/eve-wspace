@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from POS.utils import add_status_info
 register=template.Library()
 
+
 @register.inclusion_tag('posstatus.html')
 def myposstatus(user):
     #Get list of POSes where user is the manager
@@ -11,6 +12,7 @@ def myposstatus(user):
     #Get status information and return
     posstatus = add_status_info(poses)
     return {'posstatus': posstatus}
+
 
 @register.inclusion_tag('posstatus.html')
 def corpposstatus(user):
@@ -23,6 +25,7 @@ def corpposstatus(user):
     #Add status info and return
     posstatus = add_status_info(poses)
     return {'posstatus': posstatus}
+
 
 @register.inclusion_tag('posstatus_detail.html')
 def posstatusdetails(posstatus):
