@@ -1,5 +1,7 @@
 from django.db import models
+from django import forms
 from django.contrib.auth.models import User, Group
+from django.contrib.auth.forms import UserCreationForm
 from Map.models import Map, System
 from django.db.models.signals import post_save
 import pytz
@@ -26,7 +28,7 @@ class GroupProfile(models.Model):
     """GroupProfile defines custom fields tied to each Group record."""
     group = models.ForeignKey(Group, unique=True)
     description = models.CharField(max_length=200, blank=True, null=True)
-
+    regcode = models.CharField(max_length=64, blank=True, null=True)
 
 def create_user_profile(sender, instance, created, **kwargs):
     """Handle user creation event and create a new profile to match the new user"""
@@ -37,8 +39,14 @@ post_save.connect(create_user_profile, sender=User)
 
 
 def create_group_profile(sender, instance, created, **kwargs):
-    """Handle group creation even and create a new group profile."""
+    """Handle group creation event and create a new group profile."""
     if created:
         GroupProfile.objects.create(group=instance)
 
 post_save.connect(create_group_profile, sender=Group)
+
+
+class RegistrationForm(UserCreationForm):
+    """Extends the django registration form to add fields."""
+    regcode = forms.CharField(max_length=64)
+

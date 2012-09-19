@@ -16,7 +16,7 @@ def mapnavlist(user):
                 maplist.append(map)
     else:
         #User is in a restricted group, only add maps with access > 0
-        for map in Map.objects.get_all():
+        for map in Map.objects.all():
             if check_map_permission(user, map) > 0:
                 maplist.append(map)
     return {'maps': maplist}

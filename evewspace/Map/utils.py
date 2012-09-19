@@ -25,7 +25,7 @@ def check_map_permission(user, map):
     # Case 2: User is in the map's permissions list
     # Note: We return the highest permission of all entries
     highestperm = 0
-    for group in user.groups:
+    for group in user.groups.all():
         if MapPermission.objects.filter(map=map, group=group).count() > 0:
             perm = MapPermission.objects.get(map=map, group=group).access
             if perm > highestperm:
@@ -136,7 +136,7 @@ def delete_system(mapSystem, user):
     # Remove our parent wormholes
     mapSystem.parent_wormholes.all().delete()
     # Get a child count before we kill them all
-    children = mapSystem.childsystems..count()
+    children = mapSystem.childsystems.count()
     # Remove our children
     for system in mapSystem.childsystems.all():
         delete_system(system, user)
@@ -187,7 +187,7 @@ def escalate_site(signature, user):
 
     for map in signature.system.maps.all():
         add_log(user, map, "Escalated site %s (%s) in %s." % (signature.sigid, 
-            signature.sigtype.shortname, signature.system.name)
+            signature.sigtype.shortname, signature.system.name))
     return None
 
 
@@ -214,6 +214,6 @@ def activate_site(signature, user):
 
     for map in signature.system.maps.all():
         add_log(user, map, "Activated site %s (%s) in %s." % (signature.sigid, 
-            signature.sigtype.shortname, signature.system.name)
+            signature.sigtype.shortname, signature.system.name))
 
     return None
