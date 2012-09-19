@@ -116,10 +116,16 @@ class Signature(models.Model):
     system = models.ForeignKey(System, related_name="signatures")
     sigtype = models.ForeignKey(SignatureType, related_name="sigs")
     sigid = models.CharField(max_length = 10)
-    updated= models.DateTimeField()
-    #ratscleared and lastescalated are used to track wormhole combat sites.
-    #ratscleared is the DateTime that sleepers were cleared initially
-    #lastescalated is the last time the site was escalated (if applicable)
+    # TODO: Implement server status checker to reset updated and increment
+    #       downtimes
+    updated= models.BooleanField()
+    # ratscleared and lastescalated are used to track wormhole combat sites.
+    # ratscleared is the DateTime that sleepers were cleared initially
+    # lastescalated is the last time the site was escalated (if applicable)
+    # activated is when the site was marked activated for reference
+    # downtimes should be incremented by the server status checker
+    activated = models.DateTimeField(null=True, blank=True)
+    downtimes = models.IntegerField(null=True, blank=True)
     ratscleared = models.DateTimeField(null=True, blank=True)
     lastescalated = models.DateTimeField(null=True, blank=True)
 
@@ -149,6 +155,17 @@ class MapLog(models.Model):
     def __unicode__(self):
         return "Map: %s  User: %s  Action: %s  Time: %s" % (self.map.name, self.user.username, 
                 self.action, self.timestamp)
+
+
+class Snapshot(models.Model):
+    """Represents a snapshot of the JSON strings that are used to draw a map."""
+
+    mapname = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, related_name='snapshots')
+    systemsjson = models.TextField()
+    wormholesjson = models.TextField()
+
 
 # Model Forms
 class MapForm(ModelForm):

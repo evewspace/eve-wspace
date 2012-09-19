@@ -22,6 +22,7 @@ class Command(NoArgsCommand):
                     newdata.systemdata_ptr = system
                     newdata.save()
                 else:
+                    # TODO: Populate statics by constellation
                     newdata = WSystem(static1=None, static2=None, sysclass=sysclass, 
                             lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc), 
                             info='', occupied='')

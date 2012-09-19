@@ -6,12 +6,16 @@
         <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui.js"></script>
         <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/vader/vader.css" />
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css" />
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css" />
+        <script type="text/javascript">
+            $.ready(function(){
+                CCPEVE.requestTrust('{{SITE_URL}}');
+            });
 		{% block scripts %}{%endblock%}
 		{% block head %}{%endblock%}
 	</head>
 
-	<body onload="CCPEVE.requestTrust('{{SITE_URL}}')">
+    <body>
 	<!-- Header block is rendered before the nav bar. Contentheader is rendered after -->
 		<!-- Divs have both class and id so that base CSS can use classes and child templates can override this with id selectors -->
 		<div id="baseHeadDiv" class="header">
