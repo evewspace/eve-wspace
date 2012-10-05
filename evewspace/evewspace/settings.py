@@ -101,6 +101,7 @@ MIDDLEWARE_CLASSES = (
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
+        'eveigb.middleware.IGBMiddleware',
 )
 
 ROOT_URLCONF = 'evewspace.urls'
@@ -129,7 +130,9 @@ INSTALLED_APPS = (
         'Cart',
         'API',
         'account',
-        'POS'
+        'POS',
+        'eveigb',
+        'autocomplete_light',
         # Uncomment the next line to enable admin documentation:
         # 'django.contrib.admindocs',
 )
@@ -137,10 +140,12 @@ INSTALLED_APPS = (
 API_CORP_KEY_ID=325904
 API_CORP_KEY_VCODE='bbR0lFKHULzUuh7luVJlz22VUl4T4SkZmMLeveunrMcZxPdbwZqMXMffnUXvaRHF'
 
+#Require a registration code to register
+ACCOUNT_REQUIRE_REG_CODE=True
+
 AUTH_PROFILE_MODULE = 'account.UserProfile'
 import django.conf.global_settings as DEFAULT_SETTINGS
-TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + ('core.context_processors.site',)
-
+TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + ('core.context_processors.site', 'eveigb.context_processors.igb',)
 # ejabberd auth gateway log settings
 
 import logging

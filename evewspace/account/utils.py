@@ -4,8 +4,9 @@ from account.models import *
 def get_groups_for_code(regcode):
     """Returns a list of groups for a given registration code."""
     grouplist = []
-    for group in Group.objects.all():
-        if group.profile.regcode == regcode:
+    for group in Group.objects.filter(profile__isnull=False).all():
+        profile = GroupProfile.objects.get(group=group)
+        if profile.regcode == regcode:
             grouplist.append(group)
 
     return grouplist

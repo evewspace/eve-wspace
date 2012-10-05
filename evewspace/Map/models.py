@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from core.models import SystemData
+from django import forms
 from django.forms import ModelForm
-
+import autocomplete_light as ac
 # Create your models here.
 
 class WormholeType(models.Model):
@@ -14,6 +15,19 @@ class WormholeType(models.Model):
     maxmass = models.BigIntegerField()
     jumpmass = models.BigIntegerField()
     lifetime = models.IntegerField()
+    # source is a  2-char fields that can be:
+    # 1-6 : Wormhole classes 1-6
+    # H : High Sec Only (e.g. freighter capable K > C5 in high)
+    # NH : Low or Nullsec (e.g. cap capable K > C5)
+    # K : Any K-space (e.g. X702 to a C3)
+    # N: Nullsec
+    # L: Lowsec
+    # Z: Class 5 or 6 (5/6 > K holes)
+    # X: Special ID for K162 and stargates
+    source = models.CharField(max_length = 2)
+    # Destination is an integer representation of System.sysclass
+    # Except that it may be 0 which indicates a K162 or Stargate
+    destination = models.IntegerField()
     target = models.CharField(max_length = 15)
 
     def __unicode__(self):
@@ -32,6 +46,9 @@ class System(SystemData):
     occupied = models.TextField(blank = True)
     info = models.TextField(blank = True)
     lastscanned = models.DateTimeField()
+    npckills = models.IntegerField(null=True, blank=True)
+    podkills = models.IntegerField(null=True, blank=True)
+    shipkills = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
         """Returns name of System as unicode representation"""
@@ -40,6 +57,7 @@ class System(SystemData):
 
 class KSystem(System):
     sov = models.CharField(max_length = 100)
+    jumps = models.IntegerField(blank=True, null=True)
 
 
 class WSystem(System):
@@ -171,3 +189,4 @@ class Snapshot(models.Model):
 class MapForm(ModelForm):
     class Meta:
         model = Map
+

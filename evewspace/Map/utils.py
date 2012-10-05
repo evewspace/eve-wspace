@@ -1,9 +1,11 @@
 from Map.models import *
 from core.models import SystemData
+from django.conf import settings
 import json
 import datetime
+from datetime import timedelta
 import pytz
-
+from django.contrib.sites.models import Site
 
 def add_log(user, map, action):
     """Adds a log entry into the MapLog for a map."""
@@ -55,7 +57,7 @@ def add_system_to_map(user, map, system, friendlyname, isroot, parent):
         return newMapSystem
 
 
-def add_wormhole_to_map(user, map, topSystem, topType, bottomType, bottomSystem=None,
+def add_wormhole_to_map(map, topSystem, topType, bottomType, bottomSystem=None, 
         bottomBubbled=False, timeStatus=0, massStatus=0, topBubbled=False):
     """Adds a wormhole to the map given top and bottom MapSystems and 
     wormhole information.
@@ -68,25 +70,121 @@ def add_wormhole_to_map(user, map, topSystem, topType, bottomType, bottomSystem=
     newWormhole.save()
     return newWormhole
 
-def get_systems_json(map):
+
+def get_path_to_map_system(system):
+    """Returns a list of MapSystems on the route between the map root and
+    the provided MapSystem.
+
+    """
+    systemlist = []
+    system_walker(system, systemlist)
+    return systemlist
+
+
+def system_walker(system, systemlist):
+    """Utility function that recursively walks backward on a map path. It
+    looks at a MapSystem's parent and adds the system to systemlist if it has one.
+    
+    """
+    if system.parentsystem:
+        systemlist.append(system)
+        system_walker(system.parentsystem, systemlist)
+    return
+
+
+def get_system_icon(system, user):
+    """Takes a MapSystem and returns the appropriate icon to display on the map
+    as a realative URL.
+
+    """
+    staticPrefix = "http://%s%s" % (Site.objects.get_current().domain, settings.STATIC_URL + "images/")
+    if user.get_profile().currentsystem == system.system: 
+        if user.get_profile().lastactive > datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(minutes=15):
+            return staticPrefix + "mylocation.png"
+
+    if system.stfleets.filter(ended__isnull=True).count() != 0:
+        return staticPrefix + "farm.png" 
+
+    if system.system.shipkills + system.system.podkills > 0:
+        return staticPrefix + "pvp.png" 
+
+    if system.system.npckills > 15:
+        return staticPrefix + "carebears.png"
+
+    return None
+
+def system_to_dict(user, system, levelX, levelY):
+    """Takes a MapSystem and X,Y data and returns the dict of information to be passed to 
+    the map JS as JSON.
+
+    """
+    if system.interesttime:
+        interest = True
+    else:
+        interest = False
+    if system.map.systems.filter(interesttime__isnull=False).count() != 0:
+        interestsystem = system.map.systems.get(interesttime__isnull=False)
+
+        if system in get_path_to_map_system(interestsystem):
+            path = True
+        else:
+            path = False
+    else:
+        path = False
+
+    if system.parentsystem:
+        parentWH = system.parent_wormholes.get()
+        result = {'ID': system.pk, 'Name': system.system.name, 'LevelX': levelX,
+                'LevelY': levelY, 'SysClass': system.system.sysclass, 
+                'Friendly': system.friendlyname, 'interest': interest,
+                'interestpath': path, 'ParentID': system.parentsystem.pk, 
+                'activePilots': system.system.activepilots.count(),
+                'WhToParent': parentWH.bottom_type.name,
+                'WhFromParent': parentWH.top_type.name,
+                'WhMassStatus': parentWH.mass_status,
+                'WhTimeStatus': parentWH.time_status,
+                'WhToParentBubbled': parentWH.bottom_bubbled,
+                'WhFromParentBubbled': parentWH.top_bubbled,
+                'imageURL': get_system_icon(system, user)}
+    else:
+        result = {'ID': system.pk, 'Name': system.system.name, 'LevelX': levelX,
+                'LevelY': levelY, 'SysClass': system.system.sysclass,
+                'Friendly': system.friendlyname, 'interest': interest,
+                'interestpath': path, 'ParentID': None, 
+                'activePilots': system.system.activepilots.count(),
+                'WhToParent': "", 'WhFromParent': "",
+                'WhMassStatus': None, 'WhTimeStatus': None,
+                'WhToParentBubbled': None, 'WhFromParentBubbled': None,
+                'imageURL': get_system_icon(system, user)}
+    return result
+
+
+def get_systems_json(map, user):
     """Returns a JSON string representing the systems in a map."""
     syslist = []
-    for sys in map.systems.all():
-        if sys.parentsystem:
-            dict = {'name': sys.system.name, 'sysclass': sys.system.sysclass,
-                    'friendly': sys.friendlyname, 'interest': sys.interesttime, 
-                    'parent': sys.parentsystem.pk, 'id': sys.pk, 
-                    'occupied': sys.system.occupied, 'info': sys.system.info, 
-                    'security': sys.system.security}
-            syslist.append(dict)
-        else:
-            dict = {'name': sys.system.name, 'sysclass': sys.system.sysclass,
-                    'friendly': sys.friendlyname, 'interest': sys.interesttime,
-                    'parent': None, 'id': sys.pk,
-                    'occupied': sys.system.occupied, 'info': sys.system.info,
-                    'security': sys.system.security}
-            syslist.append(dict)
-    return json.dumps(syslist, sort_keys=True, indent=4)
+    root = map.systems.get(parentsystem__isnull=True)
+    levelY = 0
+    levelX = 0
+    syslist.append(system_to_dict(user, root, levelX, levelY))
+    recursive_system_data_generator(user, root.childsystems.all(), levelY, levelX +1, syslist)
+    return json.dumps(syslist, sort_keys=True)
+
+
+def recursive_system_data_generator(user, mapSystems, levelY, levelX, syslist):
+    """Prepares a list of MapSystem objects for conversion to JSON for map JS.
+    Takes a queryset of MapSystems, a levelY integer that is manipulated,
+    a levelX integer, and the current list of systems prepared for JSON.
+
+    """
+    # We will need an index later, so let's enumerate the mapSystems
+    enumSystems = enumerate(mapSystems, start=0)
+    for item in enumSystems:
+        i = item[0]
+        system = item[1]
+        if i > 0:
+            levelY += 1
+        syslist.append(system_to_dict(user, system, levelX, levelY))
+        recursive_system_data_generator(user, system.childsystems.all(), levelY, levelX + 1, syslist)
 
 
 def get_wormholes_json(map):
@@ -121,7 +219,7 @@ def get_wormholes_json(map):
                     'topMaxMass': wh.top_type.maxmass,
                     'topTarget': wh.top_type.target}
             whlist.append(dict)
-    return json.dumps(whlist, sort_keys=True, indent=4)
+    return json.dumps(whlist, sort_keys=True)
 
 
 def delete_system(mapSystem, user):
@@ -141,8 +239,10 @@ def delete_system(mapSystem, user):
     for system in mapSystem.childsystems.all():
         delete_system(system, user)
     # Logs for the logs god
+    delSystemname = mapSystem.system.name
+    mapSystem.delete()
     add_log(user, mapSystem.map, "Removed %s from the map and %s child systems."
-            % (mapSystem.system.name, children))
+            % (delSystemname, children))
     return None
 
 
@@ -217,3 +317,93 @@ def activate_site(signature, user):
             signature.sigtype.shortname, signature.system.name))
 
     return None
+
+
+def get_map_context(map, user):
+    """Gets the context dict items needed to render the map. Used for both
+        initial map view and system-specific views.
+
+    """
+    permissions = check_map_permission(user, map)
+    systemsJSON = get_systems_json(map, user)
+    wormholesJSON = get_wormholes_json(map)
+
+    context = {'map': map, 'access': permissions, 'systemsJSON': systemsJSON, 
+            'wormholesJSON': wormholesJSON}
+    return context
+
+
+def get_wormhole_type(system1, system2):
+    """Gets the one-way wormhole types between system1 and system2."""
+    
+    source = "K"
+    destination = "K"
+    # Set the source and destination for system1 > system2
+    if system1.sysclass < 7:
+        source = str(system1.sysclass)
+    if system1.sysclass == 7:
+        source = "H"
+    if system1.sysclass > 7:
+        source = "NH"
+    
+    destination = system2.sysclass
+    
+    sourcewh = None
+
+    if source == "H":
+        if WormholeType.objects.filter(source="H",
+                destination=destination).count() == 0:
+            sourcewh = WormholeType.objects.filter(source="K",
+                    destination=destination).all()
+        else:
+            sourcewh = WormholeType.objects.get(source="H",
+                    destination=destination)
+    if source == "NH":
+        if WormholeType.objects.filter(source="NH",
+                destination=destination).count() == 0:
+            sourcewh = WormholeType.objects.filter(source="K",
+                    destination=destination).all()
+        else:
+            sourcewh = WormholeType.objects.filter(source="NH",
+                    destination=destination).all()
+    if source == "5" or source == "6":
+        if WormholeType.objects.filter(source="Z",
+                destination=destination).count() != 0:
+            sourcewh = WormholeType.objects.filter(source="Z",
+                    destination=destination).all
+    
+    if sourcewh == None:
+        sourcewh = WormholeType.objects.filter(source=source,
+                destination=destination).all()
+    return sourcewh
+
+
+def get_possible_wormhole_types(system1, system2):
+    """Takes two systems and gets the possible wormhole types between them.
+    For example, given system1 as highsec and system2 as C2, it should return
+    R943 and B274. system1 is the source and system2 is the destination.
+    Results are returned as lists because some combinations have multiple possibilities.
+    Returns a dict in the format {system1: [R943,], system2: [B274,]}.
+
+    """
+
+    # Get System1 > System2
+
+    forward = get_wormhole_type(system1, system2)
+    
+    # Get Reverse
+
+    reverse = get_wormhole_type(system2, system1)
+
+    result = {'system1': forward, 'system2': reverse}
+
+    return result
+
+
+def system_is_in_map(system, map):
+    """Returns true if a System is a MapSystem in the map."""
+    if map.systems.filter(system=system).count() != 0:
+        return True
+    else:
+        return False
+

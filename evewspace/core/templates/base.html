@@ -8,9 +8,7 @@
         <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/vader/vader.css" />
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css" />
         <script type="text/javascript">
-            $.ready(function(){
-                CCPEVE.requestTrust('{{SITE_URL}}');
-            });
+            CCPEVE.requestTrust('{{SITE_URL}}');
         </script>
 		{% block scripts %}{%endblock%}
 		{% block head %}{%endblock%}

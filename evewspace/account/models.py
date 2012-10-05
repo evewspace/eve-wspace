@@ -26,7 +26,7 @@ class UserProfile(models.Model):
 
 class GroupProfile(models.Model):
     """GroupProfile defines custom fields tied to each Group record."""
-    group = models.ForeignKey(Group, unique=True)
+    group = models.ForeignKey(Group, related_name='profile', unique=True)
     description = models.CharField(max_length=200, blank=True, null=True)
     regcode = models.CharField(max_length=64, blank=True, null=True)
 
@@ -48,5 +48,7 @@ post_save.connect(create_group_profile, sender=Group)
 
 class RegistrationForm(UserCreationForm):
     """Extends the django registration form to add fields."""
-    regcode = forms.CharField(max_length=64)
+    username = forms.CharField(max_length=30, label="Character Name", help_text="<br /> This will act as your username as well.")
+    password2 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password:")
+    regcode = forms.CharField(max_length=64, label="Registration Code")
 

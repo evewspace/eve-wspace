@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
-from Map.models import Map, System
+from Map.models import Map, System, MapSystem
 
 # Create your models here.
 
 class Fleet(models.Model):
     """Represents a SiteTracker fleet."""
-    map = models.ForeignKey(Map, related_name="fleets")
+    mapsystem = models.ForeignKey(MapSystem, related_name="stfleets")
     boss = models.ForeignKey(User, related_name="bossfleets")
     started = models.DateTimeField()
     ended = models.DateTimeField(blank=True, null=True)
@@ -15,7 +15,7 @@ class Fleet(models.Model):
         permissions = (("can_sitetracker", "Use the Site Tracker system."),)
 
     def __unicode__(self):
-        return u"Map: %s Boss: %s  Started: %s  Ended: %s" %(self.map.name, self.boss.username, self.started, self.ended)
+        return u"MapSystem: %s Boss: %s  Started: %s  Ended: %s" %(self.mapsystem.system.name, self.boss.username, self.started, self.ended)
 
 class SiteType(models.Model):
     """Represents a type of site that can be credited."""

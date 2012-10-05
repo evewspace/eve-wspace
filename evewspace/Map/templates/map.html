@@ -1,5 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Map: {{map.name}}{% endblock %}
+{% block scripts %}
+    <script type="text/javascript">
+        var systemsJSON = {{systemsJSON|safe}};
+        var wormholesJSON = {{wormholesJSON|safe}};
+    </script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/raphael-min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/map_functions.js"></script>
+    <link rel="stylesheet" href="{{STATIC_URL}}css/map.css" type="text/css" />
+    {% include 'autocomplete_light/static.html' %}    
+{% endblock %}
+{% block contentheader %}
+<div id="mapDiv" class="mapDiv">
+
+</div>
+{% endblock %}
 {% block content %}
 <h1>Placeholder</h1>
 <h2>Access: {{access}}</h2>
@@ -9,4 +24,7 @@
 <li>{{sys.system.name}} : {{sys.friendlyname}}</li>
 {% endfor %}
 </ul>
+{% if is_isgb  %}
+This is the IGB
+{% endif %}
 {% endblock %}

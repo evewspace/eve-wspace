@@ -12,7 +12,7 @@
 <div class="registerBox">
     <form method="post" action="{% url account.views.register %}">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form.as_ul }}
     <input type="submit" value="Register" />
     </form>
 </div>
