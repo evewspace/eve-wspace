@@ -134,7 +134,7 @@ def system_to_dict(user, system, levelX, levelY):
 
     if system.parentsystem:
         parentWH = system.parent_wormholes.get()
-        result = {'ID': system.pk, 'Name': system.system.name, 'LevelX': levelX,
+        result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
                 'LevelY': levelY, 'SysClass': system.system.sysclass, 
                 'Friendly': system.friendlyname, 'interest': interest,
                 'interestpath': path, 'ParentID': system.parentsystem.pk, 
@@ -145,9 +145,10 @@ def system_to_dict(user, system, levelX, levelY):
                 'WhTimeStatus': parentWH.time_status,
                 'WhToParentBubbled': parentWH.bottom_bubbled,
                 'WhFromParentBubbled': parentWH.top_bubbled,
-                'imageURL': get_system_icon(system, user)}
+                'imageURL': get_system_icon(system, user),
+                'msID': system.pk}
     else:
-        result = {'ID': system.pk, 'Name': system.system.name, 'LevelX': levelX,
+        result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
                 'LevelY': levelY, 'SysClass': system.system.sysclass,
                 'Friendly': system.friendlyname, 'interest': interest,
                 'interestpath': path, 'ParentID': None, 
@@ -155,7 +156,8 @@ def system_to_dict(user, system, levelX, levelY):
                 'WhToParent': "", 'WhFromParent': "",
                 'WhMassStatus': None, 'WhTimeStatus': None,
                 'WhToParentBubbled': None, 'WhFromParentBubbled': None,
-                'imageURL': get_system_icon(system, user)}
+                'imageURL': get_system_icon(system, user),
+                'msID': system.pk}
     return result
 
 

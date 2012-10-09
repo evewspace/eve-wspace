@@ -1,6 +1,6 @@
 from Map.models import *
 from Map.utils import *
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
@@ -108,6 +108,32 @@ def get_map(request, mapID="0"):
             jsonvalues.update({'logs': logstring})
         return HttpResponse(json.dumps(jsonvalues), mimetype="application/json")
 
+
+def view_system(request):
+    """This view returns the HTML to display a system within a div." It should
+    be called via an AJAX POST request, but not necessarily from a Map.
+
+    """
+    if request.is_ajax():
+        sysid = request.POST.get("sysid", "0")
+        mapsystem = request.POST.get("mapsystem", None)
+        mapsys = None
+        if sysid == "0":
+            raise Http404
+        try:
+            result = System.objects.get(pk=sysid)
+        except ObjectDoesNotExist:
+            raise Http404
+        if mapsystem:
+            try:
+                mapsys = MapSystem.objects.get(pk=mapsystem)
+            except ObjectDoesNotExist:
+                raise Http404
+        return HttpResponse(render_to_string('system_ajax.html', 
+            {'system': result, 'mapsys': mapsys}, 
+            context_instance=RequestContext(request)))
+    else:
+        raise PermissionDenied
 
 
 @permission_required('Map.add_Map')

@@ -23,9 +23,9 @@ $.ajaxSetup({
             }
             return cookieValue;
         }
-        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+        //if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-        }
+        //}
     }
 });
 
@@ -66,6 +66,19 @@ function doMapAjaxCheckin() {
 }
 
 
+function DisplaySystemInfo(sysID, msID){
+    //TODO: Somehow pass the proper system URL from Django instead of hard-coding
+    address = "http://" + window.location.host + "/map/system/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        data: {"sysid": sysID, "mapsystem": msID},
+        success: function(data) { $("#sysInfoDiv").html(data);},
+        error: function(errorThrown) {alert("An error occured loading the system data.");}
+    });
+}
+
+
 function StartDrawing() {
     if ((typeof (systemsJSON) != "undefined") && (systemsJSON != null)) {
         var stellarSystemsLength = systemsJSON.length;
@@ -103,7 +116,7 @@ function ConnectSystems(obj1, obj2, line, bg, interest) {
     for (var i = 0; i < 4; i++) {
         for (var j = 4; j < 8; j++) {
             var dx = Math.abs(p[i].x - p[j].x),
-                dy = Math.abs(p[i].y - p[j].y);
+        dy = Math.abs(p[i].y - p[j].y);
             if ((i == j - 4) || (((i != 3 && j != 6) || p[i].x < p[j].x) && ((i != 2 && j != 7) || p[i].x > p[j].x) && ((i != 0 && j != 5) || p[i].y > p[j].y) && ((i != 1 && j != 4) || p[i].y < p[j].y))) {
                 dis.push(dx + dy);
                 d[dis[dis.length - 1]] = [i, j];
@@ -227,11 +240,13 @@ function DrawSystem(system) {
     var sysText;
     if (system.LevelX != null && system.LevelX > 0) {
         var childSys = paper.ellipse(sysX, sysY, 45, 28);
-        childSys.sysID = system.ID;
-        //childSys.click(onSysClick);
+        childSys.sysID = system.sysID;
+        childSys.msID = system.msID;
+        childSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
-        sysText.sysID = system.ID;
-        //sysText.click(onSysClick);
+        sysText.sysID = system.sysID;
+        sysText.msID = system.msID;
+        sysText.click(onSysClick);
 
         ColorSystem(system, childSys, sysText);
         objSystems.push(childSys);
@@ -253,10 +268,13 @@ function DrawSystem(system) {
         }
     }else{
         var rootSys = paper.ellipse(sysX, sysY, 40, 30);
-        rootSys.sysID = system.ID;
-        //rootSys.click(onSysClick);
+        rootSys.sysID = system.sysID;
+        rootSys.msID = system.msID;
+        rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
-        //sysText.click(onSysClick);
+        sysText.sysID = system.sysID;
+        sysText.msID = system.msID;
+        sysText.click(onSysClick);
 
         ColorSystem(system, rootSys, sysText);
 
@@ -325,7 +343,7 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     var sysStrokeDashArray = "none";
     var textColor = "#000";
 
-    if (system.ID == GetSelectedSysID()) {
+    if (system.msID == GetSelectedSysID()) {
 
         // selected
         sysStrokeWidth = 5;
@@ -498,7 +516,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         whFromSys = paper.text(whFromSysX, whFromSysY, systemTo.WhFromParent + " >");
         whFromSys.attr({ fill: whFromColor, cursor: "pointer", "font-size": 11, "font-weight": decoration });  //stroke: "#fff"
 
-        //whFromSys.whID = systemTo.WhFromParent;
+        whFromSys.whID = systemTo.WhFromParent;
         whFromSys.whInfoPnl = GetWhInfoPanelID(systemTo.WhFromParent, true);
         
         whFromSys.mouseover(OnWhOver);
@@ -508,7 +526,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         whToSys = paper.text(whToSysX, whToSysY, "< " + systemTo.WhToParent);
         whToSys.attr({ fill: whToColor, cursor: "pointer", "font-size": 11, "font-weight": decoration });
 
-        //whToSys.whID = systemTo.WhToParent;
+        whToSys.whID = systemTo.WhToParent;
         whToSys.whInfoPnl = GetWhInfoPanelID(systemTo.WhToParent, true);
 
         whToSys.mouseover(OnWhOver);
@@ -597,7 +615,7 @@ function GetSystemIndex(systemID) {
     for (i = 0; i < stellarSystemsLength; i++) {
         var stellarSystem = systemsJSON[i];
 
-        if (stellarSystem.ID == systemID) {
+        if (stellarSystem.msID == systemID) {
             index = i;
             return index;
         }
@@ -614,7 +632,7 @@ function GetSelectedSysID() {
 }
 
 function onSysClick() {
-    return;
+    DisplaySystemInfo(this.sysID, this.msID);
 }
 
 function OnWhOver() {

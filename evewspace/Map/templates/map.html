@@ -16,15 +16,6 @@
 </div>
 {% endblock %}
 {% block content %}
-<h1>Placeholder</h1>
-<h2>Access: {{access}}</h2>
-<h2>Systems: </h2>
-<ul>
-{% for sys in map.systems.all %}
-<li>{{sys.system.name}} : {{sys.friendlyname}}</li>
-{% endfor %}
-</ul>
-{% if is_isgb  %}
-This is the IGB
-{% endif %}
+<div id="sysInfoDiv" class="sysInfoDiv">
+</div>
 {% endblock %}
