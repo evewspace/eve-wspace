@@ -5,8 +5,10 @@
 		<title>{% block title %} Eve W-Space {% endblock %}</title>
         <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui.js"></script>
+        <script type="text/javascript" src="{{STATIC_URL}}bootstrap/js/bootstrap.js"> </script>
         <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/vader/vader.css" />
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css" />
+        <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}bootstrap/css/bootstrap.css" />
         <script type="text/javascript">
             CCPEVE.requestTrust('{{SITE_URL}}');
         </script>
@@ -21,8 +23,10 @@
 			{%block header%}{%endblock%}
 		</div>
 
-		<div id="baseNavDiv" class="navdiv">
-			<ul id="nav">
+        <div id="baseNavDiv" class="navbar">
+            <div class="navbar-inner">
+                <ul class="nav">
+                    <a class="brand" href="{% url core.views.home_view %}">Eve W-Space</a>
 				{% include "map_nav.html" %}
 				{% include "sitetracker_nav.html" %}
 				{% include "cart_nav.html"%}
@@ -32,7 +36,8 @@
 				{% include "api_nav.html" %}
 				{% include "account_nav.html" %}
 				{%block navigation %}{%endblock%}
-			</ul>
+            </ul>
+        </div>
 		</div>
 
 		<div id="baseContentHeadDiv" class="contenthead">

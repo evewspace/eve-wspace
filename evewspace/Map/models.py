@@ -63,7 +63,7 @@ class KSystem(System):
 class WSystem(System):
     static1 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="primary_statics")
     static2 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="secondary_statics")
-
+    effect = models.CharField(max_length=50, blank=True, null=True)
 
 class Map(models.Model):
     """Stores the maps available in the map tool. root relates to System model."""
@@ -88,7 +88,6 @@ class MapSystem(models.Model):
     interesttime = models.DateTimeField(null=True, blank=True)
     parentsystem = models.ForeignKey('self', related_name="childsystems", 
             null=True, blank=True)
-
     def __unicode__(self):
         return "system %s in map %s" % (self.system.name, self.map.name)
 

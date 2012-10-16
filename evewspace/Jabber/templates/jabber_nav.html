@@ -1,5 +1,5 @@
 {% if perms.Jabber.can_jabber %}
-<li><a href="#">Jabber</a><ul>
+<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Jabber</a><ul class="dropdown-menu">
 	<li> <a href="#">Send Ping</a></li>
 	<li> <a href="#">My Groups</a></li>
 	{% if perms.Jabber.jabber_admin %}

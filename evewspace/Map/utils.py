@@ -97,7 +97,7 @@ def get_system_icon(system, user):
     as a realative URL.
 
     """
-    staticPrefix = "http://%s%s" % (Site.objects.get_current().domain, settings.STATIC_URL + "images/")
+    staticPrefix = "%s%s" % (Site.objects.get_current().domain, settings.STATIC_URL + "images/")
     if user.get_profile().currentsystem == system.system: 
         if user.get_profile().lastactive > datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(minutes=15):
             return staticPrefix + "mylocation.png"

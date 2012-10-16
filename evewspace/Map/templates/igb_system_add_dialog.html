@@ -5,24 +5,24 @@
         <input type="hidden" name="bottomsystem" value="{{newsystem}}">
         <h3>Wormhole Status:</h3>
         Time Status: <br />
-        <input type="radio" name="timestatus" value="0" selected="selected">Fine<br />
+        <input type="radio" name="timestatus" value="0" checked="checked">Fine<br />
         <input type="radio" name="timestatus" value="1">End of Life<br />
         <br />
         Mass Status: <br />
-        <input type="radio" name="massstatus" value="0" selected="selected">Fine<br />
+        <input type="radio" name="massstatus" value="0" checked="checked">Fine<br />
         <input type="radio" name="massstatus" value="1">First Shrink<br />
         <input type="radio" name="massstatus" value="2">Critical<br />
         <br />
         <h3>Wormhole in: {{oldsystem}}</h3>
         Type:
         <br />
-        <input type="radio" name="topwh" value="K162" selected="selected">K162<br/>
+        <input type="radio" name="topwh" value="K162" checked="checked">K162<br/>
         {% for wh in wormholes.system1 %}
         <input type="radio" name="topwh" value={{wh.name}}>{{wh.name}}<br />
         {% endfor %}
         <br />
         Bubbled: <br />
-        <input type="radio" name="topbubbled" value="0" selected="selected">No <br />
+        <input type="radio" name="topbubbled" value="0" checked="checked">No <br />
         <input type="radio" name="topbubbled" value="1">Yes
         <br />
         
@@ -31,14 +31,14 @@
         <input type="text" name="friendly" value=""> <br />
         Type:
         <br />
-        <input type="radio" name="bottomwh" value="K162" selected="selected">K162 <br />
+        <input type="radio" name="bottomwh" value="K162" checked="checked">K162 <br />
         {% for wh in wormholes.system2 %}
         <input type="radio" name="bottomwh" value={{wh.name}}>{{wh.name}}<br />
         {% endfor %}
         <br />
         Bubbled: <br />
-        <input type="radio" name="bottombubbled" value="0">No <br />
-        <input type="radio" name="bottombubbled" value="1" selected="selected">Yes
+        <input type="radio" name="bottombubbled" value="0" checked="checked">No <br />
+        <input type="radio" name="bottombubbled" value="1">Yes
         <br />
         
         <input type="submit" value="Add System">

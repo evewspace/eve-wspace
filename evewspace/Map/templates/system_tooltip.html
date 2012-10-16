@@ -1,0 +1,38 @@
+<div class="mapSysInfo">
+    <div class="sysClassSpan">
+        {% if system.sysclass < 7 %}
+        <div> 
+            <strong>Class: {{system.sysclass}}</strong>
+        </div>
+        <div>
+            <strong>Effect: {{specialsys.effect}}</strong>
+        </div>
+        <div>
+            <strong>Probable Statics: {{specialsys.static1}} {% if specialsys.static2 %}{{specialsys.static2}} {% endif %}</strong>
+        </div>
+        {% endif %}
+        {% if system.sysclass = 7 %}
+        High Sec
+        {% endif %}
+        {% if system.sysclass = 8 %}
+        Low Sec
+        {% endif %}
+        {% if system.sysclass = 9 %}
+        Null Sec
+        {% endif %}
+    </div>
+    <br />
+    <span class="sysLastScanned label {% if scanwarning  %} label-warning {% endif %}">
+        Last Scanned: {{system.lastscanned|date:"Y-m-d H:i"}}
+    </span> 
+    <br />
+    <br />
+    <p class="statusText label label-success">POS: {{system.poses.count}} Pilots: {{system.activepilots.count}}</p>
+    {% if system.occupied %}
+    <p class="occupiedTooltip label label-important"> Occupied: <br /> {{system.occupied|safe}}</p>
+    {% endif %}
+    {% if system.info %}
+    <p class="infoTooltip label label-info"> Info: <br /> {{system.info|safe}} </p>
+    {% endif %}
+    <p class="statsText label label-inverse"> NPC: {{system.npckills}} Ship: {{system.shipkills}} Pod: {{system.podkills}}{% if system.sysclass > 6 %} Jumps: {{specialsys.jumps}} {% endif %}</p> 
+</div>

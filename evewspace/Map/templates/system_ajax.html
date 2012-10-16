@@ -1,5 +1,113 @@
-<h2>System Information: {{system.name}}</h2>
+<div id="sysPanelHeader" class="systemPanelHeader row">
+    <div class="span6 page-header well well-large">
+    <div class="dropdown">
+    <h4> System Details: <a class="dropdown-toggle" data-toggle="dropdown"> {{system.name}}</a>
+    <ul class="dropdown-menu pull-right" role="menu">
+        <li><a href="http://www.wormnav.com/index.php?locus={{system.name}}" target="_blank">Wormnav</a></li>
+        <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
+        <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
+        {% if system.sysclass < 7 %}
+        <li><a href="http://www.wormhol.es/{{system.name}}" target="_blank">Wormhol.es</a></li>
+        {% endif %}
 
-<h3>Signatures: {{system.signatures.count}}</h3>
+    </ul>
+</h4>
+</div>
+    <div class="mapSysInfo">
+        <h5 class="friendlyName"> Friendly Name: <small>{{mapsys.friendlyname}}</small> </h5> 
+    </div>
+    <div class="sysClassSpan row">
+        {% if system.sysclass < 7 %}
+        <div class="span2"> 
+            <strong>Class: {{system.sysclass}}</strong>
+        </div>
+        <div class="span2">
+            <strong>Effect: {{specialsys.effect}}</strong>
+        </div>
+        <div class="span2">
+            <strong>Probable Statics: 
+                <span title="Time: {{specialsys.static1.lifetime}}H &nbsp Mass: {{specialsys.static1.maxmass}}kg &nbsp Jump Mass: {{specialsys.static1.jumpmass}}kg">
+                    {{specialsys.static1}}
+            </span> 
+            {% if specialsys.static2 %}
+            <span title="Time: {{specialsys.static2.lifetime}}H &nbsp Mass: {{specialsys.static2.maxmass}}kg &nbsp Jump Mass: {{specialsys.static2.jumpmass}}">
+                {{specialsys.static2}} 
+            </span>
+            {% endif %}</strong>
+        </div>
+        {% endif %}
+        {% if system.sysclass = 7 %}
+        High Sec
+        {% endif %}
+        {% if system.sysclass = 8 %}
+        Low Sec
+        {% endif %}
+        {% if system.sysclass = 9 %}
+        Null Sec
+        {% endif %}
+    </div>
+    <br />
+<div>
+    <span class="sysLastScanned label {% if scanwarning  %} label-warning {% endif %}">
+        Last Scanned: {{system.lastscanned|date:"Y-m-d H:i"}}
+    </span> &nbsp 
+    <i id="markScanned" onclick="MarkScanned({{system.pk}}, {{mapsys.pk}}, true);" class="icon-refresh" title="Mark Scanned"></i>
+    <br />
+    <br />
+    <p class="occupiedText label label-important"><i class="icon-pencil" title="Edit"></i> <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p>
+    <p class="infoText label label-info"><i class="icon-pencil" title="Edit"></i> <span class="infoTitle">Info:</span> <br /> {{system.info|safe}} </p>
+</div>
+     <div id="systemStatsPanel" class="systemStatsPanel">
+        <h6>System Statistics </h6>
+            <ul class="systemStatsList">
+                <li class="systemStatItem">NPC Kills: {{system.npckills}}</li>
+                <li class="systemStatItem">Ship Kills: {{system.shipkills}}</li>
+                <li class="systemStatItem">Pod Kills: {{system.podkills}}</li>
+                {% if system.sysclass > 6 %}
+                <li class="systemStatItem">Jumps: {{specialsys.jumps}}</li>
+                {% endif %}
+            </ul>
+    </div>
+     
+</div>
+  <div id="sigsPanel" class="sigsPanel span6">
+       <div id=systemSigsWell class="systemSigsWell well well-small">
+        <h5>Signatures ({{system.signatures.count}} Total)</h5>
+              <div id="sigAddPanel" class"sigAddPanel span4">
+        <h6>Add Signature</h6>
+        <form name="sigAddForm" class="form-inline" action="#" method="POST">
+            ID: <input type="text" class="input-mini" name="id">
+             Type: <input type="select" class="input-small" name="type"><br />
+             Info: <input type="text" name="type"> <br />
+             <input type="submit" value="Add Signature">
+         </form>
 
-<h3>Active Players: {{system.activepilots.all.count}}</h3>
+    </div>      <ul class="systemSigsList">
+                <li class="systemSigsItem">No Signatures! </li>
+            </ul>
+            </div>
+        </div>
+
+    <div id="activePlayerPanel" class="activePlayerPanel span6">
+        <h5>Active Pilots ({{system.activepilots.all.count}} total) </h5>
+        <div id="activePlayerList" class="activePlayerList well well-small">
+            <ul class="activePlayerUL">
+                {% for pilot in system.activepilots.all %}
+                <li class="activePlayerItem">{{pilot.user.username}}</li>
+                {% empty %}
+                <li class="activePlayerItem">No Active Pilots </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+    <div class="row">
+    <div id="systemPosPanel" class="systemPosPanel span6">
+        <h5>Starbases ({{system.poses.all.count}} Total)</h5>
+        <div id="systemPosWell" class="systemPosWell well well-small">
+            <ul class="systemPosList">
+                <li class="systemPosItem">No Starbases!</li>
+            </ul>
+        </div>
+    </div>
+    </div>

@@ -66,16 +66,95 @@ function doMapAjaxCheckin() {
 }
 
 
-function DisplaySystemInfo(sysID, msID){
-    //TODO: Somehow pass the proper system URL from Django instead of hard-coding
-    address = "http://" + window.location.host + "/map/system/";
+function DisplaySystemDetails(sysID, msID){
+    //TODO: Dynamic Addressing
+    address = "http://"+window.location.host + "/map/system/";
     $.ajax({
         type: "POST",
         url: address,
         data: {"sysid": sysID, "mapsystem": msID},
-        success: function(data) { $("#sysInfoDiv").html(data);},
-        error: function(errorThrown) {alert("An error occured loading the system data.");}
+        success: function(data){
+            if (!document.getElementById("sysInfoDiv")){
+                $('#baseContentDiv').append(data);
+            }
+            else{
+                $('#sysInfoDiv').html(data);
+            }
+            CloseSystemMenu();
+        },
+        error: function(errorThrown) {alert("An error occured building the details page.");}
     });
+}
+
+
+function DisplaySystemMenu(sysID, msID, x, y){
+    //TODO: Somehow pass the proper system URL from Django instead of hard-coding
+    address = "http://" + window.location.host + "/map/sysmenu/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        data: {"sysid": sysID, "mapsystem": msID},
+        success: function(data) { 
+            if (!document.getElementById("sysMenu")){
+                $('#mapDiv').append(data);
+            }
+            else{
+                $('#sysMenu').replaceWith(data);
+            }
+            var div = document.getElementById("sysMenu");
+            div.style.position = "absolute";
+            div.style.top = y + 'px';
+            div.style.left = x + 10 + 'px';
+            div.style.visibility = "visible";
+        },
+        error: function(errorThrown) {alert("An error occured loading the system menu.");}
+    });
+}
+
+
+function MarkScanned(sysID, msID, fromPanel){
+    //TODO: Dynamic Addressing
+    address = "http://" + window.location.host + "/map/markscanned/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        async: false,
+        data: {"sysid": sysID},
+        success: function(data) { 
+            GetSystemTooltip(sysID, msID);
+            if (fromPanel){
+                DisplaySystemDetails(sysID, msID);
+            }
+            CloseSystemMenu();
+
+        },
+        error: function(errorThrown) {alert("An error occured marking the system scanned.");}
+    });
+   
+}
+
+
+function GetSystemTooltip(sysID, msID){
+    //TODO: Dynamic addressing
+    address = "http://" + window.location.host + "/map/systooltip/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        data: {"sysid": sysID, "mapsystem": msID},
+        success: function(data){
+               var divName = "#sys" + msID + "Tip";
+                if ($(divName).length == 0){
+                    div = $('<div></div>').html(data).attr('id','sys' + msID + 'Tip').addClass('systemTooltip').addClass('tip').appendTo('body');
+               }else{
+                $(divName).html(data);
+               }
+        },
+            error: function(errorThrown) {alert("An error occured loading the tooltip.");}
+            });
+}
+
+function CloseSystemMenu(){
+    $('#sysMenu').remove();
 }
 
 
@@ -183,7 +262,6 @@ function InitializeRaphael() {
     var holderWidth = 120 + maxLevelX * (indentX + 20);
 
     paper = Raphael("mapDiv", holderWidth, holderHeight);
-
     holder = document.getElementById("mapDiv");
     holder.style.height = holderHeight + "px";
     holder.style.width = holderWidth + "px";
@@ -247,7 +325,6 @@ function DrawSystem(system) {
         sysText.sysID = system.sysID;
         sysText.msID = system.msID;
         sysText.click(onSysClick);
-
         ColorSystem(system, childSys, sysText);
         objSystems.push(childSys);
         var parentIndex = GetSystemIndex(system.ParentID);
@@ -342,7 +419,7 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     var textFontSize = 12;
     var sysStrokeDashArray = "none";
     var textColor = "#000";
-
+    GetSystemTooltip(ellipseSystem.sysID, ellipseSystem.msID);
     if (system.msID == GetSelectedSysID()) {
 
         // selected
@@ -430,19 +507,13 @@ function ColorSystem(system, ellipseSystem, textSysName) {
 
     if (selected == false) {
 
-        var divId = GetSystemInfoPanelID(system.ID);
-        
-        ellipseSystem.sysInfoPnlID = divId;
-        textSysName.sysInfoPnlID = divId;
+        ellipseSystem.sysInfoPnlID = 0;
+        textSysName.sysInfoPnlID = 0;
 
         
-        ellipseSystem.mouseover(OnSysOver);
-        ellipseSystem.mouseout(OnSysOut);
-        
+        ellipseSystem.hover(OnSysOver, OnSysOut); 
         textSysName.ellipseIndex = objSystems.length;
-        
-        textSysName.mouseover(OnSysOver);
-        textSysName.mouseout(OnSysOut);
+        textSysName.hover(OnSysOver, OnSysOut);
         
     }
 }
@@ -627,12 +698,38 @@ function GetSystemIndex(systemID) {
 
 }
 
+
+function getScrollY() {
+var scrOfX = 0, scrOfY = 0;
+if (typeof (window.pageYOffset) == 'number') {
+//Netscape compliant
+scrOfY = window.pageYOffset;
+scrOfX = window.pageXOffset;
+} else if (document.body && (document.body.scrollLeft || document.body.scrollTop)) {
+//DOM compliant
+scrOfY = document.body.scrollTop;
+scrOfX = document.body.scrollLeft;
+} else if (document.documentElement && (document.documentElement.scrollLeft || document.documentElement.scrollTop)) {
+//IE6 standards compliant mode
+scrOfY = document.documentElement.scrollTop;
+scrOfX = document.documentElement.scrollLeft;
+}
+//return [scrOfX, scrOfY];
+return scrOfY;
+}
+
+
+
 function GetSelectedSysID() {
     return;
 }
 
-function onSysClick() {
-    DisplaySystemInfo(this.sysID, this.msID);
+function onSysClick(e) {
+    var x = e.pageX;
+    var y = e.pageY;
+    DisplaySystemMenu(this.sysID, this.msID, x, y);
+    var div = document.getElementById("sys"+this.msID+"Tip");
+    div.style.display = 'none';
 }
 
 function OnWhOver() {
@@ -667,56 +764,25 @@ function OnWhOut() {
     }
 }
 
-function OnSysOver() {
-
-    var div = document.getElementById(this.sysInfoPnlID);
-    if (div != null) {
-
-        //var mouseX = window.event.clientX;
-        //var mouseY = window.event.clientY;
-
-        var mouseX = tempX;
-        var mouseY = tempY + getScrollY();;
+function OnSysOver(e) {
+    var divName = "sys" + this.msID + "Tip";
+    var div = document.getElementById(divName);
+    if (div){
+    
+        var mouseX = e.clientX
+        var mouseY = e.clientY + getScrollY();
 
         div.style.position = "absolute";
-
-        // "px" needed for Firefox and Chrome
         div.style.top = mouseY + "px";
         div.style.left = mouseX + 10 + "px";
-
-        div.style.visibility = "visible";
+        div.style.display = 'block';
     }
-
-    if (this.ellipseIndex != null) {
-        // text
-
-        ellipse = objSystems[this.ellipseIndex];
-        if (ellipse) {
-            ellipse.attr({ "stroke-width": 4 });
-        }
-    } else {
-        // ellipse
-        this.attr({ "stroke-width": 4 });
-    }
-
 }
 
 function OnSysOut() {
-
-    var div = document.getElementById(this.sysInfoPnlID);
-
-    if (div != null) {
-        div.style.visibility = "hidden";
-    }
-
-    if (this.ellipseIndex != null) {
-        // text
-        ellipse = objSystems[this.ellipseIndex];
-        if (ellipse) {
-            ellipse.attr({ "stroke-width": 2 });
-        }
-    } else {
-        // ellipse
-        this.attr({ "stroke-width": 2 });
+    var divName = "sys" + this.msID + "Tip";
+    var div = document.getElementById(divName);
+    if (div){
+        div.style.display = 'none';
     }
 }

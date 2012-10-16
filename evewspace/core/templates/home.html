@@ -12,12 +12,10 @@
 	    });
 </script>
 {% endblock %}
-{% block header %}
-<img src="{{STATIC_URL}}images/webtitle.png" />
-{% endblock %}
 {% block contentheader %} <h2> Welcome, {{user.username}}!</h2> {% endblock %}
 {% block content%} 
-<div class="homegridleft homecollapse">
+<div id="homeRow1" class="row">
+<div class="span6 homecollapse">
 	{% load posstatus %}
 	<h3 class="active">My POSes:</h3>
 	<div>
@@ -27,18 +25,26 @@
 	<div>
 		{% corpposstatus user %}
 	</div>
-
-	<h2>Claims Status</h2>
 </div>
-<div class="homegridright homecollapse">
+<div class="span6 homecollapse">
 	{% load apicalendar %}
 	<h3>Calendar:</h3>
 	<div>
 		{% upcomingevents user %}
 	</div>
-    <h2>Vital Statistics</h2>
+   </div>
+</div>
+<div id="homeRow2" class="row">
+    <div class="span6 homecollapse">
+        <h3>Claims Status</h3>
+        <div>
+        </div>
+    </div>
+    <div class="span6 homecollapse">
+        <h3>Vital Statistics</h3>
     <div>
         <b>Time since last Legion loss by James:</b> 12 minutes
+ 
     </div>
 </div>
 {%endblock%}

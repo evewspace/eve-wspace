@@ -15,5 +15,6 @@ def register_groups(user, regcode):
     """Registers a user for all groups associated with a registration code."""
     grouplist = get_groups_for_code(regcode)
     if len(grouplist) != 0:
-        user.groups.add(grouplist)
+        for group in grouplist:
+            user.groups.add(group)
     return None

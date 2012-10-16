@@ -1,0 +1,36 @@
+<div id="sysMenu">
+<div class="btn-group btn-group-vertical">
+    <a class="btn" onclick="DisplaySystemDetails({{system.pk}},{{mapsys.pk}});" href="#sysInfo">Details </a>
+    <div class="btn-group dropdown">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            Intel
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+        <li><a href="http://www.wormnav.com/index.php?locus={{system.name}}" target="_blank">Wormnav</a></li>
+        <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
+        <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
+        {% if system.sysclass < 7 %}
+        <li><a href="http://www.wormhol.es/{{system.name}}" target="_blank">Wormhol.es</a></li>
+        {% endif %}
+
+    </ul>
+</div>
+    <div class="btn-group dropdown">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            Interest
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+            {% if isinterest == False %}
+            <li><a href="#">Set Interest</a></li>
+            {% else %}
+            <li><a href="#">Renew Interest</a></li>
+            <li><a href="#">Remove Interest </a></li>
+            {% endif %}
+        </ul>
+    </div>
+        <a class="btn" onclick="MarkScanned({{system.pk}}, {{mapsys.pk}}, false);">Mark Scanned</a>
+        <a class="btn" onclick="CloseSystemMenu();">Close Menu</a>
+    </div>
+</div>

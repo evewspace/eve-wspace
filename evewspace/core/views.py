@@ -9,13 +9,5 @@ def home_view(request):
     from django.core.urlresolvers import reverse
     from Map.models import Map
     from django.template.response import TemplateResponse
-    #Default map settings are stored in users' profiles.
-    profile = request.user.get_profile()
-
-    if profile.defaultmap:
-        #Redirect to the proper map
-        return redirect(Map.views.get_map, args=[request, profile.defaultmap.pk])
-
-    #No default map is set, so let's display the home page.
 
     return TemplateResponse(request, 'home.html')

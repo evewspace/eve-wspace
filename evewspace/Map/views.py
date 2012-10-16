@@ -75,6 +75,7 @@ def get_map(request, mapID="0"):
             if request.is_igb_trusted:
                 # Get values to pass in JSON
                 oldsystem = ""
+                oldsysobj = None
                 if profile.currentsystem:
                     oldsystem = profile.currentsystem.name
                     oldsysobj = System.objects.get(name=oldsystem)
@@ -85,13 +86,14 @@ def get_map(request, mapID="0"):
                 # TODO: if currentsystem isn't on the map, oldsystem is, and lastactive
                 # is recent, add new system to map
                 if profile.lastactive > datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(minutes=5):
-                    if oldsystem != currentsystem and system_is_in_map(oldsysobj, result) == True:
-                        if system_is_in_map(currentsysobj, result) == False:
-                            dialogHtml = render_to_string('igb_system_add_dialog.html',
-                                    {'oldsystem': oldsystem, 'newsystem': currentsystem,
-                                        'wormholes': get_possible_wormhole_types(oldsysobj, 
+                    if oldsysobj:
+                        if oldsystem != currentsystem and system_is_in_map(oldsysobj, result) == True:
+                            if system_is_in_map(currentsysobj, result) == False:
+                                dialogHtml = render_to_string('igb_system_add_dialog.html',
+                                        {'oldsystem': oldsystem, 'newsystem': currentsystem,
+                                            'wormholes': get_possible_wormhole_types(oldsysobj, 
                                             currentsysobj)}, context_instance=RequestContext(request))
-                            jsonvalues.update({'dialogHTML': dialogHtml})
+                                jsonvalues.update({'dialogHTML': dialogHtml})
                 profile.lastactive = datetime.utcnow().replace(tzinfo=pytz.utc)
                 profile.save()
                
@@ -109,12 +111,24 @@ def get_map(request, mapID="0"):
         return HttpResponse(json.dumps(jsonvalues), mimetype="application/json")
 
 
-def view_system(request):
+@login_required()
+def view_system(request, action=0):
     """This view returns the HTML to display a system within a div." It should
-    be called via an AJAX POST request, but not necessarily from a Map.
+    be called via an AJAX POST request, but not necessarily from a Map. It uses
+    different templates depending on the action vaiable:
+    0 = system_ajax.html
+    1 = system_menu.html
+    2 = system_tooltip.html
 
     """
     if request.is_ajax():
+        if action == 0:
+            template = 'system_ajax.html'
+        if action == 1:
+            template = 'system_menu.html'
+        if action == 2:
+            template = 'system_tooltip.html'
+
         sysid = request.POST.get("sysid", "0")
         mapsystem = request.POST.get("mapsystem", None)
         mapsys = None
@@ -122,6 +136,17 @@ def view_system(request):
             raise Http404
         try:
             result = System.objects.get(pk=sysid)
+            threshold = datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(hours=3)
+            print threshold
+            if result.lastscanned > threshold:
+                scanwarning = False
+            else:
+                scanwarning = True
+            print scanwarning
+            if result.sysclass > 6:
+                specialsys = KSystem.objects.get(name=result.name)
+            else:
+                specialsys = WSystem.objects.get(name=result.name)
         except ObjectDoesNotExist:
             raise Http404
         if mapsystem:
@@ -129,12 +154,38 @@ def view_system(request):
                 mapsys = MapSystem.objects.get(pk=mapsystem)
             except ObjectDoesNotExist:
                 raise Http404
-        return HttpResponse(render_to_string('system_ajax.html', 
-            {'system': result, 'mapsys': mapsys}, 
+        return HttpResponse(render_to_string(template, 
+            {'system': result, 'mapsys': mapsys, 'specialsys': specialsys,
+                'scanwarning': scanwarning}, 
             context_instance=RequestContext(request)))
     else:
         raise PermissionDenied
 
+
+@login_required()
+def wormhole_tooltip(request):
+    raise PermissionDenied
+
+
+@login_required()
+def mark_scanned(request):
+    """Takes a POST request from AJAX with a system ID and marks that system
+    as scanned.
+
+    """
+    if request.is_ajax():
+        sysid = request.POST.get("sysid",0)
+        if sysid == 0:
+            raise Http404
+        try:
+            system = System.objects.get(pk=sysid)
+            system.lastscanned = datetime.utcnow().replace(tzinfo=pytz.utc)
+            system.save()
+            return HttpResponse('[]')
+        except DoesNotExist:
+            raise Http404
+    else:
+        raise PermissionDenied
 
 @permission_required('Map.add_Map')
 def create_map(request):
