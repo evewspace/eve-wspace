@@ -1,6 +1,10 @@
 <div id="sysMenu">
 <div class="btn-group btn-group-vertical">
     <a class="btn" onclick="DisplaySystemDetails({{system.pk}},{{mapsys.pk}});" href="#sysInfo">Details </a>
+    {% if not is_igb %}
+    <a class="btn" onclick="AssertLocation({{system.pk}});" href="#">I'm Here</a>
+    {% endif %}
+    <a class="btn" onclick="AddSystem({{system.pk}});" href="#">Add System</a>
     <div class="btn-group dropdown">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             Intel
@@ -16,21 +20,22 @@
 
     </ul>
 </div>
-    <div class="btn-group dropdown">
-        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            Interest
-            <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu" role="menu">
-            {% if isinterest == False %}
-            <li><a href="#">Set Interest</a></li>
+            {% if isinterest %}
+            <a class="btn" onclick="RemoveInterest({{mapsys.pk}});" href="#">Remove Interest </a>
             {% else %}
-            <li><a href="#">Renew Interest</a></li>
-            <li><a href="#">Remove Interest </a></li>
+            <a class="btn" onclick="SetInterest({{mapsys.pk}});" href="#">Set Interest</a>
+
             {% endif %}
-        </ul>
-    </div>
         <a class="btn" onclick="MarkScanned({{system.pk}}, {{mapsys.pk}}, false);">Mark Scanned</a>
+        <div class="btn-group dropdown">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                Delete
+            </a>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#">I'm sure!</a></li>
+                <li><a href="#">Just Kidding!</a></li>
+            </ul>
+        </div>
         <a class="btn" onclick="CloseSystemMenu();">Close Menu</a>
     </div>
 </div>

@@ -143,6 +143,11 @@ API_CORP_KEY_VCODE='bbR0lFKHULzUuh7luVJlz22VUl4T4SkZmMLeveunrMcZxPdbwZqMXMffnUXv
 #Require a registration code to register
 ACCOUNT_REQUIRE_REG_CODE=True
 
+# Map Settings
+
+# Number of minutes that a sytem of interest remains flagged
+MAP_INTEREST_TIME=30
+
 AUTH_PROFILE_MODULE = 'account.UserProfile'
 import django.conf.global_settings as DEFAULT_SETTINGS
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + ('core.context_processors.site', 'eveigb.context_processors.igb',)

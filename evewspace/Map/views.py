@@ -137,12 +137,10 @@ def view_system(request, action=0):
         try:
             result = System.objects.get(pk=sysid)
             threshold = datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(hours=3)
-            print threshold
             if result.lastscanned > threshold:
                 scanwarning = False
             else:
                 scanwarning = True
-            print scanwarning
             if result.sysclass > 6:
                 specialsys = KSystem.objects.get(name=result.name)
             else:
@@ -154,9 +152,16 @@ def view_system(request, action=0):
                 mapsys = MapSystem.objects.get(pk=mapsystem)
             except ObjectDoesNotExist:
                 raise Http404
+        interestthreshold = datetime.utcnow().replace(
+                tzinfo=pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
+        interest = False
+        if mapsys.interesttime: 
+            if mapsys.interesttime > interestthreshold:
+                interest = True
+        print interest
         return HttpResponse(render_to_string(template, 
             {'system': result, 'mapsys': mapsys, 'specialsys': specialsys,
-                'scanwarning': scanwarning}, 
+                'scanwarning': scanwarning, 'isinterest': interest}, 
             context_instance=RequestContext(request)))
     else:
         raise PermissionDenied
@@ -164,7 +169,22 @@ def view_system(request, action=0):
 
 @login_required()
 def wormhole_tooltip(request):
-    raise PermissionDenied
+    """Takes a POST request from AJAX with a Wormhole ID and renders the
+    wormhole tooltip for that ID to response.
+    
+    """
+    if request.is_ajax():
+        whid = request.POST.get("whid",0)
+        if whid == 0:
+            raise Http404
+        try:
+            wh = Wormhole.objects.get(pk=whid)
+            return HttpResponse(render_to_string("wormhole_tooltip.html",
+                {'wh': wh}, context_instance=RequestContext(request)))
+        except ObjectDoesNotExist:
+            raise Http404
+    else:
+        raise PermissionDenied
 
 
 @login_required()
@@ -182,10 +202,62 @@ def mark_scanned(request):
             system.lastscanned = datetime.utcnow().replace(tzinfo=pytz.utc)
             system.save()
             return HttpResponse('[]')
-        except DoesNotExist:
+        except ObjectDoesNotExist:
             raise Http404
     else:
         raise PermissionDenied
+
+
+@login_required()
+def assert_location(request):
+    """Takes a POST request form AJAX with a System ID and marks the user as
+    being active in that system.
+
+    """
+    if request.is_ajax():
+        sysid = request.POST.get("sysid", 0)
+        if sysid == 0:
+            raise Http404
+        try:
+            system = System.objects.get(pk=sysid)
+            profile = request.user.get_profile()
+            profile.currentsystem = system
+            profile.lastactive = datetime.utcnow().replace(tzinfo=pytz.utc)
+            profile.save()
+            return HttpResponse("[]")
+        except ObjectDoesNotExist:
+            raise Http404
+    else:
+        raise PermissionDenied
+
+
+@login_required()
+def set_interest(request):
+    """Takes a POST request from AJAX with a MapSystem ID and action and marks that system
+    as having utcnow as interesttime. The action can be either "set" or "remove".
+
+    """
+    if request.is_ajax():
+        mapsysid = request.POST.get("mapsystem",0)
+        action = request.POST.get("action","none")
+        if mapsysid == 0 or action == "none":
+            raise Http404
+        try:
+            system = MapSystem.objects.get(pk=mapsysid)
+            if action == "set":
+                system.interesttime = datetime.utcnow().replace(tzinfo=pytz.utc)
+                system.save()
+                return HttpResponse('[]')
+            if action == "remove":
+                system.interesttime = None
+                system.save()
+                return HttpResponse('[]')
+            return HttpResponse(staus=418)
+        except ObjectDoesNotExist:
+            raise Http404
+    else:
+        raise PermissionDenied
+
 
 @permission_required('Map.add_Map')
 def create_map(request):

@@ -118,17 +118,17 @@ def system_to_dict(user, system, levelX, levelY):
     the map JS as JSON.
 
     """
-    if system.interesttime:
+    threshold = datetime.datetime.utcnow().replace(
+            tzinfo=pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
+    if system.interesttime and system.interesttime > threshold:
         interest = True
     else:
         interest = False
-    if system.map.systems.filter(interesttime__isnull=False).count() != 0:
-        interestsystem = system.map.systems.get(interesttime__isnull=False)
-
-        if system in get_path_to_map_system(interestsystem):
-            path = True
-        else:
-            path = False
+    if system.map.systems.filter(interesttime__gt=threshold).count() != 0:
+        path = False
+        for sys in system.map.systems.filter(interesttime__gt=threshold).all():
+            if system in get_path_to_map_system(sys):
+                path = True
     else:
         path = False
 
@@ -146,7 +146,7 @@ def system_to_dict(user, system, levelX, levelY):
                 'WhToParentBubbled': parentWH.bottom_bubbled,
                 'WhFromParentBubbled': parentWH.top_bubbled,
                 'imageURL': get_system_icon(system, user),
-                'msID': system.pk}
+                'whID': parentWH.pk, 'msID': system.pk}
     else:
         result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
                 'LevelY': levelY, 'SysClass': system.system.sysclass,
@@ -157,7 +157,7 @@ def system_to_dict(user, system, levelX, levelY):
                 'WhMassStatus': None, 'WhTimeStatus': None,
                 'WhToParentBubbled': None, 'WhFromParentBubbled': None,
                 'imageURL': get_system_icon(system, user),
-                'msID': system.pk}
+                'whID': None, 'msID': system.pk}
     return result
 
 

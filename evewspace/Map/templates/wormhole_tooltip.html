@@ -1,0 +1,38 @@
+<div class="wormholeInfo">
+    <div class="row">
+        <div class="wormholeSideDiv span2">
+            <h4>{{wh.top.system.name}}</h4>
+            <span class="wormholeType">Type: {{wh.top_type.name}}</span><br />
+            <span class="wormholeBubbled {% if wh.top_bubbled %}text-error{% endif %}">
+                Bubbled: {{wh.top_bubbled|yesno:"Yes,No"}}
+            </span>
+        </div>
+        <div class="wormholeSideDiv span2">
+            <h4>{{wh.bottom.system.name}}</h4>
+            <span class="wormholeType">Type: {{wh.bottom_type.name}}</span><br />
+            <span class="wormholeType {% if wh.bottom_bubbled %}text-error{% endif %}">
+                Bubbled: {{wh.bottom_bubbled|yesno:"Yes,No"}}
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="wormholeOverallInfo span2">
+            {% if wh.mass_status = 0 %}
+            <span class="massStatus label label-success">Mass: Fine
+            {% elif wh.mass_status = 1 %}
+            <span class="massStatus label label-warning">Mass: First Shrink
+            {% else %}
+            <span class="massStatus label label-important">Mass: Critical
+            {% endif %}
+            </span>
+        </div>
+        <div class="wormholeOverallInfo span2">
+            {% if wh.time_status = 0 %}
+            <span class="timeStatus label label-success">Time: Fine
+            {% else %}
+            <span class="timeStatus label label-important">Time: End of Life
+            {% endif %}
+            </span>
+        </div>
+    </div>
+</div>

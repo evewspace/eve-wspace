@@ -8,4 +8,6 @@ urlpatterns = patterns('',
         url(r'systooltip/$', 'Map.views.view_system', {'action': 2}, 'system_tooltip' ),
         url(r'whtooltip/$', 'Map.views.wormhole_tooltip', name='wormhole_tooltip'),
         url(r'markscanned/$', 'Map.views.mark_scanned', name='mark_scanned'),
+        url(r'interest/$', 'Map.views.set_interest', name='interest'),
+        url(r'location/$', 'Map.views.assert_location', name='assert_location'),
         )

@@ -134,6 +134,59 @@ function MarkScanned(sysID, msID, fromPanel){
 }
 
 
+function SetInterest(msID){
+     //TODO: Dynamic Addressing
+    address = "http://" + window.location.host + "/map/interest/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        async: false,
+        data: {"mapsystem": msID, "action": "set"},
+        success: function(data) { 
+            CloseSystemMenu();
+            window.location.reload();
+        },
+        error: function(errorThrown) {alert("An error occured setting the interest.");}
+    });
+   
+}
+
+
+function RemoveInterest(msID){
+    //TODO: Dynamic Addressing
+    address = "http://" + window.location.host + "/map/interest/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        async: false,
+        data: {"mapsystem": msID, "action": "remove"},
+        success: function(data) { 
+            CloseSystemMenu();
+            window.location.reload();
+        },
+        error: function(errorThrown) {alert("An error occured removing the interest.");}
+    });
+
+}
+
+
+function AssertLocation(sysID){
+    //TODO: Dynamic Addressing
+    address = "http://" + window.location.host + "/map/location/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        async: true,
+        data: {"sysid": sysID},
+        success: function(data) { 
+            CloseSystemMenu();
+            window.location.reload();
+        },
+        error: function(errorThrown) {alert("An error occured asserting your location.");}
+    });
+}
+
+
 function GetSystemTooltip(sysID, msID){
     //TODO: Dynamic addressing
     address = "http://" + window.location.host + "/map/systooltip/";
@@ -152,6 +205,28 @@ function GetSystemTooltip(sysID, msID){
             error: function(errorThrown) {alert("An error occured loading the tooltip.");}
             });
 }
+
+
+function GetWormholeTooltip(whID){
+    //TODO: Dynamic addressing
+    address = "http://" + window.location.host + "/map/whtooltip/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        data: {"whid": whID},
+        success: function(data){
+               var divName = "#wh" + whID + "Tip";
+                if ($(divName).length == 0){
+                    div = $('<div></div>').html(data).attr('id','wh' + whID + 'Tip').addClass('wormholeTooltip').addClass('tip').appendTo('body');
+               }else{
+                $(divName).html(data);
+               }
+        },
+            error: function(errorThrown) {alert("An error occured loading the wormhole tooltip.");}
+            });
+}
+
+
 
 function CloseSystemMenu(){
     $('#sysMenu').remove();
@@ -587,9 +662,8 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         whFromSys = paper.text(whFromSysX, whFromSysY, systemTo.WhFromParent + " >");
         whFromSys.attr({ fill: whFromColor, cursor: "pointer", "font-size": 11, "font-weight": decoration });  //stroke: "#fff"
 
-        whFromSys.whID = systemTo.WhFromParent;
-        whFromSys.whInfoPnl = GetWhInfoPanelID(systemTo.WhFromParent, true);
-        
+        whFromSys.whID = systemTo.whID;
+        GetWormholeTooltip(whFromSys.whID);
         whFromSys.mouseover(OnWhOver);
         whFromSys.mouseout(OnWhOut);
     }
@@ -597,72 +671,13 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         whToSys = paper.text(whToSysX, whToSysY, "< " + systemTo.WhToParent);
         whToSys.attr({ fill: whToColor, cursor: "pointer", "font-size": 11, "font-weight": decoration });
 
-        whToSys.whID = systemTo.WhToParent;
-        whToSys.whInfoPnl = GetWhInfoPanelID(systemTo.WhToParent, true);
+        whToSys.whID = systemTo.whID;
 
         whToSys.mouseover(OnWhOver);
         whToSys.mouseout(OnWhOut);
     }
 }
 
-
-
-function GetWhInfoPanelID(whName, buildId) {
-
-    if (whName == null) {
-        return "";
-    }
-
-    var partID = whName;
-
-    if (buildId == true) {
-        partID = "wh" + whName + "info";
-    }
-
-    var divID = "";
-    var noInfoId = "whNoInfo";
-
-    var divs = document.getElementsByTagName("div");
-    for (var i = 0; i < divs.length; i++) {
-
-        if (divs[i].id.indexOf(noInfoId) >= 0) {
-            noInfoId = divID = divs[i].id;
-        }
-
-        if (divs[i].id.indexOf(partID) >= 0) {
-            divID = divs[i].id;
-            break;
-        }
-    }
-
-    if (divID.length < 1) {
-        divID = noInfoId;
-    }
-
-    return divID;
-}
-
-function GetSystemInfoPanelID(systemID) {
-
-    if (systemID == null) {
-        return "";
-    }
-
-    var partID = "sys" + systemID + "info";
-
-    var divID = "";
-
-    var divs = document.getElementsByTagName("div");
-    for (var i = 0; i < divs.length; i++) {
-
-        if (divs[i].id.indexOf(partID) >= 0) {
-            divID = divs[i].id;
-            break;
-        }
-    }
-
-    return divID;
-}
 
 function ChangeSysWormholePosition(system, parent) {
 
@@ -732,35 +747,28 @@ function onSysClick(e) {
     div.style.display = 'none';
 }
 
-function OnWhOver() {
+function OnWhOver(e) {
+    var divName = "wh" + this.whID + "Tip";
+    var div = document.getElementById(divName);
 
-    var div = document.getElementById(this.whInfoPnl);
-
-    if (div != null) {
-
-        //var mouseX = window.event.clientX;
-        //var mouseY = window.event.clientY;
-
-        var mouseX = tempX;
-        //var mouseY = tempY;
-        var mouseY = tempY + getScrollY();
+    if (div){
+    
+        var mouseX = e.clientX
+        var mouseY = e.clientY + getScrollY();
 
         div.style.position = "absolute";
-
-        // "px" needed for Firefox and Chrome
         div.style.top = mouseY + "px";
         div.style.left = mouseX + 10 + "px";
-
-        div.style.visibility = "visible";
+        div.style.display = 'block';
     }
 }
 
 function OnWhOut() {
+    var divName = "wh" + this.whID + "Tip";
+    var div = document.getElementById(divName);
 
-    var div = document.getElementById(this.whInfoPnl);
-
-    if (div != null) {
-        div.style.visibility = "hidden";
+    if (div) {
+        div.style.display = 'none';
     }
 }
 
