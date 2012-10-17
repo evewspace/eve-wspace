@@ -16,6 +16,11 @@
     width: 300px;
     display: none;
 }
+.wormholeTooltip
+{
+    width: 200px;
+    display: none;
+}
 .popover
 {
     width: 300px;
