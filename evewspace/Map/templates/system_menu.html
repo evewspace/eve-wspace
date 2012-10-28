@@ -1,6 +1,6 @@
 <div id="sysMenu">
 <div class="btn-group btn-group-vertical">
-    <a class="btn" onclick="DisplaySystemDetails({{system.pk}},{{mapsys.pk}});" href="#sysInfo">Details </a>
+    <a class="btn" onclick="DisplaySystemDetails({{system.pk}});" href="#sysInfo">Details </a>
     {% if not is_igb %}
     <a class="btn" onclick="AssertLocation({{system.pk}});" href="#">I'm Here</a>
     {% endif %}
@@ -21,12 +21,12 @@
     </ul>
 </div>
             {% if isinterest %}
-            <a class="btn" onclick="RemoveInterest({{mapsys.pk}});" href="#">Remove Interest </a>
+            <a class="btn" onclick="RemoveInterest({{system.pk}});" href="#">Remove Interest </a>
             {% else %}
-            <a class="btn" onclick="SetInterest({{mapsys.pk}});" href="#">Set Interest</a>
+            <a class="btn" onclick="SetInterest({{system.pk}});" href="#">Set Interest</a>
 
             {% endif %}
-        <a class="btn" onclick="MarkScanned({{system.pk}}, {{mapsys.pk}}, false);">Mark Scanned</a>
+        <a class="btn" onclick="MarkScanned({{system.pk}}, false);">Mark Scanned</a>
         <div class="btn-group dropdown">
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                 Delete

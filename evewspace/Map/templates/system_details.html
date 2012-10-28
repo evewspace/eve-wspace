@@ -22,16 +22,16 @@
             <strong>Class: {{system.sysclass}}</strong>
         </div>
         <div class="span2">
-            <strong>Effect: {{specialsys.effect}}</strong>
+            <strong>Effect: {{system.effect}}</strong>
         </div>
         <div class="span2">
             <strong>Probable Statics: 
-                <span title="Time: {{specialsys.static1.lifetime}}H &nbsp Mass: {{specialsys.static1.maxmass}}kg &nbsp Jump Mass: {{specialsys.static1.jumpmass}}kg">
-                    {{specialsys.static1}}
+                <span title="Time: {{system.static1.lifetime}}H &nbsp Mass: {{system.static1.maxmass}}kg &nbsp Jump Mass: {{system.static1.jumpmass}}kg">
+                    {{system.static1}}
             </span> 
-            {% if specialsys.static2 %}
-            <span title="Time: {{specialsys.static2.lifetime}}H &nbsp Mass: {{specialsys.static2.maxmass}}kg &nbsp Jump Mass: {{specialsys.static2.jumpmass}}">
-                {{specialsys.static2}} 
+            {% if system.static2 %}
+            <span title="Time: {{system.static2.lifetime}}H &nbsp Mass: {{system.static2.maxmass}}kg &nbsp Jump Mass: {{system.static2.jumpmass}}">
+                {{system.static2}} 
             </span>
             {% endif %}</strong>
         </div>
@@ -51,7 +51,7 @@
     <span class="sysLastScanned label {% if scanwarning  %} label-warning {% endif %}">
         Last Scanned: {{system.lastscanned|date:"Y-m-d H:i"}}
     </span> &nbsp 
-    <i id="markScanned" onclick="MarkScanned({{system.pk}}, {{mapsys.pk}}, true);" class="icon-refresh" title="Mark Scanned"></i>
+    <i id="markScanned" onclick="MarkScanned({{system.pk}}, true);" class="icon-refresh" title="Mark Scanned"></i>
     <br />
     <br />
     <p class="occupiedText label label-important"><i class="icon-pencil" title="Edit"></i> <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p>
@@ -64,7 +64,7 @@
                 <li class="systemStatItem">Ship Kills: {{system.shipkills}}</li>
                 <li class="systemStatItem">Pod Kills: {{system.podkills}}</li>
                 {% if system.sysclass > 6 %}
-                <li class="systemStatItem">Jumps: {{specialsys.jumps}}</li>
+                <li class="systemStatItem">Jumps: {{system.jumps}}</li>
                 {% endif %}
             </ul>
     </div>
