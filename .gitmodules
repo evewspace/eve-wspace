@@ -1,3 +1,7 @@
 [submodule "evewspace/lib/eveapi"]
 	path = evewspace/lib/eveapi
 	url = https://github.com/ntt/eveapi.git
+
+[submodule "evewspace/lib/django-eveigb"]
+	path = evewspace/lib/django-eveigb
+	url = https://github.com/jenslauterbach/django-eve-igb.git
