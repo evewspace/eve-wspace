@@ -358,8 +358,8 @@ def get_wormhole_type(system1, system2):
             sourcewh = WormholeType.objects.filter(source="K",
                     destination=destination).all()
         else:
-            sourcewh = WormholeType.objects.get(source="H",
-                    destination=destination)
+            sourcewh = WormholeType.objects.filter(source="H",
+                    destination=destination).all()
     if source == "NH":
         if WormholeType.objects.filter(source="NH",
                 destination=destination).count() == 0:
@@ -372,7 +372,7 @@ def get_wormhole_type(system1, system2):
         if WormholeType.objects.filter(source="Z",
                 destination=destination).count() != 0:
             sourcewh = WormholeType.objects.filter(source="Z",
-                    destination=destination).all
+                    destination=destination).all()
     
     if sourcewh == None:
         sourcewh = WormholeType.objects.filter(source=source,

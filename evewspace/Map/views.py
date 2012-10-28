@@ -258,6 +258,40 @@ def set_interest(request):
     else:
         raise PermissionDenied
 
+@login_required()
+def add_signature(request):
+    """This function processes the Add Signature form. GET gets the form
+    and POST submits it and returns either a blank JSON dict or a form with errors.
+    in addition to the SignatureForm, the form should have a hidden field called sysID
+    with the System id. All requests should be AJAX.
+    
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    else:
+        if request.method == 'POST':
+            form = SignatureForm(request.POST)
+            try:
+                system = System.objects.get(pk=request.POST['sysID']) 
+                if form.is_valid():
+                    newSig = form.save(commit=False)
+                    newSig.system = system
+                    newSig.updated = True
+                    newSig.save()
+                    return HttpResponse('[]')
+                else:
+                    return TemplateResponse(request, "add_sig_form.html", {'form': form})
+            except DoesNotExist:
+                raise Http404
+        else:
+            form = SignatureForm()
+        return TemplateResponse(request, "add_sig_form.html", {'form': form})
+
+
+@login_required()
+def get_signature_list(request, system):
+    pass
+
 
 @permission_required('Map.add_Map')
 def create_map(request):

@@ -1,0 +1,34 @@
+<div id="sys{{system.pk}}Sigs" class="sysSigsDiv">
+    <ul class="sysSigsList">
+        {% for sig in system.signatures %}
+            <li class="sysSigsEntry">
+            <i class="icon-pencil" title="Edit" onclick="EditSignature({{signature.pk}}, {{system.pk}});"></i> &nbsp
+            <i class="icon-ban-circle" title="Delete" onclick="RemoveSignature({{signature.pk}}, {{system.pk}});"</i> &nbsp
+            {% if sig.updated %}
+                <i class="icon-ok-sign" title="Signature Updated"></i> &nbsp
+            {% else %}
+                <i class="icon-remove-sign" title="Signature Not Updated"></i> &nbsp
+            {% endif %}
+            <span class="signatureID">{{sig.sigid}}</span> &nbsp
+            <span class="signatureType" onclick="GetSiteSpawns({{sig.system.sysclass}}, {{sig.sigtype.pk}});">{{sig.sigtype.shortname}}</span> &nbsp
+            <span class="signatureInfo">{{sig.info}}</span>
+            {% if sig.sigtype.sleepersite and not sig.ratscleared %}
+                <i class="icon-warning-sign" title="Sleepers not cleared!"></i> &nbsp
+            {% else %}
+                <i class="icon-screenshot" title="Sleepers cleared at {{sig.ratscleared|date:'Y-m-d H:i'}}"></i> &nbsp
+            {% endif %}
+            {% if sig.sigtype.escalatable and sig.lastescalated < escalationThreshold %}
+                {% if sig.downtimes = 2 %}
+                    <i class="icon-fire" title="Site will despawn at DT."></i>
+                {% else %}
+                    <i class="icon-fullscreen" title="Clear escalation only."></i>
+                {% endif %}
+            {% elif sig.sigtype.escalatable %}
+                <i class="icon-ok" title="Site escalated today."></i>
+            {% endif %}
+            </li>
+        {% empty %}
+            <li class="sysSigsEntry">No Signatures!</li>
+        {% endfor%}
+    </ul>
+</div>

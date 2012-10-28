@@ -135,7 +135,8 @@ class Signature(models.Model):
     sigid = models.CharField(max_length = 10)
     # TODO: Implement server status checker to reset updated and increment
     #       downtimes
-    updated= models.BooleanField()
+    updated = models.BooleanField()
+    info = models.CharField(max_length=65, null=True, blank=True)
     # ratscleared and lastescalated are used to track wormhole combat sites.
     # ratscleared is the DateTime that sleepers were cleared initially
     # lastescalated is the last time the site was escalated (if applicable)
@@ -188,4 +189,14 @@ class Snapshot(models.Model):
 class MapForm(ModelForm):
     class Meta:
         model = Map
+
+
+class SignatureForm(ModelForm):
+    """This form should only be used with commit=False since it does not
+    set the system or updated fields.
+
+    """
+    class Meta:
+        model = Signature
+        fields = ('sigid', 'sigtype', 'info')
 
