@@ -56,7 +56,7 @@ function processAjax(data){
 
 //XXX: should POST to a dedicated "update" url
 function doMapAjaxCheckin() {
-    var currentpath = window.location.pathname;
+    var currentpath = "update/";
     $.ajax({
         type: "POST",
         url: currentpath,
@@ -67,9 +67,9 @@ function doMapAjaxCheckin() {
 }
 
 
-function DisplaySystemDetails(sysID){
+function DisplaySystemDetails(msID){
     //TODO: Dynamic Addressing
-    address = "system/" + sysID + "/";
+    address = "system/" + msID + "/";
     $.ajax({
         type: "GET",
         url: address,
@@ -87,9 +87,9 @@ function DisplaySystemDetails(sysID){
 }
 
 
-function DisplaySystemMenu(sysID, x, y){
+function DisplaySystemMenu(msID, x, y){
     //TODO: Somehow pass the proper system URL from Django instead of hard-coding
-    address = "system/" + sysID + "/menu/";
+    address = "system/" + msID + "/menu/";
     $.ajax({
         type: "GET",
         url: address,
@@ -111,20 +111,18 @@ function DisplaySystemMenu(sysID, x, y){
 }
 
 
-//XXX: need to reimplement server side
-/*
-function MarkScanned(sysID, msID, fromPanel){
+function MarkScanned(msID, fromPanel){
     //TODO: Dynamic Addressing
-    address = "http://" + window.location.host + "/map/markscanned/";
+    address = "system/" + msID + "/scanned/";
     $.ajax({
         type: "POST",
         url: address,
         async: false,
-        data: {"sysid": sysID},
+        data: {},
         success: function(data) { 
-            GetSystemTooltip(sysID, msID);
+            GetSystemTooltip(msID);
             if (fromPanel){
-                DisplaySystemDetails(sysID, msID);
+                DisplaySystemDetails(msID);
             }
             CloseSystemMenu();
 
@@ -133,18 +131,15 @@ function MarkScanned(sysID, msID, fromPanel){
     });
    
 }
-*/
 
-//XXX: need to reimplement server side
-/*
-function SetInterest(sysID){
+function SetInterest(msID){
      //TODO: Dynamic Addressing
-    address = "http://" + window.location.host + "/map/interest/";
+    address = "system/" + msID + "/interest/";
     $.ajax({
         type: "POST",
         url: address,
         async: false,
-        data: {"mapsystem": msID, "action": "set"},
+        data: {"action": "set"},
         success: function(data) { 
             CloseSystemMenu();
             window.location.reload();
@@ -153,18 +148,15 @@ function SetInterest(sysID){
     });
    
 }
-*/
 
-//XXX: need to reimplement server side
-/*
-function RemoveInterest(sysID){
+function RemoveInterest(msID){
     //TODO: Dynamic Addressing
-    address = "http://" + window.location.host + "/map/interest/";
+    address = "system/" + msID + "/interest/";
     $.ajax({
         type: "POST",
         url: address,
         async: false,
-        data: {"mapsystem": msID, "action": "remove"},
+        data: {"action": "remove"},
         success: function(data) { 
             CloseSystemMenu();
             window.location.reload();
@@ -173,18 +165,15 @@ function RemoveInterest(sysID){
     });
 
 }
-*/
 
-//XXX: need to reimplement server side
-/*
-function AssertLocation(sysID){
+function AssertLocation(msID){
     //TODO: Dynamic Addressing
-    address = "http://" + window.location.host + "/map/location/";
+    address = "system/" + msID + "/location/";
     $.ajax({
         type: "POST",
         url: address,
         async: true,
-        data: {"sysid": sysID},
+        data: {},
         success: function(data) { 
             CloseSystemMenu();
             window.location.reload();
@@ -192,18 +181,17 @@ function AssertLocation(sysID){
         error: function(errorThrown) {alert("An error occured asserting your location.");}
     });
 }
-*/
 
-function GetSystemTooltip(sysID){
+function GetSystemTooltip(msID){
     //TODO: Dynamic addressing
-    address = "system/" + sysID + "/tooltip/";
+    address = "system/" + msID + "/tooltip/";
     $.ajax({
         type: "GET",
         url: address,
         success: function(data){
-               var divName = "#sys" + sysID + "Tip";
+               var divName = "#sys" + msID + "Tip";
                 if ($(divName).length == 0){
-                    div = $('<div></div>').html(data).attr('id','sys' + sysID + 'Tip').addClass('systemTooltip').addClass('tip').appendTo('body');
+                    div = $('<div></div>').html(data).attr('id','sys' + msID + 'Tip').addClass('systemTooltip').addClass('tip').appendTo('body');
                }else{
                 $(divName).html(data);
                }
@@ -213,15 +201,12 @@ function GetSystemTooltip(sysID){
 }
 
 
-//XXX: need to reimplement server side
-/*
 function GetWormholeTooltip(whID){
     //TODO: Dynamic addressing
-    address = "http://" + window.location.host + "/map/whtooltip/";
+    address = "wormhole/" + whID + "/tooltip";
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: address,
-        data: {"whid": whID},
         success: function(data){
                var divName = "#wh" + whID + "Tip";
                 if ($(divName).length == 0){
@@ -233,7 +218,6 @@ function GetWormholeTooltip(whID){
             error: function(errorThrown) {alert("An error occured loading the wormhole tooltip.");}
             });
 }
-*/
 
 
 function CloseSystemMenu(){
@@ -402,9 +386,11 @@ function DrawSystem(system) {
     if (system.LevelX != null && system.LevelX > 0) {
         var childSys = paper.ellipse(sysX, sysY, 45, 28);
         childSys.sysID = system.sysID;
+        childSys.msID = system.msID;
         childSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
         sysText.sysID = system.sysID;
+        sysText.msID = system.msID;
         sysText.click(onSysClick);
         ColorSystem(system, childSys, sysText);
         objSystems.push(childSys);
@@ -422,11 +408,12 @@ function DrawSystem(system) {
             }
             DrawWormholes(parentSys, system, whColor);
         }else{
-            allert("Error processing system " + system.Name);
+            alert("Error processing system " + system.Name);
         }
     }else{
         var rootSys = paper.ellipse(sysX, sysY, 40, 30);
         rootSys.sysID = system.sysID;
+        rootSys.msID = system.msID;
         rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
         sysText.sysID = system.sysID;
@@ -498,7 +485,7 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     var textFontSize = 12;
     var sysStrokeDashArray = "none";
     var textColor = "#000";
-    GetSystemTooltip(ellipseSystem.sysID);
+    GetSystemTooltip(ellipseSystem.msID);
     if (system.sysID == GetSelectedSysID()) {
 
         // selected
@@ -705,7 +692,7 @@ function GetSystemIndex(systemID) {
     for (i = 0; i < stellarSystemsLength; i++) {
         var stellarSystem = systemsJSON[i];
 
-        if (stellarSystem.sysID == systemID) {
+        if (stellarSystem.msID == systemID) {
             index = i;
             return index;
         }
@@ -746,8 +733,8 @@ function GetSelectedSysID() {
 function onSysClick(e) {
     var x = e.pageX;
     var y = e.pageY;
-    DisplaySystemMenu(this.sysID, x, y);
-    var div = document.getElementById("sys"+this.sysID+"Tip");
+    DisplaySystemMenu(this.msID, x, y);
+    var div = document.getElementById("sys"+this.msID+"Tip");
     div.style.display = 'none';
 }
 
@@ -777,7 +764,7 @@ function OnWhOut() {
 }
 
 function OnSysOver(e) {
-    var divName = "sys" + this.sysID + "Tip";
+    var divName = "sys" + this.msID + "Tip";
     var div = document.getElementById(divName);
     if (div){
     
@@ -792,7 +779,7 @@ function OnSysOver(e) {
 }
 
 function OnSysOut() {
-    var divName = "sys" + this.sysID + "Tip";
+    var divName = "sys" + this.msID + "Tip";
     var div = document.getElementById(divName);
     if (div){
         div.style.display = 'none';

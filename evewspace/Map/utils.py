@@ -409,3 +409,10 @@ def system_is_in_map(system, map):
     else:
         return False
 
+
+def assert_location(user, system):
+    """Sets a user's current location to system and refreshes lastactive. """
+    profile = user.get_profile()
+    profile.currentsystem = system
+    profile.lastactive = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    profile.save()
