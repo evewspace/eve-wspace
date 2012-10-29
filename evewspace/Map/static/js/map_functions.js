@@ -54,7 +54,6 @@ function processAjax(data){
 }
 
 
-//XXX: should POST to a dedicated "update" url
 function doMapAjaxCheckin() {
     var currentpath = "update/";
     $.ajax({

@@ -2,6 +2,7 @@ from django.conf.urls.defaults import patterns, include, url
 
 syspatterns = patterns('Map.views',
         url(r'^$', 'system_details'),
+        url(r'^new/$', 'add_system'),
         url(r'^menu/$', 'system_menu'),
         url(r'^tooltip/$', 'system_tooltip'),
         url(r'^interest/$','set_interest'),

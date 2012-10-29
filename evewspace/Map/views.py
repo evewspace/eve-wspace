@@ -12,7 +12,6 @@ from django.conf import settings
 from datetime import datetime, timedelta
 import pytz
 import json
-# Create your views here.
 
 #@login_required()
 #def get_map(request, mapID="0"):
@@ -201,6 +200,45 @@ def get_system_context(msID):
 
     return { 'system' : system, 'mapsys' : mapsys, 
              'scanwarning' : scanwarning, 'isinterest' : interest }
+
+    
+@login_required
+def add_system(request, mapID):
+    """
+    AJAX view to add a system to a map. Requires POST containing:
+       topMsID: MapSystem ID of the parent MapSystem
+       bottomSystem: Name of the new system
+       topType: WormholeType name of the parent side
+       bottomType: WormholeType name of the new side
+       timeStatus: Womrhole time status integer value
+       massStatus: Wormhole mass status integer value
+       topBubbled: 1 if Parent side bubbled
+       bottomBubbled: 1 if new side bubbled
+       friendlyName: Friendly name for the new MapSystem
+    """
+    if not request.is_ajax():
+       raise PermissionDenied
+    try:
+        # Prepare data
+        map = Map.objects.get(pk=mapID)
+        topMS = MapSystem.objects.get(pk=request.POST.get('topMsID'))
+        bottomSys = System.objects.get(name=request.POST.get('bottomSystem'))
+        topType = WormholeType.objects.get(name=request.POST.get('topType'))
+        bottomType = WormholeType.objects.get(name=request.POST.get('bottomType'))
+        timeStatus = int(request.POST.get('timeStatus'))
+        massStatus = int(request.POST.get('massStatus'))
+        topBubbled = "1" == request.POST.get('topBubbled')
+        bottomBubbled = "1" == request.POST.get('bottomBubbled')
+        # Add System
+        bottomMS = utils.add_system_to_map(request.user, map, bottomSys,
+                request.POST.get('friendlyName'), False, topMS)
+        # Add Wormhole
+        add_wormhole_to_map(map, topMS, topType, bottomType, bottomMS,
+                bottomBubbled, timeStatus, massStatus, topBubbled)
+
+        return HttpResponse('[]')
+    except DoesNotExist:
+        return HttpResponse(status=400)
 
 
 @login_required
