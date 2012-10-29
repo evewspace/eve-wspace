@@ -54,6 +54,10 @@ class System(SystemData):
         """Returns name of System as unicode representation"""
         return self.name
 
+    def is_kspace(self):
+        return self.sysclass >= 7
+    def is_wspace(self):
+        return self.sysclass < 7
 
 class KSystem(System):
     sov = models.CharField(max_length = 100)
@@ -78,6 +82,19 @@ class Map(models.Model):
     def __unicode__(self):
         """Returns name of Map as unicode representation."""
         return self.name
+
+    def __contains__(self, system):
+        """
+        A convience to allow 'if system in map:' type statements to determine if
+        there exist a MapSystem with map == map and system == system.
+        NOTE: system must be a System, NOT a MapSystem
+        """
+        #I *think* this should be handled by the filter used in the main return
+        #statement, but as I require this behaviour I'll make it explicit
+        if system is None:
+            return False
+
+        return self.systems.filter(system=system).exists()
 
 
 class MapSystem(models.Model):

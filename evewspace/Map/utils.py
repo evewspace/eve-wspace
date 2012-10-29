@@ -380,7 +380,7 @@ def get_wormhole_type(system1, system2):
     return sourcewh
 
 
-def get_possible_wormhole_types(system1, system2):
+def get_possible_wh_types(system1, system2):
     """Takes two systems and gets the possible wormhole types between them.
     For example, given system1 as highsec and system2 as C2, it should return
     R943 and B274. system1 is the source and system2 is the destination.
@@ -401,18 +401,3 @@ def get_possible_wormhole_types(system1, system2):
 
     return result
 
-
-def system_is_in_map(system, map):
-    """Returns true if a System is a MapSystem in the map."""
-    if map.systems.filter(system=system).count() != 0:
-        return True
-    else:
-        return False
-
-
-def assert_location(user, system):
-    """Sets a user's current location to system and refreshes lastactive. """
-    profile = user.get_profile()
-    profile.currentsystem = system
-    profile.lastactive = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-    profile.save()

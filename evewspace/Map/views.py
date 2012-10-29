@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from datetime import datetime, timedelta
 import pytz
@@ -41,12 +41,10 @@ def get_map(request, mapID):
     If we do, then return a TemplateResponse for the map. If map does not
     exist, return 404. If we don't have permission, return PermissionDenied.
     """
-    try:
-        map = Map.objects.get(pk=mapID)
-    except DoesNotExist:
-        return Http404
+    map = get_object_or_404(Map, pk=mapID)
     context = utils.get_map_context(map, request.user)
     return TemplateResponse(request, 'map.html', context)
+
 
 @login_required
 @require_map_permission(permission=1)
@@ -54,46 +52,73 @@ def map_checkin(request, mapID):
     # Initialize json return dict
     jsonvalues = {}
     profile = request.user.get_profile()
+    currentmap = get_object_or_404(Map, pk=mapID)
+
     # Out AJAX requests should post a JSON datetime called loadtime
     # back that we use to get recent logs.
-    if not request.POST.get("loadtime"):
+    if  'loadtime' not in request.POST:
         return HttpResponse(json.dumps({error: "No loadtime"}),mimetype="application/json")
-    timestring = request.POST.get("loadtime")
+    timestring = request.POST['loadtime']
+
     if request.is_igb:
         loadtime = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%SZ')
         loadtime = loadtime.replace(tzinfo=pytz.utc)
-        if request.is_igb_trusted:
-            # Get values to pass in JSON
-            oldsystem = ""
-            oldsysobj = None
-            if profile.currentsystem:
-                oldsystem = profile.currentsystem.name
-                oldsysobj = System.objects.get(name=oldsystem)
-            currentsystem = request.eve_systemname
-            currentsysobj = System.objects.get(name=currentsystem)
-            # IGB checkin should assert our location
-            utils.assert_location(request.user, currentsysobj)
-            if profile.lastactive > datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(minutes=5):
-                if oldsysobj:
-                    if oldsystem != currentsystem and system_is_in_map(oldsysobj, result) == True:
-                        if system_is_in_map(currentsysobj, result) == False:
-                            dialogHtml = render_to_string('igb_system_add_dialog.html',
-                                    {'oldsystem': oldsystem, 'newsystem': currentsystem,
-                                        'wormholes': get_possible_wormhole_types(oldsysobj, 
-                                        currentsysobj)}, context_instance=RequestContext(request))
-                            jsonvalues.update({'dialogHTML': dialogHtml})
     else:
         loadtime = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%S.%fZ')
         loadtime.replace(tzinfo=pytz.utc)
-    newlogquery = MapLog.objects.filter(timestamp__gt=loadtime).all()
-    if len(newlogquery) > 0:
-        loglist = []
-        for log in newlogquery:
-            loglist.append("Time: %s  User: %s Action: %s" % (log.timestamp,
-                log.user.username, log.action))
-        logstring = render_to_string('log_div.html', {'logs': loglist})
-        jsonvalues.update({'logs': logstring})
+
+    if request.is_igb_trusted:
+        dialogHtml = checkin_igb_trusted(request, currentmap)
+        if dialogHtml is not None:
+            jsonvalues.update({'dialogHTML': dialogHtml})
+
+    newlogquery = MapLog.objects.filter(timestamp__gt=loadtime)
+    loglist = []
+
+    for log in newlogquery:
+        loglist.append("Time: %s  User: %s Action: %s" % (log.timestamp,
+            log.user.username, log.action))
+
+    logstring = render_to_string('log_div.html', {'logs': loglist})
+    jsonvalues.update({'logs': logstring})
+
     return HttpResponse(json.dumps(jsonvalues), mimetype="application/json")
+
+def checkin_igb_trusted(request, map):
+    """
+    Runs the specific code for the case that the request came from an igb that
+    trusts us, returns None if no further action is required, returns a string
+    containing the html for a system add dialog if we detect that a new system
+    needs to be added
+    """
+    profile = request.user.get_profile()
+    currentsystem = System.objects.get(name=request.eve_systemname)
+    oldsystem = None
+    result = None
+    
+    if profile.currentsystem:
+        oldsystem = profile.currentsystem
+
+    #Conditions for the system to be automagically added to the map. The case
+    #of oldsystem == None is handled by a condition on "sys in map" (None cannot
+    #be in any map), the case oldsystem == currentsystem is handled by the
+    #condition that if two systems are equal one cannot be in and the other not
+    #in the same map (i.e 'oldsystem in map and currentsystem not in map' will be
+    #False).
+    if oldsystem in map
+    and currentsystem not in map
+    #Stop it from adding everyone's paths through k-space to the map
+    and not (oldsystem.is_kspace() and currentsystem.is_kspace())
+    and profile.lastactive > datetime.now(pytz.utc) - tmiedelta(minutes=5):
+        context = { 'oldsystem' : oldsystem, 
+                    'newsystem' : currentsystem,
+                    'wormhole'  : util.get_possible_wh_types(oldsystem, currentsystem),
+                  }
+        result = render_to_string('igb_system_add_dialog.html', context,
+                                  context_instance=RequestContext(request))
+
+    profile.update_location(currentsystem)
+    return result
 
 def get_system_context(msID):
     try:
@@ -101,7 +126,7 @@ def get_system_context(msID):
         currentmap = mapsys.map
 
         #if mapsys represents a k-space system get the relevent KSystem object
-        if mapsys.system.sysclass > 6:
+        if mapsys.system.is_kspace():
             system = mapsys.system.ksystem
         #otherwise get the relevant WSystem
         else:
@@ -109,14 +134,11 @@ def get_system_context(msID):
     except ObjectDoesNotExist:
         raise Http404
 
-    scanthreshold = datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(hours=3)
-    interestthreshold = datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
+    scanthreshold = datetime.now(pytz.utc) - timedelta(hours=3)
+    interestthreshold = datetime.now(pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
 
     scanwarning = system.lastscanned < scanthreshold
-    if mapsys.interesttime:
-        interest = mapsys.interesttime > interestthreshold
-    else:
-        interest = False
+    interest = mapsys.interesttime and mapsys.interesttime > interestthreshold
 
     return { 'system' : system, 'mapsys' : mapsys, 
              'scanwarning' : scanwarning, 'isinterest' : interest }
@@ -154,8 +176,8 @@ def add_system(request, mapID):
         bottomMS = utils.add_system_to_map(request.user, map, bottomSys,
                 request.POST.get('friendlyName'), False, topMS)
         # Add Wormhole
-        add_wormhole_to_map(map, topMS, topType, bottomType, bottomMS,
-                bottomBubbled, timeStatus, massStatus, topBubbled)
+        utils.add_wormhole_to_map(map, topMS, topType, bottomType, bottomMS,
+                                  bottomBubbled, timeStatus, massStatus, topBubbled)
 
         return HttpResponse('[]')
     except ObjectDoesNotExist:
@@ -290,24 +312,24 @@ def add_signature(request, mapID, msID):
     """
     if not request.is_ajax():
         raise PermissionDenied
+
+    if request.method == 'POST':
+        form = SignatureForm(request.POST)
+        try:
+            mapsystem = MapSystem.objects.get(pk=msID)
+            if form.is_valid():
+                newSig = form.save(commit=False)
+                newSig.system = mapsystem.system
+                newSig.updated = True
+                newSig.save()
+                return HttpResponse('[]')
+            else:
+                return TemplateResponse(request, "add_sig_form.html", {'form': form})
+        except DoesNotExist:
+            raise Http404
     else:
-        if request.method == 'POST':
-            form = SignatureForm(request.POST)
-            try:
-                mapsystem = MapSystem.objects.get(pk=msID)
-                if form.is_valid():
-                    newSig = form.save(commit=False)
-                    newSig.system = mapsystem.system
-                    newSig.updated = True
-                    newSig.save()
-                    return HttpResponse('[]')
-                else:
-                    return TemplateResponse(request, "add_sig_form.html", {'form': form})
-            except DoesNotExist:
-                raise Http404
-        else:
-            form = SignatureForm()
-        return TemplateResponse(request, "add_sig_form.html", {'form': form})
+        form = SignatureForm()
+    return TemplateResponse(request, "add_sig_form.html", {'form': form})
 
 
 @login_required()

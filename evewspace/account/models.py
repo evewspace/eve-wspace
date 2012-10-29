@@ -23,6 +23,14 @@ class UserProfile(models.Model):
     currentsystem = models.ForeignKey(System, related_name="activepilots", blank=True, null=True)
     lastactive = models.DateTimeField()
 
+    def update_location(self, system):
+        """
+        updates the current location and last active timestamp for this user
+        """
+        self.currentsystem = system
+        self.lastactive = datetime.datetime.now(pytz.utc)
+        self.save()
+
 
 class GroupProfile(models.Model):
     """GroupProfile defines custom fields tied to each Group record."""
