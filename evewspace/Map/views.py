@@ -11,6 +11,20 @@ from datetime import datetime, timedelta
 import pytz
 # Create your views here.
 
+# Decorator to check map permissions. Takes request and mapID
+# Permissions are 0 = None, 1 = View, 2 = Change
+# When used without a permission=x specification, requires Change access
+def require_map_permission(function, permission=2):
+    def wrap(request, mapID, *args, **kwargs):
+        try:
+            map = Map.objects.get(pk=mapID)
+            if utils.check_map_permission(reqeust.user, map) < permission:
+                raise PermissionDenied
+            else:
+                return function(*args, **kwargs)
+        except DoesNotExist:
+            raise Http404
+
 @login_required()
 def get_map(request, mapID="0"):
     """This function takes a request and Map ID, determines if access
