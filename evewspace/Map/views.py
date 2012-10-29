@@ -20,14 +20,11 @@ import json
 def require_map_permission(permission=2):
     def _dec(view_func):
         def _view(request, mapID, *args, **kwargs):
-            try:
-                map = Map.objects.get(pk=mapID)
-                if utils.check_map_permission(request.user, map) < permission:
-                    raise PermissionDenied
-                else:
-                    return view_func(request, mapID, *args, **kwargs)
-            except ObjectDoesNotExist:
-                raise Http404
+            map = get_object_or_404(Map, pk=mapID)
+            if utils.check_map_permission(request.user, map) < permission:
+                raise PermissionDenied
+            else:
+                return view_func(request, mapID, *args, **kwargs)
         _view.__name__ = view_func.__name__
         _view.__doc__ = view_func.__doc__
         _view.__dict__ = view_func.__dict__
@@ -105,11 +102,13 @@ def checkin_igb_trusted(request, map):
     #condition that if two systems are equal one cannot be in and the other not
     #in the same map (i.e 'oldsystem in map and currentsystem not in map' will be
     #False).
-    if oldsystem in map
-    and currentsystem not in map
-    #Stop it from adding everyone's paths through k-space to the map
-    and not (oldsystem.is_kspace() and currentsystem.is_kspace())
-    and profile.lastactive > datetime.now(pytz.utc) - tmiedelta(minutes=5):
+    if (
+      oldsystem in map
+      and currentsystem not in map
+      #Stop it from adding everyone's paths through k-space to the map
+      and not (oldsystem.is_kspace() and currentsystem.is_kspace())
+      and profile.lastactive > datetime.now(pytz.utc) - timedelta(minutes=5)
+      ):
         context = { 'oldsystem' : oldsystem, 
                     'newsystem' : currentsystem,
                     'wormhole'  : util.get_possible_wh_types(oldsystem, currentsystem),
@@ -121,18 +120,15 @@ def checkin_igb_trusted(request, map):
     return result
 
 def get_system_context(msID):
-    try:
-        mapsys = MapSystem.objects.get(pk=msID)
-        currentmap = mapsys.map
+    mapsys = get_object_or_404(MapSystem, pk=msID)
+    currentmap = mapsys.map
 
-        #if mapsys represents a k-space system get the relevent KSystem object
-        if mapsys.system.is_kspace():
-            system = mapsys.system.ksystem
-        #otherwise get the relevant WSystem
-        else:
-            system = mapsys.system.wsystem
-    except ObjectDoesNotExist:
-        raise Http404
+    #if mapsys represents a k-space system get the relevent KSystem object
+    if mapsys.system.is_kspace():
+        system = mapsys.system.ksystem
+    #otherwise get the relevant WSystem
+    else:
+        system = mapsys.system.wsystem
 
     scanthreshold = datetime.now(pytz.utc) - timedelta(hours=3)
     interestthreshold = datetime.now(pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
@@ -227,12 +223,9 @@ def wormhole_tooltip(request, mapID, whID):
     
     """
     if request.is_ajax():
-        try:
-            wh = Wormhole.objects.get(pk=whID)
-            return HttpResponse(render_to_string("wormhole_tooltip.html",
-                {'wh': wh}, context_instance=RequestContext(request)))
-        except ObjectDoesNotExist:
-            raise Http404
+        wh = get_object_or_404(Wormhole, pk=whID)
+        return HttpResponse(render_to_string("wormhole_tooltip.html",
+            {'wh': wh}, context_instance=RequestContext(request)))
     else:
         raise PermissionDenied
 
@@ -245,13 +238,10 @@ def mark_scanned(request, mapID, msID):
 
     """
     if request.is_ajax():
-        try:
-            mapsys = MapSystem.objects.get(pk=msID)
-            mapsys.system.lastscanned = datetime.utcnow().replace(tzinfo=pytz.utc)
-            mapsys.system.save()
-            return HttpResponse('[]')
-        except ObjectDoesNotExist:
-            raise Http404
+        mapsys = get_object_or_404(MapSystem, pk=msID)
+        mapsys.system.lastscanned = datetime.now(pytz.utc)
+        mapsys.system.save()
+        return HttpResponse('[]')
     else:
         raise PermissionDenied
 
@@ -263,12 +253,9 @@ def manual_location(request, mapID, msID):
 
     """
     if request.is_ajax():
-        try:
-            mapsystem = MapSystem.objects.get(pk=msID)
-            utils.assert_location(request.user, mapsystem.system)
-            return HttpResponse("[]")
-        except ObjectDoesNotExist:
-            raise Http404
+        mapsystem = get_object_or_404(MapSystem, pk=msID)
+        utils.assert_location(request.user, mapsystem.system)
+        return HttpResponse("[]")
     else:
         raise PermissionDenied
 
@@ -285,19 +272,16 @@ def set_interest(request, mapID, msID):
         action = request.POST.get("action","none")
         if action == "none":
             raise Http404
-        try:
-            system = MapSystem.objects.get(pk=msID)
-            if action == "set":
-                system.interesttime = datetime.utcnow().replace(tzinfo=pytz.utc)
-                system.save()
-                return HttpResponse('[]')
-            if action == "remove":
-                system.interesttime = None
-                system.save()
-                return HttpResponse('[]')
-            return HttpResponse(staus=418)
-        except ObjectDoesNotExist:
-            raise Http404
+        system = get_object_or_404(MapSystem, pk=msID)
+        if action == "set":
+            system.interesttime = datetime.now(pytz.utc)
+            system.save()
+            return HttpResponse('[]')
+        if action == "remove":
+            system.interesttime = None
+            system.save()
+            return HttpResponse('[]')
+        return HttpResponse(staus=418)
     else:
         raise PermissionDenied
 
@@ -315,18 +299,15 @@ def add_signature(request, mapID, msID):
 
     if request.method == 'POST':
         form = SignatureForm(request.POST)
-        try:
-            mapsystem = MapSystem.objects.get(pk=msID)
-            if form.is_valid():
-                newSig = form.save(commit=False)
-                newSig.system = mapsystem.system
-                newSig.updated = True
-                newSig.save()
-                return HttpResponse('[]')
-            else:
-                return TemplateResponse(request, "add_sig_form.html", {'form': form})
-        except DoesNotExist:
-            raise Http404
+        mapsystem = get_object_or_404(MapSystem, pk=msID)
+        if form.is_valid():
+            newSig = form.save(commit=False)
+            newSig.system = mapsystem.system
+            newSig.updated = True
+            newSig.save()
+            return HttpResponse('[]')
+        else:
+            return TemplateResponse(request, "add_sig_form.html", {'form': form})
     else:
         form = SignatureForm()
     return TemplateResponse(request, "add_sig_form.html", {'form': form})
