@@ -17,18 +17,25 @@ import json
 # Permissions are 0 = None, 1 = View, 2 = Change
 # When used without a permission=x specification, requires Change access
 
-def require_map_permission(function, permission=2):
-    def wrap(request, mapID, *args, **kwargs):
-        try:
-            map = Map.objects.get(pk=mapID)
-            if utils.check_map_permission(reqeust.user, map) < permission:
-                raise PermissionDenied
-            else:
-                return function(*args, **kwargs)
-        except DoesNotExist:
-            raise Http404
+def require_map_permission(permission=2):
+    def _dec(view_func):
+        def _view(request, mapID, *args, **kwargs):
+            try:
+                map = Map.objects.get(pk=mapID)
+                if utils.check_map_permission(request.user, map) < permission:
+                    raise PermissionDenied
+                else:
+                    return view_func(request, mapID, *args, **kwargs)
+            except ObjectDoesNotExist:
+                raise Http404
+        _view.__name__ = view_func.__name__
+        _view.__doc__ = view_func.__doc__
+        _view.__dict__ = view_func.__dict__
+        return _view
+    return _dec
 
 @login_required
+@require_map_permission(permission=1)
 def get_map(request, mapID):
     """Get the map and determine if we have permissions to see it. 
     If we do, then return a TemplateResponse for the map. If map does not
@@ -38,14 +45,11 @@ def get_map(request, mapID):
         map = Map.objects.get(pk=mapID)
     except DoesNotExist:
         return Http404
-    # Check our permissions for the map
-    permissions = utils.check_map_permission(request.user, map)
-    if permissions == 0:
-        return PermissionDenied
     context = utils.get_map_context(map, request.user)
     return TemplateResponse(request, 'map.html', context)
 
 @login_required
+@require_map_permission(permission=1)
 def map_checkin(request, mapID):
     # Initialize json return dict
     jsonvalues = {}
@@ -119,6 +123,7 @@ def get_system_context(msID):
 
     
 @login_required
+@require_map_permission(permission=2)
 def add_system(request, mapID):
     """
     AJAX view to add a system to a map. Requires POST containing:
@@ -153,11 +158,12 @@ def add_system(request, mapID):
                 bottomBubbled, timeStatus, massStatus, topBubbled)
 
         return HttpResponse('[]')
-    except DoesNotExist:
+    except ObjectDoesNotExist:
         return HttpResponse(status=400)
 
 
 @login_required
+@require_map_permission(permission=1)
 def system_details(request, mapID, msID):
     """
     Returns a html div representing details of the System given by msID in
@@ -169,6 +175,7 @@ def system_details(request, mapID, msID):
     return render(request, 'system_details.html', get_system_context(msID))
 
 @login_required
+@require_map_permission(permission=1)
 def system_menu(request, mapID, msID):
     """
     Returns the html for system menu
@@ -179,6 +186,7 @@ def system_menu(request, mapID, msID):
     return render(request, 'system_menu.html', get_system_context(msID))
 
 @login_required
+@require_map_permission(permission=1)
 def system_tooltip(request, mapID, msID):
     """
     Returns a system tooltip for msID in mapID
@@ -190,6 +198,7 @@ def system_tooltip(request, mapID, msID):
 
 
 @login_required
+@require_map_permission(permission=1)
 def wormhole_tooltip(request, mapID, whID):
     """Takes a POST request from AJAX with a Wormhole ID and renders the
     wormhole tooltip for that ID to response.
@@ -207,6 +216,7 @@ def wormhole_tooltip(request, mapID, whID):
 
 
 @login_required()
+@require_map_permission(permission=2)
 def mark_scanned(request, mapID, msID):
     """Takes a POST request from AJAX with a system ID and marks that system
     as scanned.
@@ -242,6 +252,7 @@ def manual_location(request, mapID, msID):
 
 
 @login_required()
+@require_map_permission(permission=2)
 def set_interest(request, mapID, msID):
     """Takes a POST request from AJAX with an action and marks that system
     as having either utcnow or None as interesttime. The action can be either 
@@ -269,6 +280,7 @@ def set_interest(request, mapID, msID):
         raise PermissionDenied
 
 @login_required()
+@require_map_permission(permission=2)
 def add_signature(request, mapID, msID):
     """This function processes the Add Signature form. GET gets the form
     and POST submits it and returns either a blank JSON list or a form with errors.
@@ -304,6 +316,7 @@ def get_signature_list(request, mapID, msID):
 
 
 @login_required
+@require_map_permission(permission=2)
 def edit_wormhole(request, whID):
     raise PermissiondDenied
 
