@@ -81,6 +81,18 @@ def map_checkin(request, mapID):
 
     return HttpResponse(json.dumps(jsonvalues), mimetype="application/json")
 
+@login_required
+@require_map_permission(permission=1)
+def map_refresh(request, mapID):
+    """
+    Returns an HttpResponse with the updated systemJSON for an asynchronous
+    map refresh.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    map = get_object_or_404(Map, pk=mapID)
+    return HttpResponse(utils.get_systems_json(map, request.user))
+
 def checkin_igb_trusted(request, map):
     """
     Runs the specific code for the case that the request came from an igb that
@@ -254,7 +266,8 @@ def manual_location(request, mapID, msID):
     """
     if request.is_ajax():
         mapsystem = get_object_or_404(MapSystem, pk=msID)
-        utils.assert_location(request.user, mapsystem.system)
+        profile = request.user.get_profile()
+        profile.update_location(mapsystem.system)
         return HttpResponse("[]")
     else:
         raise PermissionDenied

@@ -1,13 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Map: {{map.name}}{% endblock %}
 {% block scripts %}
-    <script type="text/javascript">
-        var systemsJSON = {{systemsJSON|safe}};
-        var wormholesJSON = {{wormholesJSON|safe}};
-    </script>
     <script type="text/javascript" src="{{STATIC_URL}}js/raphael-min.js"></script>
     <script type="text/javascript" src="{{STATIC_URL}}js/map_functions.js"></script>
     <link rel="stylesheet" href="{{STATIC_URL}}css/map.css" type="text/css" />
+    <script type="text/javascript">var ajax_image = "<img src= '{{STATIC_URL}}images/loading.gif'></img>"; </script>
     {% include 'autocomplete_light/static.html' %}    
 {% endblock %}
 {% block contentheader %}

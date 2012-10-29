@@ -31,7 +31,10 @@ $.ajaxSetup({
 
 
 $(document).ready(function(){setInterval(function(){doMapAjaxCheckin();}, 5000);});
-$(document).ready(function(){StartDrawing();});
+$(document).ready(function(){
+    $('#mapDiv').html(ajax_image);
+    RefreshMap();
+});
 
 
 function processAjax(data){
@@ -128,7 +131,6 @@ function MarkScanned(msID, fromPanel){
         },
         error: function(errorThrown) {alert("An error occured marking the system scanned.");}
     });
-   
 }
 
 function SetInterest(msID){
@@ -140,8 +142,7 @@ function SetInterest(msID){
         async: false,
         data: {"action": "set"},
         success: function(data) { 
-            CloseSystemMenu();
-            window.location.reload();
+            RefreshMap();
         },
         error: function(errorThrown) {alert("An error occured setting the interest.");}
     });
@@ -157,8 +158,7 @@ function RemoveInterest(msID){
         async: false,
         data: {"action": "remove"},
         success: function(data) { 
-            CloseSystemMenu();
-            window.location.reload();
+            RefreshMap();
         },
         error: function(errorThrown) {alert("An error occured removing the interest.");}
     });
@@ -174,8 +174,7 @@ function AssertLocation(msID){
         async: true,
         data: {},
         success: function(data) { 
-            CloseSystemMenu();
-            window.location.reload();
+            RefreshMap();
         },
         error: function(errorThrown) {alert("An error occured asserting your location.");}
     });
@@ -216,6 +215,23 @@ function GetWormholeTooltip(whID){
         },
             error: function(errorThrown) {alert("An error occured loading the wormhole tooltip.");}
             });
+}
+
+
+function RefreshMap(){
+    address = "refresh/";
+    $.ajax({
+        type: "GET",
+        url: address,
+        success: function(data){
+            CloseSystemMenu();
+            systemsJSON = $.parseJSON(data);
+            StartDrawing();
+        },
+        error: function(errorThrown){
+            alert("An error occured reloading the map.");
+        }
+    });
 }
 
 
@@ -324,8 +340,11 @@ function InitializeRaphael() {
     if (paper){
         paper.clear();
     }
+    else{
+        $('#mapDiv').empty();
+    }
     var holderHeight = 90 + maxLevelY * indentY;
-    var holderWidth = 120 + maxLevelX * (indentX + 20);
+    var holderWidth = 170 + maxLevelX * (indentX + 20);
 
     paper = Raphael("mapDiv", holderWidth, holderHeight);
     holder = document.getElementById("mapDiv");
@@ -384,11 +403,11 @@ function DrawSystem(system) {
     var sysText;
     if (system.LevelX != null && system.LevelX > 0) {
         var childSys = paper.ellipse(sysX, sysY, 45, 28);
-        childSys.sysID = system.sysID;
+        //childSys.sysID = system.sysID;
         childSys.msID = system.msID;
         childSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
-        sysText.sysID = system.sysID;
+        //sysText.sysID = system.sysID;
         sysText.msID = system.msID;
         sysText.click(onSysClick);
         ColorSystem(system, childSys, sysText);
@@ -411,11 +430,12 @@ function DrawSystem(system) {
         }
     }else{
         var rootSys = paper.ellipse(sysX, sysY, 40, 30);
-        rootSys.sysID = system.sysID;
+        //rootSys.sysID = system.sysID;
         rootSys.msID = system.msID;
         rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
-        sysText.sysID = system.sysID;
+        //sysText.sysID = system.sysID;
+        sysText.msID = system.msID;
         sysText.click(onSysClick);
 
         ColorSystem(system, rootSys, sysText);

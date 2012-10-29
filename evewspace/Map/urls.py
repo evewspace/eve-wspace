@@ -18,6 +18,7 @@ wormholepatterns = patterns('Map.views',
 mappatterns = patterns('Map.views',
         url(r'^$', 'get_map'),
         url(r'^update/$', 'map_checkin'),
+        url(r'^refresh/$', 'map_refresh'),
         url(r'^system/(?P<msID>\d+)/', include(syspatterns)),
         url(r'^wormhole/(?P<whID>\d+)/', include(wormholepatterns)),
         )
