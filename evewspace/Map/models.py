@@ -4,6 +4,8 @@ from core.models import SystemData
 from django import forms
 from django.forms import ModelForm
 import autocomplete_light as ac
+from datetime import datetime
+import pytz
 # Create your models here.
 
 class WormholeType(models.Model):
@@ -96,6 +98,57 @@ class Map(models.Model):
 
         return self.systems.filter(system=system).exists()
 
+    #Given a __contains__ function I guess it makes sense to implement this
+    #so for ... in ... will work too.
+    def __iter__(self):
+        """
+        Returns an iterator over all Systems in the map
+        NOTE: returns Systems not MapSystems
+        """
+        for msys in self.systems.all():
+            yield msys.system
+
+    def add_log(self, user, action):
+        """
+        Adds a log entry into a MapLog for the map.
+        """
+        log = MapLog(user=user, map=self, action=action,
+                     timestamp=datetime.now(pytz.utc))
+        log.save()
+
+    def get_permission(self, user):
+        """
+        Returns the highest permision that user has on the map.
+        0 = No Access
+        1 = Read Access
+        2 = Write Access
+        """
+        #Special case: if user is unrestricted we don't care unless the map
+        #requires explicit permissions
+        if user.has_perm['Map.map_unrestricted'] and not self.explicitperms:
+            return 2
+
+        #Otherwise take the highest of the permissions granted by the groups
+        #user is a member of
+        highestperm = 0
+        #query set of all groups the user is a member of
+        groups = user.groups.all()
+        #Done this way there should only be one db hit which gets all relevant
+        #permissions
+        for perm in self.grouppermissions.filter(group__in=groups):
+            highestperm = max(highestperm, perm)
+
+        return highestperm
+
+    def add_system(self, user, system, friendlyname, parent=None):
+        """
+        Adds the provided system to the map with the provided
+        friendly name. Returns the new MapSystem object. 
+        """
+        system = MapSystem(map=self, system=system, friendlyname=friendlyname, parentsystem = parent)
+        system.save()
+        self.add_log(user, "Added system: %s" % system.name)
+        return system
 
 class MapSystem(models.Model):
     """Stores information regarding which systems are active in which maps at the present time."""
@@ -108,6 +161,21 @@ class MapSystem(models.Model):
     def __unicode__(self):
         return "system %s in map %s" % (self.system.name, self.map.name)
 
+    def connect_to(self, system,
+                   topType, bottomType, 
+                   topBubbled=False, bottomBubbled=False,
+                   timeStatus=0, massStatus=0):
+        """
+        Connect self to system and add the connecting WH to map, self is the
+        bottom system. Returns the connecting wormhole.
+        """
+        wormhole = Wormhole(map=self.map, top = system, bottom=self,
+                      top_type=topType, bottom_type=bottomType,
+                      top_bubbled=topBubbled, bottom_bubbled=bottomBubbled,
+                      time_status=timeStatus, mass_status=massStatus)
+
+        wormhole.save()
+        return wormhole
 
 class Wormhole(models.Model):
     """An instance of a wormhole in a  map. 

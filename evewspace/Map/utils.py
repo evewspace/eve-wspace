@@ -28,7 +28,7 @@ def check_map_permission(user, map):
     # Note: We return the highest permission of all entries
     highestperm = 0
     for group in user.groups.all():
-        if MapPermission.objects.filter(map=map, group=group).count() > 0:
+        if MapPermission.objects.filter(map=map, group=group):
             perm = MapPermission.objects.get(map=map, group=group).access
             if perm > highestperm:
                 highestperm = perm
