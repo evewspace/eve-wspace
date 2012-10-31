@@ -346,8 +346,8 @@ def create_map(request):
         form = MapForm(request.POST)
         if form.is_valid():
             newMap = form.save()
-            add_log(request.user, newMap, "Created the %s map." % (newMap.name))
-            add_system_to_map(request.user, newMap, newMap.root, "Root", True, None)
+            utils.add_log(request.user, newMap, "Created the %s map." % (newMap.name))
+            utils.add_system_to_map(request.user, newMap, newMap.root, "Root", True, None)
             return HttpResponseRedirect(reverse('Map.views.get_map', 
                 kwargs={'mapID': newMap.pk }))
     else:
