@@ -353,4 +353,3 @@ def create_map(request):
     else:
         form = MapForm
         return TemplateResponse(request, 'new_map.html', { 'form': form, })
-
