@@ -193,6 +193,17 @@ def add_system(request, mapID):
 
 
 @login_required
+@require_map_permission(permission=2)
+def remove_system(request, mapID, msID):
+    """
+    Removes the supplied MapSystem from a map.
+    """
+    system = get_object_or_404(MapSystem, pk=msID)
+    utils.delete_system(system, request.user)
+    return HttpResponse('[]')
+
+
+@login_required
 @require_map_permission(permission=1)
 def system_details(request, mapID, msID):
     """

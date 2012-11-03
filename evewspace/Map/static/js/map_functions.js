@@ -247,10 +247,26 @@ function AddSystem(){
         url: address,
         data: $('#sysAddForm').serialize(),
         success: function(data){
-            RefreshMap();
+            setTimeout(RefreshMap(), 500);
         },
         error: function(errorThrown){
             alert("An error occured adding the system to the map.");
+        }
+    });
+}
+
+
+function DeleteSystem(msID){
+    CloseSystemMenu();
+    address = "system/" + msID + "/remove/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        success: function(){
+            setTimeout(RefreshMap(), 500);
+        },
+        error: function(){
+            alert("An error occured removing the system from the map.");
         }
     });
 }
