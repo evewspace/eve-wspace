@@ -123,7 +123,7 @@ def checkin_igb_trusted(request, map):
       ):
         context = { 'oldsystem' : map.systems.filter(system=oldsystem).all()[0], 
                     'newsystem' : currentsystem,
-                    'wormhole'  : utils.get_possible_wh_types(oldsystem, currentsystem),
+                    'wormholes'  : utils.get_possible_wh_types(oldsystem, currentsystem),
                   }
         result = render_to_string('igb_system_add_dialog.html', context,
                                   context_instance=RequestContext(request))
