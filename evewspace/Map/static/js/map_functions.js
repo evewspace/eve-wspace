@@ -143,7 +143,8 @@ function SetInterest(msID){
         url: address,
         async: false,
         data: {"action": "set"},
-        success: function(data) { 
+        success: function(data) {
+            CloseSystemMenu();
             RefreshMap();
         },
         error: function(errorThrown) {alert("An error occured setting the interest.");}
@@ -160,6 +161,7 @@ function RemoveInterest(msID){
         async: false,
         data: {"action": "remove"},
         success: function(data) { 
+            CloseSystemMenu();
             RefreshMap();
         },
         error: function(errorThrown) {alert("An error occured removing the interest.");}
