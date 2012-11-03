@@ -40,11 +40,13 @@ $(document).ready(function(){
 function processAjax(data){
     if (data['dialogHTML']){
         $(data['dialogHTML']).dialog({
+            autoOpen: false,
             close: function(event, ui) { 
                 $(this).dialog("destroy");
                 $(this).remove();
             }
         });
+        $('#igbAddDialog').dialog('open');
     }
     if (data['logs']){
         if ($('#logList').length == 0){
@@ -230,6 +232,23 @@ function RefreshMap(){
         },
         error: function(errorThrown){
             alert("An error occured reloading the map.");
+        }
+    });
+}
+
+
+function AddSystem(){
+    //This function adds a system using the information in a form named #sysAddForm
+    address = "system/new/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        data: $('#sysAddForm').serialize(),
+        success: function(data){
+            RefreshMap();
+        },
+        error: function(errorThrown){
+            alert("An error occured adding the system to the map.");
         }
     });
 }

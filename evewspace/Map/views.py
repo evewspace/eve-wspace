@@ -121,9 +121,9 @@ def checkin_igb_trusted(request, map):
       and not (oldsystem.is_kspace() and currentsystem.is_kspace())
       and profile.lastactive > datetime.now(pytz.utc) - timedelta(minutes=5)
       ):
-        context = { 'oldsystem' : oldsystem, 
+        context = { 'oldsystem' : map.systems.filter(system=oldsystem).all()[0], 
                     'newsystem' : currentsystem,
-                    'wormhole'  : util.get_possible_wh_types(oldsystem, currentsystem),
+                    'wormhole'  : utils.get_possible_wh_types(oldsystem, currentsystem),
                   }
         result = render_to_string('igb_system_add_dialog.html', context,
                                   context_instance=RequestContext(request))

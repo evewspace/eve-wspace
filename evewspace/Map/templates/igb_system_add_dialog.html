@@ -1,46 +1,55 @@
-<div class="igbAddDialog" title="You've entered an unmapped system!">
-    <form action="{{request.get_full_path}}" method="post">
+<div id="igbAddDialog" class="igbAddDialog" title="You've entered an unmapped system!">
+    <form id="sysAddForm" action="system/new/" method="post">
         {% csrf_token %}
-        <input type="hidden" name="topsystem" value="{{oldsystem}}">
-        <input type="hidden" name="bottomsystem" value="{{newsystem}}">
+        <input type="hidden" class="sysAddInput" name="topMsID" value="{{oldsystem.pk}}">
+        <input type="hidden" class="sysAddInput" name="bottomSystem" value="{{newsystem}}">
         <h3>Wormhole Status:</h3>
         Time Status: <br />
-        <input type="radio" name="timestatus" value="0" checked="checked">Fine<br />
-        <input type="radio" name="timestatus" value="1">End of Life<br />
+        <input type="radio" class="sysAddInput" name="timeStatus" value="0" checked="checked">Fine<br />
+        <input type="radio" class="sysAddInput" name="timeStatus" value="1">End of Life<br />
         <br />
         Mass Status: <br />
-        <input type="radio" name="massstatus" value="0" checked="checked">Fine<br />
-        <input type="radio" name="massstatus" value="1">First Shrink<br />
-        <input type="radio" name="massstatus" value="2">Critical<br />
+        <input type="radio" class="sysAddInput" name="massStatus" value="0" checked="checked">Fine<br />
+        <input type="radio" class="sysAddInput" name="massStatus" value="1">First Shrink<br />
+        <input type="radio" class="sysAddInput" name="massStatus" value="2">Critical<br />
         <br />
         <h3>Wormhole in: {{oldsystem.name}}</h3>
         Type:
         <br />
-        <input type="radio" name="topwh" value="K162" checked="checked">K162<br/>
+        <input type="radio" class="sysAddInput" name="topType" value="K162" checked="checked">K162<br/>
         {% for wh in wormholes.system1 %}
-        <input type="radio" name="topwh" value={{wh.name}}>{{wh.name}}<br />
+        <input type="radio" class="sysAddInput" name="topType" value={{wh.name}}>{{wh.name}}<br />
         {% endfor %}
         <br />
         Bubbled: <br />
-        <input type="radio" name="topbubbled" value="0" checked="checked">No <br />
-        <input type="radio" name="topbubbled" value="1">Yes
+        <input type="radio" class="sysAddInput" name="topBubbled" value="0" checked="checked">No <br />
+        <input type="radio" class="sysAddInput" name="topBubbled" value="1">Yes
         <br />
         
         <h3>Wormhole in: {{newsystem.name}}</h3>
         Friendly Name:<br />
-        <input type="text" name="friendly" value=""> <br />
+        <input type="text" class="sysAddInput" name="friendlyName" value=""> <br />
         Type:
         <br />
-        <input type="radio" name="bottomwh" value="K162" checked="checked">K162 <br />
+        <input type="radio" class="sysAddInput" name="bottomType" value="K162" checked="checked">K162 <br />
         {% for wh in wormholes.system2 %}
-        <input type="radio" name="bottomwh" value={{wh.name}}>{{wh.name}}<br />
+        <input type="radio" class="sysAddInput" name="bottomType" value={{wh.name}}>{{wh.name}}<br />
         {% endfor %}
         <br />
         Bubbled: <br />
-        <input type="radio" name="bottombubbled" value="0" checked="checked">No <br />
-        <input type="radio" name="bottombubbled" value="1">Yes
+        <input type="radio" class="sysAddInput" name="bottomBubbled" value="0" checked="checked">No <br />
+        <input type="radio" class="sysAddInput" name="bottomBubbled" value="1">Yes
         <br />
-        
-        <input type="submit" value="Add System">
+        <input id="sysAddSubmit" class="sysAddInput" type="submit" value="Add System">
     </form>
+        <script type="text/javascript">
+            $('#sysAddForm').submit(function(e){
+                        e.preventDefault();
+                        AddSystem();
+                        $('#igbAddDialog').dialog('close');
+                        $('#igbAddDialog').remove();
+                        return false;
+            });
+        </script>
+
 </div>
