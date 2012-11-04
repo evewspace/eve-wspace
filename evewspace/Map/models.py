@@ -218,8 +218,6 @@ class Signature(models.Model):
     system = models.ForeignKey(System, related_name="signatures")
     sigtype = models.ForeignKey(SignatureType, related_name="sigs")
     sigid = models.CharField(max_length = 10)
-    # TODO: Implement server status checker to reset updated and increment
-    #       downtimes
     updated = models.BooleanField()
     info = models.CharField(max_length=65, null=True, blank=True)
     # ratscleared and lastescalated are used to track wormhole combat sites.
@@ -238,22 +236,28 @@ class Signature(models.Model):
 
     def activate(self):
         """Marks the site activated."""
-        self.activated = datetime.now(pytz.utcnow)
+        self.activated = datetime.now(pytz.utc)
         self.save()
 
     def clear_rats(self):
         """Marks the NPCs cleared."""
-        self.ratscleared = datetime.now(pytz.utcnow)
+        self.ratscleared = datetime.now(pytz.utc)
         self.save()
 
     def escalate(self):
         """Marks the sig escalated."""
-        self.lastescalated = datetime.now(pytz.utcnow)
+        self.lastescalated = datetime.now(pytz.utc)
         self.save()
 
     def increment_downtime(self):
-        """Increments the downtime count."""
-        self.downtimes += 1
+        """Increments the downtime count and does downtime cleanup 
+        of updated and activated."""
+        self.activated = None
+        self.updated = False
+        if self.downtimes:
+            self.downtimes += 1
+        else:
+            self.downtimes = 1
         self.save()
 
     def escalated_today(self):
@@ -270,7 +274,12 @@ class Signature(models.Model):
             # It is before downtime, use yesterday's date
             threshold = datetime.combine(currenttime.date() - timedelta(days=1),
                     time(hour=11, tzinfo=pytz.utc))
-        return self.lastescalated > threshold
+        return self.lastescalated > thresholda
+
+    def update(self):
+        """Mark the signature as having been updated since DT."""
+        self.updated = True
+        self.save()
 
 
 class MapPermission(models.Model):

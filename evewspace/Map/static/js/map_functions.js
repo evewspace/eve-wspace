@@ -282,6 +282,66 @@ function LoadSignatures(msID){
 }
 
 
+function MarkCleared(sigID, msID){
+    address = "system/" + msID + "/signatures/" + sigID + "/clear/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        success: function(){
+            LoadSignatures(msID);
+        },
+        error: function(){
+            alert("The signature action failed.");
+        }
+    });
+}
+
+
+function MarkEscalated(sigID, msID){
+    address = "system/" + msID + "/signatures/" + sigID + "/escalate/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        success: function(){
+            LoadSignatures(msID);
+        },
+        error: function(){
+            alert("The signature action failed.");
+        }
+    });
+}
+
+
+function MarkActivated(sigID, msID){
+    address = "system/" + msID + "/signatures/" + sigID + "/activate/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        success: function(){
+            LoadSignatures(msID);
+        },
+        error: function(){
+            alert("The signature action failed.");
+        }
+    });
+}
+
+
+function DeleteSignature(sigID, msID){
+    address = "system/" + msID + "/signatures/" + sigID + "/remove/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        success: function(){
+            LoadSignatures(msID);
+        },
+        error: function(){
+            alert("The signature action failed.");
+        }
+    });
+}
+
+
 function AddSystem(){
     //This function adds a system using the information in a form named #sysAddForm
     address = "system/new/";

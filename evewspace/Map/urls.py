@@ -1,6 +1,10 @@
 from django.conf.urls.defaults import patterns, include, url
 
 sigpatterns = patterns('Map.views',
+        url(r'^activate/$', 'activate_signature'),
+        url(r'^escalate/$', 'escalate_site'),
+        url(r'^clear/$', 'mark_signature_cleared'),
+        url(r'^remove/$', 'delete_signature'),
         )
 
 syspatterns = patterns('Map.views',

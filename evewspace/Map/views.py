@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import pytz
 import json
 
@@ -345,13 +345,66 @@ def add_signature(request, mapID, msID):
 @require_map_permission(permission=1)
 def get_signature_list(request, mapID, msID):
     """
-    Determines system from given MapSystem and renders system_signatures.html.
+    Determines the proper escalationThreshold time and renders 
+    system_signatures.html
     """
     if not request.is_ajax():
         raise PermissionDenied
-
     system = get_object_or_404(MapSystem, pk=msID)
-    return TemplateResponse(request, "system_signatures.html", {'system': system})
+    return TemplateResponse(request, "system_signatures.html",
+        {'system': system})
+
+
+@login_required
+@require_map_permission(permission=2)
+def mark_signature_cleared(request, mapID, msID, sigID):
+    """
+    Marks a signature as having its NPCs cleared.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    sig = get_object_or_404(Signature, pk=sigID)
+    sig.clear_rats()
+    return HttpResponse('[]')
+
+    
+@login_required
+@require_map_permission(permission=2)
+def escalate_site(request, mapID, msID, sigID):
+    """
+    Marks a site as having been escalated.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    sig = get_object_or_404(Signature, pk=sigID)
+    sig.escalate()
+    return HttpResponse('[]')
+
+
+@login_required
+@require_map_permission(permission=2)
+def activate_signature(request, mapID, msID, sigID):
+    """
+    Marks a site activated.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    sig = get_object_or_404(Signature, pk=sigID)
+    sig.activate()
+    return HttpResponse('[]')
+
+
+@login_required
+@require_map_permission(permission=2)
+def delete_signature(request, mapID, msID, sigID):
+    """
+    Deletes a signature.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    sig = get_object_or_404(Signature, pk=sigID)
+    sig.delete()
+    return HttpResponse('[]')
 
 
 @login_required
