@@ -281,6 +281,10 @@ class SignatureForm(ModelForm):
     set the system or updated fields.
 
     """
+    sigid = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-mini'}), label="ID:")
+    sigtype = forms.ModelChoiceField(queryset=SignatureType.objects.all(), label="Type:")
+    info = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-medium'}),label="Info:")
+    sigtype.widget.attrs['class'] = 'input-small'
     class Meta:
         model = Signature
         fields = ('sigid', 'sigtype', 'info')

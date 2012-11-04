@@ -70,23 +70,18 @@
     </div>
      
 </div>
-  <div id="sigsPanel" class="sigsPanel span6">
+  <div id="sigsPanel" class="sigsPanel span8">
        <div id=systemSigsWell class="systemSigsWell well well-small">
-        <h5>Signatures ({{system.signatures.count}} Total)</h5>
-              <div id="sigAddPanel" class"sigAddPanel span4">
-        <h6>Add Signature</h6>
-        <form name="sigAddForm" class="form-inline" action="#" method="POST">
-            ID: <input type="text" class="input-mini" name="id">
-             Type: <input type="select" class="input-small" name="type"><br />
-             Info: <input type="text" name="type"> <br />
-             <input type="submit" value="Add Signature">
-         </form>
-
-    </div>      <ul class="systemSigsList">
-                <li class="systemSigsItem">No Signatures! </li>
-            </ul>
+            <h5>Signatures ({{system.signatures.count}} Total)</h5>
+            <div id="sigAddPanel" class"sigAddPanel">
+                <h6>Add Signature</h6>
+                <div id="sys{{mapsys.pk}}SigAddForm">
+                </div>
+            </div>
+            <div id="sys{{mapsys.pk}}Signatures" class="signatureListDiv">
             </div>
         </div>
+    </div>
 
     <div id="activePlayerPanel" class="activePlayerPanel span6">
         <h5>Active Pilots ({{system.activepilots.all.count}} total) </h5>

@@ -84,6 +84,17 @@ function DisplaySystemDetails(msID){
             else{
                 $('#sysInfoDiv').html(data);
             }
+            LoadSignatures(msID);
+            $.ajax({
+                type: "GET",
+                url: "system/" + msID +  "/signatures/new/",
+                success: function(data){
+                    $('#sys'+msID+'SigAddForm').html(data);
+                },
+                error: function(){
+                    alert("An error occured getting a blank signature add form.");
+                }
+            });
             CloseSystemMenu();
         },
         error: function(errorThrown) {alert("An error occured building the details page.");}
@@ -234,6 +245,38 @@ function RefreshMap(){
         },
         error: function(errorThrown){
             alert("An error occured reloading the map.");
+        }
+    });
+}
+
+
+function AddSignature(msID){
+    address = "system/" + msID + "/signatures/new/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        data: $("#sigAddForm").serialize(),
+        success: function(data){
+            $('#sys' + msID + "SigAddForm").html(data);
+            LoadSignatures(msID);
+        },
+        error: function(){
+            alert("An error occured adding the signature.");
+        }
+    });
+}
+
+
+function LoadSignatures(msID){
+    address = "system/" + msID + "/signatures/";
+    $.ajax({
+        url: address,
+        type: "GET",
+        success: function(data){
+            $('#sys' + msID + "Signatures").html(data);
+        },
+        error: function(){
+            alert("An error occured loading the signature list.");
         }
     });
 }

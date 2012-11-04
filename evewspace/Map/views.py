@@ -320,26 +320,38 @@ def add_signature(request, mapID, msID):
     """
     if not request.is_ajax():
         raise PermissionDenied
+    mapsystem = get_object_or_404(MapSystem, pk=msID)
 
     if request.method == 'POST':
         form = SignatureForm(request.POST)
-        mapsystem = get_object_or_404(MapSystem, pk=msID)
         if form.is_valid():
             newSig = form.save(commit=False)
             newSig.system = mapsystem.system
             newSig.updated = True
             newSig.save()
-            return HttpResponse('[]')
+            newForm = SignatureForm()
+            return TemplateResponse(request, "add_sig_form.html", 
+                    {'form': newForm, 'system': mapsystem})
         else:
-            return TemplateResponse(request, "add_sig_form.html", {'form': form})
+            return TemplateResponse(request, "add_sig_form.html", 
+                    {'form': form, 'system': mapsystem})
     else:
         form = SignatureForm()
-    return TemplateResponse(request, "add_sig_form.html", {'form': form})
+    return TemplateResponse(request, "add_sig_form.html", 
+            {'form': form, 'system': mapsystem})
 
 
 @login_required()
+@require_map_permission(permission=1)
 def get_signature_list(request, mapID, msID):
-    raise PermissionDenied
+    """
+    Determines system from given MapSystem and renders system_signatures.html.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+
+    system = get_object_or_404(MapSystem, pk=msID)
+    return TemplateResponse(request, "system_signatures.html", {'system': system})
 
 
 @login_required

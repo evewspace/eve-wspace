@@ -41,6 +41,18 @@
 {
     text-align: center;
 }
+.signatureListDiv
+{
+    text-align: left;
+}
+.sysSigsList
+{
+    list-style: none;
+}
+.sigAddFormDiv
+{
+    text-align: left;
+}
 .tip {
   background: #eee;
   border: 1px solid #ccc;
