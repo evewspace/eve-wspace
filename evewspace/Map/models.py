@@ -4,7 +4,7 @@ from core.models import SystemData
 from django import forms
 from django.forms import ModelForm
 import autocomplete_light as ac
-from datetime import datetime
+from datetime import datetime, timedelta, time
 import pytz
 # Create your models here.
 
@@ -235,6 +235,42 @@ class Signature(models.Model):
     def __unicode__(self):
         """Returns sig ID as unicode representation"""
         return self.sigid
+
+    def activate(self):
+        """Marks the site activated."""
+        self.activated = datetime.now(pytz.utcnow)
+        self.save()
+
+    def clear_rats(self):
+        """Marks the NPCs cleared."""
+        self.ratscleared = datetime.now(pytz.utcnow)
+        self.save()
+
+    def escalate(self):
+        """Marks the sig escalated."""
+        self.lastescalated = datetime.now(pytz.utcnow)
+        self.save()
+
+    def increment_downtime(self):
+        """Increments the downtime count."""
+        self.downtimes += 1
+        self.save()
+
+    def escalated_today(self):
+        """
+        Determines if the site was last escalated during the current
+        11:00 to 11:00 eve day.
+        """
+        currenttime = datetime.now(pytz.utc)
+        if currenttime.time() >= time(hour=11):
+            # It is at or after downtime, use current date
+            threshold = datetime.combine(currenttime.date(), 
+                    time(hour=11, tzinfo=pytz.utc))
+        else:
+            # It is before downtime, use yesterday's date
+            threshold = datetime.combine(currenttime.date() - timedelta(days=1),
+                    time(hour=11, tzinfo=pytz.utc))
+        return self.lastescalated > threshold
 
 
 class MapPermission(models.Model):
