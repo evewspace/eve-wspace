@@ -3,8 +3,9 @@
 var loadtime = new Date();
 var paper = null;
 var objSystems = new Array();
-var indentX = 180;
-var indentY = 64;
+var indentX = 130; //The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180.
+var indentY = 64; // The amount of space (in px) between system ellipses on the Y axis
+var renderWormholeTags = false; // Determines whether wormhole types are shown on the map.
 
 //AJAX Setup to work with Django CSFR Middleware
 $.ajaxSetup({
@@ -72,7 +73,6 @@ function doMapAjaxCheckin() {
 
 
 function DisplaySystemDetails(msID){
-    //TODO: Dynamic Addressing
     address = "system/" + msID + "/";
     $.ajax({
         type: "GET",
@@ -103,7 +103,6 @@ function DisplaySystemDetails(msID){
 
 
 function DisplaySystemMenu(msID, x, y){
-    //TODO: Somehow pass the proper system URL from Django instead of hard-coding
     address = "system/" + msID + "/menu/";
     $.ajax({
         type: "GET",
@@ -127,7 +126,6 @@ function DisplaySystemMenu(msID, x, y){
 
 
 function MarkScanned(msID, fromPanel){
-    //TODO: Dynamic Addressing
     address = "system/" + msID + "/scanned/";
     $.ajax({
         type: "POST",
@@ -147,7 +145,6 @@ function MarkScanned(msID, fromPanel){
 }
 
 function SetInterest(msID){
-     //TODO: Dynamic Addressing
     address = "system/" + msID + "/interest/";
     $.ajax({
         type: "POST",
@@ -164,7 +161,6 @@ function SetInterest(msID){
 }
 
 function RemoveInterest(msID){
-    //TODO: Dynamic Addressing
     address = "system/" + msID + "/interest/";
     $.ajax({
         type: "POST",
@@ -181,7 +177,6 @@ function RemoveInterest(msID){
 }
 
 function AssertLocation(msID){
-    //TODO: Dynamic Addressing
     address = "system/" + msID + "/location/";
     $.ajax({
         type: "POST",
@@ -196,7 +191,6 @@ function AssertLocation(msID){
 }
 
 function GetSystemTooltip(msID){
-    //TODO: Dynamic addressing
     address = "system/" + msID + "/tooltip/";
     $.ajax({
         type: "GET",
@@ -215,7 +209,6 @@ function GetSystemTooltip(msID){
 
 
 function GetWormholeTooltip(whID){
-    //TODO: Dynamic addressing
     address = "wormhole/" + whID + "/tooltip";
     $.ajax({
         type: "GET",
@@ -397,7 +390,7 @@ function StartDrawing() {
 }
 
 
-function ConnectSystems(obj1, obj2, line, bg, interest) {
+function ConnectSystems(obj1, obj2, line, bg, interest, whID) {
     if (obj1.line && obj1.from && obj1.to) {
         line = obj1;
         obj1 = line.from;
@@ -448,15 +441,24 @@ function ConnectSystems(obj1, obj2, line, bg, interest) {
         line.line.attr({ path: path });
     } else {
         var color = typeof line == "string" ? line : "#000";
+        if (renderWormholeTags){
+            strokeWidth = 1;
+            interestWidth = 2;
+        } else {
+            strokeWidth = 3;
+            interestWidth = 3;
+        }
         if (interest == true) {
             var dasharray = "--";
-            var lineObj = paper.path(path).attr({ stroke: color, fill: "none", "stroke-dasharray": dasharray, "stroke-width": 2 });
-            lineObj.toBack();
+            var lineObj = paper.path(path).attr({ stroke: color, fill: "none", "stroke-dasharray": dasharray, "stroke-width": interestWidth });
         } else {
-            var lineObj = paper.path(path).attr({ stroke: color, fill: "none" });
-            lineObj.toBack();
+            var lineObj = paper.path(path).attr({ stroke: color, fill: "none", "stroke-width": strokeWidth });
         }
-        
+        GetWormholeTooltip(whID);
+        //lineObj.toBack();
+        lineObj.mouseover(OnWhOver);
+        lineObj.mouseout(OnWhOut);
+        lineObj.whID = whID;
     }
 
 
@@ -542,12 +544,10 @@ function DrawSystem(system) {
     sysName += "\n("+classString+"+"+system.activePilots+"P)";
     var sysText;
     if (system.LevelX != null && system.LevelX > 0) {
-        var childSys = paper.ellipse(sysX, sysY, 45, 28);
-        //childSys.sysID = system.sysID;
+        var childSys = paper.ellipse(sysX, sysY, 40, 28);
         childSys.msID = system.msID;
         childSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
-        //sysText.sysID = system.sysID;
         sysText.msID = system.msID;
         sysText.click(onSysClick);
         ColorSystem(system, childSys, sysText);
@@ -560,21 +560,21 @@ function DrawSystem(system) {
             var lineColor = GetConnectionColor(system);
             var whColor = GetWormholeColor(system);
             if (system.interestpath == true || system.interest == true){
-                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", true);
+                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", true, system.whID);
             }else{
-                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", false);
+                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", false, system.whID);
             }
-            DrawWormholes(parentSys, system, whColor);
+            if (renderWormholeTags){
+                DrawWormholes(parentSys, system, whColor);
+            }
         }else{
             alert("Error processing system " + system.Name);
         }
     }else{
         var rootSys = paper.ellipse(sysX, sysY, 40, 30);
-        //rootSys.sysID = system.sysID;
         rootSys.msID = system.msID;
         rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
-        //sysText.sysID = system.sysID;
         sysText.msID = system.msID;
         sysText.click(onSysClick);
 
@@ -813,7 +813,6 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         whFromSys.attr({ fill: whFromColor, cursor: "pointer", "font-size": 11, "font-weight": decoration });  //stroke: "#fff"
 
         whFromSys.whID = systemTo.whID;
-        GetWormholeTooltip(whFromSys.whID);
         whFromSys.mouseover(OnWhOver);
         whFromSys.mouseout(OnWhOut);
     }
