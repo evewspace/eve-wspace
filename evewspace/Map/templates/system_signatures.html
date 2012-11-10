@@ -1,22 +1,35 @@
-    <ul class="sysSigsList">
-        {{escalationThreshold}}
-        {% for sig in system.system.signatures.all %}
-            <li class="sysSigsEntry">
-            <i class="icon-pencil" title="Edit" onclick="EditSignature({{sig.pk}}, {{system.pk}});"></i> &nbsp
-            <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> &nbsp
+<table class=sysSigsTable" cellpadding="10">
+    <tr>
+    <th>Actions</th>
+    <th>Upd.</th>
+    <th>Sig ID</th>
+    <th>Type</th>
+    <th>Info</th>
+    <th>Rats</th>
+    <th>Escl.</th>
+    </tr>
+    {% for sig in system.system.signatures.all %}
+    <tr>
+        <td><i class="icon-pencil" title="Edit" onclick="EditSignature({{sig.pk}}, {{system.pk}});"></i> &nbsp
+            <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> </td>
+        <td>
             {% if sig.updated %}
                 <i class="icon-ok-sign" title="Signature Updated"></i> &nbsp
             {% else %}
                 <i class="icon-remove-sign" title="Signature Not Updated"></i> &nbsp
             {% endif %}
-            <span class="signatureID">{{sig.sigid}}</span> &nbsp
-            <span class="signatureType" onclick="GetSiteSpawns({{sig.system.sysclass}}, {{sig.sigtype.pk}});" title="{{sig.sigtype.longname}}">{{sig.sigtype.shortname}}</span> &nbsp
-            <span class="signatureInfo">{{sig.info}}</span>
+            </td>
+            <td><span class="signatureID">{{sig.sigid}}</span> </td>
+            <td><span class="signatureType" onclick="GetSiteSpawns({{sig.system.sysclass}}, {{sig.sigtype.pk}});" title="{{sig.sigtype.longname}}">{{sig.sigtype.shortname}}</span></td>
+            <td><span class="signatureInfo">{{sig.info}}</span></td>
+            <td>
             {% if sig.sigtype.sleeprsite and not sig.ratscleared %}
-            <i class="icon-warning-sign" onclick="MarkCleared({{sig.pk}}, {{system.pk}});" title="NPCs not cleared!"></i> &nbsp
+            <i class="icon-warning-sign" onclick="MarkCleared({{sig.pk}}, {{system.pk}});" title="NPCs not cleared!"></i> 
             {% elif sig.sigtype.sleeprsite %}
-                <i class="icon-screenshot" title="NPCs cleared at {{sig.ratscleared|date:'Y-m-d H:i'}}"></i> &nbsp
-            {% endif %}
+                <i class="icon-screenshot" title="NPCs cleared at {{sig.ratscleared|date:'Y-m-d H:i'}}"></i> 
+                {% endif %}
+            </td>
+            <td>
             {% if sig.sigtype.escalatable and sig.system.sysclass > 4 and sig.system.sysclass < 7 %}
                 {% if sig.lastescalated < escalationThreshold or not sig.lastescalated %}
                     {% if sig.downtimes = 2 %}
@@ -27,9 +40,10 @@
                 {% else %}    
                     <i class="icon-ok" title="Site escalated today."></i>
                 {% endif %}    
-            {% endif %}
-            </li>
+                {% endif %}
+            </td>
         {% empty %}
-            <li class="sysSigsEntry">No Signatures!</li>
-        {% endfor%}
-    </ul>
+        <tr><td>No Signatures!</td></tr>
+    </tr>
+            {% endfor%}
+</table>

@@ -327,6 +327,7 @@ def add_signature(request, mapID, msID):
         if form.is_valid():
             newSig = form.save(commit=False)
             newSig.system = mapsystem.system
+            newSig.sigid = newSig.sigid.upper()
             newSig.updated = True
             newSig.save()
             newForm = SignatureForm()

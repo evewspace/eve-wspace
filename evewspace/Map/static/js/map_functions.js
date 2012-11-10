@@ -335,6 +335,30 @@ function DeleteSignature(sigID, msID){
 }
 
 
+function GetAddSystemDialog(msID){
+    //This funciton gets the dialog for manual system adding with msID being
+    //the parent's msID
+    address = "system/" + msID + "/addchild/";
+    $.ajax({
+        url: address,
+        type: "GET",
+        success: function(data){
+            $(data).dialog({
+                autoOpen: false,
+                close: function(event, ui) { 
+                $(this).dialog("destroy");
+                $(this).remove();
+                }
+            });
+            $('#addSystemDialog').dialog('show');
+        },
+        eror: function(){
+            alert("Failed to get the add system dialog.");
+        }
+    });
+}
+
+
 function AddSystem(){
     //This function adds a system using the information in a form named #sysAddForm
     address = "system/new/";
@@ -390,7 +414,8 @@ function StartDrawing() {
 }
 
 
-function ConnectSystems(obj1, obj2, line, bg, interest, whID) {
+function ConnectSystems(obj1, obj2, line, bg, interest) {
+    var systemTo = obj2;
     if (obj1.line && obj1.from && obj1.to) {
         line = obj1;
         obj1 = line.from;
@@ -444,21 +469,28 @@ function ConnectSystems(obj1, obj2, line, bg, interest, whID) {
         if (renderWormholeTags){
             strokeWidth = 1;
             interestWidth = 2;
+            var dasharray = "none";
         } else {
-            strokeWidth = 3;
-            interestWidth = 3;
+            strokeWidth = 2;
+            interestWidth = 2;
+            if (systemTo.WhFromParentBubbled || systemTo.WhToParentBubbled){
+                var dasharray = "none";
+                color = "#FF9900";
+            } else {
+                var dasharray = "none";
+            }
         }
         if (interest == true) {
             var dasharray = "--";
             var lineObj = paper.path(path).attr({ stroke: color, fill: "none", "stroke-dasharray": dasharray, "stroke-width": interestWidth });
         } else {
-            var lineObj = paper.path(path).attr({ stroke: color, fill: "none", "stroke-width": strokeWidth });
+            var lineObj = paper.path(path).attr({ stroke: color, fill: "none", "stroke-dasharray": dasharray, "stroke-width": strokeWidth });
         }
-        GetWormholeTooltip(whID);
+        GetWormholeTooltip(systemTo.whID);
         //lineObj.toBack();
         lineObj.mouseover(OnWhOver);
         lineObj.mouseout(OnWhOut);
-        lineObj.whID = whID;
+        lineObj.whID = systemTo.whID;
     }
 
 
@@ -546,6 +578,9 @@ function DrawSystem(system) {
     if (system.LevelX != null && system.LevelX > 0) {
         var childSys = paper.ellipse(sysX, sysY, 40, 28);
         childSys.msID = system.msID;
+        childSys.whID = system.whID;
+        childSys.WhFromParentBubbled = system.WhFromParentBubbled;
+        childSys.WhToParentBubbled = system.WhToParentBubbled;
         childSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
@@ -560,9 +595,9 @@ function DrawSystem(system) {
             var lineColor = GetConnectionColor(system);
             var whColor = GetWormholeColor(system);
             if (system.interestpath == true || system.interest == true){
-                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", true, system.whID);
+                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", true);
             }else{
-                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", false, system.whID);
+                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", false);
             }
             if (renderWormholeTags){
                 DrawWormholes(parentSys, system, whColor);
