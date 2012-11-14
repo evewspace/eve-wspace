@@ -2,8 +2,8 @@ from django.conf.urls import patterns, include, url
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
-import autocomplete_light
-autocomplete_light.autodiscover()
+from search import registry as search_registry
+search_registry.autodiscover()
 admin.autodiscover()
 #django_cron.autodiscover()
 urlpatterns = patterns('',
@@ -17,6 +17,6 @@ urlpatterns = patterns('',
         url(r'^account/', include('account.urls')),
         url(r'^map/', include('Map.urls')),
         # Uncomment the next line to enable the admin:
-         url(r'^sekrit/', include(admin.site.urls)),
-         url(r'autocomplete/', include('autocomplete_light.urls')),
+        url(r'^sekrit/', include(admin.site.urls)),
+        url(r'search/', include('search.urls')),
 )

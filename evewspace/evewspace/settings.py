@@ -132,7 +132,7 @@ INSTALLED_APPS = (
         'account',
         'POS',
         'eveigb',
-        'autocomplete_light',
+        'search'
         # Uncomment the next line to enable admin documentation:
         # 'django.contrib.admindocs',
 )
