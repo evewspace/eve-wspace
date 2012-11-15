@@ -1,0 +1,48 @@
+<div id="editWormholeDialog">
+    <form id="editWormholeForm" class="editWormholeForm" method="post" action="wormhole/{{wormhole.pk}}/edit/">
+        {% csrf_token %}
+        <h4>Wormhole Status:</h4>
+        Time Status: &nbsp
+        <input type="radio" class="editWormholeInput" name="timeStatus" value="0" {% if wormhole.time_status == 0 %} checked="checked" {% endif %}> Fine &nbsp
+        <input type="radio" class="editWormholeInput" name="timeStatus" value="1" {% if wormhole.time_status == 1 %} checked="checked" {% endif %}> End of Life
+        <br />
+        Mass Status: &nbsp
+        <input type="radio" class="editWormholeInput" name="massStatus" value="0" {% if wormhole.mass_status == 0 %} checked="checked" {% endif %}> Fine &nbsp
+        <input type="radio" class="editWormholeInput" name="massStatus" value="1" {% if wormhole.mass_status == 1 %} checked="checked" {% endif %}> First Shrink &nbsp
+        <input type="radio" class="editWormholeInput" name="massStatus" value="2" {% if wormhole.mass_status == 2 %} checked="checked" {% endif %}> Critical
+        <br />
+        <h4>Wormhole in: {{wormhole.top.system.name}}</h4>
+        Type: &nbsp
+        <input type="text" id="topType" class="editWormholeInput" name="topType" value="{{wormhole.top_type.name}}">
+        <br />
+        Bubbled: &nbsp <input type="radio" class="editWormholeInput" name="topBubbled" value="0" {% if not wormhole.top_bubbled %} checked="checked" {% endif %}> No &nbsp
+        <input type="radio" class="editWormholeInput" name="topBubbled" value="1" {% if wormhole.top_bubbled %} checked="checked" {% endif %}> Yes
+        <br />
+        <h4>Wormhole in: {{wormhole.bottom.system.name}}</h4>
+        Type: &nbsp
+        <input type="text" id="bottomType" class="editWormholeInput" name="bottomType" value="{{wormhole.bottom_type.name}}">
+        <br />
+        Bubbled: &nbsp <input type="radio" class="editWormholeInput" name="bottomBubbled" value="0" {% if not wormhole.bottom_bubbled %} checked="checked" {% endif %}> No &nbsp
+         <input type="radio" class="editWormholeInput" name="bottomBubbled" value="1" {% if wormhole.bottom_bubbled %} checked="checked" {% endif %}> Yes
+        <br />
+        <br />
+        <input type="submit" value="Save Wormhole">       
+    </form>
+    <script type="text/javascript">
+        $('#topType').autocomplete({
+                    source: "/search/whtype/",
+                    minLength: 1
+                    });
+        $('#bottomType').autocomplete({
+                    source: "/search/whtype/",
+                    minLength: 1
+                    });
+        $('#editWormholeForm').submit(function(e){
+                    e.preventDefault();
+                    EditWormhole({{wormhole.pk}});
+                    $('#editWormholeDialog').dialog('close');
+                    $('#editWormholeDialog').remove();
+                    return false;
+                    });
+    </script>
+</div>

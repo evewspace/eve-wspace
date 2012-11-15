@@ -23,7 +23,7 @@ syspatterns = patterns('Map.views',
 
 wormholepatterns = patterns('Map.views',
         url(r'^tooltip/$', 'wormhole_tooltip'),
-        url(r'^$', 'edit_wormhole'),
+        url(r'^edit/$$', 'edit_wormhole'),
         )
 
 mappatterns = patterns('Map.views',

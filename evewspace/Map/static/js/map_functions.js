@@ -383,6 +383,44 @@ function AddSystem(){
 }
 
 
+function GetEditWormholeDialog(whID){
+    address= "wormhole/" + whID + "/edit/";
+    $.ajax({
+        type: "GET",
+        url: address,
+        success: function(data){
+            $(data).dialog({
+                autoOpen: false,
+                close: function(event, ui) { 
+                $(this).dialog("destroy");
+                $(this).remove();
+                }
+            });
+            $('#editWormholeDialog').dialog('open');
+        },
+        error: function(){
+            alert('There was an error getting the edit wormhole dialog.');
+        }
+    });
+}
+
+
+function EditWormhole(whID){
+    address = "wormhole/" + whID + "/edit/";
+    $.ajax({
+        type: 'POST',
+        url: address,
+        data: $('#editWormholeForm').serialize(),
+        success: function(){
+            RefreshMap();
+        },
+        error: function(){
+            alert('There was an error editing the wormhole.');
+        }
+    });
+}
+
+
 function DeleteSystem(msID){
     CloseSystemMenu();
     address = "system/" + msID + "/remove/";
@@ -498,6 +536,7 @@ function ConnectSystems(obj1, obj2, line, bg, interest) {
         lineObj.mouseover(OnWhOver);
         lineObj.mouseout(OnWhOut);
         lineObj.whID = systemTo.whID;
+        lineObj.click(function(){ GetEditWormholeDialog(lineObj.whID);});
     }
 
 

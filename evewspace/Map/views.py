@@ -421,9 +421,56 @@ def manual_add_system(request, mapID, msID):
     return render(request, 'add_system_box.html', {'topMs': topMS, 
         'sysList': systems, 'whList': wormholes})
 
+
 @login_required
 @require_map_permission(permission=2)
-def edit_wormhole(request, whID):
+def edit_system(request, mapID, msID):
+    """
+    A GET request gets the edit system dialog pre-filled with current information.
+    A POST request saves the posted data as the new information.
+        POST values are friendlyName, info, and occupied.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    mapSystem = get_object_or_404(MapSystem, pk=msID)
+    if request.method == 'GET':
+        return TemplateResponse(request, 'edit_system.html', {'mapSystem': mapSystem})
+    if request.method == 'POST':
+        mapSystem.friendlyname = request.POST.get('frinedlyName', '')
+        mapSystem.system.info = request.POST.get('info', '')
+        mapSystem.system.occupied = request.POST.get('occupied', '')
+        mapSystem.system.save()
+        mapSystem.save()
+        return HttpResponse('[]')
+    raise PermissionDenied
+
+
+@login_required
+@require_map_permission(permission=2)
+def edit_wormhole(request, mapID, whID):
+    """
+    A GET request gets the edit wormhole dialog pre-filled with current info.
+    A POST request saves the posted data as the new info.
+        POST values are topType, bottomType, massStatus, timeStatus, topBubbled,
+        and bottomBubbled.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    wormhole = get_object_or_404(Wormhole, pk=whID)
+    if request.method == 'GET':
+        return TemplateResponse(request, 'edit_wormhole.html', {'wormhole': wormhole})
+    if request.method == 'POST':
+        wormhole.mass_status = int(request.POST.get('massStatus',0))
+        wormhole.time_status = int(request.POST.get('timeStatus',0))
+        wormhole.top_type = get_object_or_404(WormholeType, 
+                name=request.POST.get('topType', 'K162'))
+        wormhole.bottom_type = get_object_or_404(WormholeType,
+                name=request.POST.get('bottomType', 'K162'))
+        wormhole.top_bubbled = request.POST.get('topBubbled', '1') == '1'
+        wormhole.bottom_bubbled = request.POST.get('bottomBubbled', '1') == '1'
+        wormhole.save()
+        return HttpResponse('[]')
+
     raise PermissiondDenied
 
 
