@@ -3,7 +3,10 @@
         {% csrf_token %}
         <input type="hidden" class="sysAddInput" name="topMsID" value="{{oldsystem.pk}}">
         <input type="hidden" class="sysAddInput" name="bottomSystem" value="{{newsystem}}">
-        <h3>Wormhole Status:</h3>
+        <h4>Friendly Name:</h4>
+        <input type="text" class="sysAddInput" name="friendlyName" value=""> <br />
+
+        <h4>Wormhole Status:</h4>
         Time Status: <br />
         <input type="radio" class="sysAddInput" name="timeStatus" value="0" checked="checked">Fine<br />
         <input type="radio" class="sysAddInput" name="timeStatus" value="1">End of Life<br />
@@ -13,7 +16,7 @@
         <input type="radio" class="sysAddInput" name="massStatus" value="1">First Shrink<br />
         <input type="radio" class="sysAddInput" name="massStatus" value="2">Critical<br />
         <br />
-        <h3>Wormhole in: {{oldsystem.name}}</h3>
+        <h4>Wormhole in: {{oldsystem.system.name}}</h4>
         Type:
         <br />
         <input type="radio" class="sysAddInput" name="topType" value="K162" checked="checked">K162<br/>
@@ -26,9 +29,7 @@
         <input type="radio" class="sysAddInput" name="topBubbled" value="1">Yes
         <br />
         
-        <h3>Wormhole in: {{newsystem.name}}</h3>
-        Friendly Name:<br />
-        <input type="text" class="sysAddInput" name="friendlyName" value=""> <br />
+        <h4>Wormhole in: {{newsystem.name}}</h4>
         Type:
         <br />
         <input type="radio" class="sysAddInput" name="bottomType" value="K162" checked="checked">K162 <br />

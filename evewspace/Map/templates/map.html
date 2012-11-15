@@ -5,9 +5,9 @@
     <script type="text/javascript" src="{{STATIC_URL}}js/map_functions.js"></script>
     <link rel="stylesheet" href="{{STATIC_URL}}css/map.css" type="text/css" />
     <script type="text/javascript">var ajax_image = "<img src= '{{STATIC_URL}}images/loading.gif'></img>"; </script>
-    {% include 'autocomplete_light/static.html' %}    
 {% endblock %}
 {% block contentheader %}
+<input type="button" class="button" value="Refresh" onclick="RefreshMap();" />
 <div id="mapDiv" class="mapDiv">
 
 </div>

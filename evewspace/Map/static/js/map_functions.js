@@ -233,6 +233,7 @@ function RefreshMap(){
         url: address,
         success: function(data){
             CloseSystemMenu();
+            objSystems = new Array();
             systemsJSON = $.parseJSON(data);
             StartDrawing();
         },
@@ -267,6 +268,11 @@ function LoadSignatures(msID){
         type: "GET",
         success: function(data){
             $('#sys' + msID + "Signatures").html(data);
+            setTimeout(function(){
+                if (document.getElementById("sys" + msID + "Signatures")){
+                    LoadSignatures(msID);
+                }
+            }, 10000);
         },
         error: function(){
             alert("An error occured loading the signature list.");
@@ -342,6 +348,7 @@ function GetAddSystemDialog(msID){
     $.ajax({
         url: address,
         type: "GET",
+        async: false,
         success: function(data){
             $(data).dialog({
                 autoOpen: false,
@@ -350,7 +357,7 @@ function GetAddSystemDialog(msID){
                 $(this).remove();
                 }
             });
-            $('#addSystemDialog').dialog('show');
+            $('#addSystemDialog').dialog('open');
         },
         eror: function(){
             alert("Failed to get the add system dialog.");
@@ -367,7 +374,7 @@ function AddSystem(){
         url: address,
         data: $('#sysAddForm').serialize(),
         success: function(data){
-            setTimeout(RefreshMap(), 500);
+            setTimeout(function(){RefreshMap();}, 500);
         },
         error: function(errorThrown){
             alert("An error occured adding the system to the map.");
@@ -383,7 +390,7 @@ function DeleteSystem(msID){
         type: "POST",
         url: address,
         success: function(){
-            setTimeout(RefreshMap(), 500);
+            setTimeout(function(){RefreshMap();}, 500);
         },
         error: function(){
             alert("An error occured removing the system from the map.");
@@ -400,7 +407,7 @@ function CloseSystemMenu(){
 function StartDrawing() {
     if ((typeof (systemsJSON) != "undefined") && (systemsJSON != null)) {
         var stellarSystemsLength = systemsJSON.length;
-
+        $('#mapDiv').empty();
         if (stellarSystemsLength > 0) {
             InitializeRaphael();
 
@@ -487,7 +494,7 @@ function ConnectSystems(obj1, obj2, line, bg, interest) {
             var lineObj = paper.path(path).attr({ stroke: color, fill: "none", "stroke-dasharray": dasharray, "stroke-width": strokeWidth });
         }
         GetWormholeTooltip(systemTo.whID);
-        //lineObj.toBack();
+        lineObj.toBack();
         lineObj.mouseover(OnWhOver);
         lineObj.mouseout(OnWhOut);
         lineObj.whID = systemTo.whID;
@@ -511,15 +518,12 @@ function InitializeRaphael() {
             maxLevelY = stellarSystem.LevelY;
         }
     }
-    if (paper){
-        paper.clear();
-    }
-    else{
-        $('#mapDiv').empty();
-    }
     var holderHeight = 90 + maxLevelY * indentY;
     var holderWidth = 170 + maxLevelX * (indentX + 20);
-
+    if (paper){
+        paper.clear();
+        paper.remove();
+    }
     paper = Raphael("mapDiv", holderWidth, holderHeight);
     holder = document.getElementById("mapDiv");
     holder.style.height = holderHeight + "px";
@@ -572,7 +576,12 @@ function DrawSystem(system) {
             classString = "C"+system.SysClass;
             break;
     }
-    var sysName = system.Friendly + "\n" + system.Name;
+    if (system.Friendly){
+        var friendly = system.Friendly + "\n";
+    }else{
+        var friendly = "";
+    }
+    var sysName = friendly + system.Name;
     sysName += "\n("+classString+"+"+system.activePilots+"P)";
     var sysText;
     if (system.LevelX != null && system.LevelX > 0) {

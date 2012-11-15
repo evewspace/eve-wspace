@@ -35,7 +35,7 @@ class SearchBase(object):
     def choices_for_request(self):
         assert self.choices is not None, 'choices should be a queryset'
         assert self.search_field, 'search_field must be set'
-        q = self.request.GET.get('q', '')
+        q = self.request.GET.get('term', '')
 
         conditions = Q()
         if q:

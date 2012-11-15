@@ -1,0 +1,57 @@
+<div id="addSystemDialog">
+<h4>Add System Connected To: {{topMs.system.name}}</h4>
+<form id="sysAddForm" action="system/new" method="post">
+    {% csrf_token %}
+    <input type="hidden" class="sysAddInput" name="topMsID" value="{{topMs.pk}}">
+    System: &nbsp <input type="text" class="sysAddInput" name="bottomSystem" id="sysNameBox" /> <br />
+        Friendly Name: &nbsp
+        <input type="text" class="sysAddInput" name="friendlyName" value=""> <br />
+
+        <h5>Wormhole Status:</h5>
+        Time Status: &nbsp
+        <input type="radio" class="sysAddInput" name="timeStatus" value="0" checked="checked">Fine &nbsp
+        <input type="radio" class="sysAddInput" name="timeStatus" value="1">End of Life
+        <br />
+        Mass Status: &nbsp
+        <input type="radio" class="sysAddInput" name="massStatus" value="0" checked="checked">Fine &nbsp
+        <input type="radio" class="sysAddInput" name="massStatus" value="1">First Shrink &nbsp
+        <input type="radio" class="sysAddInput" name="massStatus" value="2">Critical<br />
+        <br />
+        <h5>Wormhole in: {{topMs.system.name}}</h5>
+        Type: &nbsp  <input type="text" class="sysAddInput" id="topTypeInput" name="topType" value="K162" onclick="this.value = '';" />
+       <br />
+        Bubbled: &nbsp
+        <input type="radio" class="sysAddInput" name="topBubbled" value="0" checked="checked">No 
+        <input type="radio" class="sysAddInput" name="topBubbled" value="1">Yes
+        <h5>Wormhole on Opposite Side:</h5>
+        Type: &nbsp  <input type="text" class="sysAddInput" id="bottomTypeInput" name="bottomType" value="K162" onclick="this.value = '';" />
+        <br />
+        Bubbled: &nbsp
+        <input type="radio" class="sysAddInput" name="bottomBubbled" value="0" checked="checked">No 
+        <input type="radio" class="sysAddInput" name="bottomBubbled" value="1">Yes
+        <br /><br />
+        <input id="sysAddSubmit" class="sysAddInput" type="submit" value="Add System">
+    </form>
+        <script type="text/javascript">
+            $('#sysNameBox').autocomplete({
+                    source: "/search/system/",
+                    minLength: 2
+                    });
+            $('#topTypeInput').autocomplete({
+                    source: "/search/whtype/",
+                    minLength: 1
+                    });
+             $('#bottomTypeInput').autocomplete({
+                    source: "/search/whtype/",
+                    minLength: 1
+                    });
+           $('#sysAddForm').submit(function(e){
+                        e.preventDefault();
+                        AddSystem();
+                        $('#addSystemDialog').dialog('close');
+                        $('#addSystemDialog').remove();
+                        return false;
+            });
+        </script>
+    </div>
+

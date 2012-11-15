@@ -410,6 +410,19 @@ def delete_signature(request, mapID, msID, sigID):
 
 @login_required
 @require_map_permission(permission=2)
+def manual_add_system(request, mapID, msID):
+    """
+    A GET request gets a blank add system form with the provided mapSystem
+    as top system. The form is then POSTed to the add_system view.
+    """
+    topMS = get_object_or_404(MapSystem, pk=msID)
+    systems = System.objects.all()
+    wormholes = WormholeType.objects.all()
+    return render(request, 'add_system_box.html', {'topMs': topMS, 
+        'sysList': systems, 'whList': wormholes})
+
+@login_required
+@require_map_permission(permission=2)
 def edit_wormhole(request, whID):
     raise PermissiondDenied
 

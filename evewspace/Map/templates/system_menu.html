@@ -4,7 +4,7 @@
     {% if not is_igb %}
     <a class="btn" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
     {% endif %}
-    <a class="btn" onclick="AddSystem({{mapsys.pk}});">Add System</a>
+    <a class="btn" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
     <div class="btn-group dropdown">
         <a class="btn dropdown-toggle" data-toggle="dropdown">
             Intel

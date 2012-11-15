@@ -3,7 +3,6 @@ from django.contrib.auth.models import User, Group
 from core.models import SystemData
 from django import forms
 from django.forms import ModelForm
-import autocomplete_light as ac
 from datetime import datetime, timedelta, time
 import pytz
 # Create your models here.

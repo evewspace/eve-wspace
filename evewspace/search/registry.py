@@ -24,7 +24,7 @@ class SearchRegistry(dict):
         search = self[name]
         del self[name]
 
-    def register(self, model, name, search_field):
+    def register(self, model, name, search_field, queryset):
         """
         Registers a search on a model.
 
@@ -34,14 +34,21 @@ class SearchRegistry(dict):
         """
         if not issubclass(model, models.Model):
             raise AttributeError
-        if not isinstance(search_field, models.Field):
+        if not search_field:
             raise AttributeError
         if not name:
             name = '%sSearch' % model.__name__
 
         base = SearchBase
-        baseContext = {'choices': model.objects.all(),
-                'search_field': search_field}
+
+        try:
+            search_model_field = model._meta.get_field(search_field)
+        except:
+            raise Exception('The provided search field is not defined int he model.')
+        if not queryset:
+            queryset = model.objects.all()
+        baseContext = {'choices': queryset,
+                'search_field': search_model_field}
 
         search = type(name, (base,), baseContext)
         self[search.__name__] = search
@@ -69,6 +76,6 @@ registry = SearchRegistry()
 def autodiscover():
     _autodiscover(registry)
 
-def register(model, name, search_field):
+def register(model, name, search_field, queryset=None):
     """Proxy for registry register method."""
-    return registry.register(model, name, search_field)
+    return registry.register(model, name, search_field, queryset)
