@@ -149,3 +149,44 @@ class LocationWormholeClass(models.Model):
 
     class Meta:
         db_table='mapLocationWormholeClasses'
+
+
+class SystemJump(models.Model):
+    """Core model for SDD mapSolarSystemJumps used in A* calcs."""
+    fromregion = models.ForeignKey(Region, related_name="sys_jumps_from",
+            db_column="fromRegionID")
+    fromconstellation = models.ForeignKey(Constellation, related_name="sys_jumps_from",
+            db_column="fromConstellationID")
+    fromsystem = models.ForeignKey(SystemData, primary_key=True, related_name="jumps_from",
+            db_column="fromSolarSystemID")
+    tosystem = models.ForeignKey(SystemData, primary_key=True, related_name="jumps_to",
+            db_column="toSolarSystemID")
+    toconstellation = models.ForeignKey(Constellation, related_name="sys_jumps_to",
+            db_column="toConstellationID")
+    toregion = models.ForeignKey(Region, related_name="sys_jumps_to",
+            db_column="toRegionID")
+
+    def cost(self):
+        """Returns a cost to use this path equal to 10 * (1-sec) of end system."""
+        return (1 - self.tosystem.security)
+
+    class Meta:
+        db_table='mapSolarSystemJumps'
+
+
+class ConstellationJump(models.Model):
+    fromregion = models.ForeignKey(Region, null=True, related_name='con_jumps_from', db_column='fromRegionID',  blank=True) 
+    fromconstellation = models.ForeignKey(Constellation, primary_key=True, related_name='jumps_from', db_column='fromConstellationID')
+    toconstellation = models.ForeignKey(Constellation, primary_key=True, related_name='jumps_to',  db_column='toConstellationID') 
+    toregion = models.ForeignKey(Region, null=True, db_column='toRegionID', related_name='con_jumps_to', blank=True)
+
+    class Meta:
+        db_table = u'mapConstellationJumps'
+
+
+class RegionJump(models.Model):
+    fromregion = models.ForeignKey(Region, primary_key=True, db_column='fromRegionID', related_name='jumps_from')
+    toregion = models.ForeignKey(Region, primary_key=True, db_column='toRegionID', related_name='jumps_to')
+    
+    class Meta:
+        db_table = u'mapRegionJumps'
