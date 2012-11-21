@@ -11,7 +11,7 @@ class Command(NoArgsCommand):
         basedata = SystemData.objects.all()
         for system in basedata:
             #self.stdout.write('Processing system: %s' % (system.name))
-            try:
+	    try:
                 sysclass = LocationWormholeClass.objects.get(location=system.region.id).sysclass
                 if sysclass > 6:
                     newdata = KSystem(sov='', sysclass=sysclass, 
@@ -20,6 +20,10 @@ class Command(NoArgsCommand):
                     for field in system._meta.fields:
                         setattr(newdata, field.attname, getattr(system, field.attname))
                     newdata.systemdata_ptr = system
+		    newdata.jumps = 0
+		    newdata.podkills = 0
+		    newdata.npckills = 0
+		    newdata.shipkills = 0
                     newdata.save()
                 else:
                     # TODO: Populate statics by constellation
@@ -29,6 +33,9 @@ class Command(NoArgsCommand):
                     for field in system._meta.fields:
                         setattr(newdata, field.attname, getattr(system, field.attname))
                     newdata.systemdata_ptr = system
+		    newdata.podkills = 0
+		    newdata.npckills = 0
+		    newdata.shipkills = 0
                     newdata.save()
             except LocationWormholeClass.DoesNotExist:
                 pass
