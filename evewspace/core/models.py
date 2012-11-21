@@ -3,7 +3,7 @@ from django.db import models
 
 class MarketGroup(models.Model):
     """A market group from the Eve SDD."""
-    id = models.BigIntegerField(primary_key=True, db_column='marketGroupID')
+    id = models.IntegerField(primary_key=True, db_column='marketGroupID')
     name = models.CharField(max_length = 100, null=True, blank=True, 
             db_column='marketGroupName')
     parentgroup = models.ForeignKey("self", related_name="childgroups", 
@@ -20,7 +20,7 @@ class MarketGroup(models.Model):
 
 class Type(models.Model):
     """A type from the Eve SDD invTypes table."""
-    id = models.BigIntegerField(primary_key=True, db_column='typeID')
+    id = models.IntegerField(primary_key=True, db_column='typeID')
     name = models.CharField(max_length = 100, db_column='typeName')
     description = models.TextField(blank=True, null=True)
     volume = models.FloatField(blank=True, null=True)
@@ -38,7 +38,7 @@ class Type(models.Model):
 class Region(models.Model):
     """Core model for static region data"""
 
-    id   = models.BigIntegerField(primary_key=True, db_column='regionID')
+    id   = models.IntegerField(primary_key=True, db_column='regionID')
     name = models.CharField(max_length=100, db_column='regionName')
     x    = models.FloatField()
     y    = models.FloatField()
@@ -53,7 +53,7 @@ class Region(models.Model):
 
 class Constellation(models.Model):
     """Core model for static constellation data, references Region"""
-    id = models.BigIntegerField(primary_key=True, db_column='constellationID')
+    id = models.IntegerField(primary_key=True, db_column='constellationID')
     name = models.CharField(max_length=100, db_column='constellationName')
     region = models.ForeignKey(Region, related_name='constellations', 
             db_column='regionID')
@@ -70,7 +70,7 @@ class Constellation(models.Model):
 
 class SystemData(models.Model):
     """Core model for static system data from the SDD, references Region and Constellation"""
-    id = models.BigIntegerField(primary_key=True, db_column='solarSystemID')
+    id = models.IntegerField(primary_key=True, db_column='solarSystemID')
     name = models.CharField(max_length=100, db_column='solarSystemName')
     constellation = models.ForeignKey(Constellation, related_name='systems',
             db_column='constellationID')
@@ -120,7 +120,7 @@ class StarbaseResource(models.Model):
 
 class Location(models.Model):
     """Core model for SDD mapDenormalize table that generic locations map to."""
-    itemid = models.BigIntegerField(primary_key=True, db_column='itemID')
+    itemid = models.IntegerField(primary_key=True, db_column='itemID')
     typeid = models.ForeignKey(Type, null=True, blank=True, related_name='mapentries',
             db_column='typeID')
     system = models.ForeignKey(SystemData, null=True, blank=True, related_name='mapentries',
@@ -149,3 +149,44 @@ class LocationWormholeClass(models.Model):
 
     class Meta:
         db_table='mapLocationWormholeClasses'
+
+
+class SystemJump(models.Model):
+    """Core model for SDD mapSolarSystemJumps used in A* calcs."""
+    fromregion = models.ForeignKey(Region, related_name="sys_jumps_from",
+            db_column="fromRegionID")
+    fromconstellation = models.ForeignKey(Constellation, related_name="sys_jumps_from",
+            db_column="fromConstellationID")
+    fromsystem = models.ForeignKey(SystemData, primary_key=True, related_name="jumps_from",
+            db_column="fromSolarSystemID")
+    tosystem = models.ForeignKey(SystemData, primary_key=True, related_name="jumps_to",
+            db_column="toSolarSystemID")
+    toconstellation = models.ForeignKey(Constellation, related_name="sys_jumps_to",
+            db_column="toConstellationID")
+    toregion = models.ForeignKey(Region, related_name="sys_jumps_to",
+            db_column="toRegionID")
+
+    def cost(self):
+        """Returns a cost to use this path equal to 10 * (1-sec) of end system."""
+        return (1 - self.tosystem.security)
+
+    class Meta:
+        db_table='mapSolarSystemJumps'
+
+
+class ConstellationJump(models.Model):
+    fromregion = models.ForeignKey(Region, null=True, related_name='con_jumps_from', db_column='fromRegionID',  blank=True) 
+    fromconstellation = models.ForeignKey(Constellation, primary_key=True, related_name='jumps_from', db_column='fromConstellationID')
+    toconstellation = models.ForeignKey(Constellation, primary_key=True, related_name='jumps_to',  db_column='toConstellationID') 
+    toregion = models.ForeignKey(Region, null=True, db_column='toRegionID', related_name='con_jumps_to', blank=True)
+
+    class Meta:
+        db_table = u'mapConstellationJumps'
+
+
+class RegionJump(models.Model):
+    fromregion = models.ForeignKey(Region, primary_key=True, db_column='fromRegionID', related_name='jumps_from')
+    toregion = models.ForeignKey(Region, primary_key=True, db_column='toRegionID', related_name='jumps_to')
+    
+    class Meta:
+        db_table = u'mapRegionJumps'

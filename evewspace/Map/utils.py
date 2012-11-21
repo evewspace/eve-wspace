@@ -6,6 +6,9 @@ import datetime
 from datetime import timedelta
 import pytz
 from django.contrib.sites.models import Site
+from math import pow, sqrt
+import bisect
+from core.models import SystemJump
 
 def add_log(user, map, action):
     """Adds a log entry into the MapLog for a map."""
@@ -169,7 +172,7 @@ def get_systems_json(map, user):
     levelX = 0
     syslist.append(system_to_dict(user, root, levelX, levelY))
     recursive_system_data_generator(user, root.childsystems.all(), levelY, levelX +1, syslist)
-    return json.dumps(syslist, sort_keys=True)
+    return json.dumps(syslist, sort_keys=True, indent=4)
 
 
 def recursive_system_data_generator(user, mapSystems, levelY, levelX, syslist):
@@ -184,7 +187,7 @@ def recursive_system_data_generator(user, mapSystems, levelY, levelX, syslist):
         i = item[0]
         system = item[1]
         if i > 0:
-            levelY += 1
+            levelY = levelY + 1
         syslist.append(system_to_dict(user, system, levelX, levelY))
         recursive_system_data_generator(user, system.childsystems.all(), levelY, levelX + 1, syslist)
 
@@ -401,3 +404,139 @@ def get_possible_wh_types(system1, system2):
 
     return result
 
+
+def get_ly_distance(sys1, sys2):
+    """
+    Gets the distance in light years between two systems.
+    """
+    x1 = sys1.x
+    y1 = sys1.y
+    z1 = sys1.z
+    x2 = sys2.x
+    y2 = sys2.y
+    z2 = sys2.z
+
+    distance = sqrt(pow(x1 - x2 ,2) + pow(y1-y2,2) + pow(z1-z2,2)) / 9.4605284e+15
+    return distance
+
+class entry(object):
+    def __init__(self, g, h, parent, system):
+        self.f =  g + h
+        self.g = g
+        self.h = h
+        self.parent = parent
+        self.system = system
+    def cmp(self, other):
+        return cmp(self.f, other.f)
+    def get_route(self):
+        route = []
+        parent = self
+        while parent:
+            route.append(parent.system)
+            parent = parent.parent
+        return route
+
+class entryList(list):
+    def has_node(self, node):
+        t = False
+        for n in self:
+            if n.system == node.system:
+                t = True
+        return t
+
+    def replace_node(self, p):
+        for n in self:
+            if n.system == p.system:
+                n = p
+
+def dijkstra_route(sys1, sys2):
+    """
+    Employs Dijkstra's algorithm to find the shortest route between two systems.
+    """
+    openList = entryList()
+    visitedList = entryList()
+    a = SystemJump.objects
+    for region in dijkstra_region(sys1.region, sys2.region):
+        print region.name
+        a = a.filter(fromregion=region)
+    openList.append(entry(0, 0, None, sys1))
+    while len(openList):
+        current = openList.pop(0)
+        if current.system.name == sys2.name:
+            return current.get_route()
+        print a.filter(fromsystem=current.system).count()
+        for adjacentSystem in a.filter(fromsystem=current.system).all():
+            newNode = entry(0, 0, current, adjacentSystem.tosystem)
+            if not visitedList.has_node(newNode):
+                openList.append(newNode)
+                visitedList.append(newNode)
+    return "No Route!"
+
+
+def dijkstra_const(con1, con2):
+    """
+    Employs Dijkstra's algorithm to find the shortest route between two constellations.
+    """
+    openList = entryList()
+    visitedList = entryList()
+    openList.append(entry(0, 0, None, con1))
+    while len(openList):
+        current = openList.pop(0)
+        if current.system.name == con2.name:
+            return current.get_route()
+
+        for adjacentSystem in current.system.jumps_from.all():
+            newNode = entry(0, 0, current, adjacentSystem.toconstellation)
+            if not visitedList.has_node(newNode):
+                openList.append(newNode)
+                visitedList.append(newNode)
+    return "No Route!"
+
+
+def dijkstra_region(con1, con2):
+    """
+    Employs Dijkstra's algorithm to find the shortest route between two constellations.
+    """
+    openList = entryList()
+    visitedList = entryList()
+    openList.append(entry(0, 0, None, con1))
+    while len(openList):
+        current = openList.pop(0)
+        if current.system.name == con2.name:
+            return current.get_route()
+
+        for adjacentSystem in current.system.jumps_from.all():
+            newNode = entry(0, 0, current, adjacentSystem.toregion)
+            if not visitedList.has_node(newNode):
+                openList.append(newNode)
+                visitedList.append(newNode)
+    return "No Route!"
+
+
+
+def a_star_route(sys1, sys2):
+    """
+    Employs A* algorithm to find the shortest route between two systems.
+    """
+    openList = entryList()
+    closedList = entryList()
+
+    openList.append(entry(0, len(dijkstra_region(sys1.region, sys2.region)), None, sys1))
+    while len(openList):
+        n = openList.pop(0)
+        closedList.append(n)
+        if n.system.name == sys2.name:
+            return n.get_route()
+
+        for adjSystem in n.system.jumps_from.all():
+            print "Processing system: %s" % (adjSystem.tosystem.name)
+            newNode = entry(n.g + 1, len(dijkstra_region(adjSystem.tosystem.region, sys2.region)), n, adjSystem.tosystem)
+            if not closedList.has_node(newNode):
+                if newNode.system.name == sys2.name:
+                    return newNode.get_route()
+                elif newNode.f < n.f or len(dijkstra_const(newNode.system.constellation, sys2.system.constellation)) < len(dijkstra_const(n.system.constellation, sys2.system.constellation)):
+                    bisect.insort(openList, newNode)
+                else:
+                    closedList.append(newNode)
+        print len(closedList)
+    return "No Route!"
