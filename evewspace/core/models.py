@@ -3,7 +3,7 @@ from django.db import models
 
 class MarketGroup(models.Model):
     """A market group from the Eve SDD."""
-    id = models.BigIntegerField(primary_key=True, db_column='marketGroupID')
+    id = models.IntegerField(primary_key=True, db_column='marketGroupID')
     name = models.CharField(max_length = 100, null=True, blank=True, 
             db_column='marketGroupName')
     parentgroup = models.ForeignKey("self", related_name="childgroups", 
@@ -20,7 +20,7 @@ class MarketGroup(models.Model):
 
 class Type(models.Model):
     """A type from the Eve SDD invTypes table."""
-    id = models.BigIntegerField(primary_key=True, db_column='typeID')
+    id = models.IntegerField(primary_key=True, db_column='typeID')
     name = models.CharField(max_length = 100, db_column='typeName')
     description = models.TextField(blank=True, null=True)
     volume = models.FloatField(blank=True, null=True)
@@ -38,7 +38,7 @@ class Type(models.Model):
 class Region(models.Model):
     """Core model for static region data"""
 
-    id   = models.BigIntegerField(primary_key=True, db_column='regionID')
+    id   = models.IntegerField(primary_key=True, db_column='regionID')
     name = models.CharField(max_length=100, db_column='regionName')
     x    = models.FloatField()
     y    = models.FloatField()
@@ -53,7 +53,7 @@ class Region(models.Model):
 
 class Constellation(models.Model):
     """Core model for static constellation data, references Region"""
-    id = models.BigIntegerField(primary_key=True, db_column='constellationID')
+    id = models.IntegerField(primary_key=True, db_column='constellationID')
     name = models.CharField(max_length=100, db_column='constellationName')
     region = models.ForeignKey(Region, related_name='constellations', 
             db_column='regionID')
@@ -70,7 +70,7 @@ class Constellation(models.Model):
 
 class SystemData(models.Model):
     """Core model for static system data from the SDD, references Region and Constellation"""
-    id = models.BigIntegerField(primary_key=True, db_column='solarSystemID')
+    id = models.IntegerField(primary_key=True, db_column='solarSystemID')
     name = models.CharField(max_length=100, db_column='solarSystemName')
     constellation = models.ForeignKey(Constellation, related_name='systems',
             db_column='constellationID')
@@ -120,7 +120,7 @@ class StarbaseResource(models.Model):
 
 class Location(models.Model):
     """Core model for SDD mapDenormalize table that generic locations map to."""
-    itemid = models.BigIntegerField(primary_key=True, db_column='itemID')
+    itemid = models.IntegerField(primary_key=True, db_column='itemID')
     typeid = models.ForeignKey(Type, null=True, blank=True, related_name='mapentries',
             db_column='typeID')
     system = models.ForeignKey(SystemData, null=True, blank=True, related_name='mapentries',
