@@ -62,5 +62,6 @@ exec {'create-db':
 
 exec {'requirements':
 	command => "/usr/bin/pip install -r /vagrant/requirements.txt",
+	timeout => 0,
 	require => [Package["python-pip"], Exec['easy_install -U distribute'], Package['libmysqlclient-dev'], Package['python-dev'] ],
 	}
