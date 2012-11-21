@@ -1,6 +1,7 @@
 from django.db import models
 from core.models import Type, Location
 from Map.models import System
+import csv
 from django.contrib.auth.models import User
 
 
@@ -9,7 +10,7 @@ class Alliance(models.Model):
     id = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=100)
     shortname = models.CharField(max_length=100)
-    executor = models.ForeignKey('Corporation', related_name='+')
+    executor = models.ForeignKey('Corporation', blank=True, null=True, related_name='+')
 
     def __unicode__(self):
         return self.name
@@ -52,7 +53,6 @@ class POS(models.Model):
         if not updated:
             import datetime
             updated = datetime.datetime.utcnow()
-
 
     def __unicode__(self):
         return self.location.name
