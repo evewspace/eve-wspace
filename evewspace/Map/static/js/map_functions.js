@@ -3,9 +3,9 @@
 var loadtime = new Date();
 var paper = null;
 var objSystems = new Array();
-var indentX = 130; //The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180.
+var indentX = 150; //The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180.
 var indentY = 64; // The amount of space (in px) between system ellipses on the Y axis
-var renderWormholeTags = false; // Determines whether wormhole types are shown on the map.
+var renderWormholeTags = true; // Determines whether wormhole types are shown on the map.
 
 //AJAX Setup to work with Django CSFR Middleware
 $.ajaxSetup({
@@ -647,9 +647,7 @@ function DrawSystem(system) {
             }else{
                 ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", false);
             }
-            if (renderWormholeTags){
                 DrawWormholes(parentSys, system, whColor);
-            }
         }else{
             alert("Error processing system " + system.Name);
         }
@@ -862,10 +860,13 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
 
         textCenterX = sysX2 - 73;
         textCenterY = sysY2 - 30;
-
-        whFromSysX = textCenterX + 23;
-        whToSysX = textCenterX - 23;
-
+        if (renderWormholeTags){
+            whFromSysX = textCenterX + 23;
+            whToSysX = textCenterX - 23;
+        }else{
+            whFromSysX = textCenterX + 35;
+            whToSysX = textCenterX - 10;
+        }
         whFromSysY = textCenterY;
         whToSysY = textCenterY;
     } 
@@ -891,20 +892,26 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
     }
     
     if (systemTo.WhFromParent) {
-
-        whFromSys = paper.text(whFromSysX, whFromSysY, systemTo.WhFromParent + " >");
+        if (!renderWormholeTags){
+            whFromText = ">";
+            whToText = "<";
+        }else{
+            whFromText = systemTo.WhFromParent + " >";
+            whToText = "< " + systemTo.WhToParent;
+        }
+        whFromSys = paper.text(whFromSysX, whFromSysY, whFromText);
         whFromSys.attr({ fill: whFromColor, cursor: "pointer", "font-size": 11, "font-weight": decoration });  //stroke: "#fff"
-
+        whFromSys.click(function(){GetEditWormholeDialog(systemTo.whID);});
         whFromSys.whID = systemTo.whID;
         whFromSys.mouseover(OnWhOver);
         whFromSys.mouseout(OnWhOut);
     }
     if (systemTo.WhToParent) {
-        whToSys = paper.text(whToSysX, whToSysY, "< " + systemTo.WhToParent);
+        whToSys = paper.text(whToSysX, whToSysY, whToText);
         whToSys.attr({ fill: whToColor, cursor: "pointer", "font-size": 11, "font-weight": decoration });
 
         whToSys.whID = systemTo.whID;
-
+        whToSys.click(function(){GetEditWormholeDialog(systemTo.whID);});
         whToSys.mouseover(OnWhOver);
         whToSys.mouseout(OnWhOut);
     }
