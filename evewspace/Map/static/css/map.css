@@ -53,6 +53,10 @@
 {
     text-align: left;
 }
+.sysFriendlySpan
+{
+    text-align: center;
+}
 .tip {
   background: #eee;
   border: 1px solid #ccc;

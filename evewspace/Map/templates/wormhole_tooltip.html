@@ -35,4 +35,16 @@
             </span>
         </div>
     </div>
+    <div class="row">
+        <br />
+        <div class="wormholeOverallInfo span4">
+        {% if wh.top_type.maxmass > wh.bottom_type.maxmass %}
+            <strong>Max Mass: {{wh.top_type.maxmass}} kg </strong> <br />
+            <strong>Jump Mass: {{wh.top_type.jumpmass}} kg </strong>
+        {% else %}
+            <strong>Max Mass: {{wh.bottom_type.maxmass}} kg </strong><br />
+            <strong>Jump Mass: {{wh.bottom_type.jumpmass}} kg </strong>
+        {% endif %}
+        </div>
+    </div>
 </div>
