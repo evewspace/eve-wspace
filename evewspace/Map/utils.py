@@ -8,7 +8,7 @@ import pytz
 from django.contrib.sites.models import Site
 from math import pow, sqrt
 import bisect
-from core.models import SystemJump
+from core.models import SystemJump, RegionJump, ConstellationJump
 
 def add_log(user, map, action):
     """Adds a log entry into the MapLog for a map."""
@@ -438,11 +438,19 @@ class entry(object):
             parent = parent.parent
         return route
 
+    def get_expanded_route(self):
+        route = []
+        parent = self
+        while parent:
+            route.append(parent.system)
+            route.extend([x.toregion for x in list(parent.system.jumps_from.all())])
+            parent = parent.parent
+        return route
+
 class entryList(list):
     def has_node(self, node):
         systems = [x.system for x in self]
-
-	return node.system in systems
+        return node.system in systems
 
 
 def dijkstra_route(sys1, sys2):
@@ -452,11 +460,13 @@ def dijkstra_route(sys1, sys2):
     openList = entryList()
     visitedList = entryList()
     openList.append(entry(0, 0, None, sys1))
+    constCandidates = dijkstra_const(sys1.constellation, sys2.constellation)
+    query = SystemJump.objects.filter(fromconstellation__in=constCandidates)
     while len(openList):
         current = openList.pop(0)
         if current.system.name == sys2.name:
-	    return current.get_route()
-        for adjacentSystem in current.system.jumps_from.all():
+            return current.get_route()
+        for adjacentSystem in query.filter(fromsystem=current.system).all():
             newNode = entry(0, 0, current, adjacentSystem.tosystem)
             if not visitedList.has_node(newNode):
                 openList.append(newNode)
@@ -471,12 +481,14 @@ def dijkstra_const(con1, con2):
     openList = entryList()
     visitedList = entryList()
     openList.append(entry(0, 0, None, con1))
+    regionCandidates = dijkstra_region(con1.region, con2.region)
+    query = ConstellationJump.objects.filter(fromregion__in=regionCandidates)
     while len(openList):
         current = openList.pop(0)
         if current.system.name == con2.name:
             return current.get_route()
 
-        for adjacentSystem in current.system.jumps_from.all():
+        for adjacentSystem in query.filter(fromconstellation=current.system).all():
             newNode = entry(0, 0, current, adjacentSystem.toconstellation)
             if not visitedList.has_node(newNode):
                 openList.append(newNode)
@@ -494,7 +506,7 @@ def dijkstra_region(con1, con2):
     while len(openList):
         current = openList.pop(0)
         if current.system.name == con2.name:
-            return current.get_route()
+            return current.get_expanded_route()
 
         for adjacentSystem in current.system.jumps_from.all():
             newNode = entry(0, 0, current, adjacentSystem.toregion)
