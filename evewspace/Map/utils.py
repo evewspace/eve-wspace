@@ -426,8 +426,10 @@ class entry(object):
         self.h = h
         self.parent = parent
         self.system = system
+    
     def cmp(self, other):
         return cmp(self.f, other.f)
+    
     def get_route(self):
         route = []
         parent = self
@@ -438,16 +440,10 @@ class entry(object):
 
 class entryList(list):
     def has_node(self, node):
-        t = False
-        for n in self:
-            if n.system == node.system:
-                t = True
-        return t
+        systems = [x.system for x in self]
 
-    def replace_node(self, p):
-        for n in self:
-            if n.system == p.system:
-                n = p
+	return node.system in systems
+
 
 def dijkstra_route(sys1, sys2):
     """
@@ -455,17 +451,12 @@ def dijkstra_route(sys1, sys2):
     """
     openList = entryList()
     visitedList = entryList()
-    a = SystemJump.objects
-    for region in dijkstra_region(sys1.region, sys2.region):
-        print region.name
-        a = a.filter(fromregion=region)
     openList.append(entry(0, 0, None, sys1))
     while len(openList):
         current = openList.pop(0)
         if current.system.name == sys2.name:
-            return current.get_route()
-        print a.filter(fromsystem=current.system).count()
-        for adjacentSystem in a.filter(fromsystem=current.system).all():
+	    return current.get_route()
+        for adjacentSystem in current.system.jumps_from.all():
             newNode = entry(0, 0, current, adjacentSystem.tosystem)
             if not visitedList.has_node(newNode):
                 openList.append(newNode)
