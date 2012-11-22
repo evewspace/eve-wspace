@@ -10,10 +10,11 @@ from math import pow, sqrt
 import bisect
 from core.models import SystemJump
 
-def add_log(user, map, action):
+def add_log(user, map, action, visible=False):
     """Adds a log entry into the MapLog for a map."""
     newLog = MapLog(user=user, map=map, action=action,
-            timestamp=datetime.datetime.utcnow().replace(tzinfo=pytz.utc))
+            timestamp=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
+            visible=visible)
     newLog.save()
 
 
@@ -56,7 +57,7 @@ def add_system_to_map(user, map, system, friendlyname, isroot, parent):
         newMapSystem = MapSystem(map=map, system=system, 
                 friendlyname=friendlyname, interesttime=None, parentsystem=parent)
         newMapSystem.save()
-        add_log(user, map, "Added system: %s" % (system.name))
+        add_log(user, map, "Added system: %s" % (system.name), True)
         return newMapSystem
 
 
@@ -172,7 +173,7 @@ def get_systems_json(map, user):
     levelX = 0
     syslist.append(system_to_dict(user, root, levelX, levelY))
     recursive_system_data_generator(user, root.childsystems.all(), levelY, levelX +1, syslist)
-    return json.dumps(syslist, sort_keys=True, indent=4)
+    return json.dumps(syslist, sort_keys=True)
 
 
 def recursive_system_data_generator(user, mapSystems, levelY, levelX, syslist):
@@ -238,16 +239,14 @@ def delete_system(mapSystem, user):
         mapSystem.system.signatures.all().delete()
     # Remove our parent wormholes
     mapSystem.parent_wormholes.all().delete()
-    # Get a child count before we kill them all
-    children = mapSystem.childsystems.count()
     # Remove our children
     for system in mapSystem.childsystems.all():
         delete_system(system, user)
     # Logs for the logs god
     delSystemname = mapSystem.system.name
     mapSystem.delete()
-    add_log(user, mapSystem.map, "Removed %s from the map and %s child systems."
-            % (delSystemname, children))
+    add_log(user, mapSystem.map, "Removed %s from the map."
+            % (delSystemname, children), visible=True)
     return None
 
 

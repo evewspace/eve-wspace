@@ -57,6 +57,7 @@ class System(SystemData):
 
     def is_kspace(self):
         return self.sysclass >= 7
+ 
     def is_wspace(self):
         return self.sysclass < 7
 
@@ -107,12 +108,13 @@ class Map(models.Model):
         for msys in self.systems.all():
             yield msys.system
 
-    def add_log(self, user, action):
+    def add_log(self, user, action, visible=False):
         """
         Adds a log entry into a MapLog for the map.
         """
         log = MapLog(user=user, map=self, action=action,
-                     timestamp=datetime.now(pytz.utc))
+                     timestamp=datetime.now(pytz.utc),
+                     visible=visible)
         log.save()
 
     def get_permission(self, user):
@@ -146,7 +148,7 @@ class Map(models.Model):
         """
         system = MapSystem(map=self, system=system, friendlyname=friendlyname, parentsystem = parent)
         system.save()
-        self.add_log(user, "Added system: %s" % system.name)
+        self.add_log(user, "Added system: %s" % system.name, True)
         return system
 
 class MapSystem(models.Model):
@@ -298,6 +300,8 @@ class MapLog(models.Model):
     user = models.ForeignKey(User, related_name="maplogs")
     timestamp = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=255)
+    # Visible logs are pushed to clients as they ocurr (e.g. system added to map)
+    visible = models.BooleanField()
 
     def __unicode__(self):
         return "Map: %s  User: %s  Action: %s  Time: %s" % (self.map.name, self.user.username, 
@@ -311,7 +315,6 @@ class Snapshot(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, related_name='snapshots')
     systemsjson = models.TextField()
-    wormholesjson = models.TextField()
 
 
 # Model Forms

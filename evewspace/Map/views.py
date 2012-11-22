@@ -57,23 +57,20 @@ def map_checkin(request, mapID):
         return HttpResponse(json.dumps({error: "No loadtime"}),mimetype="application/json")
     timestring = request.POST['loadtime']
 
-    if request.is_igb:
-        loadtime = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%SZ')
-        loadtime = loadtime.replace(tzinfo=pytz.utc)
-    else:
-        loadtime = datetime.strptime(timestring, '%Y-%m-%dT%H:%M:%S.%fZ')
-        loadtime.replace(tzinfo=pytz.utc)
+    loadtime = datetime.strptime(timestring, "%Y-%m-%d %H:%M:%S.%f")
+    loadtime.replace(tzinfo=pytz.utc)
 
     if request.is_igb_trusted:
         dialogHtml = checkin_igb_trusted(request, currentmap)
         if dialogHtml is not None:
             jsonvalues.update({'dialogHTML': dialogHtml})
 
-    newlogquery = MapLog.objects.filter(timestamp__gt=loadtime)
+    newlogquery = MapLog.objects.filter(timestamp__gt=loadtime, visible=True,
+            map=currentmap)
     loglist = []
 
     for log in newlogquery:
-        loglist.append("Time: %s  User: %s Action: %s" % (log.timestamp,
+        loglist.append("<strong>User:</strong> %s <strong>Action:</strong> %s" % (
             log.user.username, log.action))
 
     logstring = render_to_string('log_div.html', {'logs': loglist})
@@ -91,7 +88,9 @@ def map_refresh(request, mapID):
     if not request.is_ajax():
         raise PermissionDenied
     map = get_object_or_404(Map, pk=mapID)
-    return HttpResponse(utils.get_systems_json(map, request.user))
+    result = [datetime.strftime(datetime.now(pytz.utc), "%Y-%m-%d %H:%M:%S.%f"),
+            utils.get_systems_json(map, request.user)]
+    return HttpResponse(json.dumps(result))
 
 def checkin_igb_trusted(request, map):
     """

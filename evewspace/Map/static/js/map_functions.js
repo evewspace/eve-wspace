@@ -1,6 +1,6 @@
 // Portions Copyright (c) 2011 Georgi Kolev (arcanis@wiadvice.com). Licensed under the GPL (http://www.gnu.org/copyleft/gpl.html) license.
 
-var loadtime = new Date();
+var loadtime = null;
 var paper = null;
 var objSystems = new Array();
 var indentX = 150; //The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180.
@@ -65,7 +65,7 @@ function doMapAjaxCheckin() {
     $.ajax({
         type: "POST",
         url: currentpath,
-        data: {"loadtime": loadtime.toJSON()},
+        data: {"loadtime": loadtime},
         success: function(data) {processAjax(data);},
         error: function(errorThrown) {alert("An error occurred querying the server.");}
         });
@@ -234,7 +234,9 @@ function RefreshMap(){
         success: function(data){
             CloseSystemMenu();
             objSystems = new Array();
-            systemsJSON = $.parseJSON(data);
+            newData = $.parseJSON(data);
+            systemsJSON = $.parseJSON(newData[1]);
+            loadtime = newData[0];
             StartDrawing();
         },
         error: function(errorThrown){
