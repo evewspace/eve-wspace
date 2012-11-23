@@ -77,122 +77,122 @@ def add_wormhole_to_map(map, topSystem, topType, bottomType, bottomSystem=None,
     return newWormhole
 
 
-def get_path_to_map_system(system):
-    """Returns a list of MapSystems on the route between the map root and
-    the provided MapSystem.
-
+class MapJSONGenerator(object):
     """
-    systemlist = []
-    system_walker(system, systemlist)
-    return systemlist
-
-
-def system_walker(system, systemlist):
-    """Utility function that recursively walks backward on a map path. It
-    looks at a MapSystem's parent and adds the system to systemlist if it has one.
+    A MapJSONGenerator is instantiated with a map and user. It provides
+    a method that returns the JSON representation of the map.
+    """
     
-    """
-    if system.parentsystem:
-        systemlist.append(system)
-        system_walker(system.parentsystem, systemlist)
-    return
+    def __init__(self, map, user):
+        self.map = map
+        self.user = user
+        self.levelY = 0
+
+    def get_path_to_map_system(self, system):
+        """
+        Returns a list of MapSystems on the route between the map root and
+        the provided MapSystem.
+        """
+        systemlist = []
+        parent = system
+        while parent:
+            systemlist.append(parent)
+            parent = parent.parent
+        return systemlist
+
+    def get_system_icon(self, system):
+        """
+        Takes a MapSystem and returns the appropriate icon to display on the map
+        as a realative URL.
+        """
+        staticPrefix = "%s" % (settings.STATIC_URL + "images/")
+        if self.user.get_profile().currentsystem == system.system: 
+            if self.user.get_profile().lastactive > datetime.datetime.now(pytz.utc) - timedelta(minutes=15):
+                return staticPrefix + "mylocation.png"
+
+        if system.stfleets.filter(ended__isnull=True).count() != 0:
+            return staticPrefix + "farm.png" 
+
+        if system.system.shipkills + system.system.podkills > 0:
+            return staticPrefix + "pvp.png" 
+
+        if system.system.npckills > 15:
+            return staticPrefix + "carebears.png"
+
+        return None
+
+    def system_to_dict(self, system, levelX):
+        """
+        Takes a MapSystem and X,Y data and returns the dict of information to be passed to 
+        the map JS as JSON.
+        """
+        threshold = datetime.datetime.now(pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
+        if system.interesttime and system.interesttime > threshold:
+            interest = True
+        else:
+            interest = False
+        if system.map.systems.filter(interesttime__gt=threshold).count() != 0:
+            path = False
+            for sys in system.map.systems.filter(interesttime__gt=threshold).all():
+                if system in self.get_path_to_map_system(sys):
+                    path = True
+        else:
+            path = False
+
+        if system.parentsystem:
+            parentWH = system.parent_wormholes.get()
+            result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
+                    'LevelY': self.levelY, 'SysClass': system.system.sysclass, 
+                    'Friendly': system.friendlyname, 'interest': interest,
+                    'interestpath': path, 'ParentID': system.parentsystem.pk, 
+                    'activePilots': system.system.activepilots.count(),
+                    'WhToParent': parentWH.bottom_type.name,
+                    'WhFromParent': parentWH.top_type.name,
+                    'WhMassStatus': parentWH.mass_status,
+                    'WhTimeStatus': parentWH.time_status,
+                    'WhToParentBubbled': parentWH.bottom_bubbled,
+                    'WhFromParentBubbled': parentWH.top_bubbled,
+                    'imageURL': self.get_system_icon(system),
+                    'whID': parentWH.pk, 'msID': system.pk}
+        else:
+            result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
+                    'LevelY': self.levelY, 'SysClass': system.system.sysclass,
+                    'Friendly': system.friendlyname, 'interest': interest,
+                    'interestpath': path, 'ParentID': None, 
+                    'activePilots': system.system.activepilots.count(),
+                    'WhToParent': "", 'WhFromParent': "",
+                    'WhMassStatus': None, 'WhTimeStatus': None,
+                    'WhToParentBubbled': None, 'WhFromParentBubbled': None,
+                    'imageURL': self.get_system_icon(system),
+                    'whID': None, 'msID': system.pk}
+        return result
 
 
-def get_system_icon(system, user):
-    """Takes a MapSystem and returns the appropriate icon to display on the map
-    as a realative URL.
-
-    """
-    staticPrefix = "%s%s" % (Site.objects.get_current().domain, settings.STATIC_URL + "images/")
-    if user.get_profile().currentsystem == system.system: 
-        if user.get_profile().lastactive > datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(minutes=15):
-            return staticPrefix + "mylocation.png"
-
-    if system.stfleets.filter(ended__isnull=True).count() != 0:
-        return staticPrefix + "farm.png" 
-
-    if system.system.shipkills + system.system.podkills > 0:
-        return staticPrefix + "pvp.png" 
-
-    if system.system.npckills > 15:
-        return staticPrefix + "carebears.png"
-
-    return None
-
-def system_to_dict(user, system, levelX, levelY):
-    """Takes a MapSystem and X,Y data and returns the dict of information to be passed to 
-    the map JS as JSON.
-
-    """
-    threshold = datetime.datetime.utcnow().replace(
-            tzinfo=pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
-    if system.interesttime and system.interesttime > threshold:
-        interest = True
-    else:
-        interest = False
-    if system.map.systems.filter(interesttime__gt=threshold).count() != 0:
-        path = False
-        for sys in system.map.systems.filter(interesttime__gt=threshold).all():
-            if system in get_path_to_map_system(sys):
-                path = True
-    else:
-        path = False
-
-    if system.parentsystem:
-        parentWH = system.parent_wormholes.get()
-        result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
-                'LevelY': levelY, 'SysClass': system.system.sysclass, 
-                'Friendly': system.friendlyname, 'interest': interest,
-                'interestpath': path, 'ParentID': system.parentsystem.pk, 
-                'activePilots': system.system.activepilots.count(),
-                'WhToParent': parentWH.bottom_type.name,
-                'WhFromParent': parentWH.top_type.name,
-                'WhMassStatus': parentWH.mass_status,
-                'WhTimeStatus': parentWH.time_status,
-                'WhToParentBubbled': parentWH.bottom_bubbled,
-                'WhFromParentBubbled': parentWH.top_bubbled,
-                'imageURL': get_system_icon(system, user),
-                'whID': parentWH.pk, 'msID': system.pk}
-    else:
-        result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
-                'LevelY': levelY, 'SysClass': system.system.sysclass,
-                'Friendly': system.friendlyname, 'interest': interest,
-                'interestpath': path, 'ParentID': None, 
-                'activePilots': system.system.activepilots.count(),
-                'WhToParent': "", 'WhFromParent': "",
-                'WhMassStatus': None, 'WhTimeStatus': None,
-                'WhToParentBubbled': None, 'WhFromParentBubbled': None,
-                'imageURL': get_system_icon(system, user),
-                'whID': None, 'msID': system.pk}
-    return result
+    def get_systems_json(self):
+        """Returns a JSON string representing the systems in a map."""
+        syslist = []
+        root = self.map.systems.get(parentsystem__isnull=True)
+        syslist.append(self.system_to_dict(root, 0))
+        self.recursive_system_data_generator(root.childsystems.all(), syslist, 1)
+        return json.dumps(syslist, sort_keys=True)
 
 
-def get_systems_json(map, user):
-    """Returns a JSON string representing the systems in a map."""
-    syslist = []
-    root = map.systems.get(parentsystem__isnull=True)
-    levelY = 0
-    levelX = 0
-    syslist.append(system_to_dict(user, root, levelX, levelY))
-    recursive_system_data_generator(user, root.childsystems.all(), levelY, levelX +1, syslist)
-    return json.dumps(syslist, sort_keys=True)
-
-
-def recursive_system_data_generator(user, mapSystems, levelY, levelX, syslist):
-    """Prepares a list of MapSystem objects for conversion to JSON for map JS.
-    Takes a queryset of MapSystems, a levelY integer that is manipulated,
-    a levelX integer, and the current list of systems prepared for JSON.
-
-    """
-    # We will need an index later, so let's enumerate the mapSystems
-    enumSystems = enumerate(mapSystems, start=0)
-    for item in enumSystems:
-        i = item[0]
-        system = item[1]
-        if i > 0:
-            levelY = levelY + 1
-        syslist.append(system_to_dict(user, system, levelX, levelY))
-        recursive_system_data_generator(user, system.childsystems.all(), levelY, levelX + 1, syslist)
+    def recursive_system_data_generator(self, mapSystems, syslist, levelX):
+        """
+        Prepares a list of MapSystem objects for conversion to JSON for map JS.
+        Takes a queryset of MapSystems and the current list of systems prepared 
+        for JSON.
+        """
+        # We will need an index later, so let's enumerate the mapSystems
+        enumSystems = enumerate(mapSystems, start=0)
+        for item in enumSystems:
+            i = item[0]
+            system = item[1]
+            if i > 0:
+                self.levelY +=1
+            syslist.append(self.system_to_dict(system, levelX))
+            self.recursive_system_data_generator(system.childsystems.all(), 
+                    syslist, levelX + 1)
 
 
 def get_wormholes_json(map):

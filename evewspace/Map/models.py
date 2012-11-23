@@ -126,7 +126,7 @@ class Map(models.Model):
         """
         #Special case: if user is unrestricted we don't care unless the map
         #requires explicit permissions
-        if user.has_perm['Map.map_unrestricted'] and not self.explicitperms:
+        if user.has_perm('Map.map_unrestricted') and not self.explicitperms:
             return 2
 
         #Otherwise take the highest of the permissions granted by the groups

@@ -39,7 +39,8 @@ def get_map(request, mapID):
     exist, return 404. If we don't have permission, return PermissionDenied.
     """
     map = get_object_or_404(Map, pk=mapID)
-    context = utils.get_map_context(map, request.user)
+    context = {'map': map, 'access': map.get_permission(request.user),
+            'systemsJSON': utils.MapJSONGenerator(map, request.user).get_systems_json()}
     return TemplateResponse(request, 'map.html', context)
 
 
@@ -89,7 +90,7 @@ def map_refresh(request, mapID):
         raise PermissionDenied
     map = get_object_or_404(Map, pk=mapID)
     result = [datetime.strftime(datetime.now(pytz.utc), "%Y-%m-%d %H:%M:%S.%f"),
-            utils.get_systems_json(map, request.user)]
+            utils.MapJSONGenerator(map, request.user).get_systems_json()]
     return HttpResponse(json.dumps(result))
 
 def checkin_igb_trusted(request, map):
