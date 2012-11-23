@@ -35,6 +35,19 @@ class WormholeType(models.Model):
         """Returns Wormhole ID as unicode representation."""
         return self.name
 
+    def dest_string(self):
+        """Returns a readable destination. Cx for w-space and H, L, N otherwise."""
+        if self.destination < 7 and self.destination > 0:
+            return "C%s" % (self.destination)
+        if self.destination == 0:
+            return "Varies"
+        if self.destination == 7:
+            return "High Sec"
+        if self.destination == 8:
+            return "Low Sec"
+        if self.destination == 9:
+            return "Null Sec"
+        return "Unknown"
 
 class System(SystemData):
     """Stores the permanent record of a solar system. 

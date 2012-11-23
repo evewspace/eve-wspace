@@ -9,7 +9,8 @@
             <strong>Effect: {{system.effect}}</strong>
         </div>
         <div>
-            <strong>Probable Statics: {{system.static1}} {% if system.static2 %}{{system.static2}} {% endif %}</strong>
+            <strong>Probable Statics: <br />
+                {{system.static1}} ({{system.static1.dest_string}}) &nbsp {% if system.static2 %}{{system.static2}} ({{system.static2.dest_string}}){% endif %}</strong>
         </div>
         {% endif %}
         <strong>

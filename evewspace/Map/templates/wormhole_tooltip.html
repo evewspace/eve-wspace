@@ -1,15 +1,16 @@
+{% load humanize %}
 <div class="wormholeInfo">
     <div class="row">
         <div class="wormholeSideDiv span2">
             <h4>{{wh.top.system.name}}</h4>
-            <span class="wormholeType">Type: {{wh.top_type.name}}</span><br />
+            <span class="wormholeType">Type: {{wh.top_type.name}} ({{wh.top_type.dest_string}})</span><br />
             <span class="wormholeBubbled {% if wh.top_bubbled %}text-error{% endif %}">
                 Bubbled: {{wh.top_bubbled|yesno:"Yes,No"}}
             </span>
         </div>
         <div class="wormholeSideDiv span2">
             <h4>{{wh.bottom.system.name}}</h4>
-            <span class="wormholeType">Type: {{wh.bottom_type.name}}</span><br />
+            <span class="wormholeType">Type: {{wh.bottom_type.name}} ({{wh.bottom_type.dest_string}})</span><br />
             <span class="wormholeType {% if wh.bottom_bubbled %}text-error{% endif %}">
                 Bubbled: {{wh.bottom_bubbled|yesno:"Yes,No"}}
             </span>
@@ -39,11 +40,11 @@
         <br />
         <div class="wormholeOverallInfo span4">
         {% if wh.top_type.maxmass > wh.bottom_type.maxmass %}
-            <strong>Max Mass: {{wh.top_type.maxmass}} kg </strong> <br />
-            <strong>Jump Mass: {{wh.top_type.jumpmass}} kg </strong>
+            <strong>Max Mass: {{wh.top_type.maxmass|intcomma}} kg </strong> <br />
+            <strong>Jump Mass: {{wh.top_type.jumpmass|intcomma}} kg </strong>
         {% else %}
-            <strong>Max Mass: {{wh.bottom_type.maxmass}} kg </strong><br />
-            <strong>Jump Mass: {{wh.bottom_type.jumpmass}} kg </strong>
+            <strong>Max Mass: {{wh.bottom_type.maxmass|intcomma}} kg </strong><br />
+            <strong>Jump Mass: {{wh.bottom_type.jumpmass|intcomma}} kg </strong>
         {% endif %}
         </div>
     </div>
