@@ -1,6 +1,6 @@
 from django.conf import settings
 from models import CorpPOS
-from lib.eveapi import eveapi
+import eveapi
 from API import utils as handler
 
 

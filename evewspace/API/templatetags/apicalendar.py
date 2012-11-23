@@ -1,5 +1,5 @@
 from django import template
-from lib.eveapi import eveapi
+import eveapi
 from API import utils as handler
 from API.utils import timestamp_to_datetime
 from API.models import *
