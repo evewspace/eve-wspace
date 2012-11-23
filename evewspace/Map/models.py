@@ -183,6 +183,16 @@ class Map(models.Model):
         """
         return utils.MapJSONGenerator(self, user).get_systems_json()
 
+    def snapshot(self, user, name, description):
+        """
+        Makes and returns a snapshot of the map.
+        """
+        result = Snapshot(user=user, name=name, description=description,
+                json=self.as_json(user))
+        result.save()
+        self.add_log(user, "Created Snapshot: %s" % (name))
+        return result
+
 class MapSystem(models.Model):
     """Stores information regarding which systems are active in which maps at the present time."""
     map = models.ForeignKey(Map, related_name="systems")
@@ -223,7 +233,7 @@ class MapSystem(models.Model):
         self.parent_wormholes.all().delete()
         for system in self.childsystems.all():
             system.remove_system(user)
-        self.map.add_log(user, "Removed system %s (%s)" % (self.system.name, 
+        self.map.add_log(user, "Removed system: %s (%s)" % (self.system.name, 
             self.friendlyname), True)
         self.delete()
 
@@ -361,11 +371,11 @@ class MapLog(models.Model):
 class Snapshot(models.Model):
     """Represents a snapshot of the JSON strings that are used to draw a map."""
 
-    mapname = models.CharField(max_length=100)
+    name = models.CharField(max_length=64)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, related_name='snapshots')
-    systemsjson = models.TextField()
-
+    json = models.TextField()
+    description = models.CharField(max_length=255)
 
 # Model Forms
 class MapForm(ModelForm):

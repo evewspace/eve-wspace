@@ -314,8 +314,7 @@ def set_interest(request, mapID, msID):
 def add_signature(request, mapID, msID):
     """This function processes the Add Signature form. GET gets the form
     and POST submits it and returns either a blank JSON list or a form with errors.
-    in addition to the SignatureForm, the form should have a hidden field called sysID
-    with the System id. All requests should be AJAX.
+    All requests should be AJAX.
     
     """
     if not request.is_ajax():
@@ -331,6 +330,8 @@ def add_signature(request, mapID, msID):
             newSig.updated = True
             newSig.save()
             newForm = SignatureForm()
+            mapsystem.map.add_log(request.user, "Added signature %s to %s (%s)." 
+                    % (newSig.sigid, mapsystem.system.name, mapsystem.friendlyname))
             return TemplateResponse(request, "add_sig_form.html", 
                     {'form': newForm, 'system': mapsystem})
         else:
@@ -403,8 +404,11 @@ def delete_signature(request, mapID, msID, sigID):
     """
     if not request.is_ajax():
         raise PermissionDenied
+    mapsys = get_object_or_404(MapSystem, pk=msID)
     sig = get_object_or_404(Signature, pk=sigID)
     sig.delete()
+    mapsys.map.add_log(request.user, "Deleted signature %s in %s (%s)." 
+            % (sig.sigid, mapsys.system.name, mapsys.friendlyname))
     return HttpResponse('[]')
 
 
@@ -441,6 +445,8 @@ def edit_system(request, mapID, msID):
         mapSystem.system.occupied = request.POST.get('occupied', '')
         mapSystem.system.save()
         mapSystem.save()
+        mapSystem.map.add_log(request.user, "Edited System: %s (%s)" 
+                % (mapSystem.system.name, mapSystem.friendlyname))
         return HttpResponse('[]')
     raise PermissionDenied
 
@@ -469,6 +475,9 @@ def edit_wormhole(request, mapID, whID):
         wormhole.top_bubbled = request.POST.get('topBubbled', '1') == '1'
         wormhole.bottom_bubbled = request.POST.get('bottomBubbled', '1') == '1'
         wormhole.save()
+        wormhole.map.add_log(request.user, "Updated the wormhole between %s(%s) and %s(%s)."
+                % (wormhole.top.system.name, wormhole.top.friendlyname, 
+                    wormhole.bottom.system.name, wormhole.bottom.friendlyname))
         return HttpResponse('[]')
 
     raise PermissiondDenied
@@ -476,8 +485,8 @@ def edit_wormhole(request, mapID, whID):
 
 @permission_required('Map.add_Map')
 def create_map(request):
-    """This function creates a map and then redirects to the new map.
-
+    """
+    This function creates a map and then redirects to the new map.
     """
     if request.method == 'POST':
         form = MapForm(request.POST)
