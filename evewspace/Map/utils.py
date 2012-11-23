@@ -8,7 +8,9 @@ import pytz
 from django.contrib.sites.models import Site
 from math import pow, sqrt
 import bisect
-from core.models import SystemJump, RegionJump, ConstellationJump
+from core.models import SystemJump
+from collections import OrderedDict
+from django.core.cache import cache
 
 def add_log(user, map, action):
     """Adds a log entry into the MapLog for a map."""
@@ -405,141 +407,77 @@ def get_possible_wh_types(system1, system2):
     return result
 
 
-def get_ly_distance(sys1, sys2):
-    """
-    Gets the distance in light years between two systems.
-    """
-    x1 = sys1.x
-    y1 = sys1.y
-    z1 = sys1.z
-    x2 = sys2.x
-    y2 = sys2.y
-    z2 = sys2.z
 
-    distance = sqrt(pow(x1 - x2 ,2) + pow(y1-y2,2) + pow(z1-z2,2)) / 9.4605284e+15
-    return distance
 
-class entry(object):
-    def __init__(self, g, h, parent, system):
-        self.f =  g + h
-        self.g = g
-        self.h = h
-        self.parent = parent
-        self.system = system
+class RouteFinder(object):
+    """
+    A RouteFinder object is created with two system objects and has methods
+    for getting the shortest stargate jump route length, the light-year distance,
+    and the shortest stargate route as a list of KSystem objects.
+    """
+    def _get_ly_distance(self):
+        """
+        Gets the distance in light years between two systems.
+        """
+        x1 = self.sys1.x
+        y1 = self.sys1.y
+        z1 = self.sys1.z
+        x2 = self.sys2.x
+        y2 = self.sys2.y
+        z2 = self.sys2.z
+
+        distance = sqrt(pow(x1 - x2 ,2) + pow(y1-y2,2) + pow(z1-z2,2)) / 9.4605284e+15
+        return distance
+
+    def __init__(self, sys1, sys2):
+        self.sys1 = sys1
+        self.sys2 = sys2
+
+    def ly_distance(self):
+        return self._get_ly_distance()
+
+    def route_as_ids(self):
+        return self._dijkstra_route()
+
+    def route(self):
+        return [KSystem.objects.get(pk=sysid) for sysid in self._dijkstra_route()]
+
+    def route_length(self):
+        return len(self._dijkstra_route())
+
+    def _cache_system_jumps(self):
+        cache.set('sysJumps', 1)
+        for sys in KSystem.objects.all():
+            cache.set(sys.pk, 
+                    [i.tosystem for i in SystemJump.objects.filter(fromsystem=sys.pk).all()])
+
+    def _dijkstra_route(self):
+        """
+        Employs Dijkstra's algorithm to find the shortest route between two systems.
+        Takes two system objects (can be KSystem or SystemData).
+        Returns a list of system IDs that comprise the route.
+        """
+        openList = OrderedDict()
+        visitedList = OrderedDict()
+        openList.update({self.sys1.pk: {'pk': self.sys1.pk, 'parent': None}})
+        # The cache should be populated by an asynch worker, but we check anyway
+        if cache.get('sysJumps') is not 1:
+            self._cache_system_jumps()
+        target = self.sys2.pk
+        while openList:
+            current = openList.popitem(last=False)[1]
+            if current['pk'] == target:
+                route = []
+                parent = current
+                while parent:
+                    route.append(parent['pk'])
+                    parent = parent['parent']
+                return route
+            for adjacentSystem in cache.get(current['pk']):
+                newNode = {adjacentSystem: {'pk': adjacentSystem, 'parent': current}}
+                if not adjacentSystem in visitedList:
+                    openList.update(newNode)
+                    visitedList.update(newNode)
+        return []
     
-    def cmp(self, other):
-        return cmp(self.f, other.f)
-    
-    def get_route(self):
-        route = []
-        parent = self
-        while parent:
-            route.append(parent.system)
-            parent = parent.parent
-        return route
 
-    def get_expanded_route(self):
-        route = []
-        parent = self
-        while parent:
-            route.append(parent.system)
-            route.extend([x.toregion for x in list(parent.system.jumps_from.all())])
-            parent = parent.parent
-        return route
-
-class entryList(list):
-    def has_node(self, node):
-        systems = [x.system for x in self]
-        return node.system in systems
-
-
-def dijkstra_route(sys1, sys2):
-    """
-    Employs Dijkstra's algorithm to find the shortest route between two systems.
-    """
-    openList = entryList()
-    visitedList = entryList()
-    openList.append(entry(0, 0, None, sys1))
-    constCandidates = dijkstra_const(sys1.constellation, sys2.constellation)
-    query = SystemJump.objects.filter(fromconstellation__in=constCandidates)
-    while len(openList):
-        current = openList.pop(0)
-        if current.system.name == sys2.name:
-            return current.get_route()
-        for adjacentSystem in query.filter(fromsystem=current.system).all():
-            newNode = entry(0, 0, current, adjacentSystem.tosystem)
-            if not visitedList.has_node(newNode):
-                openList.append(newNode)
-                visitedList.append(newNode)
-    return "No Route!"
-
-
-def dijkstra_const(con1, con2):
-    """
-    Employs Dijkstra's algorithm to find the shortest route between two constellations.
-    """
-    openList = entryList()
-    visitedList = entryList()
-    openList.append(entry(0, 0, None, con1))
-    regionCandidates = dijkstra_region(con1.region, con2.region)
-    query = ConstellationJump.objects.filter(fromregion__in=regionCandidates)
-    while len(openList):
-        current = openList.pop(0)
-        if current.system.name == con2.name:
-            return current.get_route()
-
-        for adjacentSystem in query.filter(fromconstellation=current.system).all():
-            newNode = entry(0, 0, current, adjacentSystem.toconstellation)
-            if not visitedList.has_node(newNode):
-                openList.append(newNode)
-                visitedList.append(newNode)
-    return "No Route!"
-
-
-def dijkstra_region(con1, con2):
-    """
-    Employs Dijkstra's algorithm to find the shortest route between two constellations.
-    """
-    openList = entryList()
-    visitedList = entryList()
-    openList.append(entry(0, 0, None, con1))
-    while len(openList):
-        current = openList.pop(0)
-        if current.system.name == con2.name:
-            return current.get_expanded_route()
-
-        for adjacentSystem in current.system.jumps_from.all():
-            newNode = entry(0, 0, current, adjacentSystem.toregion)
-            if not visitedList.has_node(newNode):
-                openList.append(newNode)
-                visitedList.append(newNode)
-    return "No Route!"
-
-
-
-def a_star_route(sys1, sys2):
-    """
-    Employs A* algorithm to find the shortest route between two systems.
-    """
-    openList = entryList()
-    closedList = entryList()
-
-    openList.append(entry(0, len(dijkstra_region(sys1.region, sys2.region)), None, sys1))
-    while len(openList):
-        n = openList.pop(0)
-        closedList.append(n)
-        if n.system.name == sys2.name:
-            return n.get_route()
-
-        for adjSystem in n.system.jumps_from.all():
-            print "Processing system: %s" % (adjSystem.tosystem.name)
-            newNode = entry(n.g + 1, len(dijkstra_region(adjSystem.tosystem.region, sys2.region)), n, adjSystem.tosystem)
-            if not closedList.has_node(newNode):
-                if newNode.system.name == sys2.name:
-                    return newNode.get_route()
-                elif newNode.f < n.f or len(dijkstra_const(newNode.system.constellation, sys2.system.constellation)) < len(dijkstra_const(n.system.constellation, sys2.system.constellation)):
-                    bisect.insort(openList, newNode)
-                else:
-                    closedList.append(newNode)
-        print len(closedList)
-    return "No Route!"

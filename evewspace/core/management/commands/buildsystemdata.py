@@ -1,6 +1,7 @@
 from django.core.management.base import NoArgsCommand, CommandError
 from core.models import *
 from Map.models import *
+from Map.utils import RouteFinder
 import datetime
 import pytz
 
@@ -11,7 +12,7 @@ class Command(NoArgsCommand):
         basedata = SystemData.objects.all()
         for system in basedata:
             #self.stdout.write('Processing system: %s' % (system.name))
-	    try:
+            try:
                 sysclass = LocationWormholeClass.objects.get(location=system.region.id).sysclass
                 if sysclass > 6:
                     newdata = KSystem(sov='', sysclass=sysclass, 
@@ -20,10 +21,10 @@ class Command(NoArgsCommand):
                     for field in system._meta.fields:
                         setattr(newdata, field.attname, getattr(system, field.attname))
                     newdata.systemdata_ptr = system
-		    newdata.jumps = 0
-		    newdata.podkills = 0
-		    newdata.npckills = 0
-		    newdata.shipkills = 0
+                    newdata.jumps = 0
+                    newdata.podkills = 0
+                    newdata.npckills = 0
+                    newdata.shipkills = 0
                     newdata.save()
                 else:
                     # TODO: Populate statics by constellation
@@ -33,9 +34,9 @@ class Command(NoArgsCommand):
                     for field in system._meta.fields:
                         setattr(newdata, field.attname, getattr(system, field.attname))
                     newdata.systemdata_ptr = system
-		    newdata.podkills = 0
-		    newdata.npckills = 0
-		    newdata.shipkills = 0
+                    newdata.podkills = 0
+                    newdata.npckills = 0
+                    newdata.shipkills = 0
                     newdata.save()
             except LocationWormholeClass.DoesNotExist:
                 pass
@@ -50,3 +51,7 @@ class Command(NoArgsCommand):
                 lowsec.save()
             except LocationWormholeClass.DoesNotExist:
                 pass
+        # Get a quick route to build the SystemJump cache
+        sys1 = KSystem.objects.get(name="Jita")
+        sys2 = KSystem.objects.get(name="Amarr")
+        RouteFinder(sys1, sys2).route_length()

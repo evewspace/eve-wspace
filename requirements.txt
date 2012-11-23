@@ -4,3 +4,5 @@ South>=0.7.5
 git+https://github.com/nikdoof/django-eveigb
 pytz>=2012d
 eveapi>=1.2
+django-infinite-memcached==0.1
+python-memcached==1.48
