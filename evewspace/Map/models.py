@@ -5,6 +5,7 @@ from django import forms
 from django.forms import ModelForm
 from datetime import datetime, timedelta, time
 import pytz
+from Map import utils
 # Create your models here.
 
 class WormholeType(models.Model):
@@ -77,6 +78,18 @@ class System(SystemData):
 class KSystem(System):
     sov = models.CharField(max_length = 100)
     jumps = models.IntegerField(blank=True, null=True)
+
+    def jumps_to(self, destination):
+        """
+        Returns the number of gate jumps to the destination by shortest route.
+        """
+        return utils.RouteFinder(self, destination).route_length()
+
+    def distance(self, destination):
+        """
+        Returns the light-year distance to the destination.
+        """
+        return utils.RouteFinder(self, destination).ly_distance()
 
 
 class WSystem(System):
@@ -159,10 +172,16 @@ class Map(models.Model):
         Adds the provided system to the map with the provided
         friendly name. Returns the new MapSystem object. 
         """
-        system = MapSystem(map=self, system=system, friendlyname=friendlyname, parentsystem = parent)
-        system.save()
+        mapsystem = MapSystem(map=self, system=system, friendlyname=friendlyname, parentsystem = parent)
+        mapsystem.save()
         self.add_log(user, "Added system: %s" % system.name, True)
-        return system
+        return mapsystem
+
+    def as_json(self, user):
+        """
+        Returns the json representation of the map for the mapping Javascript.
+        """
+        return utils.MapJSONGenerator(self, user).get_systems_json()
 
 class MapSystem(models.Model):
     """Stores information regarding which systems are active in which maps at the present time."""
@@ -190,6 +209,24 @@ class MapSystem(models.Model):
 
         wormhole.save()
         return wormhole
+    
+    def remove_system(self, user):
+        """
+        Removes the supplied system and all of its children. If there are
+        no other instances of the system on other maps, also clears its sigs.
+        """
+        # Raise ValueError if we're trying to delete the root
+        if not self.parentsystem:
+            raise ValueError("Cannot remove the root system.")
+        if self.system.maps.count() == 1:
+            self.system.signatures.all().delete()
+        self.parent_wormholes.all().delete()
+        for system in self.childsystems.all():
+            system.remove_system(user)
+        self.map.add_log(user, "Removed system %s (%s)" % (self.system.name, 
+            self.friendlyname), True)
+        self.delete()
+
 
 class Wormhole(models.Model):
     """An instance of a wormhole in a  map. 

@@ -21,7 +21,7 @@ def require_map_permission(permission=2):
     def _dec(view_func):
         def _view(request, mapID, *args, **kwargs):
             map = get_object_or_404(Map, pk=mapID)
-            if utils.check_map_permission(request.user, map) < permission:
+            if map.get_permission(request.user) < permission:
                 raise PermissionDenied
             else:
                 return view_func(request, mapID, *args, **kwargs)
@@ -40,7 +40,7 @@ def get_map(request, mapID):
     """
     map = get_object_or_404(Map, pk=mapID)
     context = {'map': map, 'access': map.get_permission(request.user),
-            'systemsJSON': utils.MapJSONGenerator(map, request.user).get_systems_json()}
+            'systemsJSON': map.as_json(request.user)}
     return TemplateResponse(request, 'map.html', context)
 
 
@@ -181,11 +181,11 @@ def add_system(request, mapID):
         topBubbled = "1" == request.POST.get('topBubbled')
         bottomBubbled = "1" == request.POST.get('bottomBubbled')
         # Add System
-        bottomMS = utils.add_system_to_map(request.user, map, bottomSys,
-                request.POST.get('friendlyName'), False, topMS)
+        bottomMS = map.add_system(request.user, bottomSys,
+                request.POST.get('friendlyName'), topMS)
         # Add Wormhole
-        utils.add_wormhole_to_map(map, topMS, topType, bottomType, bottomMS,
-                                  bottomBubbled, timeStatus, massStatus, topBubbled)
+        bottomMS.connect_to(topMS, topType, bottomType, topBubbled, 
+                bottomBubbled, timeStatus, massStatus)
 
         return HttpResponse('[]')
     except ObjectDoesNotExist:
@@ -199,7 +199,7 @@ def remove_system(request, mapID, msID):
     Removes the supplied MapSystem from a map.
     """
     system = get_object_or_404(MapSystem, pk=msID)
-    utils.delete_system(system, request.user)
+    system.remove_system(request.user)
     return HttpResponse('[]')
 
 
@@ -483,8 +483,8 @@ def create_map(request):
         form = MapForm(request.POST)
         if form.is_valid():
             newMap = form.save()
-            utils.add_log(request.user, newMap, "Created the %s map." % (newMap.name))
-            utils.add_system_to_map(request.user, newMap, newMap.root, "Root", True, None)
+            newMap.add_log(request.user, "Created the %s map." % (newMap.name))
+            newMap.add_system(request.user, newMap.root, "Root", None)
             return HttpResponseRedirect(reverse('Map.views.get_map', 
                 kwargs={'mapID': newMap.pk }))
     else:
