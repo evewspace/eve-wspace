@@ -1,6 +1,5 @@
 from django import template
 from Map.models import *
-from Map.utils import check_map_permission
 register = template.Library()
 
 @register.inclusion_tag('map_list.html')
@@ -17,6 +16,6 @@ def mapnavlist(user):
     else:
         #User is in a restricted group, only add maps with access > 0
         for map in Map.objects.all():
-            if check_map_permission(user, map) > 0:
+            if map.get_permissions(user) > 0:
                 maplist.append(map)
     return {'maps': maplist}
