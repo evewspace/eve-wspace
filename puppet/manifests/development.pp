@@ -35,6 +35,10 @@ package {'mysql-server':
 	ensure => present,
 	}
 
+package {'memcached':
+    ensure => present,
+    }
+
 service {'mysql':
 	ensure => 'running',
 	provider => 'upstart',
@@ -57,7 +61,7 @@ exec {'create-db':
 	cwd => "/home/vagrant",
         command => "/usr/bin/mysql -e \"create database djangotest;\" && /vagrant/puppet/scripts/django_load_db.sh",
 	timeout => 0,
-        require => [ Service["mysql"], Package['mysql-server'], Exec['requirements'], Package['bzip2'] ]
+        require => [ Service["mysql"], Package['mysql-server'], Exec['requirements'], Package['bzip2'], Package['memcached'] ]
 	}
 
 exec {'requirements':
