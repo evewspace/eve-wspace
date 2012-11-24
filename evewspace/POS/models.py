@@ -3,7 +3,7 @@ from core.models import Type, Location
 from Map.models import System
 import csv
 from django.contrib.auth.models import User
-
+import pytz
 
 class Alliance(models.Model):
     """Represents an alliance, data pulled from api"""
@@ -45,17 +45,25 @@ class POS(models.Model):
     #TODO: add a validator to make sure this is only set if status = 3 (Reinforced)
     rftime = models.DateTimeField(null=True, blank=True)
     updated = models.DateTimeField()
-
+    # These values will be set by the TSV parser from d-scan data if available
+    guns = models.IntegerField(null=True, blank=True)
+    ewar = models.IntegerField(null=True, blank=True)
+    sma = models.IntegerField(null=True, blank=True)
+    hardener = models.IntegerField(null=True, blank=True)
+    # This is a short comment that is displayed as a warning
+    warpin_notice = models.CharField(blank=True, null=True, max_length=64)
+    
     def clean(self):
         from django.core.exceptions import ValidationError
         if rftime and status != 3:
             raise ValidationError("A POS cannot have an rftime unless it is reinforced")
         if not updated:
             import datetime
-            updated = datetime.datetime.utcnow()
+            import pytz
+            updated = datetime.datetime.now(pytz.utc)
 
     def __unicode__(self):
-        return self.location.name
+        return self.name
 
     #overide save to implement posname defaulting to towertype.name
     def save(self, *args, **kwargs):
@@ -63,6 +71,60 @@ class POS(models.Model):
             self.posname = self.towertype.name
         super(POS, self).save(*args, **kwargs)
 
+    def size(self):
+        """
+        Returns the size of the tower, Small Medium or Large.
+        """
+        if u'Small' in self.towertype.name:
+            return u'Small'
+        if u'Medium' in self.towertype.name:
+            return u'Medium'
+
+        return "Large"
+
+    def fit_from_dscan(self, dscan):
+        """
+        Fills in a POS's fitting from a copy / paste of d-scan results.
+        """
+        import csv
+        from core.models import Type
+        itemDict={}
+        # marketGroupIDs to consider guns, ewar, hardeners, and smas
+        gunsGroups = [480, 479, 594, 595, 596]
+        ewarGroups = [481, 1009]
+        smaGroups = [484,]
+        hardenerGroups = [485,]
+        towers = 0
+        for row in csv.reader(dscan, delimiter="\t"):
+            itemType = Type.objects.get(name=row[1])
+            groupTree = []
+            parent = itemType.marketgroup
+            while parent:
+                groupTree.append(parent.id)
+                parent = parent.parentgroup
+            if itemType.marketgroup__id in gunsGroups:
+                self.guns += 1
+            if itemType.marketgroup__id in ewarGroups:
+                self.ewar += 1
+            if itemType.marketgroup__id in smaGroups:
+                self.sma += 1
+            if itemType.marketgroup__id in hardenerGroups:
+                self.hardeners += 1
+            if itemType.marketgroup__id == 478:
+                towers += 1
+            if itemDict.has_key(itemTpe.name):
+                itemDict[itemType.name] += 1
+            elif 1285 in groupTree and 478 not in groupTree:
+                itemDict.update({itemtype.name: 1})
+
+        for itemtype in itemDict:
+            self.fitting += "\n%s : %s" % (itemtype, itemDict[itemtype])
+        if towers == 1:
+            self.save()
+        elif towers == 0:
+            raise AttributeError('No towers detected in the D-Scan!')
+        else:
+            raise AttributeError('Too many towers detected in the D-Scan!')
 
 class CorpPOS(POS):
     """A corp-controlled POS with manager and password data."""

@@ -49,11 +49,27 @@
 {
     list-style: none;
 }
+.posListItem
+{
+    list-style: none;
+}
+.poslist_main
+{
+    margin-left: 25px;
+}
 .sigAddFormDiv
 {
     text-align: left;
 }
 .sysFriendlySpan
+{
+    text-align: center;
+}
+.activePlayerPanel
+{
+    margin-left: 46px;
+}
+h5
 {
     text-align: center;
 }

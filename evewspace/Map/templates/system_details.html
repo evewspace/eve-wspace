@@ -71,7 +71,7 @@
     </div>
      
 </div>
-  <div id="sigsPanel" class="sigsPanel span8">
+  <div id="sigsPanel" class="sigsPanel page-header span8">
        <div id=systemSigsWell class="systemSigsWell well well-small">
             <h5>Signatures ({{system.signatures.count}} Total)</h5>
             <div id="sigAddPanel" class"sigAddPanel">
@@ -83,10 +83,11 @@
             </div>
         </div>
     </div>
-
-    <div id="activePlayerPanel" class="activePlayerPanel span6">
+</div>
+    <div class="row">
+    <div id="activePlayerPanel" class="activePlayerPanel page-header well well-small span6 offset 1">
         <h5>Active Pilots ({{system.activepilots.all.count}} total) </h5>
-        <div id="activePlayerList" class="activePlayerList well well-small">
+        <div id="activePlayerList" class="activePlayerList">
             <ul class="activePlayerUL">
                 {% for pilot in system.activepilots.all %}
                 <li class="activePlayerItem">{{pilot.user.username}}</li>
@@ -96,14 +97,12 @@
             </ul>
         </div>
     </div>
-</div>
-    <div class="row">
-    <div id="systemPosPanel" class="systemPosPanel span6">
+
+        {% load poslist %}    
+    <div id="systemPosPanel" class="systemPosPanel page-header well well-small span6">
         <h5>Starbases ({{system.poses.all.count}} Total)</h5>
-        <div id="systemPosWell" class="systemPosWell well well-small">
-            <ul class="systemPosList">
-                <li class="systemPosItem">No Starbases!</li>
-            </ul>
+        <div id="systemPosWell" class="systemPosWell">
+                {% poslist system %}
         </div>
     </div>
     </div>
