@@ -343,6 +343,36 @@ def add_signature(request, mapID, msID):
             {'form': form, 'system': mapsystem})
 
 
+@login_required
+@require_map_permission(permission=2)
+def edit_signature(request, mapID, msID, sigID):
+    """
+    GET gets a pre-filled edit signature form. POST updates the signature with the new information and returns a blank add form.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    signature = get_object_or_404(Signature, pk=sigID)
+    mapsys = get_object_or_404(MapSystem, pk=msID)
+
+    if request.method == 'POST':
+        form = SignatureForm(request.POST)
+        if form.is_valid():
+            signature.sigid = request.POST['sigid'].upper()
+            signature.updated = True
+            signature.info = request.POST['info']
+            signature.sigtype = SignatureType.objects.get(pk=request.POST['sigtype'])
+            signature.save()
+            mapsys.map.add_log(request.user, "Updated signature %s in %s (%s)" %
+                    (signature.sigid, mapsys.system.name, mapsys.friendlyname))
+            return TemplateResponse(request, "add_sig_form.html",
+                    {'form': SignatureForm(), 'system': mapsys})
+        else:
+            return TemplateResponse(request, "edit_sig_form.html",
+                    {'form': form, 'system': mapsys, 'sig': signature})
+    else:
+        return TemplateResponse(request, "edit_sig_form.html",
+                {'form': SignatureForm(instance=signature), 'system': mapsys, 'sig': signature})
+
 @login_required()
 @require_map_permission(permission=1)
 def get_signature_list(request, mapID, msID):
@@ -438,9 +468,9 @@ def edit_system(request, mapID, msID):
         raise PermissionDenied
     mapSystem = get_object_or_404(MapSystem, pk=msID)
     if request.method == 'GET':
-        return TemplateResponse(request, 'edit_system.html', {'mapSystem': mapSystem})
+        return TemplateResponse(request, 'edit_system.html', {'mapsys': mapSystem})
     if request.method == 'POST':
-        mapSystem.friendlyname = request.POST.get('frinedlyName', '')
+        mapSystem.friendlyname = request.POST.get('friendlyName', '')
         mapSystem.system.info = request.POST.get('info', '')
         mapSystem.system.occupied = request.POST.get('occupied', '')
         mapSystem.system.save()

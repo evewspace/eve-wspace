@@ -10,7 +10,7 @@
     </tr>
     {% for sig in system.system.signatures.all %}
     <tr>
-        <td><i class="icon-pencil" title="Edit" onclick="EditSignature({{sig.pk}}, {{system.pk}});"></i> &nbsp
+        <td><i class="icon-pencil" title="Edit" onclick="GetEditSignatureBox({{system.pk}}, {{sig.pk}}, {{system.pk}});"></i> &nbsp
             <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> </td>
         <td>
             {% if sig.updated %}

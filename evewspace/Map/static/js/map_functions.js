@@ -246,6 +246,38 @@ function RefreshMap(){
 }
 
 
+function EditSignature(msID, sigID){
+    address = "system/" + msID + "/signatures/" + sigID + "/edit/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        data: $("#sigEditForm").serialize(),
+        success: function(data){
+            $('#sys' + msID + "SigAddForm").html(data);
+            LoadSignatures(msID);
+        },
+        error: function(){
+            alert("An error occured editing the signature.");
+        }
+    });
+}
+
+
+function GetEditSignatureBox(msID, sigID){
+    address = "system/" + msID + "/signatures/" + sigID + "/edit";
+    $.ajax({
+        url: address,
+        type: "GET",
+        success: function(data){
+            $('#sys' + msID + "SigAddForm").html(data);
+        },
+        error: function(){
+            alert("An error occured getting the edit sig form.");
+        }
+    });
+}
+
+
 function AddSignature(msID){
     address = "system/" + msID + "/signatures/new/";
     $.ajax({
@@ -418,6 +450,45 @@ function EditWormhole(whID){
         },
         error: function(){
             alert('There was an error editing the wormhole.');
+        }
+    });
+}
+
+
+function GetEditSystemDialog(msID){
+    address= "system/" + msID + "/edit/";
+    $.ajax({
+        type: "GET",
+        url: address,
+        success: function(data){
+            $(data).dialog({
+                autoOpen: false,
+                close: function(event, ui) { 
+                $(this).dialog("destroy");
+                $(this).remove();
+                }
+            });
+            $('#editSystemDialog').dialog('open');
+        },
+        error: function(){
+            alert('There was an error getting the edit system dialog.');
+        }
+    });
+}
+
+
+function EditSystem(msID){
+    address = "system/" + msID + "/edit/";
+    $.ajax({
+        type: 'POST',
+        url: address,
+        data: $('#editSystemForm').serialize(),
+        success: function(){
+            RefreshMap();
+            DisplaySystemDetails(msID);
+        },
+        error: function(){
+            alert('There was an error editing the system.');
         }
     });
 }

@@ -2,7 +2,7 @@
 <div id="sysPanelHeader" class="systemPanelHeader row">
     <div class="span6 page-header well well-large">
     <div class="dropdown">
-    <h4> System Details: <a class="dropdown-toggle" data-toggle="dropdown"> {{system.name}}</a>
+        <h4> <i title="Edit Info" class="icon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i> System Details: <a class="dropdown-toggle" data-toggle="dropdown"> {{system.name}}</a>
     <ul class="dropdown-menu pull-right" role="menu">
         <li><a href="http://www.wormnav.com/index.php?locus={{system.name}}" target="_blank">Wormnav</a></li>
         <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
@@ -55,8 +55,8 @@
     <i id="markScanned" onclick="MarkScanned({{mapsys.pk}}, true);" class="icon-refresh" title="Mark Scanned"></i>
     <br />
     <br />
-    <p class="occupiedText label label-important"><i class="icon-pencil" title="Edit"></i> <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p>
-    <p class="infoText label label-info"><i class="icon-pencil" title="Edit"></i> <span class="infoTitle">Info:</span> <br /> {{system.info|safe}} </p>
+    <p class="occupiedText label label-important"><span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p>
+    <p class="infoText label label-info"><span class="infoTitle">Info:</span> <br /> {{system.info|safe}} </p>
 </div>
      <div id="systemStatsPanel" class="systemStatsPanel">
         <h6>System Statistics </h6>

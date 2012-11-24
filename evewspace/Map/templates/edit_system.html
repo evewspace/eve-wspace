@@ -1,0 +1,22 @@
+<div id="editSystemDialog" title="Edit System Information">
+    <form id="editSystemForm" class="editSystemForm" method="post" action="system/{{mapsys.pk}}/edit/">
+        {% csrf_token %}
+        <h4>Friendly Name:</h4> 
+        <input type="text" id="friendlyField" name="friendlyName" value="{{mapsys.friendlyname}}">
+        <h4>Info: </h4>
+        <textarea name="info" id="infoField" rows=8 cols=50>{{mapsys.system.info}}</textarea> 
+        <h4>Occupied: </h4>
+        <textarea name="occupied" id="occupiedField" rows=8 cols=50 >{{mapsys.system.occupied}}</textarea><br />
+        <br />
+        <input type="submit" value="Save Info">
+    </form>
+    <script type="text/javascript">
+        $('#editSystemForm').submit(function(e){
+            e.preventDefault();
+            EditSystem({{mapsys.pk}});
+            $('#editSystemDialog').dialog('close');
+            $('#editSystemDialog').remove();
+            return false;
+            });
+    </script>
+</div>
