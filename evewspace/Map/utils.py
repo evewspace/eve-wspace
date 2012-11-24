@@ -228,12 +228,15 @@ class RouteFinder(object):
         return self._dijkstra_route()
 
     def route(self):
+        from Map.models import KSystem
         return [KSystem.objects.get(pk=sysid) for sysid in self._dijkstra_route()]
 
     def route_length(self):
         return len(self._dijkstra_route())
 
     def _cache_system_jumps(self):
+        from Map.models import KSystem
+        from core.models import SystemJump
         cache.set('sysJumps', 1)
         for sys in KSystem.objects.all():
             cache.set(sys.pk, 
