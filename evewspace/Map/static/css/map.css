@@ -15,6 +15,10 @@ body .dialog
 {
     margin-bottom: 150px;
 }
+.sysDetailsFooter
+{
+    text-align: left;
+}
 .systemTooltip
 {
     width: 300px;
@@ -24,6 +28,10 @@ body .dialog
 {
     width: 200px;
     display: none;
+}
+.systemStatsList
+{
+    list-style: none;
 }
 .popover
 {
@@ -81,6 +89,16 @@ body .dialog
 h5
 {
     text-align: center;
+}
+th
+{
+    padding-left: 10px;
+    padding-right: 10px;
+}
+td
+{
+    padding-left: 15px;
+    padding-right: 10px;
 }
 .tip {
   background: #eee;

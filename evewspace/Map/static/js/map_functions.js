@@ -96,6 +96,7 @@ function DisplaySystemDetails(msID, sysID){
                 }
             });
             GetPOSList(sysID);
+            GetDestinations(msID);
             CloseSystemMenu();
         },
         error: function(errorThrown) {alert("An error occured building the details page.");}
@@ -111,6 +112,18 @@ function GetPOSList(sysID){
         success: function(data){
             $('#sys' + sysID + "POSDiv").html(data);
         },
+    });
+}
+
+
+function GetDestinations(msID){
+    address = "system/" + msID + "/destinations/";
+    $.ajax({
+        type: "GET",
+        url: address,
+        success: function(data){
+            $('#systemDestinationsDiv').html(data);
+        }
     });
 }
 

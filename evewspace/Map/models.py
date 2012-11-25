@@ -410,6 +410,13 @@ class ActivePilot(models.Model):
     system = models.ForeignKey(System, related_name='active_pilots')
     timestamp = models.DateTimeField(auto_now_add=True)
 
+
+class Destination(models.Model):
+    """Represents a corp-wide destination whose range should be shown in the map."""
+    system = models.ForeignKey(KSystem, related_name='destinations')
+    # Capital destinations also show light year distance
+    capital = models.BooleanField()
+
 # Model Forms
 class MapForm(ModelForm):
     class Meta:

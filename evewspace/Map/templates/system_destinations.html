@@ -1,0 +1,20 @@
+{% load cache %}
+{% cache 0 destinations system.pk %}
+<table class="destinationTable">
+    <tr>
+        <th>System</th>
+        <th>Jumps</th>
+        <th>LY</th>
+    </tr>
+    {% load routetags %}
+    {% for d in destinations %}
+        <tr>
+            <td>{{d.system.name}}</td>
+            <td>{% jumps system d.system %}</td>
+            {% if d.capital %}
+            <td>{% ly system d.system %}</td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+</table>
+{% endcache %}

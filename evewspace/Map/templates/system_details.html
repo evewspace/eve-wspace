@@ -62,7 +62,8 @@
     <p class="occupiedText label label-important"><span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p>
     <p class="infoText label label-info"><span class="infoTitle">Info:</span> <br /> {{system.info|safe}} </p>
 </div>
-     <div id="systemStatsPanel" class="systemStatsPanel">
+    <div class="row sysDetailsFooter">
+     <div id="systemStatsPanel" class="systemStatsPanel span2">
         <h6>System Statistics </h6>
             <ul class="systemStatsList">
                 <li class="systemStatItem">NPC Kills: {{system.npckills}}</li>
@@ -72,6 +73,9 @@
                 <li class="systemStatItem">Jumps: {{system.jumps}}</li>
                 {% endif %}
             </ul>
+        </div>
+        <div id="systemDestinationsDiv" class="span4">
+        </div>
     </div>
      
 </div>
