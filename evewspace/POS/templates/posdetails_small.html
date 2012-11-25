@@ -1,4 +1,7 @@
 <li id="pos{{pos.pk}}" class="posListItem">
+<i class="icon-pencil" onclick="GetEditPOSDialog({{pos.pk}}, {{system.pk}});" title="Edit POS"></i>
+<i class="icon-ban-circle" onclick="DeletePOS({{pos.pk}}, {{system.pk}});" title="Delete POS"></i>
+
 <div class="poslist_header" data-toggle="collapse" data-target="#pos{{pos.pk}}Details" style="position:relative">
         <img height="48" width="48" src="http://image.eveonline.com/Render/{{pos.towertype.pk}}_128.png"></img>
         <span class="planetlabel">Planet: </span>
@@ -6,9 +9,24 @@
 		<span class="moonlabel">Moon: </span>
         <span class="moonno"><strong>{{pos.moon}}<strong></span>&nbsp
         <span class="postype"><strong>{{pos.towertype.name}}</strong></span>&nbsp &nbsp
-        <i class="icon-pencil" onclick="EditStarbase({{system.pk}}, {{pos.pk}});" title="Edit POS"></i>
         <br />
         <div class="posSummary">
+            {% if pos.status == 0 %}
+                <span class="label label-info">Status: UNANCHORED</span>
+            {% endif %}
+            {% if pos.status == 1 %}
+                <span class="label label-info">Status: ANCHORED</span>
+            {% endif %}
+            {% if pos.status == 2 %}
+                <span class="label label-info">Status: ONLINING</span>
+            {% endif %}
+            {% if pos.status == 3 %}
+                <span class="label label-important">Status: REINFORCED  Comes Out: {{pos.rftime|date:"Y-m-d H:i"}}</span>
+            {% endif %}
+            {% if pos.status == 4 %}
+                <span class="label label-success">Status: ONLINE</span>
+            {% endif %}
+                <br />
             {% if pos.guns %}
                 <img height="32" width="32" title="GUNS" src="/static/images/posguns.png" /> {{pos.guns}}
             {% endif %}

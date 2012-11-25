@@ -1,3 +1,7 @@
+body .dialog
+{
+    width: 40%;
+}
 .mapDiv
 {
     margin-top:10px;

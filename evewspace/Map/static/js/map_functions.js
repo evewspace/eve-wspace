@@ -232,7 +232,8 @@ function GetAddPOSDialog(sysID){
                 close: function(event, ui) { 
                 $(this).dialog("destroy");
                 $(this).remove();
-                }
+                },
+                width: "400px"
             });
             $('#addPOSDialog').dialog('open');
         },
@@ -254,6 +255,58 @@ function AddPOS(sysID){
         },
         error: function(errorThrown){
             alert("An error occured adding the POS, please check your input.");
+        }
+    });
+}
+
+
+function DeletePOS(posID, sysID){
+    address = "/pos/" + sysID + "/" + posID + "/remove/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        success: function(){
+            GetPOSList(sysID);
+        },
+        error: function(){
+            alert("Corp POSes cannot be deleted from the map.");
+        }
+    });
+}
+
+
+function GetEditPOSDialog(posID, sysID){
+    address= "/pos/" + sysID + "/" + posID + "/edit/";
+    $.ajax({
+        type: "GET",
+        url: address,
+        success: function(data){
+             $(data).dialog({
+                autoOpen: false,
+                width: "400px",
+                close: function(event, ui) { 
+                $(this).dialog("destroy");
+                $(this).remove();
+                },
+            });
+             $('#editPOSDialog').dialog('open');
+        }
+    });
+}
+
+
+function EditPOS(posID, sysID){
+    //This function adds a system using the information in a form named #sysAddForm
+    address = "/pos/" + sysID + "/" + posID + "/edit/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        data: $('#editPOSForm').serialize(),
+        success: function(data){
+            GetPOSList(sysID);
+        },
+        error: function(errorThrown){
+            alert("An error occured editing the POS, please check your input.");
         }
     });
 }

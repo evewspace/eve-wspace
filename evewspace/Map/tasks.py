@@ -18,16 +18,22 @@ def update_system_stats():
     KSystem.objects.all().update(jumps=0)
     # Update jumps from Jumps API for K-space systems
     for entry in jumpapi.solarSystems:
-        sys = KSystem.objects.get(pk=entry.solarSystemID)
-        sys.jumps = entry.shipJumps
-        sys.save()
+        try:
+            sys = KSystem.objects.get(pk=entry.solarSystemID)
+            sys.jumps = entry.shipJumps
+            sys.save()
+        except:
+            pass
     # Update kills from Kills API
     for entry in killapi.solarSystems:
-        sys = System.objects.get(pk=entry.solarSystemID)
-        sys.shipkills = entry.shipKills
-        sys.podkills = entry.podKills
-        sys.npckills = entry.factionKills
-        sys.save()
+        try:
+            sys = System.objects.get(pk=entry.solarSystemID)
+            sys.shipkills = entry.shipKills
+            sys.podkills = entry.podKills
+            sys.npckills = entry.factionKills
+            sys.save()
+        except:
+            pass
 
 @task()
 def update_system_sov():

@@ -1,0 +1,48 @@
+<div title="Edit Starbase" id="editPOSDialog" class="addPOSDialog">
+    <form id="editPOSForm" action="/pos/{{system.pk}}/{{pos.id}}/edit/" method="POST">
+        {% csrf_token %}
+        Full Corp Name: <input id="corpBox" value="{{pos.corporation.name}}" name="corp" type="text" > <br />
+        <span class="label label-warning" id="digiterror">Please enter digits only for planet and moon. </span><br /><br />
+        Planet: <input name="planet" value="{{pos.planet}}" class="input-mini" type="text"> 
+        Moon: <input name="moon" value="{{pos.moon}}"class="input-mini" type="text"> <br />
+        Tower Name: <input name="name" value="{{pos.posname}}" type="text"> <br />
+        Tower Type: <input id="towertype" value="{{pos.towertype.name}}" name="tower" type="text"> <br />
+        Status: <br />
+        <input type="radio" onclick="Test(this);" name="status" value="0" {% if pos.status == 0 %}checked="checked" {% endif %}> &nbsp Unanchored<br />
+        <input type="radio" name="status" onclick="Test(this);" value="1"{% if pos.status == 1 %}checked="checked" {% endif %}> &nbsp Anchored <br />
+        <input type="radio" name="status" onclick="Test(this);" value="2"{% if pos.status == 2 %}checked="checked" {% endif %}> &nbsp Onlining<br />
+        <input type="radio" name="status" onclick="Test(this);" value="3"{% if pos.status == 3 %}checked="checked" {% endif %}> &nbsp Reinforced<br />
+        <input type="radio" name="status" value="4" onclick="Test(this);" {% if pos.status == 4 %}checked="checked" {% endif %}> &nbsp Online <br />
+        <br />
+        <div id="rftime" class="rftimerdiv" style="display: none">
+            RF Timer: Days: <input name="rfdays" class="input-mini" type="text">
+            Hours: <input name="rfhours" class="input-mini" type="text">
+            Minutes: <input name="rfminutes" class="input-mini" type="text">
+        </div>
+        Fitting: <br />
+        <textarea  rows="10" name="fitting">{{fitting}}</textarea><br />
+        Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1"> <br />
+        <input type="submit" value="Save POS">
+    </form>
+    <script type="text/javascript">
+    function Test(rad){
+        var rads=document.getElementsByName(rad.name);
+        document.getElementById('rftime').style.display=(rads[3].checked)?'block':'none';
+    }
+    $('#corpBox').autocomplete({
+                source: "/search/corp",
+                minLength: 2
+                });
+    $('#towertype').autocomplete({
+                source: "/search/item",
+                minLength: 2
+                });
+    $('#editPOSForm').submit(function(e){
+                e.preventDefault();
+                EditPOS({{pos.pk}}, {{system.pk}});
+                $('#editPOSDialog').dialog('close');
+                $('#editPOSDialog').remove();
+                return false;
+            });
+    </script>
+</div>

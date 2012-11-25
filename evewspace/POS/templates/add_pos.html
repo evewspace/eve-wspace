@@ -7,19 +7,19 @@
         Moon: <input name="moon" class="input-mini" type="text"> <br />
         Tower Name: <input name="name" type="text"> <br />
         Tower Type: <input id="towertype" name="tower" type="text"> <br />
-        Status: Unanchored <input type="radio" onclick="Test(this);" name="status" value="0">  
-        Anchored <input type="radio" name="status" onclick="Test(this);" value="1"> 
-        Onlining <input type="radio" name="status" onclick="Test(this);" value="2">
-        Reinforced <input type="radio" name="status" onclick="Test(this);" value="3">
-        Online <input type="radio" name="status" value="4" onclick="Test(this);" checked="checked">
+        Status: <br /><input type="radio" onclick="Test(this);" name="status" value="0">&nbsp Unanchored 
+        <br /><input type="radio" name="status" onclick="Test(this);" value="1">&nbsp Anchored
+        <br /><input type="radio" name="status" onclick="Test(this);" value="2">&nbsp Onlining
+        <br /><input type="radio" name="status" onclick="Test(this);" value="3"> &nbsp Reinforced
+        <br /><input type="radio" name="status" value="4" onclick="Test(this);" checked="checked"> &nbsp Online
         <br />
         <div id="rftime" class="rftimerdiv" style="display: none">
-            RF Timer: Days: <input name="rfdays" class="input-mini" type="text">
-            Hours: <input name="rfhours" class="input-mini" type="text">
-            Minutes: <input name="rfminutes" class="input-mini" type="text">
+            RF Timer:<br /> D: <input name="rfdays" class="input-mini" type="text">
+            H: <input name="rfhours" class="input-mini" type="text">
+            M: <input name="rfminutes" class="input-mini" type="text">
         </div>
-        Fitting: <br />
-        <textarea name="fitting"></textarea><br />
+        <br />Fitting: <br />
+        <textarea cols=40 rows=10 name="fitting"></textarea><br />
         Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1"> <br />
         <input type="submit" value="Add POS">
     </form>
