@@ -1,0 +1,7 @@
+<html>
+    <form action="/pos/{{pos.pk}}/testfit/" method="post">
+        {% csrf_token %}
+        <textarea name="fit"></textarea>
+        <input type="submit">
+    </form>
+</html>

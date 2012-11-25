@@ -24,7 +24,7 @@ class Type(models.Model):
     name = models.CharField(max_length = 100, db_column='typeName')
     description = models.TextField(blank=True, null=True)
     volume = models.FloatField(blank=True, null=True)
-    marketgroup = models.ForeignKey(MarketGroup, related_name="types",
+    marketgroup = models.ForeignKey(MarketGroup, null=True, blank=True, related_name="types",
             db_column='marketGroupID')
     published = models.BooleanField()
 

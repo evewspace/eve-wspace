@@ -128,7 +128,8 @@ def checkin_igb_trusted(request, map):
         result = render_to_string('igb_system_add_dialog.html', context,
                                   context_instance=RequestContext(request))
 
-    profile.update_location(currentsystem)
+    currentsystem.add_active_pilot(request.user, request.eve_charname,
+            request.eve_shipname, request.eve_shiptypename)
     return result
 
 def get_system_context(msID):
@@ -277,8 +278,8 @@ def manual_location(request, mapID, msID):
     """
     if request.is_ajax():
         mapsystem = get_object_or_404(MapSystem, pk=msID)
-        profile = request.user.get_profile()
-        profile.update_location(mapsystem.system)
+        mapsystem.system.add_active_pilot(request.user, "OOG Browser",
+                "Unknown", "Uknown")
         return HttpResponse("[]")
     else:
         raise PermissionDenied

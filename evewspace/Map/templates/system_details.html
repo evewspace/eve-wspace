@@ -86,15 +86,24 @@
 </div>
     <div class="row">
     <div id="activePlayerPanel" class="activePlayerPanel page-header well well-small span6 offset 1">
-        <h5>Active Pilots ({{system.activepilots.all.count}} total) </h5>
+        <h5>Active Pilots ({{system.active_pilots.all.count}} total) </h5>
         <div id="activePlayerList" class="activePlayerList">
-            <ul class="activePlayerUL">
-                {% for pilot in system.activepilots.all %}
-                <li class="activePlayerItem">{{pilot.user.username}}</li>
-                {% empty %}
-                <li class="activePlayerItem">No Active Pilots </li>
+            <table class="activePilotsTable" cellpadding="10">
+                <tr>
+                    <th>Member</th>
+                    <th>Character</th>
+                    <th>Ship Type</th>
+                    <th>Ship Name</th>
+                </tr>
+                {% for pilot in system.active_pilots.all %}
+                <tr>
+                    <td>{{pilot.user.username}}</td>
+                    <td>{{pilot.charactername}}</td>
+                    <td>{{pilot.shiptype}}</td>
+                    <td>{{pilot.shipname}}</td>
+                </tr>
                 {% endfor %}
-            </ul>
+            </table>
         </div>
     </div>
 

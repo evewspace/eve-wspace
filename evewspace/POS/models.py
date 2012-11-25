@@ -53,22 +53,27 @@ class POS(models.Model):
     # This is a short comment that is displayed as a warning
     warpin_notice = models.CharField(blank=True, null=True, max_length=64)
     
+    class Meta:
+        ordering = ['system__name', 'planet', 'moon']
+    
     def clean(self):
         from django.core.exceptions import ValidationError
-        if rftime and status != 3:
+        if self.rftime and self.status != 3:
             raise ValidationError("A POS cannot have an rftime unless it is reinforced")
-        if not updated:
-            import datetime
-            import pytz
-            updated = datetime.datetime.now(pytz.utc)
 
     def __unicode__(self):
-        return self.name
+        return self.posname
 
     #overide save to implement posname defaulting to towertype.name
     def save(self, *args, **kwargs):
         if not self.posname:
             self.posname = self.towertype.name
+        # Ensure that any newline characters in fitting are changed to <br>
+        self.fitting = self.fitting.replace("\n", "<br />")
+        # Mark tower as having been updated
+        from datetime import datetime
+        import pytz
+        self.updated = datetime.now(pytz.utc)
         super(POS, self).save(*args, **kwargs)
 
     def size(self):
@@ -80,7 +85,7 @@ class POS(models.Model):
         if u'Medium' in self.towertype.name:
             return u'Medium'
 
-        return "Large"
+        return u'Large'
 
     def fit_from_dscan(self, dscan):
         """
@@ -95,34 +100,38 @@ class POS(models.Model):
         smaGroups = [484,]
         hardenerGroups = [485,]
         towers = 0
-        for row in csv.reader(dscan, delimiter="\t"):
+        self.sma = 0
+        self.hardener = 0
+        self.guns = 0
+        self.ewar = 0
+        for row in csv.reader(dscan.splitlines(), delimiter="\t"):
             itemType = Type.objects.get(name=row[1])
-            groupTree = []
-            parent = itemType.marketgroup
-            while parent:
-                groupTree.append(parent.id)
-                parent = parent.parentgroup
-            if itemType.marketgroup__id in gunsGroups:
-                self.guns += 1
-            if itemType.marketgroup__id in ewarGroups:
-                self.ewar += 1
-            if itemType.marketgroup__id in smaGroups:
-                self.sma += 1
-            if itemType.marketgroup__id in hardenerGroups:
-                self.hardeners += 1
-            if itemType.marketgroup__id == 478:
-                towers += 1
-            if itemDict.has_key(itemTpe.name):
-                itemDict[itemType.name] += 1
-            elif 1285 in groupTree and 478 not in groupTree:
-                itemDict.update({itemtype.name: 1})
+            if itemType.marketgroup:
+                groupTree = []
+                parent = itemType.marketgroup
+                while parent:
+                    groupTree.append(parent.id)
+                    parent = parent.parentgroup
+                if itemType.marketgroup.id in gunsGroups:
+                    self.guns += 1
+                if itemType.marketgroup.id in ewarGroups:
+                    self.ewar += 1
+                if itemType.marketgroup.id in smaGroups:
+                    self.sma += 1
+                if itemType.marketgroup.id in hardenerGroups:
+                    self.hardener += 1
+                if itemType.marketgroup.id == 478:
+                    towers += 1
+                if itemDict.has_key(itemType.name):
+                    itemDict[itemType.name] += 1
+                elif 1285 in groupTree and 478 not in groupTree:
+                    itemDict.update({itemType.name: 1})
 
+        self.fitting = "Imported from D-Scan:\n"
         for itemtype in itemDict:
             self.fitting += "\n%s : %s" % (itemtype, itemDict[itemtype])
-        if towers == 1:
+        if towers <= 1:
             self.save()
-        elif towers == 0:
-            raise AttributeError('No towers detected in the D-Scan!')
         else:
             raise AttributeError('Too many towers detected in the D-Scan!')
 

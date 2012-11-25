@@ -81,6 +81,22 @@ class System(SystemData):
         self.occupied = self.occupied.replace("\n", "<br />")
         super(System, self).save(*args, **kwargs)
 
+    def add_active_pilot(self, user, charname, shipname, shiptype):
+        from Map.models import ActivePilot
+        from datetime import datetime, timedelta
+        import pytz
+        # Do nothing if there is a recent matching record
+        threshold = datetime.now(pytz.utc) - timedelta(minutes=30)
+        if ActivePilot.objects.filter(timestamp__gt=threshold, user=user,
+                charactername=charname, shipname=shipname, 
+                shiptype=shiptype).count() == 0:
+            # Flush other records for this character
+            ActivePilot.objects.filter(charactername=charname).delete()
+            # Add new record
+            record = ActivePilot(system=self, user=user, charactername=charname,
+                    shipname=shipname, shiptype=shiptype).save()
+        # Purge old records while we're at it
+        ActivePilot.objects.filter(timestamp__lt=threshold).delete()
 
 class KSystem(System):
     sov = models.CharField(max_length = 100)
@@ -383,6 +399,16 @@ class Snapshot(models.Model):
     user = models.ForeignKey(User, related_name='snapshots')
     json = models.TextField()
     description = models.CharField(max_length=255)
+
+
+class ActivePilot(models.Model):
+    """Represents the location of a tracked character."""
+    user = models.ForeignKey(User, related_name='locations')
+    charactername = models.CharField(max_length=72)
+    shipname = models.CharField(max_length=32)
+    shiptype = models.CharField(max_length=32)
+    system = models.ForeignKey(System, related_name='active_pilots')
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 # Model Forms
 class MapForm(ModelForm):

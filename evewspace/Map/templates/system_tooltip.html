@@ -31,7 +31,7 @@
     </span> 
     <br />
     <br />
-    <p class="statusText label label-success">SIG: {{system.signatures.count}} POS: {{system.poses.count}} Pilots: {{system.activepilots.count}}</p>
+    <p class="statusText label label-success">SIG: {{system.signatures.count}} POS: {{system.poses.count}} Pilots: {{system.active_pilots.count}}</p>
     {% if system.occupied %}
     <p class="occupiedTooltip label label-important"> Occupied: <br /> {{system.occupied|safe}}</p>
     {% endif %}

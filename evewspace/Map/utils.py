@@ -39,9 +39,8 @@ class MapJSONGenerator(object):
         as a realative URL.
         """
         staticPrefix = "%s" % (settings.STATIC_URL + "images/")
-        if self.user.get_profile().currentsystem == system.system: 
-            if self.user.get_profile().lastactive > datetime.datetime.now(pytz.utc) - timedelta(minutes=15):
-                return staticPrefix + "mylocation.png"
+        if system.system.active_pilots.filter(user=self.user).count():
+            return staticPrefix + "mylocation.png"
 
         if system.stfleets.filter(ended__isnull=True).count() != 0:
             return staticPrefix + "farm.png" 
@@ -49,7 +48,7 @@ class MapJSONGenerator(object):
         if system.system.shipkills + system.system.podkills > 0:
             return staticPrefix + "pvp.png" 
 
-        if system.system.npckills > 15:
+        if system.system.npckills > 10:
             return staticPrefix + "carebears.png"
 
         return None
@@ -78,7 +77,7 @@ class MapJSONGenerator(object):
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass, 
                     'Friendly': system.friendlyname, 'interest': interest,
                     'interestpath': path, 'ParentID': system.parentsystem.pk, 
-                    'activePilots': system.system.activepilots.count(),
+                    'activePilots': system.system.active_pilots.count(),
                     'WhToParent': parentWH.bottom_type.name,
                     'WhFromParent': parentWH.top_type.name,
                     'WhMassStatus': parentWH.mass_status,
@@ -92,7 +91,7 @@ class MapJSONGenerator(object):
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
                     'interestpath': path, 'ParentID': None, 
-                    'activePilots': system.system.activepilots.count(),
+                    'activePilots': system.system.active_pilots.count(),
                     'WhToParent': "", 'WhFromParent': "",
                     'WhMassStatus': None, 'WhTimeStatus': None,
                     'WhToParentBubbled': None, 'WhFromParentBubbled': None,

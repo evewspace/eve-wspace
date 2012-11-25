@@ -1,6 +1,9 @@
 {% load poslist %}
 <ul>
-{% for p in poses %}
-	{% posdetails system p %}
-{% endfor %}
+    {% for p in poses %}
+        {% posdetails system p %}
+        <br />
+    {% empty %}
+        <li>No Starbases!</li>
+    {% endfor %}
 </ul>	

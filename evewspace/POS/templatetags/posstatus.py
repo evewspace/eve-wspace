@@ -10,8 +10,8 @@ def myposstatus(user):
     #Get list of POSes where user is the manager
     poses = CorpPOS.objects.filter(manager=user)
     #Get status information and return
-    posstatus = add_status_info(poses)
-    return {'posstatus': posstatus}
+    status = add_status_info(poses)
+    return {'posstatus': status}
 
 
 @register.inclusion_tag('posstatus.html')
@@ -23,10 +23,10 @@ def corpposstatus(user):
     else:
         poses = CorpPOS.objects.filter(manager=None)
     #Add status info and return
-    posstatus = add_status_info(poses)
-    return {'posstatus': posstatus}
+    status = add_status_info(poses)
+    return {'posstatus': status}
 
 
 @register.inclusion_tag('posstatus_detail.html')
-def posstatusdetails(posstatus):
-    return {'pos': posstatus}
+def posstatusdetails(status):
+    return {'pos': status}

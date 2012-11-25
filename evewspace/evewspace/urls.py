@@ -18,5 +18,6 @@ urlpatterns = patterns('',
         url(r'^map/', include('Map.urls')),
         # Uncomment the next line to enable the admin:
         url(r'^sekrit/', include(admin.site.urls)),
-        url(r'search/', include('search.urls')),
+        url(r'^search/', include('search.urls')),
+        url(r'^pos/', include('POS.urls')),
 )

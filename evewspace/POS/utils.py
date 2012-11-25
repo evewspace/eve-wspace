@@ -14,7 +14,7 @@ def add_status_info(poses):
     status: Status retrieved
 
     """
-    class posstatus:
+    class statusentry:
         def __init__(self, pos, status):
             self.itemid = pos.apiitemid
             self.pos = pos
@@ -25,7 +25,7 @@ def add_status_info(poses):
     statuslist = []
     for pos in poses:
         result = auth.corp.StarbaseDetail(itemID=pos.apiitemid)
-        posstatus = posstatus(pos, result)
-        statuslist.append(posstatus)
+        status = statusentry(pos, result)
+        statuslist.append(status)
 
     return statuslist

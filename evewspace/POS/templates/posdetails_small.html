@@ -1,6 +1,6 @@
 <li id="pos{{pos.pk}}" class="posListItem">
 <div class="poslist_header" data-toggle="collapse" data-target="#pos{{pos.pk}}Details" style="position:relative">
-        <img height="64" width="64" src="http://image.eveonline.com/Render/{{pos.towertype.pk}}_128.png"></img>
+        <img height="48" width="48" src="http://image.eveonline.com/Render/{{pos.towertype.pk}}_128.png"></img>
         <span class="planetlabel">Planet: </span>
         <span class="planetno"><strong>{{pos.planet}}</strong></span>
 		<span class="moonlabel">Moon: </span>
@@ -8,19 +8,26 @@
         <span class="postype"><strong>{{pos.towertype.name}}</strong></span>&nbsp &nbsp
         <i class="icon-pencil" onclick="EditStarbase({{system.pk}}, {{pos.pk}});" title="Edit POS"></i>
         <br />
-        {% if pos.guns %}
-        <img height="32" width="32" title="GUNS" src="/static/images/posguns.png" /> {{pos.guns}}
-        {% endif %}
-        {% if pos.ewar %}
-        <img height="32" width="32" title="EWAR" src="/static/images/posewar.png" /> {{pos.ewar}}
-        {% endif %}
-        {% if pos.sma %}
-        <img height="32" width="32" title="SMA" src="/static/images/possma.png" /> {{pos.sma}}
-        {% endif %}
-        {% if pos.warpin_notice %}
-        <br />
-        <span title="Warp-in Notice" class="label label-warning">{{pos.warpin_notice}}</span>
-        {% endif %}
+        <div class="posSummary">
+            {% if pos.guns %}
+                <img height="32" width="32" title="GUNS" src="/static/images/posguns.png" /> {{pos.guns}}
+            {% endif %}
+            {% if pos.ewar %}
+                <img height="32" width="32" title="EWAR" src="/static/images/posewar.png" /> {{pos.ewar}}
+            {% endif %}
+            {% if pos.sma %}
+                <img height="32" width="32" title="SMA" src="/static/images/possma.png" /> {{pos.sma}}
+            {% endif %}
+            {% if pos.hardener %}
+                <img height="32" width="32" title="HARDENERS" src="/static/images/poshard.png" /> {{pos.hardener}}
+            {% endif %}
+            <br />
+            Updated: {{pos.updated|date:"Y-m-d H:i"}}
+            {% if pos.warpin_notice %}
+                <br />
+                <span title="Warp-in Notice" class="label label-warning">{{pos.warpin_notice}}</span>
+            {% endif %}
+        </div>
 	</div>
     <div id="pos{{pos.pk}}Details" class="poslist_main collapse">
         <div class"poslist_info">
@@ -37,7 +44,7 @@
             <span class="poslist_ticker">[{{pos.corporation.alliance.shortname}}]</span><br />
             <span class="poslist_posname">Name: {{pos.posname}}</span> <br />
             <h5>Full Fitting: </h5>
-            <span class="poslist_fitting">{{pos.fitting}}</span> <br />
+            <span class="poslist_fitting">{{pos.fitting|safe}}</span> <br />
 		</div>
 	</div>
 </li>
