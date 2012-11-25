@@ -51,7 +51,3 @@ class Command(NoArgsCommand):
                 lowsec.save()
             except LocationWormholeClass.DoesNotExist:
                 pass
-        # Get a quick route to build the SystemJump cache
-        sys1 = KSystem.objects.get(name="Jita")
-        sys2 = KSystem.objects.get(name="Amarr")
-        RouteFinder(sys1, sys2).route_length()

@@ -46,6 +46,10 @@
         {% if system.sysclass = 9 %}
         Null Sec
         {% endif %}
+        {% if system.sov %}
+        <br />
+        Sov: {{system.sov}}
+        {% endif %}
     </div>
     <br />
 <div>

@@ -4,5 +4,8 @@ South>=0.7.5
 git+https://github.com/marbindrakon/django-eveigb
 pytz>=2012d
 eveapi>=1.2
-django-infinite-memcached==0.1
-python-memcached==1.48
+django-infinite-memcached>=0.1
+python-memcached>=1.48
+celery>=3.0.12
+django-celery>=3.0.11
+amqplib>=1.0.2

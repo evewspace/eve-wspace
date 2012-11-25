@@ -7,6 +7,43 @@ ADMINS = ('Andrew Austin', 'acaustin@uark.edu'
         # ('Your Name', 'your_email@example.com'),
 )
 
+# import Celery config
+import djcelery
+djcelery.setup_loader()
+
+BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+
+from datetime import timedelta
+from celery.schedules import crontab
+CELERYBEAT_SCHEDULE = {
+        'map_stats':{
+                'task': 'Map.tasks.update_system_stats',
+                'schedule': timedelta(hours=1),
+                'args': ()
+            },
+        'map_sov':{
+                'task': 'Map.tasks.update_system_sov',
+                'schedule': crontab(minute=0, hour=10),
+                'args': ()
+            },
+        'jump_cache':{
+                'task': 'Map.tasks.fill_jumps_cache',
+                'schedule': timedelta(minutes=10),
+                'args': ()
+            },
+        'alliance_update':{
+                'task': 'POS.tasks.update_all_alliances',
+                'schedule': crontab(minute=30, hour=10, day_of_week="tue"),
+                'args': ()
+            },
+        'server_status':{
+                'task': 'Map.tasks.check_server_status',
+                'schedule': timedelta(minutes=3),
+                'args': ()
+            }
+        }
+
+
 MANAGERS = ADMINS
 
 DATABASES = {
@@ -139,7 +176,8 @@ INSTALLED_APPS = (
         'account',
         'POS',
         'eveigb',
-        'search'
+        'search',
+        'djcelery',
         # Uncomment the next line to enable admin documentation:
         # 'django.contrib.admindocs',
 )

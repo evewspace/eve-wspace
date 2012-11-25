@@ -24,6 +24,10 @@
         Null Sec
         {% endif %}
     </strong>
+    {% if system.sov %}
+        <br />
+        <strong>Sov: {{system.sov}}</strong>
+    {% endif %}
     </div>
     <br />
     <span class="sysLastScanned label {% if scanwarning  %} label-warning {% endif %}">

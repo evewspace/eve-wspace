@@ -162,3 +162,12 @@ class SystemJump(models.Model):
 
     class Meta:
         db_table='mapSolarSystemJumps'
+
+
+class Faction(models.Model):
+    id = models.IntegerField(primary_key=True, db_column='factionID') 
+    name = models.CharField(max_length=300, db_column='factionName', blank=True) 
+    description = models.CharField(max_length=3000, blank=True)
+    iconid = models.IntegerField(null=True, db_column='iconID', blank=True)
+    class Meta:
+        db_table = u'chrFactions'
