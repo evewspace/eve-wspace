@@ -1,0 +1,47 @@
+<div title="Add Starbase" id="addPOSDialog" class="addPOSDialog">
+    <form id="addPOSForm" action="/pos/{{system.pk}}/add" method="POST">
+        {% csrf_token %}
+        Full Corp Name: <input id="corpBox" name="corp" type="text" > <br />
+        <span class="label label-warning" id="digiterror">Please enter digits only for planet and moon. </span><br /><br />
+        Planet: <input name="planet" class="input-mini" type="text"> 
+        Moon: <input name="moon" class="input-mini" type="text"> <br />
+        Tower Name: <input name="name" type="text"> <br />
+        Tower Type: <input id="towertype" name="tower" type="text"> <br />
+        Status: Unanchored <input type="radio" onclick="Test(this);" name="status" value="0">  
+        Anchored <input type="radio" name="status" onclick="Test(this);" value="1"> 
+        Onlining <input type="radio" name="status" onclick="Test(this);" value="2">
+        Reinforced <input type="radio" name="status" onclick="Test(this);" value="3">
+        Online <input type="radio" name="status" value="4" onclick="Test(this);" checked="checked">
+        <br />
+        <div id="rftime" class="rftimerdiv" style="display: none">
+            RF Timer: Days: <input name="rfdays" class="input-mini" type="text">
+            Hours: <input name="rfhours" class="input-mini" type="text">
+            Minutes: <input name="rfminutes" class="input-mini" type="text">
+        </div>
+        Fitting: <br />
+        <textarea name="fitting"></textarea><br />
+        Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1"> <br />
+        <input type="submit" value="Add POS">
+    </form>
+    <script type="text/javascript">
+    function Test(rad){
+        var rads=document.getElementsByName(rad.name);
+        document.getElementById('rftime').style.display=(rads[3].checked)?'block':'none';
+    }
+    $('#corpBox').autocomplete({
+                source: "/search/corp",
+                minLength: 2
+                });
+    $('#towertype').autocomplete({
+                source: "/search/item",
+                minLength: 2
+                });
+    $('#addPOSForm').submit(function(e){
+                e.preventDefault();
+                AddPOS({{system.pk}});
+                $('#addPOSDialog').dialog('close');
+                $('#addPOSDialog').remove();
+                return false;
+            });
+    </script>
+</div>
