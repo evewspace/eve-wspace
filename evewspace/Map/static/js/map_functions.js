@@ -72,7 +72,7 @@ function doMapAjaxCheckin() {
 }
 
 
-function DisplaySystemDetails(msID){
+function DisplaySystemDetails(msID, sysID){
     address = "system/" + msID + "/";
     $.ajax({
         type: "GET",
@@ -95,9 +95,22 @@ function DisplaySystemDetails(msID){
                     alert("An error occured getting a blank signature add form.");
                 }
             });
+            GetPOSList(sysID);
             CloseSystemMenu();
         },
         error: function(errorThrown) {alert("An error occured building the details page.");}
+    });
+}
+
+
+function GetPOSList(sysID){
+    address = "/pos/" + sysID + "/";
+    $.ajax({
+        type: "GET",
+        url: address,
+        success: function(data){
+            $('#sys' + sysID + "POSDiv").html(data);
+        },
     });
 }
 
@@ -208,8 +221,46 @@ function GetSystemTooltip(msID){
 }
 
 
+function GetAddPOSDialog(sysID){
+    address = "/pos/" + sysID + "/add/";
+    $.ajax({
+        type: "GET",
+        url: address,
+        success: function(data){
+             $(data).dialog({
+                autoOpen: false,
+                close: function(event, ui) { 
+                $(this).dialog("destroy");
+                $(this).remove();
+                }
+            });
+            $('#addPOSDialog').dialog('open');
+        },
+            error: function(errorThrown) {alert("An error occured loading the add POS box.");}
+            });
+
+}
+
+
+function AddPOS(sysID){
+    //This function adds a system using the information in a form named #sysAddForm
+    address = "/pos/" + sysID + "/add/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        data: $('#addPOSForm').serialize(),
+        success: function(data){
+            GetPOSList(sysID);
+        },
+        error: function(errorThrown){
+            alert("An error occured adding the POS, please check your input.");
+        }
+    });
+}
+
+
 function GetWormholeTooltip(whID){
-    address = "wormhole/" + whID + "/tooltip";
+    address = "wormhole/" + whID + "/tooltip/";
     $.ajax({
         type: "GET",
         url: address,

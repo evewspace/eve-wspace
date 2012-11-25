@@ -1,5 +1,9 @@
 from Map.models import *
 from Map import utils
+from API import utils as handler
+from POS import tasks as pos_tasks
+from POS.models import POS, Corporation
+from core.models import Type
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.response import TemplateResponse
@@ -12,6 +16,7 @@ from django.conf import settings
 from datetime import datetime, timedelta, time
 import pytz
 import json
+import eveapi
 
 # Decorator to check map permissions. Takes request and mapID
 # Permissions are 0 = None, 1 = View, 2 = Change
@@ -533,3 +538,45 @@ def create_map(request):
     else:
         form = MapForm
         return TemplateResponse(request, 'new_map.html', { 'form': form, })
+
+
+@require_map_permission(permission=2)
+def add_pos(request, mapID, msID):
+    """
+    GET gets the add POS dialog, POST processes it.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+
+    mapsys = get_object_or_404(MapSystem, pk=msID)
+    if request.method == 'POST':
+        tower = get_object_or_404(Type, name=request.POST['tower'])
+        try:
+            corp = Corporation.objects.get(name=request.POST['corp'])
+        except:
+            # Corp isn't in our DB, get its ID and add it
+            try:
+                api = eveapi.EVEAPIConnection(cacheHandler=handler)
+                corpID = api.eve.CharacterID(names=request.POST['corp']).characters[0].characterID
+                result = pos_tasks.update_corporation.delay(corpID)
+                corp = result.get()
+            except:
+                # The corp doesn't exist
+                raise Http404
+        pos=POS(system=mapsys.system, planet=int(request.POST['planet']),
+                moon=int(request.POST['moon']), towertype=tower,
+                posname=request.POST['name'], fitting=request.POST['fitting'],
+                status=request.POST['status'], corporation=corp)
+        # Have the async worker update the corp just so that it is up to date
+        pos_tasks.update_corporation.delay(corp.id)
+        if pos.status == 3:
+            delta = timedelta(days=request.POST['rfdays'], hours=request.POST['rfhours'],
+                    minutes=request.POST['rfminutes'])
+            pos.rftime = datetime.now(pytz.utc) + delta
+        pos.save()
+
+        if request.POST.get('dscan', None) == "1":
+            pos.fit_from_dscan(request.POST['fitting'].encode('utf-8'))
+        return HttpResponse('[]')
+    else:
+        return TemplateResponse(request, 'add_pos.html', {'mapsys': mapsys})

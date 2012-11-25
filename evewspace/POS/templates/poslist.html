@@ -1,4 +1,5 @@
 {% load poslist %}
+<div id="sys{{system.pk}}POSDiv">
 <ul>
     {% for p in poses %}
         {% posdetails system p %}
@@ -6,4 +7,5 @@
     {% empty %}
         <li>No Starbases!</li>
     {% endfor %}
-</ul>	
+</ul>
+</div>

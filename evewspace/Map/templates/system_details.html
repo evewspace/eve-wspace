@@ -113,9 +113,10 @@
 
         {% load poslist %}    
     <div id="systemPosPanel" class="systemPosPanel page-header well well-small span6">
-        <h5>Starbases ({{system.poses.all.count}} Total)</h5>
+        <h5>Starbases ({{system.poses.all.count}} Total) <img height=32 width=32 title="Add POS" src='{{STATIC_URL}}images/plus.png' onclick="GetAddPOSDialog({{mapsys.system.pk}});" /></h5>
         <div id="systemPosWell" class="systemPosWell">
-                {% poslist system %}
+            <div id="sys{{system.pk}}POSDiv">
+            </div>
         </div>
     </div>
     </div>

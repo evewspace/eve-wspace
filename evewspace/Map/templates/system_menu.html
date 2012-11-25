@@ -1,6 +1,6 @@
 <div id="sysMenu">
 <div class="btn-group btn-group-vertical">
-    <a class="btn" onclick="DisplaySystemDetails({{mapsys.pk}});" href="#sysInfo">Details </a>
+    <a class="btn" onclick="DisplaySystemDetails({{mapsys.pk}}, {{mapsys.system.pk}});" href="#sysInfo">Details </a>
     {% if not is_igb %}
     <a class="btn" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
     {% endif %}
