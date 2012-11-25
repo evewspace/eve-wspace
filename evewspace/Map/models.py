@@ -75,6 +75,13 @@ class System(SystemData):
     def is_wspace(self):
         return self.sysclass < 7
 
+    def save(self, *args, **kwargs):
+        # Make sure any new lines in info or occupied are replaced with <br />
+        self.info = self.info.replace("\n", "<br />")
+        self.occupied = self.occupied.replace("\n", "<br />")
+        super(System, self).save(*args, **kwargs)
+
+
 class KSystem(System):
     sov = models.CharField(max_length = 100)
     jumps = models.IntegerField(blank=True, null=True)

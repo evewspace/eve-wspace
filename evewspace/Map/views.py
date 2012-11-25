@@ -468,7 +468,10 @@ def edit_system(request, mapID, msID):
         raise PermissionDenied
     mapSystem = get_object_or_404(MapSystem, pk=msID)
     if request.method == 'GET':
-        return TemplateResponse(request, 'edit_system.html', {'mapsys': mapSystem})
+        occupied = mapSystem.system.occupied.replace("<br />", "\n")
+        info = mapSystem.system.info.replace("<br />", "\n")
+        return TemplateResponse(request, 'edit_system.html', {'mapsys': mapSystem,
+            'occupied': occupied, 'info': info})
     if request.method == 'POST':
         mapSystem.friendlyname = request.POST.get('friendlyName', '')
         mapSystem.system.info = request.POST.get('info', '')
