@@ -425,6 +425,9 @@ class SiteSpawn(models.Model):
     sitename = models.CharField(max_length=255)
     spawns = models.TextField()
 
+    def __unicode__(self):
+        return self.sitename
+
 
 # Model Forms
 class MapForm(ModelForm):

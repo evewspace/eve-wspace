@@ -14,6 +14,10 @@
                     e.preventDefault();
                     AddSignature({{system.pk}});
                     return false;
+                    });
+        $("#id_info").autocomplete({
+                source: "/search/site/",
+                minLength: 2
                 });
     </script>
 </div>
