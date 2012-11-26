@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block scripts %}
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/map_config.css" />
+{% endblock %}
+{% block contentheader %}
+    <ul class="nav nav-tabs">
+        <li><a href="#global" data-toggle="tab">Global Settings</a></li>
+        <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Map Settings<b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            {% for map in maps %}
+                <li><a href="#{{map.pk}}" data-toggle="tab">{{map.name}}</a></li>
+            {% empty %}
+                <li><a href="#">No Maps</a></li>
+            {% endfor %}
+    </ul>
+{% endblock %}
+{% block content %}
+<div class="tab-content">
+    <div id="global" class="tab-pane active">
+        <div class="mapGeneralSettingsHeader">
+            <h2>Global Map Settings</h2>
+            <span class="label label-info">These settings apply to all maps on this server and affect all users.</span>
+        </div>
+        <div class="row">
+            <div class="destinationsDiv span6">
+                <h4>Destinations of Interest</h4>
+                <p class="text-info">The distance to these systems appear in the detials for all K-Space systems. A capital destination will also show Light-Year distance. </p>
+                <table class="destinationTable" cellpadding="10">
+                    <tr>
+                        <th>Remove</th>
+                        <th>System</th>
+                        <th>Capital</th>
+                    </tr>
+                    {% for dest in destinations %}
+                        <tr>
+                            <td><i class="icon-ban-circle" onclick="RemoveDestination({{dest.pk}});"></i></td>
+                            <td>{{dest.system.name}}</td>
+                            <td>{{dest.capital|yesno}}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="permissionsDiv span6">
+                <h4>Permissions</h4>
+                <p class="text-info">Each group can be assigned global map roles.</p>
+                
+            </div>
+        </div>
+    </div>
+    {% for map in maps %}
+        <div id="{{map.pk}}" class="tab-pane">
+            <h2>Settings: {{map.name}}</h2>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

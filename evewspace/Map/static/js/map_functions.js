@@ -151,7 +151,7 @@ function DisplaySystemMenu(msID, x, y){
 }
 
 
-function MarkScanned(msID, fromPanel){
+function MarkScanned(msID, fromPanel, sysID){
     address = "system/" + msID + "/scanned/";
     $.ajax({
         type: "POST",
@@ -161,7 +161,7 @@ function MarkScanned(msID, fromPanel){
         success: function(data) { 
             GetSystemTooltip(msID);
             if (fromPanel){
-                DisplaySystemDetails(msID);
+                DisplaySystemDetails(msID, sysID);
             }
             CloseSystemMenu();
 
@@ -254,6 +254,29 @@ function GetAddPOSDialog(sysID){
             });
 
 }
+
+
+function GetSiteSpawns(msID, sigID){
+    address = "system/" + msID + "/signatures/" + sigID + /spawns/;
+    $.ajax({
+        type: "GET",
+        url: address,
+        success: function(data){
+             $(data).dialog({
+                autoOpen: false,
+                close: function(event, ui) { 
+                $(this).dialog("destroy");
+                $(this).remove();
+                },
+                width: "400px"
+            });
+            $('#siteSpawnsDialog').dialog('open');
+        },
+            error: function(errorThrown) {alert("An error occured loading the add POS box.");}
+            });
+
+}
+
 
 
 function AddPOS(sysID){

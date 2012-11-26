@@ -128,7 +128,8 @@ class Map(models.Model):
     explicitperms = models.BooleanField()
 
     class Meta:
-        permissions = (("map_unrestricted", "Do not require excplicit access to maps."),)
+        permissions = (("map_unrestricted", "Do not require excplicit access to maps."),
+                ("map_admin", "Access map configuration."),)
 
     def __unicode__(self):
         """Returns name of Map as unicode representation."""
@@ -416,6 +417,14 @@ class Destination(models.Model):
     system = models.ForeignKey(KSystem, related_name='destinations')
     # Capital destinations also show light year distance
     capital = models.BooleanField()
+
+class SiteSpawn(models.Model):
+    """Contains the site spawn list for a site as HTML."""
+    sysclass = models.IntegerField()
+    sigtype = models.ForeignKey(SignatureType)
+    sitename = models.CharField(max_length=255)
+    spawns = models.TextField()
+
 
 # Model Forms
 class MapForm(ModelForm):

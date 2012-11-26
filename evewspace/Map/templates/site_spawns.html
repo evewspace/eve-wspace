@@ -1,0 +1,16 @@
+<div title="Site Spawns" class="siteSpawnsDialog" id="siteSpawnsDialog">
+    <div class="accordion" id="spawnsAccordion">
+    {% for s in spawns %}
+    <div class="accordion-group">
+        <div class="spawnNav accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#spawnsAccordion" href="#{{s.pk}}">{{s.sitename}}</a>
+        </div>
+        <div class="spawnsEntry accordion-body collapse" id="{{s.pk}}">
+            {{s.spawns|safe}}
+        </div>
+    </div>
+    {% empty %}
+        <span label="label label-inverse">There are no site spawns recorded for this signature.</span>
+    {% endfor %}
+</div>
+</div>

@@ -5,7 +5,8 @@ sigpatterns = patterns('Map.views',
         url(r'^escalate/$', 'escalate_site'),
         url(r'^clear/$', 'mark_signature_cleared'),
         url(r'^remove/$', 'delete_signature'),
-        url(r'^edit/$', 'edit_signature')
+        url(r'^edit/$', 'edit_signature'),
+        url(r'^spawns/$', 'site_spawns')
         )
 
 syspatterns = patterns('Map.views',
@@ -40,5 +41,6 @@ mappatterns = patterns('Map.views',
 
 urlpatterns = patterns('Map.views',
         url(r'^new/$', 'create_map'),
+        url(r'^config/$', 'map_config'),
         url(r'^(?P<mapID>\d+)/', include(mappatterns)),
         )

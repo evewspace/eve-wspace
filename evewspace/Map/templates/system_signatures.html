@@ -20,7 +20,7 @@
             {% endif %}
             </td>
             <td><span class="signatureID">{{sig.sigid}}</span> </td>
-            <td><span class="signatureType" onclick="GetSiteSpawns({{sig.system.sysclass}}, {{sig.sigtype.pk}});" title="{{sig.sigtype.longname}}">{{sig.sigtype.shortname}}</span></td>
+            <td><span class="signatureType" onclick="GetSiteSpawns({{system.pk}}, {{sig.pk}});" title="{{sig.sigtype.longname}}">{{sig.sigtype.shortname}}</span></td>
             <td><span class="signatureInfo">{{sig.info}}</span></td>
             <td>
             {% if sig.sigtype.sleeprsite and not sig.ratscleared %}

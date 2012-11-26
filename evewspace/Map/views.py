@@ -540,6 +540,15 @@ def create_map(request):
         return TemplateResponse(request, 'new_map.html', { 'form': form, })
 
 
+@permission_required('Map.map_admin')
+def map_config(request):
+    """
+    Display the map configuration page.
+    """
+    return TemplateResponse(request, 'map_settings.html', {'maps': Map.objects.all(),
+        'destinations': Destination.objects.all()})
+
+
 @require_map_permission(permission=1)
 def destination_list(request, mapID, msID):
     """
@@ -557,3 +566,15 @@ def destination_list(request, mapID, msID):
         return HttpResponse('')
     return render(request, 'system_destinations.html', {'system': system,
         'destinations': destinations})
+
+
+def site_spawns(request, mapID, msID, sigID):
+    """
+    Returns the spawns for a given signature and system.
+    """
+    sig = get_object_or_404(Signature, pk=sigID)
+    spawns = SiteSpawn.objects.filter(sigtype=sig.sigtype).all()
+    if spawns[0].sysclass != 0:
+        spawns = SiteSpawn.objects.filter(sigtype=sig.sigtype, 
+                sysclass=sig.system.sysclass).all()
+    return render(request, 'site_spawns.html', {'spawns': spawns})

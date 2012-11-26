@@ -56,7 +56,7 @@
     <span class="sysLastScanned label {% if scanwarning  %} label-warning {% endif %}">
         Last Scanned: {{system.lastscanned|date:"Y-m-d H:i"}}
     </span> &nbsp 
-    <i id="markScanned" onclick="MarkScanned({{mapsys.pk}}, true);" class="icon-refresh" title="Mark Scanned"></i>
+    <i id="markScanned" onclick="MarkScanned({{mapsys.pk}}, true, {{mapsys.system.pk}});" class="icon-refresh" title="Mark Scanned"></i>
     <br />
     <br />
     <p class="occupiedText label label-important"><span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p>
