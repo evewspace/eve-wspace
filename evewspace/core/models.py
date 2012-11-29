@@ -1,6 +1,12 @@
 from django.db import models
 # Core models contains models used across multiple apps
 
+class ConfigEntry(models.Model):
+    """A configuration setting that may be changed at runtime."""
+    name = models.CharField(max_length=32, unique=True)
+    value = models.CharField(max_length=255, null=True, blank=True)
+
+
 class MarketGroup(models.Model):
     """A market group from the Eve SDD."""
     id = models.IntegerField(primary_key=True, db_column='marketGroupID')

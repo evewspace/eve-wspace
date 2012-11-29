@@ -51,7 +51,6 @@ def get_pos_list(request, sysID):
         'poses': poses})
 
 
-@permission_required('POS.edit_pos')
 def edit_pos(request, sysID, posID):
     """
     GET gets the edit POS dialog, POST processes it.
