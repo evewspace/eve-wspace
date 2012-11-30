@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block scripts %}
+    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/settings.css" />
+{% endblock %}
+{% block contentheader %}
+    <ul class="nav nav-tabs">
+        <li><a href="#profile" data-toggle="tab">My Settings</a></li>
+        {% if perms.Map.map_admin %}
+        <li><a href="#mapadmin" data-toggle="tab">Map Admin</a></li>
+        {% endif %}
+    </ul>
+{% endblock contentheader %}
+{% block content %}
+<div class="tab-content">
+    <div id="profile" class="tab-pane active">
+        <h1>User Profile:</h1>
+    </div>
+    <div id="mapadmin" class="tab-pane">
+        {% load mapconfig %}
+        {% map_global_admin %}
+    </div>
+</div>
+{% endblock %}
+

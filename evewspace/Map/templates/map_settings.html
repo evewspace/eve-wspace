@@ -1,30 +1,24 @@
-{% extends "base.html" %}
-{% block scripts %}
-    <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/map_config.css" />
-{% endblock %}
-{% block contentheader %}
-    <ul class="nav nav-tabs">
-        <li><a href="#global" data-toggle="tab">Global Settings</a></li>
-        <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Map Settings<b class="caret"></b></a>
-        <ul class="dropdown-menu">
-            {% for map in maps %}
-                <li><a href="#{{map.pk}}" data-toggle="tab">{{map.name}}</a></li>
-            {% empty %}
-                <li><a href="#">No Maps</a></li>
-            {% endfor %}
-    </ul>
-{% endblock %}
-{% block content %}
-<div class="tab-content">
-    <div id="global" class="tab-pane active">
-        <div class="mapGeneralSettingsHeader">
-            <h2>Global Map Settings</h2>
-            <span class="label label-info">These settings apply to all maps on this server and affect all users.</span>
+<div class="accordion" id="map_accordion">
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#mapGeneral">
+                General Settings
+            </a>
         </div>
-        <div class="row">
-            <div class="destinationsDiv span6">
-                <h4>Destinations of Interest</h4>
-                <p class="text-info">The distance to these systems appear in the detials for all K-Space systems. A capital destination will also show Light-Year distance. </p>
+        <div id="mapGeneral" class="accordion-body collapse">
+            <div class="accordion-inner">
+            </div>
+        </div>
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#Destinations">
+                Destinations
+            </a>
+        </div>
+        <div id="Destinations" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <p class="text-info">
+                    The distance to these systems appear in the details for all K-Space systems. A capital destination will also show Light-Year distance. 
+                </p>
                 <table class="destinationTable" cellpadding="10">
                     <tr>
                         <th>Remove</th>
@@ -35,22 +29,65 @@
                         <tr>
                             <td><i class="icon-ban-circle" onclick="RemoveDestination({{dest.pk}});"></i></td>
                             <td>{{dest.system.name}}</td>
-                            <td>{{dest.capital|yesno}}</td>
+                            <td>
+                                <span onclick="ToggleCapital({{dest.pk}});" title="Click to Toggle"> 
+                                    {{dest.capital|yesno}}
+                                </span>
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>
             </div>
-            <div class="permissionsDiv span6">
-                <h4>Permissions</h4>
-                <p class="text-info">Each group can be assigned global map roles.</p>
-                
+        </div>
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#Permissions">
+                Global Permissions
+            </a>
+        </div>
+        <div id="Permissions" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <p class="text-info">
+                    These permissions affect access across all maps.
+                </p>
+
             </div>
         </div>
-    </div>
-    {% for map in maps %}
-        <div id="{{map.pk}}" class="tab-pane">
-            <h2>Settings: {{map.name}}</h2>
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#SigTypes">
+                Signature Types
+            </a>
         </div>
-    {% endfor %}
+        <div id="SigTypes" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <p class="text-info">
+                Here you can define custom signature types. <br />
+                <br />
+                NOTE: Deleting a Signature Type will remove all signatures of that type and all site spawns associated with that type.
+                </p>
+            </div>
+        </div>
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#SiteSpawns">
+                Site Spawns
+            </a>
+        </div>
+        <div id="SiteSpawns" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <p class="text-info">
+                    Here you can add, remove, and change site listings.
+                </p>
+            </div>
+        </div>
+        {% for m in maps %}
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#map{{m.pk}}Settings">
+                Map: {{m.name}}
+            </a>
+        </div>
+        <div id="map{{m.pk}}Settings" class="accordion-body collapse">
+            <div class="accordion-inner">
+            </div>
+        </div>
+        {% endfor %}
+    </div>    
 </div>
-{% endblock %}

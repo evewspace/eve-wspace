@@ -41,6 +41,5 @@ mappatterns = patterns('Map.views',
 
 urlpatterns = patterns('Map.views',
         url(r'^new/$', 'create_map'),
-        url(r'^config/$', 'map_config'),
         url(r'^(?P<mapID>\d+)/', include(mappatterns)),
         )

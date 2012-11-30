@@ -39,6 +39,17 @@ package {'memcached':
     ensure => present,
     }
 
+package {'rabbitmq-server':
+    ensure => present,
+    }
+
+service {'rabbitmq-server':
+    ensure => 'running',
+    hasrestart => 'true',
+    hasstatus => 'true',
+    require => Package['rabbitmq-server']
+    }
+
 service {'mysql':
 	ensure => 'running',
 	provider => 'upstart',
@@ -61,7 +72,7 @@ exec {'create-db':
 	cwd => "/home/vagrant",
         command => "/usr/bin/mysql -e \"create database djangotest;\" && /vagrant/puppet/scripts/django_load_db.sh",
 	timeout => 0,
-        require => [ Service["mysql"], Package['mysql-server'], Exec['requirements'], Package['bzip2'], Package['memcached'] ]
+        require => [ Service["mysql"], Package['mysql-server'], Exec['requirements'], Package['bzip2'], Package['memcached'], Service['rabbitmq-server']]
 	}
 
 exec {'requirements':

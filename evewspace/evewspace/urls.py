@@ -1,10 +1,8 @@
 from django.conf.urls import patterns, include, url
 
 # Uncomment the next two lines to enable the admin:
-from django.contrib import admin
 from search import registry as search_registry
 search_registry.autodiscover()
-admin.autodiscover()
 #django_cron.autodiscover()
 urlpatterns = patterns('',
         # Examples:
@@ -14,10 +12,10 @@ urlpatterns = patterns('',
         # Uncomment the admin/doc line below to enable admin documentation:
         # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
         url(r'^$', 'core.views.home_view', name='index'),
+        url(r'^settings/$', 'core.views.config_view', name='settings'),
         url(r'^account/', include('account.urls')),
         url(r'^map/', include('Map.urls')),
         # Uncomment the next line to enable the admin:
-        url(r'^sekrit/', include(admin.site.urls)),
         url(r'^search/', include('search.urls')),
         url(r'^pos/', include('POS.urls')),
 )

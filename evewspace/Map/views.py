@@ -39,7 +39,7 @@ def require_map_permission(permission=2):
 @login_required
 @require_map_permission(permission=1)
 def get_map(request, mapID):
-    """Get the map and determine if we have permissions to see it. 
+    """Get the map and determine if we have permissions to see it.
     If we do, then return a TemplateResponse for the map. If map does not
     exist, return 404. If we don't have permission, return PermissionDenied.
     """
@@ -109,7 +109,7 @@ def checkin_igb_trusted(request, map):
     currentsystem = System.objects.get(name=request.eve_systemname)
     oldsystem = None
     result = None
-    
+
     if profile.currentsystem:
         oldsystem = profile.currentsystem
 
@@ -126,7 +126,7 @@ def checkin_igb_trusted(request, map):
       and not (oldsystem.is_kspace() and currentsystem.is_kspace())
       and profile.lastactive > datetime.now(pytz.utc) - timedelta(minutes=5)
       ):
-        context = { 'oldsystem' : map.systems.filter(system=oldsystem).all()[0], 
+        context = { 'oldsystem' : map.systems.filter(system=oldsystem).all()[0],
                     'newsystem' : currentsystem,
                     'wormholes'  : utils.get_possible_wh_types(oldsystem, currentsystem),
                   }
@@ -154,10 +154,10 @@ def get_system_context(msID):
     scanwarning = system.lastscanned < scanthreshold
     interest = mapsys.interesttime and mapsys.interesttime > interestthreshold
 
-    return { 'system' : system, 'mapsys' : mapsys, 
+    return { 'system' : system, 'mapsys' : mapsys,
              'scanwarning' : scanwarning, 'isinterest' : interest }
 
-    
+
 @login_required
 @require_map_permission(permission=2)
 def add_system(request, mapID):
@@ -190,7 +190,7 @@ def add_system(request, mapID):
         bottomMS = map.add_system(request.user, bottomSys,
                 request.POST.get('friendlyName'), topMS)
         # Add Wormhole
-        bottomMS.connect_to(topMS, topType, bottomType, topBubbled, 
+        bottomMS.connect_to(topMS, topType, bottomType, topBubbled,
                 bottomBubbled, timeStatus, massStatus)
 
         return HttpResponse('[]')
@@ -249,7 +249,7 @@ def system_tooltip(request, mapID, msID):
 def wormhole_tooltip(request, mapID, whID):
     """Takes a POST request from AJAX with a Wormhole ID and renders the
     wormhole tooltip for that ID to response.
-    
+
     """
     if request.is_ajax():
         wh = get_object_or_404(Wormhole, pk=whID)
@@ -294,7 +294,7 @@ def manual_location(request, mapID, msID):
 @require_map_permission(permission=2)
 def set_interest(request, mapID, msID):
     """Takes a POST request from AJAX with an action and marks that system
-    as having either utcnow or None as interesttime. The action can be either 
+    as having either utcnow or None as interesttime. The action can be either
     "set" or "remove".
 
     """
@@ -321,7 +321,7 @@ def add_signature(request, mapID, msID):
     """This function processes the Add Signature form. GET gets the form
     and POST submits it and returns either a blank JSON list or a form with errors.
     All requests should be AJAX.
-    
+
     """
     if not request.is_ajax():
         raise PermissionDenied
@@ -336,16 +336,16 @@ def add_signature(request, mapID, msID):
             newSig.updated = True
             newSig.save()
             newForm = SignatureForm()
-            mapsystem.map.add_log(request.user, "Added signature %s to %s (%s)." 
+            mapsystem.map.add_log(request.user, "Added signature %s to %s (%s)."
                     % (newSig.sigid, mapsystem.system.name, mapsystem.friendlyname))
-            return TemplateResponse(request, "add_sig_form.html", 
+            return TemplateResponse(request, "add_sig_form.html",
                     {'form': newForm, 'system': mapsystem})
         else:
-            return TemplateResponse(request, "add_sig_form.html", 
+            return TemplateResponse(request, "add_sig_form.html",
                     {'form': form, 'system': mapsystem})
     else:
         form = SignatureForm()
-    return TemplateResponse(request, "add_sig_form.html", 
+    return TemplateResponse(request, "add_sig_form.html",
             {'form': form, 'system': mapsystem})
 
 
@@ -383,7 +383,7 @@ def edit_signature(request, mapID, msID, sigID):
 @require_map_permission(permission=1)
 def get_signature_list(request, mapID, msID):
     """
-    Determines the proper escalationThreshold time and renders 
+    Determines the proper escalationThreshold time and renders
     system_signatures.html
     """
     if not request.is_ajax():
@@ -405,7 +405,7 @@ def mark_signature_cleared(request, mapID, msID, sigID):
     sig.clear_rats()
     return HttpResponse('[]')
 
-    
+
 @login_required
 @require_map_permission(permission=2)
 def escalate_site(request, mapID, msID, sigID):
@@ -443,7 +443,7 @@ def delete_signature(request, mapID, msID, sigID):
     mapsys = get_object_or_404(MapSystem, pk=msID)
     sig = get_object_or_404(Signature, pk=sigID)
     sig.delete()
-    mapsys.map.add_log(request.user, "Deleted signature %s in %s (%s)." 
+    mapsys.map.add_log(request.user, "Deleted signature %s in %s (%s)."
             % (sig.sigid, mapsys.system.name, mapsys.friendlyname))
     return HttpResponse('[]')
 
@@ -458,7 +458,7 @@ def manual_add_system(request, mapID, msID):
     topMS = get_object_or_404(MapSystem, pk=msID)
     systems = System.objects.all()
     wormholes = WormholeType.objects.all()
-    return render(request, 'add_system_box.html', {'topMs': topMS, 
+    return render(request, 'add_system_box.html', {'topMs': topMS,
         'sysList': systems, 'whList': wormholes})
 
 
@@ -484,7 +484,7 @@ def edit_system(request, mapID, msID):
         mapSystem.system.occupied = request.POST.get('occupied', '')
         mapSystem.system.save()
         mapSystem.save()
-        mapSystem.map.add_log(request.user, "Edited System: %s (%s)" 
+        mapSystem.map.add_log(request.user, "Edited System: %s (%s)"
                 % (mapSystem.system.name, mapSystem.friendlyname))
         return HttpResponse('[]')
     raise PermissionDenied
@@ -507,7 +507,7 @@ def edit_wormhole(request, mapID, whID):
     if request.method == 'POST':
         wormhole.mass_status = int(request.POST.get('massStatus',0))
         wormhole.time_status = int(request.POST.get('timeStatus',0))
-        wormhole.top_type = get_object_or_404(WormholeType, 
+        wormhole.top_type = get_object_or_404(WormholeType,
                 name=request.POST.get('topType', 'K162'))
         wormhole.bottom_type = get_object_or_404(WormholeType,
                 name=request.POST.get('bottomType', 'K162'))
@@ -515,7 +515,7 @@ def edit_wormhole(request, mapID, whID):
         wormhole.bottom_bubbled = request.POST.get('bottomBubbled', '1') == '1'
         wormhole.save()
         wormhole.map.add_log(request.user, "Updated the wormhole between %s(%s) and %s(%s)."
-                % (wormhole.top.system.name, wormhole.top.friendlyname, 
+                % (wormhole.top.system.name, wormhole.top.friendlyname,
                     wormhole.bottom.system.name, wormhole.bottom.friendlyname))
         return HttpResponse('[]')
 
@@ -533,27 +533,18 @@ def create_map(request):
             newMap = form.save()
             newMap.add_log(request.user, "Created the %s map." % (newMap.name))
             newMap.add_system(request.user, newMap.root, "Root", None)
-            return HttpResponseRedirect(reverse('Map.views.get_map', 
+            return HttpResponseRedirect(reverse('Map.views.get_map',
                 kwargs={'mapID': newMap.pk }))
     else:
         form = MapForm
         return TemplateResponse(request, 'new_map.html', { 'form': form, })
 
 
-@permission_required('Map.map_admin')
-def map_config(request):
-    """
-    Display the map configuration page.
-    """
-    return TemplateResponse(request, 'map_settings.html', {'maps': Map.objects.all(),
-        'destinations': Destination.objects.all()})
-
-
 @require_map_permission(permission=1)
 def destination_list(request, mapID, msID):
     """
-    Returns the destinations of interest list for K-space systems and 
-    a blank response for w-space systems. The results are cached in the template 
+    Returns the destinations of interest list for K-space systems and
+    a blank response for w-space systems. The results are cached in the template
     as long as possible since they will never change for a System.
     """
     #if not request.is_ajax():
@@ -575,6 +566,6 @@ def site_spawns(request, mapID, msID, sigID):
     sig = get_object_or_404(Signature, pk=sigID)
     spawns = SiteSpawn.objects.filter(sigtype=sig.sigtype).all()
     if spawns[0].sysclass != 0:
-        spawns = SiteSpawn.objects.filter(sigtype=sig.sigtype, 
+        spawns = SiteSpawn.objects.filter(sigtype=sig.sigtype,
                 sysclass=sig.system.sysclass).all()
     return render(request, 'site_spawns.html', {'spawns': spawns})
