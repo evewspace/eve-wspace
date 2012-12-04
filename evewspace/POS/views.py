@@ -25,14 +25,14 @@ def test_fit(request, posID):
     else:
         return TemplateResponse(request, 'testfitter.html', {'pos': pos})
 
-@permission_required('POS.delete_pos')
+
+@permission_required('POS.delete_pos', raise_exception=True)
 def remove_pos(request, sysID,  posID):
     """
     Removes the POS. Raises PermissionDenied if it is a CorpPOS.
     """
     if not request.is_ajax():
         raise PermissionDenied
-
     pos = get_object_or_404(POS, pk=posID)
     if CorpPOS.objects.filter(pk=posID).count():
         raise PermissionDenied
@@ -51,6 +51,7 @@ def get_pos_list(request, sysID):
         'poses': poses})
 
 
+@login_required
 def edit_pos(request, sysID, posID):
     """
     GET gets the edit POS dialog, POST processes it.
@@ -97,15 +98,13 @@ def edit_pos(request, sysID, posID):
         return TemplateResponse(request, 'edit_pos.html', {'system': system, 
             'pos': pos, 'fitting': fitting})
 
-
-@permission_required('POS.add_pos')
+@permission_required('POS.add_pos', raise_exception=True)
 def add_pos(request, sysID):
     """
     GET gets the add POS dialog, POST processes it.
     """
     if not request.is_ajax():
         raise PermissionDenied
-
     system = get_object_or_404(System, pk=sysID)
     if request.method == 'POST':
         tower = get_object_or_404(Type, name=request.POST['tower'])
