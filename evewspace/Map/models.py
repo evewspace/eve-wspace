@@ -89,7 +89,7 @@ class System(SystemData):
         threshold = datetime.now(pytz.utc) - timedelta(minutes=30)
         if ActivePilot.objects.filter(timestamp__gt=threshold, user=user,
                 charactername=charname, shipname=shipname, 
-                shiptype=shiptype).count() == 0:
+                shiptype=shiptype, system=self).count() == 0:
             # Flush other records for this character
             ActivePilot.objects.filter(charactername=charname).delete()
             # Add new record
