@@ -522,7 +522,7 @@ def edit_wormhole(request, mapID, whID):
     raise PermissiondDenied
 
 
-@permission_required('Map.add_Map')
+@permission_required('Map.add_map')
 def create_map(request):
     """
     This function creates a map and then redirects to the new map.
