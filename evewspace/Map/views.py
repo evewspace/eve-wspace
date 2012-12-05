@@ -64,7 +64,7 @@ def map_checkin(request, mapID):
     timestring = request.POST['loadtime']
 
     loadtime = datetime.strptime(timestring, "%Y-%m-%d %H:%M:%S.%f")
-    loadtime.replace(tzinfo=pytz.utc)
+    loadtime = loadtime.replace(tzinfo=pytz.utc)
 
     if request.is_igb_trusted:
         dialogHtml = checkin_igb_trusted(request, currentmap)

@@ -24,7 +24,7 @@ def update_alliance(allianceID):
         # Alliance doesn't exists, add it without executor, update corps
         # and then update the executor
         alliance = Alliance(id=allianceapi.allianceID, name=allianceapi.name,
-                shortname=allianceapi.shortName, exceutor=None)
+                shortname=allianceapi.shortName, executor=None)
         alliance.save()
         for corp in allianceapi.memberCorporations:
             update_corporation(corp.corporaitonID)
