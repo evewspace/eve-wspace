@@ -535,6 +535,8 @@ def create_map(request):
             newMap.add_system(request.user, newMap.root, "Root", None)
             return HttpResponseRedirect(reverse('Map.views.get_map',
                 kwargs={'mapID': newMap.pk }))
+        else:
+            return TemplateResponse(request, 'new_map.html', {'form': form})
     else:
         form = MapForm
         return TemplateResponse(request, 'new_map.html', { 'form': form, })
