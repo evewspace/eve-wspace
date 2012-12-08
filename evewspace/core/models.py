@@ -15,7 +15,7 @@ class MarketGroup(models.Model):
     parentgroup = models.ForeignKey("self", related_name="childgroups", 
             blank=True, null=True, db_column='parentGroupID')
     description = models.CharField(max_length = 200, null=True, blank=True)
-    hasTypes = models.BooleanField()
+    hasTypes = models.IntegerField()
 
     def __unicode__(self):
         return self.name
