@@ -23,11 +23,24 @@
             <td><span class="signatureType" onclick="GetSiteSpawns({{system.pk}}, {{sig.pk}});" title="{{sig.sigtype.longname}}">{{sig.sigtype.shortname}}</span></td>
             <td><span class="signatureInfo">{{sig.info}}</span></td>
             <td>
-            {% if sig.sigtype.sleeprsite and not sig.ratscleared %}
-            <i class="icon-warning-sign" onclick="MarkCleared({{sig.pk}}, {{system.pk}});" title="NPCs not cleared!"></i> 
+            {% if sig.activated %}
+            {% if not sig.ratscleared %}
+            <i id="icn{{sig.pk}}Activated" class="icon-warning-sign" title="Activated at {{sig.activated|date:'Y-m-d H:i'}} but NPCs not cleared!"></i> 
+            <script type="text/javascript">
+                $('#icn{{sig.pk}}Activated').click(function(e){
+                            if (e.ctrlKey){
+                                MarkActivated({{sig.pk}}, {{system.pk}});
+                            }else{
+                                MarkCleared({{sig.pk}}, {{system.pk}});
+                            }
+                        });
+            </script>
             {% elif sig.sigtype.sleeprsite %}
             <i class="icon-screenshot" onclick="MarkCleared({{sig.pk}}, {{system.pk}});" title="NPCs cleared at {{sig.ratscleared|date:'Y-m-d H:i'}}"></i> 
-                {% endif %}
+            {% endif %}
+            {% else %}
+            <i class="icon-off" onclick="MarkActivated({{sig.pk}}, {{system.pk}});" title="Not activated."></i>
+            {% endif %}
             </td>
             <td>
             {% if sig.sigtype.escalatable and sig.system.sysclass > 4 and sig.system.sysclass < 7 %}
