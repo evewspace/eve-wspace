@@ -244,6 +244,10 @@ class MapSystem(models.Model):
         wormhole.save()
         return wormhole
     
+    def save(self, *args, **kwargs):
+        self.friendlyname = self.friendlyname.upper()
+        super(MapSystem, self).save(*args, **kwargs)
+
     def remove_system(self, user):
         """
         Removes the supplied system and all of its children. If there are
