@@ -245,7 +245,7 @@ class MapSystem(models.Model):
         return wormhole
     
     def save(self, *args, **kwargs):
-        self.friendlyname = self.friendlyname.upper()
+        self.friendlyname = self.friendlyname.upper()[:8]
         super(MapSystem, self).save(*args, **kwargs)
 
     def remove_system(self, user):
