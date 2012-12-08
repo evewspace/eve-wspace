@@ -25,7 +25,7 @@
             <td>
             {% if sig.activated %}
             {% if not sig.ratscleared %}
-            <i id="icn{{sig.pk}}Activated" class="icon-warning-sign" title="Activated at {{sig.activated|date:'Y-m-d H:i'}} but NPCs not cleared!"></i> 
+            <i id="icn{{sig.pk}}Activated" class="icon-warning-sign" title="Activated at {{sig.activated|date:'Y-m-d H:i'}} but NPCs not cleared! Ctrl+Click to deactivate."></i> 
             <script type="text/javascript">
                 $('#icn{{sig.pk}}Activated').click(function(e){
                             if (e.ctrlKey){
