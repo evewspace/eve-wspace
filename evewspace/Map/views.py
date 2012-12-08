@@ -17,6 +17,7 @@ from datetime import datetime, timedelta, time
 import pytz
 import json
 import eveapi
+import csv
 
 # Decorator to check map permissions. Takes request and mapID
 # Permissions are 0 = None, 1 = View, 2 = Change
@@ -349,6 +350,31 @@ def add_signature(request, mapID, msID):
             {'form': form, 'system': mapsystem})
 
 
+@login_required
+@require_map_permission(permission=2)
+def bulk_sig_import(request, mapID, msID):
+    """
+    GET gets a bulk signature import form. POST processes it, creating sigs
+    with blank info and type for each sig ID detected.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    mapsystem = get_object_or_404(MapSystem, pk=msID)
+    k = 0
+    if request.method == 'POST':
+        reader = csv.reader(request.POST.get('paste', '').decode('utf-8').splitlines()
+                , delimiter="\t")
+        for row in reader:
+            if k < 75:
+                Signature(sigid=row[0], system=mapsystem.system, info=" ").save()
+                k += 1
+        mapsystem.map.add_log(request.user, 
+                "Imported %s signatures for %s(%s)." % (k, mapsystem.system.name, 
+                    mapsystem.friendlyname), True)
+        return HttpResponse('[]')
+    else:
+        return TemplateResponse(request, "bulk_sig_form.html", {'mapsys': mapsystem})
+    
 @login_required
 @require_map_permission(permission=2)
 def edit_signature(request, mapID, msID, sigID):

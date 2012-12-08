@@ -84,7 +84,7 @@ function DisplaySystemDetails(msID, sysID){
             else{
                 $('#sysInfoDiv').html(data);
             }
-            LoadSignatures(msID);
+            LoadSignatures(msID, true);
             $.ajax({
                 type: "GET",
                 url: "system/" + msID +  "/signatures/new/",
@@ -394,7 +394,7 @@ function EditSignature(msID, sigID){
         data: $("#sigEditForm").serialize(),
         success: function(data){
             $('#sys' + msID + "SigAddForm").html(data);
-            LoadSignatures(msID);
+            LoadSignatures(msID, false);
         },
         error: function(){
             alert("An error occured editing the signature.");
@@ -426,7 +426,7 @@ function AddSignature(msID){
         data: $("#sigAddForm").serialize(),
         success: function(data){
             $('#sys' + msID + "SigAddForm").html(data);
-            LoadSignatures(msID);
+            LoadSignatures(msID, false);
         },
         error: function(){
             alert("An error occured adding the signature.");
@@ -435,18 +435,20 @@ function AddSignature(msID){
 }
 
 
-function LoadSignatures(msID){
+function LoadSignatures(msID, startTimer){
     address = "system/" + msID + "/signatures/";
     $.ajax({
         url: address,
         type: "GET",
         success: function(data){
             $('#sys' + msID + "Signatures").html(data);
-            setTimeout(function(){
-                if (document.getElementById("sys" + msID + "Signatures")){
-                    LoadSignatures(msID);
-                }
-            }, 10000);
+            if (startTimer){
+                setTimeout(function(){
+                    if (document.getElementById("sys" + msID + "Signatures")){
+                        LoadSignatures(msID, true);
+                    }
+                }, 5000);
+            }
         },
         error: function(){
             alert("An error occured loading the signature list.");
@@ -461,7 +463,7 @@ function MarkCleared(sigID, msID){
         url: address,
         type: "POST",
         success: function(){
-            LoadSignatures(msID);
+            LoadSignatures(msID, false);
         },
         error: function(){
             alert("The signature action failed.");
@@ -476,7 +478,7 @@ function MarkEscalated(sigID, msID){
         url: address,
         type: "POST",
         success: function(){
-            LoadSignatures(msID);
+            LoadSignatures(msID, false);
         },
         error: function(){
             alert("The signature action failed.");
@@ -491,7 +493,7 @@ function MarkActivated(sigID, msID){
         url: address,
         type: "POST",
         success: function(){
-            LoadSignatures(msID);
+            LoadSignatures(msID, false);
         },
         error: function(){
             alert("The signature action failed.");
@@ -506,7 +508,7 @@ function DeleteSignature(sigID, msID){
         url: address,
         type: "POST",
         success: function(){
-            LoadSignatures(msID);
+            LoadSignatures(msID, false);
         },
         error: function(){
             alert("The signature action failed.");
@@ -552,6 +554,41 @@ function AddSystem(){
         },
         error: function(errorThrown){
             alert("An error occured adding the system to the map.");
+        }
+    });
+}
+
+
+function BulkImport(msID){
+    address = "system/" + msID + "/signatures/bulkadd/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        data: $('#bulkSigForm').serialize(),
+        success: function(data){
+            LoadSignatures(msID, false);
+        },
+    });
+}
+
+
+function GetBulkImport(msID){
+    address= "system/" + msID + "/signatures/bulkadd/";
+    $.ajax({
+        type: "GET",
+        url: address,
+        success: function(data){
+            $(data).dialog({
+                autoOpen: false,
+                close: function(event, ui) { 
+                $(this).dialog("destroy");
+                $(this).remove();
+                }
+            });
+            $('#bulkSigDialog').dialog('open');
+        },
+        error: function(){
+            alert('There was an error getting the edit wormhole dialog.');
         }
     });
 }

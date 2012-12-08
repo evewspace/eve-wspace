@@ -22,6 +22,7 @@ syspatterns = patterns('Map.views',
         url(r'^addchild/$', 'manual_add_system'),
         url(r'^signatures/$', 'get_signature_list'),
         url(r'^signatures/new/$', 'add_signature'),
+        url(r'^signatures/bulkadd/$', 'bulk_sig_import'),
         url(r'^signatures/(?P<sigID>\d+)/', include(sigpatterns)),
         )
 

@@ -305,7 +305,7 @@ class SignatureType(models.Model):
 class Signature(models.Model):
     """Stores the signatures active in all systems. Relates to System model."""
     system = models.ForeignKey(System, related_name="signatures")
-    sigtype = models.ForeignKey(SignatureType, related_name="sigs")
+    sigtype = models.ForeignKey(SignatureType, related_name="sigs", null=True, blank=True)
     sigid = models.CharField(max_length = 10)
     updated = models.BooleanField()
     info = models.CharField(max_length=65, null=True, blank=True)
@@ -439,7 +439,7 @@ class SignatureForm(ModelForm):
 
     """
     sigid = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-mini'}), label="ID:")
-    sigtype = forms.ModelChoiceField(queryset=SignatureType.objects.all(), label="Type:")
+    sigtype = forms.ModelChoiceField(queryset=SignatureType.objects.all(), label="Type:", required=False)
     info = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-medium'}),label="Info:", required=False)
     sigtype.widget.attrs['class'] = 'input-small'
     class Meta:
