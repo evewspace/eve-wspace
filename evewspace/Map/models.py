@@ -324,18 +324,27 @@ class Signature(models.Model):
         return self.sigid
 
     def activate(self):
-        """Marks the site activated."""
-        self.activated = datetime.now(pytz.utc)
+        """Toggles the site activation."""
+        if not self.activated:
+            self.activated = datetime.now(pytz.utc)
+        else:
+            self.activated = None
         self.save()
 
     def clear_rats(self):
-        """Marks the NPCs cleared."""
-        self.ratscleared = datetime.now(pytz.utc)
+        """Toggles the NPCs cleared."""
+        if not self.ratscleared:
+            self.ratscleared = datetime.now(pytz.utc)
+        else:
+            self.ratscleared = None
         self.save()
 
     def escalate(self):
-        """Marks the sig escalated."""
-        self.lastescalated = datetime.now(pytz.utc)
+        """Toggles the sig escalation."""
+        if not self.lastescalated:
+            self.lastescalated = datetime.now(pytz.utc)
+        else:
+            self.lastescalated = None
         self.save()
 
     def increment_downtime(self):
@@ -343,27 +352,12 @@ class Signature(models.Model):
         of updated and activated."""
         self.activated = None
         self.updated = False
+        self.lastescalated = None
         if self.downtimes:
             self.downtimes += 1
         else:
             self.downtimes = 1
         self.save()
-
-    def escalated_today(self):
-        """
-        Determines if the site was last escalated during the current
-        11:00 to 11:00 eve day.
-        """
-        currenttime = datetime.now(pytz.utc)
-        if currenttime.time() >= time(hour=11):
-            # It is at or after downtime, use current date
-            threshold = datetime.combine(currenttime.date(), 
-                    time(hour=11, tzinfo=pytz.utc))
-        else:
-            # It is before downtime, use yesterday's date
-            threshold = datetime.combine(currenttime.date() - timedelta(days=1),
-                    time(hour=11, tzinfo=pytz.utc))
-        return self.lastescalated > thresholda
 
     def update(self):
         """Mark the signature as having been updated since DT."""
