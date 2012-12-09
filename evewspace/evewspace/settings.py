@@ -225,3 +225,12 @@ LOGGING = {
                 },
         }
 }
+
+# Dirty hack to provide configuration overriding semantics. Use local_settings to override or add upon the default.
+try:
+    LOCAL_SETTINGS
+except NameError:
+    try:
+        from local_settings import *
+    except ImportError:
+        pass
