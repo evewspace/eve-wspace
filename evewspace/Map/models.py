@@ -51,7 +51,7 @@ class WormholeType(models.Model):
         return "Unknown"
 
 class System(SystemData):
-    """Stores the permanent record of a solar system. 
+    """Stores the permanent record of a solar system.
     This table should not have rows added or removed through Django.
 
     """
@@ -71,7 +71,7 @@ class System(SystemData):
 
     def is_kspace(self):
         return self.sysclass >= 7
- 
+
     def is_wspace(self):
         return self.sysclass < 7
 
@@ -88,7 +88,7 @@ class System(SystemData):
         # Do nothing if there is a recent matching record
         threshold = datetime.now(pytz.utc) - timedelta(minutes=30)
         if ActivePilot.objects.filter(timestamp__gt=threshold, user=user,
-                charactername=charname, shipname=shipname, 
+                charactername=charname, shipname=shipname,
                 shiptype=shiptype, system=self).count() == 0:
             # Flush other records for this character
             ActivePilot.objects.filter(charactername=charname).delete()
@@ -194,7 +194,7 @@ class Map(models.Model):
     def add_system(self, user, system, friendlyname, parent=None):
         """
         Adds the provided system to the map with the provided
-        friendly name. Returns the new MapSystem object. 
+        friendly name. Returns the new MapSystem object.
         """
         mapsystem = MapSystem(map=self, system=system, friendlyname=friendlyname, parentsystem = parent)
         mapsystem.save()
@@ -223,13 +223,13 @@ class MapSystem(models.Model):
     system = models.ForeignKey(System, related_name="maps")
     friendlyname = models.CharField(max_length = 10)
     interesttime = models.DateTimeField(null=True, blank=True)
-    parentsystem = models.ForeignKey('self', related_name="childsystems", 
+    parentsystem = models.ForeignKey('self', related_name="childsystems",
             null=True, blank=True)
     def __unicode__(self):
         return "system %s in map %s" % (self.system.name, self.map.name)
 
     def connect_to(self, system,
-                   topType, bottomType, 
+                   topType, bottomType,
                    topBubbled=False, bottomBubbled=False,
                    timeStatus=0, massStatus=0):
         """
@@ -243,7 +243,7 @@ class MapSystem(models.Model):
 
         wormhole.save()
         return wormhole
-    
+
     def save(self, *args, **kwargs):
         self.friendlyname = self.friendlyname.upper()[:8]
         super(MapSystem, self).save(*args, **kwargs)
@@ -261,14 +261,14 @@ class MapSystem(models.Model):
         self.parent_wormholes.all().delete()
         for system in self.childsystems.all():
             system.remove_system(user)
-        self.map.add_log(user, "Removed system: %s (%s)" % (self.system.name, 
+        self.map.add_log(user, "Removed system: %s (%s)" % (self.system.name,
             self.friendlyname), True)
         self.delete()
 
 
 class Wormhole(models.Model):
-    """An instance of a wormhole in a  map. 
-    Wormhole have a 'top' and a 'bottom', the top refers to the 
+    """An instance of a wormhole in a  map.
+    Wormhole have a 'top' and a 'bottom', the top refers to the
     side that is found first (and the bottom is obviously the other side)
 
     """
@@ -276,16 +276,16 @@ class Wormhole(models.Model):
     top = models.ForeignKey(MapSystem, related_name='child_wormholes')
     top_type = models.ForeignKey(WormholeType, related_name='+')
     top_bubbled = models.NullBooleanField(null=True, blank=True)
-    bottom = models.ForeignKey(MapSystem, null=True, related_name='parent_wormholes') 
+    bottom = models.ForeignKey(MapSystem, null=True, related_name='parent_wormholes')
     bottom_type = models.ForeignKey(WormholeType, related_name='+')
     bottom_bubbled = models.NullBooleanField(null=True, blank=True)
     time_status = models.IntegerField(choices = ((0, "Fine"), (1, "End of Life")))
-    mass_status = models.IntegerField(choices = ((0, "No Shrink"), 
+    mass_status = models.IntegerField(choices = ((0, "No Shrink"),
         (1, "First Shrink"), (2, "Critical")))
 
 
 class SignatureType(models.Model):
-    """Stores the list of possible signature types for the map tool. 
+    """Stores the list of possible signature types for the map tool.
     Custom signature types may be added at will.
 
     """
@@ -319,6 +319,9 @@ class Signature(models.Model):
     ratscleared = models.DateTimeField(null=True, blank=True)
     lastescalated = models.DateTimeField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['sigid']
+
     def __unicode__(self):
         """Returns sig ID as unicode representation"""
         return self.sigid
@@ -348,7 +351,7 @@ class Signature(models.Model):
         self.save()
 
     def increment_downtime(self):
-        """Increments the downtime count and does downtime cleanup 
+        """Increments the downtime count and does downtime cleanup
         of updated and activated."""
         self.activated = None
         self.updated = False
@@ -374,7 +377,7 @@ class MapPermission(models.Model):
 
 
 class MapLog(models.Model):
-    """Represents an action that has taken place on a map (e.g. adding a signature). 
+    """Represents an action that has taken place on a map (e.g. adding a signature).
     This is used for pushing updates since last page load to clients.
 
     """
@@ -386,7 +389,7 @@ class MapLog(models.Model):
     visible = models.BooleanField()
 
     def __unicode__(self):
-        return "Map: %s  User: %s  Action: %s  Time: %s" % (self.map.name, self.user.username, 
+        return "Map: %s  User: %s  Action: %s  Time: %s" % (self.map.name, self.user.username,
                 self.action, self.timestamp)
 
 

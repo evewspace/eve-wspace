@@ -371,13 +371,13 @@ def bulk_sig_import(request, mapID, msID):
             if k < 75:
                 Signature(sigid=row[0], system=mapsystem.system, info=" ").save()
                 k += 1
-        mapsystem.map.add_log(request.user, 
-                "Imported %s signatures for %s(%s)." % (k, mapsystem.system.name, 
+        mapsystem.map.add_log(request.user,
+                "Imported %s signatures for %s(%s)." % (k, mapsystem.system.name,
                     mapsystem.friendlyname), True)
         return HttpResponse('[]')
     else:
         return TemplateResponse(request, "bulk_sig_form.html", {'mapsys': mapsystem})
-    
+
 @login_required
 @require_map_permission(permission=2)
 def edit_signature(request, mapID, msID, sigID):
