@@ -1,6 +1,5 @@
 #include "Graph.h"
 
-#include <lemon/graph_utils.h>
 
 #define BOOST_PYTHON_STATIC_LIB
 #include <boost/python.hpp>
@@ -26,16 +25,6 @@ Graph::NodeT Graph::findOrAddNode(const std::string &label)
 	return node;
 }
 
-int Graph::nodeCount()
-{
-	return lemon::countNodes(_graph);
-}
-
-int Graph::edgeCount()
-{
-	return lemon::countEdges(_graph);
-}
-
 
 Graph::NodeT Graph::findNode(const std::string &label)
 {
@@ -53,6 +42,16 @@ void Graph::addEdge(const std::string &fromLabel, const std::string &toLabel)
 	NodeT from = findOrAddNode(fromLabel);
 	NodeT to = findOrAddNode(toLabel);
 	_graph.addEdge(from, to);
+}
+
+int Graph::edgeCount()
+{
+	return lemon::countEdges(_graph);
+}
+
+int Graph::nodeCount()
+{
+	return lemon::countNodes(_graph);
 }
 
 LabelListT Graph::findPath(const std::string &fromLabel, const std::string &toLabel)
@@ -87,8 +86,8 @@ BOOST_PYTHON_MODULE(Pathfinder)
 	class_<Pathfinder::Graph, boost::noncopyable>("Graph")
 		.def("addEdge", &Pathfinder::Graph::addEdge)
 		.def("findPath", &Pathfinder::Graph::findPath)
-		.def("nodeCount", &Pathfinder::Graph::nodeCount)
 		.def("edgeCount", &Pathfinder::Graph::edgeCount)
+		.def("nodeCount", &Pathfinder::Graph::nodeCount)
 	;
 }
 
