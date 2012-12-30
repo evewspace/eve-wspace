@@ -26,6 +26,8 @@ public:
 	Graph();
 
 	void addEdge(const std::string &fromLabel, const std::string &toLabel);
+	int nodeCount();
+	int edgeCount();
 
 	LabelListT findPath(const std::string &fromLabel, const std::string &toLabel);
 	NodeT Graph::findNode(const std::string &label);

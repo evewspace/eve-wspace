@@ -1,5 +1,7 @@
 #include "Graph.h"
 
+#include <lemon/graph_utils.h>
+
 #define BOOST_PYTHON_STATIC_LIB
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -23,6 +25,17 @@ Graph::NodeT Graph::findOrAddNode(const std::string &label)
 
 	return node;
 }
+
+int Graph::nodeCount()
+{
+	return lemon::countNodes(_graph);
+}
+
+int Graph::edgeCount()
+{
+	return lemon::countEdges(_graph);
+}
+
 
 Graph::NodeT Graph::findNode(const std::string &label)
 {
@@ -74,6 +87,8 @@ BOOST_PYTHON_MODULE(Pathfinder)
 	class_<Pathfinder::Graph, boost::noncopyable>("Graph")
 		.def("addEdge", &Pathfinder::Graph::addEdge)
 		.def("findPath", &Pathfinder::Graph::findPath)
+		.def("nodeCount", &Pathfinder::Graph::nodeCount)
+		.def("edgeCount", &Pathfinder::Graph::edgeCount)
 	;
 }
 
