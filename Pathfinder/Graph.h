@@ -30,7 +30,7 @@ public:
 	int nodeCount();
 
 	LabelListT findPath(const std::string &fromLabel, const std::string &toLabel);
-	NodeT Graph::findNode(const std::string &label);
+	NodeT findNode(const std::string &label);
 	
 
 private:
