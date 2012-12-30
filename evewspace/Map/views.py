@@ -110,9 +110,11 @@ def checkin_igb_trusted(request, map):
     currentsystem = System.objects.get(name=request.eve_systemname)
     oldsystem = None
     result = None
-
-    if profile.currentsystem:
-        oldsystem = profile.currentsystem
+    threshold = datetime.now(pytz.utc) - timedelta(minutes=5)
+    recentlyactive = request.user.locations.filter(timestamp__gt=threshold,
+            charactername=request.eve_charname).all()
+    if recentlyactive.count():
+        oldsystem = request.user.locations.get(charactername=request.eve_charname).system
 
     #Conditions for the system to be automagically added to the map. The case
     #of oldsystem == None is handled by a condition on "sys in map" (None cannot
@@ -125,7 +127,7 @@ def checkin_igb_trusted(request, map):
       and currentsystem not in map
       #Stop it from adding everyone's paths through k-space to the map
       and not (oldsystem.is_kspace() and currentsystem.is_kspace())
-      and profile.lastactive > datetime.now(pytz.utc) - timedelta(minutes=5)
+      and recentlyactive.count()
       ):
         context = { 'oldsystem' : map.systems.filter(system=oldsystem).all()[0],
                     'newsystem' : currentsystem,
@@ -175,7 +177,8 @@ def add_system(request, mapID):
        friendlyName: Friendly name for the new MapSystem
     """
     if not request.is_ajax():
-       raise PermissionDenied
+        print "Non-AJAX Request from %s." % (request.user.username)
+        raise PermissionDenied
     try:
         # Prepare data
         map = Map.objects.get(pk=mapID)
@@ -368,13 +371,13 @@ def bulk_sig_import(request, mapID, msID):
             if k < 75:
                 Signature(sigid=row[0], system=mapsystem.system, info=" ").save()
                 k += 1
-        mapsystem.map.add_log(request.user, 
-                "Imported %s signatures for %s(%s)." % (k, mapsystem.system.name, 
+        mapsystem.map.add_log(request.user,
+                "Imported %s signatures for %s(%s)." % (k, mapsystem.system.name,
                     mapsystem.friendlyname), True)
         return HttpResponse('[]')
     else:
         return TemplateResponse(request, "bulk_sig_form.html", {'mapsys': mapsystem})
-    
+
 @login_required
 @require_map_permission(permission=2)
 def edit_signature(request, mapID, msID, sigID):

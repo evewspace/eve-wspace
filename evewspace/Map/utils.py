@@ -6,7 +6,7 @@ from datetime import timedelta
 import pytz
 from django.contrib.sites.models import Site
 from math import pow, sqrt
-from core.models import SystemJump
+from core.models import SystemJump, Type, Location
 from collections import OrderedDict
 from django.core.cache import cache
 
@@ -129,7 +129,7 @@ class MapJSONGenerator(object):
 
 def get_wormhole_type(system1, system2):
     """Gets the one-way wormhole types between system1 and system2."""
-    
+    from Map.models import WormholeType
     source = "K"
     destination = "K"
     # Set the source and destination for system1 > system2
@@ -269,5 +269,3 @@ class RouteFinder(object):
                     openList.update(newNode)
                     visitedList.update(newNode)
         return []
-    
-
