@@ -31,6 +31,11 @@ CELERYBEAT_SCHEDULE = {
                 'schedule': timedelta(minutes=10),
                 'args': ()
             },
+        'downtime_sites': {
+                'task': 'Map.tasks.downtime_site_update',
+                'schedule': crontab(minute=5, hour=11),
+                'args': ()
+            },
         'alliance_update':{
                 'task': 'POS.tasks.update_all_alliances',
                 'schedule': crontab(minute=30, hour=10, day_of_week="tue"),

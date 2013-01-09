@@ -83,3 +83,14 @@ def check_server_status():
     if statusapi.serverOpen == u'True':
         return
     Signature.objects.all().update(updated=False)
+
+@task()
+def downtime_site_update():
+    """
+    This task should be run during the scheduled EVE downtime.
+    It triggers the increment_downtime function on all singatures
+    that have been activated.
+    """
+    for sig in Signature.objects.all():
+        if sig.downtimes or sig.downtimes == 0:
+            sig.increment_downtime()

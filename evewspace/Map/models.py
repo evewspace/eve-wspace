@@ -330,10 +330,14 @@ class Signature(models.Model):
         """Toggles the site activation."""
         if not self.activated:
             self.activated = datetime.now(pytz.utc)
+            if not self.downtimes:
+                self.downtimes = 0
         else:
             self.activated = None
+            if self.downtimes == 0:
+                self.downtimes = None
         self.save()
-
+    
     def clear_rats(self):
         """Toggles the NPCs cleared."""
         if not self.ratscleared:
@@ -346,6 +350,8 @@ class Signature(models.Model):
         """Toggles the sig escalation."""
         if not self.lastescalated:
             self.lastescalated = datetime.now(pytz.utc)
+            if not self.activated:
+                self.activate()
         else:
             self.lastescalated = None
         self.save()

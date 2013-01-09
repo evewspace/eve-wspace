@@ -5,7 +5,7 @@
     <th>Sig ID</th>
     <th>Type</th>
     <th>Info</th>
-    <th>Rats</th>
+    <th>Act. / Rats</th>
     <th>Escl.</th>
     </tr>
     {% for sig in system.system.signatures.all %}
@@ -25,14 +25,17 @@
             <td>
             {% if sig.activated %}
             {% if not sig.ratscleared %}
-            <i id="icn{{sig.pk}}Activated" class="icon-warning-sign" title="Activated at {{sig.activated|date:'Y-m-d H:i'}} but NPCs not cleared! Ctrl+Click to deactivate."></i> 
+            <i id="icn{{sig.pk}}Activated" class="icon-warning-sign" title="Activated at {{sig.activated|date:'Y-m-d H:i'}} {% if sig.sigtype.sleeprsite %}but NPCs not cleared!{% endif %} Ctrl+Click to deactivate."></i> 
             <script type="text/javascript">
                 $('#icn{{sig.pk}}Activated').click(function(e){
                             if (e.ctrlKey){
                                 MarkActivated({{sig.pk}}, {{system.pk}});
-                            }else{
+                                }
+                                {% if sig.sigtype.sleeprsite %}
+                                else{
                                 MarkCleared({{sig.pk}}, {{system.pk}});
-                            }
+                                } 
+                                {% endif %}
                         });
             </script>
             {% elif sig.sigtype.sleeprsite %}
