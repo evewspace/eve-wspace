@@ -446,9 +446,9 @@ class MapForm(ModelForm):
 
 
 class SignatureForm(ModelForm):
-    """This form should only be used with commit=False since it does not
+    """
+    This form should only be used with commit=False since it does not
     set the system or updated fields.
-
     """
     sigid = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-mini'}), label="ID:")
     sigtype = forms.ModelChoiceField(queryset=SignatureType.objects.all(), label="Type:", required=False)
