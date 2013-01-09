@@ -267,10 +267,10 @@ class MapSystem(models.Model):
 
 
 class Wormhole(models.Model):
-    """An instance of a wormhole in a  map.
+    """
+    An instance of a wormhole in a  map.
     Wormhole have a 'top' and a 'bottom', the top refers to the
     side that is found first (and the bottom is obviously the other side)
-
     """
     map = models.ForeignKey(Map, related_name='wormholes')
     top = models.ForeignKey(MapSystem, related_name='child_wormholes')
