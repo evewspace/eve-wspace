@@ -32,7 +32,11 @@ def update_alliance(allianceID):
                 shortname=allianceapi.shortName, executor=None)
         alliance.save()
         for corp in allianceapi.memberCorporations:
-            update_corporation(corp.corporationID)
+            try:
+                update_corporation(corp.corporationID)
+            except AttributeError:
+                # Fuck you, xCAPITALSx
+                pass
         try:
             # If an alliance's executor can't be processed for some reason,
             # set it to None
