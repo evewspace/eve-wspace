@@ -285,9 +285,9 @@ class Wormhole(models.Model):
 
 
 class SignatureType(models.Model):
-    """Stores the list of possible signature types for the map tool.
+    """
+    Stores the list of possible signature types for the map tool.
     Custom signature types may be added at will.
-
     """
     shortname = models.CharField(max_length = 6)
     longname = models.CharField(max_length = 100)
@@ -337,7 +337,7 @@ class Signature(models.Model):
             if self.downtimes == 0:
                 self.downtimes = None
         self.save()
-    
+
     def clear_rats(self):
         """Toggles the NPCs cleared."""
         if not self.ratscleared:
