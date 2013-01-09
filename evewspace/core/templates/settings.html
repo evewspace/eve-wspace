@@ -15,10 +15,12 @@
     <div id="profile" class="tab-pane active">
         <h1>User Profile:</h1>
     </div>
+    {% if perms.Map.map_admin %}
     <div id="mapadmin" class="tab-pane">
         {% load mapconfig %}
         {% map_global_admin %}
     </div>
+    {% endif %}
 </div>
 {% endblock %}
 
