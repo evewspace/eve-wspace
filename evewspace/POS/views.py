@@ -51,7 +51,7 @@ def get_pos_list(request, sysID):
         'poses': poses})
 
 
-@login_required
+@permission_required('POS.change_pos', raise_exception=True)
 def edit_pos(request, sysID, posID):
     """
     GET gets the edit POS dialog, POST processes it.
@@ -98,7 +98,8 @@ def edit_pos(request, sysID, posID):
         return TemplateResponse(request, 'edit_pos.html', {'system': system, 
             'pos': pos, 'fitting': fitting})
 
-@permission_required('POS.add_pos', raise_exception=True)
+
+@login_required
 def add_pos(request, sysID):
     """
     GET gets the add POS dialog, POST processes it.
