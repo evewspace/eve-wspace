@@ -42,7 +42,8 @@
     max-width: 300px;
     border: thin solid #CDCDCD;
     padding: 20px 20px 20px 20px;
-    text-align: left;
+    text-align: center;
+    list-style-type: none;
 }
 .registerBox li
 {

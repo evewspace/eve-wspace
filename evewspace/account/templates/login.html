@@ -27,8 +27,9 @@
 		</tr>
 		</table>
 <br />
-		<input type="submit" value="Log In" />
-		<input type="hidden" name="next" value="{{ next }}" />
+    <input class="btn btn-primary btn-large" type="submit" value="Log In" />
+    <a class="btn btn-info" href="{% url register %}">Register</a>
+    <input type="hidden" name="next" value="{{ next }}" />
 </form>
 </div>
 
