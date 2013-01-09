@@ -218,7 +218,10 @@ class Map(models.Model):
         return result
 
 class MapSystem(models.Model):
-    """Stores information regarding which systems are active in which maps at the present time."""
+    """
+    Stores information regarding which systems are active in which maps
+    at the present time.
+    """
     map = models.ForeignKey(Map, related_name="systems")
     system = models.ForeignKey(System, related_name="maps")
     friendlyname = models.CharField(max_length = 10)
