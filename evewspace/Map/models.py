@@ -375,7 +375,10 @@ class Signature(models.Model):
 
 
 class MapPermission(models.Model):
-    """Relates a user group to it's map permissions. Non-restricted groups will have change access to all maps."""
+    """
+    Relates a user group to it's map permissions.
+    Non-restricted groups will have change access to all maps.
+    """
     group = models.ForeignKey(Group, related_name="mappermissions")
     map = models.ForeignKey(Map, related_name="grouppermissions")
     access = models.IntegerField(choices=((0,'No Access'),
