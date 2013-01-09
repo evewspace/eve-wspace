@@ -1,4 +1,6 @@
 <div class="accordion" id="map_accordion">
+    {% load static %}
+    <script type="text/javascript" src="{% get_static_prefix %}js/map_settings.js"></script>
     <div class="accordion-group">
         <div class="accordion-heading">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#mapGeneral">
@@ -7,6 +9,11 @@
         </div>
         <div id="mapGeneral" class="accordion-body collapse">
             <div class="accordion-inner">
+                <p class="text-info">
+                    These settings affect the behavior of all maps.
+                </p>
+                <div id="generalDiv">
+                </div>
             </div>
         </div>
         <div class="accordion-heading">
@@ -17,26 +24,10 @@
         <div id="Destinations" class="accordion-body collapse">
             <div class="accordion-inner">
                 <p class="text-info">
-                    The distance to these systems appear in the details for all K-Space systems. A capital destination will also show Light-Year distance. 
+                    The distance to these systems (jumps and LY) appear in the details for all K-Space systems.
                 </p>
-                <table class="destinationTable" cellpadding="10">
-                    <tr>
-                        <th>Remove</th>
-                        <th>System</th>
-                        <th>Capital</th>
-                    </tr>
-                    {% for dest in destinations %}
-                        <tr>
-                            <td><i class="icon-ban-circle" onclick="RemoveDestination({{dest.pk}});"></i></td>
-                            <td>{{dest.system.name}}</td>
-                            <td>
-                                <span onclick="ToggleCapital({{dest.pk}});" title="Click to Toggle"> 
-                                    {{dest.capital|yesno}}
-                                </span>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
+                <div id="destinationsDiv">
+                </div>
             </div>
         </div>
         <div class="accordion-heading">
@@ -49,7 +40,8 @@
                 <p class="text-info">
                     These permissions affect access across all maps.
                 </p>
-
+                <div id="globalPermsDiv">
+                </div>
             </div>
         </div>
         <div class="accordion-heading">
@@ -64,6 +56,8 @@
                 <br />
                 NOTE: Deleting a Signature Type will remove all signatures of that type and all site spawns associated with that type.
                 </p>
+                <div id="sigTypesDiv">
+                </div>
             </div>
         </div>
         <div class="accordion-heading">
@@ -76,6 +70,8 @@
                 <p class="text-info">
                     Here you can add, remove, and change site listings.
                 </p>
+                <div id="siteSpawnsDiv">
+                </div>
             </div>
         </div>
         {% for m in maps %}
@@ -86,6 +82,8 @@
         </div>
         <div id="map{{m.pk}}Settings" class="accordion-body collapse">
             <div class="accordion-inner">
+                <div id="map{{m.pk}}Div">
+                </div>
             </div>
         </div>
         {% endfor %}

@@ -7,29 +7,6 @@ var indentX = 150; //The amount of space (in px) between system ellipses on the 
 var indentY = 64; // The amount of space (in px) between system ellipses on the Y axis
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map.
 
-//AJAX Setup to work with Django CSFR Middleware
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie != '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = jQuery.trim(cookies[i]);
-                    if (cookie.substring(0, name.length + 1) == (name +'=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        //if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-        //}
-    }
-});
-
 
 $(document).ready(function(){setInterval(function(){doMapAjaxCheckin();}, 5000);});
 $(document).ready(function(){

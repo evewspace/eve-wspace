@@ -1,0 +1,28 @@
+<table class="destinationTable" cellpadding="10">
+    <tr>
+        <th>Remove</th>
+        <th>System</th>
+    </tr>
+    {% for dest in destinations %}
+        <tr>
+            <td><i class="icon-ban-circle" onclick="RemoveDestination({{dest.pk}});"></i></td>
+            <td>{{dest.system.name}}</td>
+        </tr>
+    {% endfor %}
+</table>
+<form id="addDestinationForm" method="post" action="/map/settings/destinations/new/">
+    <h4>Add Destination:</h4>
+    System: <input type="text" id="sysNameBox" name="systemName"> &nbsp
+    <input type="submit" value="Add Destination">
+</form>
+<script type="text/javascript">
+    $('#sysNameBox').autocomplete({
+        source: "/search/system/",
+        minLength: 2
+        });
+    $('#addDestinationForm').submit(function(e){
+                e.preventDefault();
+                AddDestination();
+                return false;
+            });
+</script>

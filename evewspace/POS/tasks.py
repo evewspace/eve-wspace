@@ -13,7 +13,12 @@ def update_alliance(allianceID):
     if Alliance.objects.filter(id=allianceID).count():
         # Alliance exists, update it
         for corp in allianceapi.memberCorporations:
-            update_corporation(corp.corporationID)
+            try:
+                update_corporation(corp.corporationID)
+            except AttributeError:
+                # Pass on this exception because one Russian corp has an
+                # unavoidable bad character in their description
+                pass
         alliance = Alliance.objects.get(id=allianceID)
         alliance.name = allianceapi.name
         alliance.shortname = allianceapi.shortName
@@ -27,7 +32,7 @@ def update_alliance(allianceID):
                 shortname=allianceapi.shortName, executor=None)
         alliance.save()
         for corp in allianceapi.memberCorporations:
-            update_corporation(corp.corporaitonID)
+            update_corporation(corp.corporationID)
         try:
             # If an alliance's executor can't be processed for some reason,
             # set it to None
@@ -48,7 +53,7 @@ def update_corporation(corpID):
     try:
         corpapi = api.corp.CorporationSheet(corporationID=corpID)
     except:
-        raise AttributeError("Invalid Corp ID")
+        raise AttributeError("Invalid Corp ID or Corp has malformed data.")
 
     if corpapi.allianceID:
         try:

@@ -1,0 +1,41 @@
+<form id="globalPermForm" action="/map/settings/permissions/" method="POST">
+    {% csrf_token %}
+    <table class="globalPermTable" cellpadding="10">
+        <tr>
+            <th>Group</th>
+            <th>Unrestricted</th>
+            <th>Create Maps</th>
+            <th>Map Admin</th>
+        </tr>
+        {% for group in groups %}
+        <tr>
+            <td>{{group.group.name}}</td>
+            <td><input title="Has write access to all maps that do not require explicit permissions." type="checkbox" name="{{group.group.pk}}_unrestricted"
+                {% if group.unrestricted %}
+                checked="checked"
+                {% endif %}></td>
+            <td><input title="Can add maps." type="checkbox" name="{{group.group.pk}}_add"
+                {% if group.add_map %}
+                checked="checked"
+                {% endif %}></td>
+            <td><input title="Can access this admin page." type="checkbox" name="{{group.group.pk}}_admin"
+                {% if group.admin %}
+                checked="checked"
+                {% endif %}></td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td>No Groups Defined!</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br />
+    <input type="submit" value="Save Permissions">
+</form>
+<script type="text/javascript">
+    $('#globalPermForm').submit(function(e){
+            e.preventDefault();
+            SaveGlobalPermissions();
+            return false;
+            });
+</script>

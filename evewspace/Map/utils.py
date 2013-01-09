@@ -15,7 +15,7 @@ class MapJSONGenerator(object):
     A MapJSONGenerator is instantiated with a map and user. It provides
     a method that returns the JSON representation of the map.
     """
-    
+
     def __init__(self, map, user):
         self.map = map
         self.user = user
@@ -43,10 +43,10 @@ class MapJSONGenerator(object):
             return staticPrefix + "mylocation.png"
 
         if system.stfleets.filter(ended__isnull=True).count() != 0:
-            return staticPrefix + "farm.png" 
+            return staticPrefix + "farm.png"
 
         if system.system.shipkills + system.system.podkills > 0:
-            return staticPrefix + "pvp.png" 
+            return staticPrefix + "pvp.png"
 
         if system.system.npckills > 10:
             return staticPrefix + "carebears.png"
@@ -55,7 +55,7 @@ class MapJSONGenerator(object):
 
     def system_to_dict(self, system, levelX):
         """
-        Takes a MapSystem and X,Y data and returns the dict of information to be passed to 
+        Takes a MapSystem and X,Y data and returns the dict of information to be passed to
         the map JS as JSON.
         """
         threshold = datetime.datetime.now(pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
@@ -74,9 +74,9 @@ class MapJSONGenerator(object):
         if system.parentsystem:
             parentWH = system.parent_wormholes.get()
             result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
-                    'LevelY': self.levelY, 'SysClass': system.system.sysclass, 
+                    'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
-                    'interestpath': path, 'ParentID': system.parentsystem.pk, 
+                    'interestpath': path, 'ParentID': system.parentsystem.pk,
                     'activePilots': system.system.active_pilots.count(),
                     'WhToParent': parentWH.bottom_type.name,
                     'WhFromParent': parentWH.top_type.name,
@@ -90,7 +90,7 @@ class MapJSONGenerator(object):
             result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
-                    'interestpath': path, 'ParentID': None, 
+                    'interestpath': path, 'ParentID': None,
                     'activePilots': system.system.active_pilots.count(),
                     'WhToParent': "", 'WhFromParent': "",
                     'WhMassStatus': None, 'WhTimeStatus': None,
@@ -112,7 +112,7 @@ class MapJSONGenerator(object):
     def recursive_system_data_generator(self, mapSystems, syslist, levelX):
         """
         Prepares a list of MapSystem objects for conversion to JSON for map JS.
-        Takes a queryset of MapSystems and the current list of systems prepared 
+        Takes a queryset of MapSystems and the current list of systems prepared
         for JSON.
         """
         # We will need an index later, so let's enumerate the mapSystems
@@ -123,7 +123,7 @@ class MapJSONGenerator(object):
             if i > 0:
                 self.levelY +=1
             syslist.append(self.system_to_dict(system, levelX))
-            self.recursive_system_data_generator(system.childsystems.all(), 
+            self.recursive_system_data_generator(system.childsystems.all(),
                     syslist, levelX + 1)
 
 
@@ -139,9 +139,9 @@ def get_wormhole_type(system1, system2):
         source = "H"
     if system1.sysclass > 7:
         source = "NH"
-    
+
     destination = system2.sysclass
-    
+
     sourcewh = None
 
     if source == "H":
@@ -165,7 +165,7 @@ def get_wormhole_type(system1, system2):
                 destination=destination).count() != 0:
             sourcewh = WormholeType.objects.filter(source="Z",
                     destination=destination).all()
-    
+
     if sourcewh == None:
         sourcewh = WormholeType.objects.filter(source=source,
                 destination=destination).all()
@@ -184,7 +184,7 @@ def get_possible_wh_types(system1, system2):
     # Get System1 > System2
 
     forward = get_wormhole_type(system1, system2)
-    
+
     # Get Reverse
 
     reverse = get_wormhole_type(system2, system1)
@@ -238,7 +238,7 @@ class RouteFinder(object):
         from core.models import SystemJump
         cache.set('sysJumps', 1)
         for sys in KSystem.objects.all():
-            cache.set(sys.pk, 
+            cache.set(sys.pk,
                     [i.tosystem for i in SystemJump.objects.filter(fromsystem=sys.pk).all()])
 
     def _dijkstra_route(self):

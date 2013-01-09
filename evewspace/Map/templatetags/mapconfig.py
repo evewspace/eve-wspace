@@ -11,7 +11,7 @@ def map_global_admin():
     """
     return {'maps': Map.objects.all(), 'destinations': Destination.objects.all(),
             'sigtypes': SignatureType.objects.all(),
-            'spawns': SiteSpawn.objects.all()}
+            'spawns': SiteSpawn.objects.all(),}
 
 
 @register.inclusion_tag('map_settings_single.html')

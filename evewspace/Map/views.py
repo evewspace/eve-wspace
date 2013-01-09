@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import Group, Permission
 from django.shortcuts import render, get_object_or_404
 from django.conf import settings
 from datetime import datetime, timedelta, time
@@ -374,6 +375,8 @@ def bulk_sig_import(request, mapID, msID):
         mapsystem.map.add_log(request.user,
                 "Imported %s signatures for %s(%s)." % (k, mapsystem.system.name,
                     mapsystem.friendlyname), True)
+        mapsystem.system.lastscanned = datetime.now(pytz.utc)
+        mapsystem.system.save()
         return HttpResponse('[]')
     else:
         return TemplateResponse(request, "bulk_sig_form.html", {'mapsys': mapsystem})
@@ -575,8 +578,7 @@ def create_map(request):
 def destination_list(request, mapID, msID):
     """
     Returns the destinations of interest list for K-space systems and
-    a blank response for w-space systems. The results are cached in the template
-    as long as possible since they will never change for a System.
+    a blank response for w-space systems.
     """
     #if not request.is_ajax():
     #    raise PermissionDenied
@@ -600,3 +602,184 @@ def site_spawns(request, mapID, msID, sigID):
         spawns = SiteSpawn.objects.filter(sigtype=sig.sigtype,
                 sysclass=sig.system.sysclass).all()
     return render(request, 'site_spawns.html', {'spawns': spawns})
+
+#########################
+#Settings Views         #
+#########################
+
+@permission_required('Map.map_admin')
+def general_settings(request):
+    """
+    Returns and processes the general settings section.
+    """
+    return TemplateResponse(request, 'general_settings.html',
+            {})
+
+
+@permission_required('Map.map_admin')
+def sites_settings(request):
+    """
+    Returns the site spawns section.
+    """
+    return TemplateResponse(request, 'spawns_settings.html',
+            {'spawns': SiteSpawn.objects.all()})
+
+
+@permission_required('Map.map_admin')
+def add_spawns(request):
+    """
+    Adds a site spawn.
+    """
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def delete_spawns(request, spawnID):
+    """
+    Deletes a site spawn.
+    """
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def edit_spawns(request, spawnID):
+    """
+    Alters a site spawn.
+    """
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def destination_settings(request):
+    """
+    Returns the destinations section.
+    """
+    return TemplateResponse(request, 'dest_settings.html',
+            {'destinations': Destination.objects.all()})
+
+
+@permission_required('Map.map_admin')
+def add_destination(request):
+    """
+    Add a destination.
+    """
+    system = get_object_or_404(KSystem, name=request.POST['systemName'])
+    Destination(system=system, capital=False).save()
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def delete_destination(request, destID):
+    """
+    Deletes a destination.
+    """
+    destination = get_object_or_404(Destination, pk=destID)
+    destination.delete()
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def sigtype_settings(request):
+    """
+    Returns the signature types section.
+    """
+    return TemplateResponse(request, 'sigtype_settings.html',
+            {'sigtypes': SignatureType.objects.all()})
+
+
+@permission_required('Map.map_admin')
+def edit_sigtype(request, sigtypeID):
+    """
+    Alters a signature type.
+    """
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def add_sigtype(request):
+    """
+    Adds a signature type.
+    """
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def delete_sigtype(request, sigtypeID):
+    """
+    Deletes a signature type.
+    """
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def map_settings(request, mapID):
+    """
+    Returns and processes the settings section for a map.
+    """
+    subject = get_object_or_404(Map, pk=mapID)
+    return TemplateResponse(request, 'map_settings_single.html',
+            {'map': subject})
+
+
+@permission_required('Map.map_admin')
+def delete_map(request, mapID):
+    """
+    Deletes a map.
+    """
+    subject = get_object_or_404(Map, pk=mapID)
+    subject.delete()
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def edit_map(request, mapID):
+    """
+    Alters a map.
+    """
+    return HttpResponse('[]')
+
+
+@permission_required('Map.map_admin')
+def global_permissions(request):
+    """
+    Returns and processes the global permissions section.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    group_list = []
+    admin_perm = Permission.objects.get(codename="map_admin")
+    unrestricted_perm = Permission.objects.get(codename="map_unrestricted")
+    add_map_perm = Permission.objects.get(codename="add_map")
+
+    if request.method == "POST":
+        for group in Group.objects.all():
+            if request.POST.get('%s_unrestricted' % group.pk, None):
+                if unrestricted_perm not in group.permissions.all():
+                    group.permissions.add(unrestricted_perm)
+            else:
+                if unrestricted_perm in group.permissions.all():
+                    group.permissions.remove(unrestricted_perm)
+
+            if request.POST.get('%s_add' % group.pk, None):
+                if add_map_perm not in group.permissions.all():
+                    group.permissions.add(add_map_perm)
+            else:
+                if add_map_perm in group.permissions.all():
+                    group.permissions.remove(add_map_perm)
+
+            if request.POST.get('%s_admin' % group.pk, None):
+                if admin_perm not in group.permissions.all():
+                    group.permissions.add(admin_perm)
+            else:
+                if admin_perm in group.permissions.all():
+                    group.permissions.remove(admin_perm)
+
+        return HttpResponse('[]')
+    for group in Group.objects.all():
+        entry = {'group': group, 'admin': admin_perm in group.permissions.all(),
+                'unrestricted': unrestricted_perm in group.permissions.all(),
+                'add_map': add_map_perm in group.permissions.all()}
+        group_list.append(entry)
+
+    return TemplateResponse(request, 'global_perms.html',
+            {'groups': group_list})

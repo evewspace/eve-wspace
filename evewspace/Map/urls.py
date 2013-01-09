@@ -35,12 +35,39 @@ mappatterns = patterns('Map.views',
         url(r'^$', 'get_map'),
         url(r'^update/$', 'map_checkin'),
         url(r'^refresh/$', 'map_refresh'),
+        url(r'^edit/$', 'edit_map'),
+        url(r'^delete/$', 'delete_map'),
         url(r'^system/new/$', 'add_system'),
         url(r'^system/(?P<msID>\d+)/', include(syspatterns)),
         url(r'^wormhole/(?P<whID>\d+)/', include(wormholepatterns)),
+        url(r'^settings/$', 'map_settings'),
+        )
+
+spawnspatterns = patterns('Map.views',
+        url(r'^edit/$', 'edit_spawns'),
+        url(r'^delete/$', 'delete_spawns'),
+        )
+
+sigtypepatterns = patterns('Map.views',
+        url(r'^edit/$', 'edit_sigtype'),
+        url(r'^delete/$', 'delete_sigtype'),
+        )
+
+settingspatterns = patterns('Map.views',
+        url(r'^general/$', 'general_settings'),
+        url(r'^sitespawns/$', 'sites_settings'),
+        url(r'^permissions/$', 'global_permissions'),
+        url(r'^sitespawns/add/$', 'add_spawns'),
+        url(r'^sitespawns/(?P<spawnID>\d+)/', include(spawnspatterns)),
+        url(r'^destinations/$', 'destination_settings'),
+        url(r'^destinations/new/$', 'add_destination'),
+        url(r'^destinations/(?P<destID>\d+)/delete/$', 'delete_destination'),
+        url(r'^sigtypes/$', 'sigtype_settings'),
+        url(r'^sigtypes/(?P<sigtypeID>\d+)/', include(sigtypepatterns)),
         )
 
 urlpatterns = patterns('Map.views',
         url(r'^new/$', 'create_map'),
         url(r'^(?P<mapID>\d+)/', include(mappatterns)),
+        url(r'^settings/', include(settingspatterns)),
         )

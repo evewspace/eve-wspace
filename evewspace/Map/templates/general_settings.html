@@ -1,0 +1,31 @@
+<form id="mapGeneralSettingsForm" action="map/settings/general/" method="post">
+    <table>
+        <tr>
+            <td>Default Display Mode (global):<br /><br /></td>
+            <td>Compact: <input type="radio" name="mapmode" value="compact">  Classic: <input type="radio" name="mapmode" value="classic"> <br /><br /></td>
+        </tr>
+        <tr>
+            <td>Last Scanned Warning Threshold (hours):</td>
+            <td><input type="text" class="input-mini" name="scanwarn" value="{{scanwarn}}"></td>
+        </tr>
+        <tr>
+            <td>System Interest Timeout (minutes):</td> 
+            <td><input type="text" class="input-mini" name="interesttimeout" value="{{interesttimeout}}"></td>
+        </tr>
+        <tr>
+            <td>NPC Kills Threshold:</td>
+            <td> <input type="text" class="input-mini" name="npcthreshold" value="{{npcthreshold}}"></td>
+        </tr>
+        <tr>
+            <td>PVP Kills Threshold (ships + pods):</td>
+            <td> <input type="text" class="input-mini" name="pvpthreshold" value="{{pvpthreshold}}"></td>
+        </tr>
+        <tr>
+            <td>Downtimes before Burning Escalation:</td>
+            <td> <input type="text" class="input-mini" name="escdowntimes" value="{{escdowntimes}}"></td>
+        </tr>
+    </table>
+    <br />
+    <input type="submit" value="Save Changes">
+</form>
+
