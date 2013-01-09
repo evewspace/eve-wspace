@@ -383,9 +383,9 @@ class MapPermission(models.Model):
 
 
 class MapLog(models.Model):
-    """Represents an action that has taken place on a map (e.g. adding a signature).
+    """
+    Represents an action that has taken place on a map (e.g. adding a signature).
     This is used for pushing updates since last page load to clients.
-
     """
     map = models.ForeignKey(Map, related_name="logentries")
     user = models.ForeignKey(User, related_name="maplogs")
