@@ -218,7 +218,10 @@ class Map(models.Model):
         return result
 
 class MapSystem(models.Model):
-    """Stores information regarding which systems are active in which maps at the present time."""
+    """
+    Stores information regarding which systems are active in which maps
+    at the present time.
+    """
     map = models.ForeignKey(Map, related_name="systems")
     system = models.ForeignKey(System, related_name="maps")
     friendlyname = models.CharField(max_length = 10)
@@ -267,10 +270,10 @@ class MapSystem(models.Model):
 
 
 class Wormhole(models.Model):
-    """An instance of a wormhole in a  map.
+    """
+    An instance of a wormhole in a  map.
     Wormhole have a 'top' and a 'bottom', the top refers to the
     side that is found first (and the bottom is obviously the other side)
-
     """
     map = models.ForeignKey(Map, related_name='wormholes')
     top = models.ForeignKey(MapSystem, related_name='child_wormholes')
@@ -285,9 +288,9 @@ class Wormhole(models.Model):
 
 
 class SignatureType(models.Model):
-    """Stores the list of possible signature types for the map tool.
+    """
+    Stores the list of possible signature types for the map tool.
     Custom signature types may be added at will.
-
     """
     shortname = models.CharField(max_length = 6)
     longname = models.CharField(max_length = 100)
@@ -337,7 +340,7 @@ class Signature(models.Model):
             if self.downtimes == 0:
                 self.downtimes = None
         self.save()
-    
+
     def clear_rats(self):
         """Toggles the NPCs cleared."""
         if not self.ratscleared:
@@ -375,7 +378,10 @@ class Signature(models.Model):
 
 
 class MapPermission(models.Model):
-    """Relates a user group to it's map permissions. Non-restricted groups will have change access to all maps."""
+    """
+    Relates a user group to it's map permissions.
+    Non-restricted groups will have change access to all maps.
+    """
     group = models.ForeignKey(Group, related_name="mappermissions")
     map = models.ForeignKey(Map, related_name="grouppermissions")
     access = models.IntegerField(choices=((0,'No Access'),
@@ -383,9 +389,9 @@ class MapPermission(models.Model):
 
 
 class MapLog(models.Model):
-    """Represents an action that has taken place on a map (e.g. adding a signature).
+    """
+    Represents an action that has taken place on a map (e.g. adding a signature).
     This is used for pushing updates since last page load to clients.
-
     """
     map = models.ForeignKey(Map, related_name="logentries")
     user = models.ForeignKey(User, related_name="maplogs")
@@ -443,9 +449,9 @@ class MapForm(ModelForm):
 
 
 class SignatureForm(ModelForm):
-    """This form should only be used with commit=False since it does not
+    """
+    This form should only be used with commit=False since it does not
     set the system or updated fields.
-
     """
     sigid = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-mini'}), label="ID:")
     sigtype = forms.ModelChoiceField(queryset=SignatureType.objects.all(), label="Type:", required=False)

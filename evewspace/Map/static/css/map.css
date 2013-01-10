@@ -86,6 +86,10 @@ body .dialog
 {
     margin-left: 46px;
 }
+.sysMenuDiv
+{
+    z-index: 1;
+}
 h5
 {
     text-align: center;
