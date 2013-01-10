@@ -10,7 +10,12 @@ def store(host, path, params, doc, obj):
     """Store an API document in our cache."""
     #First remove any outdated versions of the document.
     cacheKey = "%s%s%s" %(host, path, params)
-    cache.set(hash(cacheKey), zlib.compress(pickle.dumps(obj)), obj.cachedUntil - int(time.time()))
+    cacheTimer = obj.cachedUntil - int(time.time())
+    # If cacheTimer is negative or 0 (due to server clock inaccuracy)
+    # We will set a default cache timer of 60 seconds
+    if cacheTimer <= 0:
+        cacheTimer = 60
+    cache.set(hash(cacheKey), zlib.compress(pickle.dumps(obj)), cacheTimer)
 
 
 def retrieve(host, path, params):
