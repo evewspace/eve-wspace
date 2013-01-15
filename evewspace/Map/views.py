@@ -198,7 +198,7 @@ def add_system(request, mapID):
         bottomMS.connect_to(topMS, topType, bottomType, topBubbled,
                 bottomBubbled, timeStatus, massStatus)
 
-        return HttpResponse('[]')
+        return HttpResponse()
     except ObjectDoesNotExist:
         return HttpResponse(status=400)
 
@@ -211,7 +211,7 @@ def remove_system(request, mapID, msID):
     """
     system = get_object_or_404(MapSystem, pk=msID)
     system.remove_system(request.user)
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @login_required
@@ -275,7 +275,7 @@ def mark_scanned(request, mapID, msID):
         mapsys = get_object_or_404(MapSystem, pk=msID)
         mapsys.system.lastscanned = datetime.now(pytz.utc)
         mapsys.system.save()
-        return HttpResponse('[]')
+        return HttpResponse()
     else:
         raise PermissionDenied
 
@@ -290,7 +290,7 @@ def manual_location(request, mapID, msID):
         mapsystem = get_object_or_404(MapSystem, pk=msID)
         mapsystem.system.add_active_pilot(request.user, "OOG Browser",
                 "Unknown", "Uknown")
-        return HttpResponse("[]")
+        return HttpResponse()
     else:
         raise PermissionDenied
 
@@ -311,11 +311,11 @@ def set_interest(request, mapID, msID):
         if action == "set":
             system.interesttime = datetime.now(pytz.utc)
             system.save()
-            return HttpResponse('[]')
+            return HttpResponse()
         if action == "remove":
             system.interesttime = None
             system.save()
-            return HttpResponse('[]')
+            return HttpResponse()
         return HttpResponse(staus=418)
     else:
         raise PermissionDenied
@@ -377,7 +377,7 @@ def bulk_sig_import(request, mapID, msID):
                     mapsystem.friendlyname), True)
         mapsystem.system.lastscanned = datetime.now(pytz.utc)
         mapsystem.system.save()
-        return HttpResponse('[]')
+        return HttpResponse()
     else:
         return TemplateResponse(request, "bulk_sig_form.html", {'mapsys': mapsystem})
 
@@ -435,7 +435,7 @@ def mark_signature_cleared(request, mapID, msID, sigID):
         raise PermissionDenied
     sig = get_object_or_404(Signature, pk=sigID)
     sig.clear_rats()
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @login_required
@@ -448,7 +448,7 @@ def escalate_site(request, mapID, msID, sigID):
         raise PermissionDenied
     sig = get_object_or_404(Signature, pk=sigID)
     sig.escalate()
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @login_required
@@ -461,7 +461,7 @@ def activate_signature(request, mapID, msID, sigID):
         raise PermissionDenied
     sig = get_object_or_404(Signature, pk=sigID)
     sig.activate()
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @login_required
@@ -477,7 +477,7 @@ def delete_signature(request, mapID, msID, sigID):
     sig.delete()
     mapsys.map.add_log(request.user, "Deleted signature %s in %s (%s)."
             % (sig.sigid, mapsys.system.name, mapsys.friendlyname))
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @login_required
@@ -518,7 +518,7 @@ def edit_system(request, mapID, msID):
         mapSystem.save()
         mapSystem.map.add_log(request.user, "Edited System: %s (%s)"
                 % (mapSystem.system.name, mapSystem.friendlyname))
-        return HttpResponse('[]')
+        return HttpResponse()
     raise PermissionDenied
 
 
@@ -549,7 +549,7 @@ def edit_wormhole(request, mapID, whID):
         wormhole.map.add_log(request.user, "Updated the wormhole between %s(%s) and %s(%s)."
                 % (wormhole.top.system.name, wormhole.top.friendlyname,
                     wormhole.bottom.system.name, wormhole.bottom.friendlyname))
-        return HttpResponse('[]')
+        return HttpResponse()
 
     raise PermissiondDenied
 
@@ -587,7 +587,7 @@ def destination_list(request, mapID, msID):
     try:
         system = KSystem.objects.get(pk=mapsys.system.pk)
     except:
-        return HttpResponse('')
+        return HttpResponse()
     return render(request, 'system_destinations.html', {'system': system,
         'destinations': destinations})
 
@@ -630,7 +630,7 @@ def add_spawns(request):
     """
     Adds a site spawn.
     """
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @permission_required('Map.map_admin')
@@ -638,7 +638,7 @@ def delete_spawns(request, spawnID):
     """
     Deletes a site spawn.
     """
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @permission_required('Map.map_admin')
@@ -646,7 +646,7 @@ def edit_spawns(request, spawnID):
     """
     Alters a site spawn.
     """
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @permission_required('Map.map_admin')
@@ -665,7 +665,7 @@ def add_destination(request):
     """
     system = get_object_or_404(KSystem, name=request.POST['systemName'])
     Destination(system=system, capital=False).save()
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @permission_required('Map.map_admin')
@@ -675,7 +675,7 @@ def delete_destination(request, destID):
     """
     destination = get_object_or_404(Destination, pk=destID)
     destination.delete()
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @permission_required('Map.map_admin')
@@ -692,7 +692,7 @@ def edit_sigtype(request, sigtypeID):
     """
     Alters a signature type.
     """
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @permission_required('Map.map_admin')
@@ -700,7 +700,7 @@ def add_sigtype(request):
     """
     Adds a signature type.
     """
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @permission_required('Map.map_admin')
@@ -708,7 +708,7 @@ def delete_sigtype(request, sigtypeID):
     """
     Deletes a signature type.
     """
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @permission_required('Map.map_admin')
@@ -728,7 +728,7 @@ def delete_map(request, mapID):
     """
     subject = get_object_or_404(Map, pk=mapID)
     subject.delete()
-    return HttpResponse('[]')
+    return HttpResponse()
 
 
 @permission_required('Map.map_admin')
@@ -774,7 +774,7 @@ def global_permissions(request):
                 if admin_perm in group.permissions.all():
                     group.permissions.remove(admin_perm)
 
-        return HttpResponse('[]')
+        return HttpResponse()
     for group in Group.objects.all():
         entry = {'group': group, 'admin': admin_perm in group.permissions.all(),
                 'unrestricted': unrestricted_perm in group.permissions.all(),

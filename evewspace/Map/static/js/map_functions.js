@@ -2,22 +2,38 @@
 
 var loadtime = null;
 var paper = null;
-var objSystems = new Array();
+var objSystems = [];
+var sigTimerID;
+var updateTimerID;
 var indentX = 150; //The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180.
 var indentY = 64; // The amount of space (in px) between system ellipses on the Y axis
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map.
 
 
-$(document).ready(function(){setInterval(function(){doMapAjaxCheckin();}, 5000);});
+$(document).ready(function(){
+    updateTimerID = setInterval(function(){
+        doMapAjaxCheckin();
+    }, 5000);
+});
+
 $(document).ready(function(){
     $('#mapDiv').html(ajax_image);
     RefreshMap();
 });
 
+//Make sure timers stop when unloading the page
+$(document).ready(function(){
+    $(window).bind('unload', function(){
+        if (sigTimerID){
+            clearTimeout(sigTimerID);
+        }
+        clearTimeout(updateTimerID);
+    });
+});
 
 function processAjax(data){
-    if (data['dialogHTML']){
-        $(data['dialogHTML']).dialog({
+    if (data.dialogHTML){
+        $(data.dialogHTML).dialog({
             autoOpen: false,
             close: function(event, ui) { 
                 $(this).dialog("destroy");
@@ -26,11 +42,11 @@ function processAjax(data){
         });
         $('#igbAddDialog').dialog('open');
     }
-    if (data['logs']){
+    if (data.logs){
         if ($('#logList').length == 0){
-            $('#baseContentHeadDiv').append(data['logs']);
+            $('#baseContentHeadDiv').append(data.logs);
         }else{
-            $('#logList').replaceWith(data['logs']);
+            $('#logList').replaceWith(data.logs);
         }
     }
     
@@ -43,8 +59,7 @@ function doMapAjaxCheckin() {
         type: "POST",
         url: currentpath,
         data: {"loadtime": loadtime},
-        success: function(data) {processAjax(data);},
-        error: function(errorThrown) {alert("An error occurred querying the server.");}
+        success: function(data) {processAjax(data);}
         });
 }
 
@@ -55,28 +70,20 @@ function DisplaySystemDetails(msID, sysID){
         type: "GET",
         url: address,
         success: function(data){
-            if (!document.getElementById("sysInfoDiv")){
-                $('#baseContentDiv').append(data);
-            }
-            else{
-                $('#sysInfoDiv').html(data);
-            }
+            $('#sysInfoDiv').empty().html(data);
             LoadSignatures(msID, true);
             $.ajax({
                 type: "GET",
                 url: "system/" + msID +  "/signatures/new/",
                 success: function(data){
-                    $('#sys'+msID+'SigAddForm').html(data);
-                },
-                error: function(){
-                    alert("An error occured getting a blank signature add form.");
+                    $('#sys'+msID+'SigAddForm').empty().html(data);
+                    $('#id_sigid').focus();
                 }
             });
             GetPOSList(sysID);
             GetDestinations(msID);
             CloseSystemMenu();
-        },
-        error: function(errorThrown) {alert("An error occured building the details page.");}
+        }
     });
 }
 
@@ -87,8 +94,9 @@ function GetPOSList(sysID){
         type: "GET",
         url: address,
         success: function(data){
+            $('#sys' + sysID + "POSDiv").empty();
             $('#sys' + sysID + "POSDiv").html(data);
-        },
+        }
     });
 }
 
@@ -99,6 +107,7 @@ function GetDestinations(msID){
         type: "GET",
         url: address,
         success: function(data){
+            $('#systemDestinationsDiv').empty();
             $('#systemDestinationsDiv').html(data);
         }
     });
@@ -122,8 +131,7 @@ function DisplaySystemMenu(msID, x, y){
             div.style.top = y + 'px';
             div.style.left = x + 10 + 'px';
             div.style.visibility = "visible";
-        },
-        error: function(errorThrown) {alert("An error occured loading the system menu.");}
+        }
     });
 }
 
@@ -142,8 +150,7 @@ function MarkScanned(msID, fromPanel, sysID){
             }
             CloseSystemMenu();
 
-        },
-        error: function(errorThrown) {alert("An error occured marking the system scanned.");}
+        }
     });
 }
 
@@ -157,8 +164,7 @@ function SetInterest(msID){
         success: function(data) {
             CloseSystemMenu();
             RefreshMap();
-        },
-        error: function(errorThrown) {alert("An error occured setting the interest.");}
+        }
     });
    
 }
@@ -173,8 +179,7 @@ function RemoveInterest(msID){
         success: function(data) { 
             CloseSystemMenu();
             RefreshMap();
-        },
-        error: function(errorThrown) {alert("An error occured removing the interest.");}
+        }
     });
 
 }
@@ -188,8 +193,7 @@ function AssertLocation(msID){
         data: {},
         success: function(data) { 
             RefreshMap();
-        },
-        error: function(errorThrown) {alert("An error occured asserting your location.");}
+        }
     });
 }
 
@@ -203,10 +207,10 @@ function GetSystemTooltip(msID){
                 if ($(divName).length == 0){
                     div = $('<div></div>').html(data).attr('id','sys' + msID + 'Tip').addClass('systemTooltip').addClass('tip').appendTo('body');
                }else{
+                $(divName).empty();
                 $(divName).html(data);
                }
-        },
-            error: function(errorThrown) {alert("An error occured loading the tooltip.");}
+        }
             });
 }
 
@@ -226,8 +230,7 @@ function GetAddPOSDialog(sysID){
                 width: "400px"
             });
             $('#addPOSDialog').dialog('open');
-        },
-            error: function(errorThrown) {alert("An error occured loading the add POS box.");}
+        }
             });
 
 }
@@ -248,8 +251,7 @@ function GetSiteSpawns(msID, sigID){
                 width: "400px"
             });
             $('#siteSpawnsDialog').dialog('open');
-        },
-            error: function(errorThrown) {alert("An error occured loading the add POS box.");}
+        }
             });
 
 }
@@ -265,9 +267,6 @@ function AddPOS(sysID){
         data: $('#addPOSForm').serialize(),
         success: function(data){
             GetPOSList(sysID);
-        },
-        error: function(errorThrown){
-            alert("An error occured adding the POS, please check your input.");
         }
     });
 }
@@ -280,9 +279,6 @@ function DeletePOS(posID, sysID){
         url: address,
         success: function(){
             GetPOSList(sysID);
-        },
-        error: function(){
-            alert("Corp POSes cannot be deleted from the map.");
         }
     });
 }
@@ -317,9 +313,6 @@ function EditPOS(posID, sysID){
         data: $('#editPOSForm').serialize(),
         success: function(data){
             GetPOSList(sysID);
-        },
-        error: function(errorThrown){
-            alert("An error occured editing the POS, please check your input.");
         }
     });
 }
@@ -335,10 +328,10 @@ function GetWormholeTooltip(whID){
                 if ($(divName).length == 0){
                     div = $('<div></div>').html(data).attr('id','wh' + whID + 'Tip').addClass('wormholeTooltip').addClass('tip').appendTo('body');
                }else{
+                $(divName).empty();
                 $(divName).html(data);
                }
-        },
-            error: function(errorThrown) {alert("An error occured loading the wormhole tooltip.");}
+        }
             });
 }
 
@@ -355,9 +348,6 @@ function RefreshMap(){
             systemsJSON = $.parseJSON(newData[1]);
             loadtime = newData[0];
             StartDrawing();
-        },
-        error: function(errorThrown){
-            alert("An error occured reloading the map.");
         }
     });
 }
@@ -370,11 +360,9 @@ function EditSignature(msID, sigID){
         type: "POST",
         data: $("#sigEditForm").serialize(),
         success: function(data){
+            $('#sys' + msID + "SigAddForm").empty();
             $('#sys' + msID + "SigAddForm").html(data);
             LoadSignatures(msID, false);
-        },
-        error: function(){
-            alert("An error occured editing the signature.");
         }
     });
 }
@@ -386,10 +374,8 @@ function GetEditSignatureBox(msID, sigID){
         url: address,
         type: "GET",
         success: function(data){
+            $('#sys' + msID + "SigAddFOrm").empty();
             $('#sys' + msID + "SigAddForm").html(data);
-        },
-        error: function(){
-            alert("An error occured getting the edit sig form.");
         }
     });
 }
@@ -402,11 +388,10 @@ function AddSignature(msID){
         type: "POST",
         data: $("#sigAddForm").serialize(),
         success: function(data){
+            $('#sys' + msID + "SigAddFOrm").empty();
             $('#sys' + msID + "SigAddForm").html(data);
             LoadSignatures(msID, false);
-        },
-        error: function(){
-            alert("An error occured adding the signature.");
+            $('#id_sigid').focus();
         }
     });
 }
@@ -418,17 +403,19 @@ function LoadSignatures(msID, startTimer){
         url: address,
         type: "GET",
         success: function(data){
+            $('#sys' + msID + "Signatures").empty();
             $('#sys' + msID + "Signatures").html(data);
             if (startTimer){
-                setTimeout(function(){
+                //Cancel currently running timer if any
+                if (sigTimerID){
+                    clearTimeout(sigTimerID);
+                }
+                sigTimerID = setInterval(function(){
                     if (document.getElementById("sys" + msID + "Signatures")){
-                        LoadSignatures(msID, true);
+                    LoadSignatures(msID, true);
                     }
                 }, 5000);
             }
-        },
-        error: function(){
-            alert("An error occured loading the signature list.");
         }
     });
 }
@@ -441,9 +428,6 @@ function MarkCleared(sigID, msID){
         type: "POST",
         success: function(){
             LoadSignatures(msID, false);
-        },
-        error: function(){
-            alert("The signature action failed.");
         }
     });
 }
@@ -456,9 +440,6 @@ function MarkEscalated(sigID, msID){
         type: "POST",
         success: function(){
             LoadSignatures(msID, false);
-        },
-        error: function(){
-            alert("The signature action failed.");
         }
     });
 }
@@ -471,9 +452,6 @@ function MarkActivated(sigID, msID){
         type: "POST",
         success: function(){
             LoadSignatures(msID, false);
-        },
-        error: function(){
-            alert("The signature action failed.");
         }
     });
 }
@@ -486,9 +464,6 @@ function DeleteSignature(sigID, msID){
         type: "POST",
         success: function(){
             LoadSignatures(msID, false);
-        },
-        error: function(){
-            alert("The signature action failed.");
         }
     });
 }
@@ -511,9 +486,6 @@ function GetAddSystemDialog(msID){
                 }
             });
             $('#addSystemDialog').dialog('open');
-        },
-        eror: function(){
-            alert("Failed to get the add system dialog.");
         }
     });
 }
@@ -528,9 +500,6 @@ function AddSystem(){
         data: $('#sysAddForm').serialize(),
         success: function(data){
             setTimeout(function(){RefreshMap();}, 500);
-        },
-        error: function(errorThrown){
-            alert("An error occured adding the system to the map.");
         }
     });
 }
@@ -563,9 +532,6 @@ function GetBulkImport(msID){
                 }
             });
             $('#bulkSigDialog').dialog('open');
-        },
-        error: function(){
-            alert('There was an error getting the edit wormhole dialog.');
         }
     });
 }
@@ -585,9 +551,6 @@ function GetEditWormholeDialog(whID){
                 }
             });
             $('#editWormholeDialog').dialog('open');
-        },
-        error: function(){
-            alert('There was an error getting the edit wormhole dialog.');
         }
     });
 }
@@ -601,9 +564,6 @@ function EditWormhole(whID){
         data: $('#editWormholeForm').serialize(),
         success: function(){
             RefreshMap();
-        },
-        error: function(){
-            alert('There was an error editing the wormhole.');
         }
     });
 }
@@ -623,9 +583,6 @@ function GetEditSystemDialog(msID){
                 }
             });
             $('#editSystemDialog').dialog('open');
-        },
-        error: function(){
-            alert('There was an error getting the edit system dialog.');
         }
     });
 }
@@ -640,9 +597,6 @@ function EditSystem(msID){
         success: function(){
             RefreshMap();
             DisplaySystemDetails(msID);
-        },
-        error: function(){
-            alert('There was an error editing the system.');
         }
     });
 }
@@ -656,9 +610,6 @@ function DeleteSystem(msID){
         url: address,
         success: function(){
             setTimeout(function(){RefreshMap();}, 500);
-        },
-        error: function(){
-            alert("An error occured removing the system from the map.");
         }
     });
 }
