@@ -11,9 +11,7 @@ var renderWormholeTags = true; // Determines whether wormhole types are shown on
 
 
 $(document).ready(function(){
-    updateTimerID = setInterval(function(){
-        doMapAjaxCheckin();
-    }, 5000);
+    updateTimerID = setInterval(doMapAjaxCheckin, 5000);
 });
 
 $(document).ready(function(){
@@ -43,11 +41,8 @@ function processAjax(data){
         $('#igbAddDialog').dialog('open');
     }
     if (data.logs){
-        if ($('#logList').length == 0){
-            $('#baseContentHeadDiv').append(data.logs);
-        }else{
-            $('#logList').replaceWith(data.logs);
-        }
+        $('#logDiv').empty();
+        $('#logDiv').html(data.logs);
     }
     
 }
@@ -59,7 +54,7 @@ function doMapAjaxCheckin() {
         type: "POST",
         url: currentpath,
         data: {"loadtime": loadtime},
-        success: function(data) {processAjax(data);}
+        success: processAjax
         });
 }
 
