@@ -85,9 +85,21 @@ def edit_pos(request, sysID, posID):
         # Have the async worker update the corp just so that it is up to date
         tasks.update_corporation.delay(corp.id)
         if pos.status == 3:
-            delta = timedelta(days=int(request.POST['rfdays']), 
-                    hours=int(request.POST['rfhours']),
-                    minutes=int(request.POST['rfminutes']))
+            if request.POST['rfdays'] == '':
+                rf_days = 0
+            else:
+                rf_days = int(request.POST['rfdays'])
+            if request.POST['rfhours'] == '':
+                rf_hours = 0
+            else:
+                rf_hours = int(request.POST['rfhours'])
+            if request.POST['rfminutes'] == '':
+                rf_minutes = 0
+            else:
+                rf_minutes = int(request.POST['rfminutes'])
+            delta = timedelta(days=rf_days,
+                    hours=rf_hours,
+                    minutes=rf_minutes)
             pos.rftime = datetime.now(pytz.utc) + delta
         pos.save()
         if request.POST.get('dscan', None) == "1":
@@ -95,7 +107,7 @@ def edit_pos(request, sysID, posID):
         return HttpResponse('[]')
     else:
         fitting = pos.fitting.replace("<br />", "\n")
-        return TemplateResponse(request, 'edit_pos.html', {'system': system, 
+        return TemplateResponse(request, 'edit_pos.html', {'system': system,
             'pos': pos, 'fitting': fitting})
 
 
@@ -128,9 +140,21 @@ def add_pos(request, sysID):
         # Have the async worker update the corp just so that it is up to date
         tasks.update_corporation.delay(corp.id)
         if pos.status == 3:
-            delta = timedelta(days=int(request.POST['rfdays']), 
-                    hours=int(request.POST['rfhours']),
-                    minutes=int(request.POST['rfminutes']))
+            if request.POST['rfdays'] == '':
+                rf_days = 0
+            else:
+                rf_days = int(request.POST['rfdays'])
+            if request.POST['rfhours'] == '':
+                rf_hours = 0
+            else:
+                rf_hours = int(request.POST['rfhours'])
+            if request.POST['rfminutes'] == '':
+                rf_minutes = 0
+            else:
+                rf_minutes = int(request.POST['rfminutes'])
+            delta = timedelta(days=rf_days,
+                    hours=rf_hours,
+                    minutes=rf_minutes)
             pos.rftime = datetime.now(pytz.utc) + delta
         pos.save()
 
