@@ -15,13 +15,13 @@
         {% endif %}
         <strong>
         {% if system.sysclass = 7 %}
-        High Sec
+        High Sec ({{system.security|floatformat}})
         {% endif %}
         {% if system.sysclass = 8 %}
-        Low Sec
+        Low Sec ({{system.security|floatformat}})
         {% endif %}
         {% if system.sysclass = 9 %}
-        Null Sec
+        Null Sec ({{system.security|floatformat}})
         {% endif %}
     </strong>
     {% if system.sov %}
@@ -30,8 +30,9 @@
     {% endif %}
     </div>
     <br />
+    {% load humanize %}
     <span class="sysLastScanned label {% if scanwarning  %} label-warning {% endif %}">
-        Last Scanned: {{system.lastscanned|date:"Y-m-d H:i"}}
+        Last Scanned: {{system.lastscanned|naturaltime}}
     </span> 
     <br />
     <br />
