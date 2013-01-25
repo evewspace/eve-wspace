@@ -141,7 +141,7 @@ function MarkScanned(msID, fromPanel, sysID){
         success: function(data) { 
             GetSystemTooltip(msID);
             if (fromPanel){
-                DisplaySystemDetails(msID, sysID);
+                LoadSignatures(msID, false);
             }
             CloseSystemMenu();
 

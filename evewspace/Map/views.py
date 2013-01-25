@@ -323,10 +323,10 @@ def set_interest(request, mapID, msID):
 @login_required()
 @require_map_permission(permission=2)
 def add_signature(request, mapID, msID):
-    """This function processes the Add Signature form. GET gets the form
-    and POST submits it and returns either a blank JSON list or a form with errors.
+    """
+    This function processes the Add Signature form. GET gets the form
+    and POST submits it and returns either a blank form or one with errors.
     All requests should be AJAX.
-
     """
     if not request.is_ajax():
         raise PermissionDenied
@@ -340,6 +340,8 @@ def add_signature(request, mapID, msID):
             newSig.sigid = newSig.sigid.upper()
             newSig.updated = True
             newSig.save()
+            mapsystem.system.lastscanned = datetime.now(pytz.utc)
+            mapsystem.system.save()
             newForm = SignatureForm()
             mapsystem.map.add_log(request.user, "Added signature %s to %s (%s)."
                     % (newSig.sigid, mapsystem.system.name, mapsystem.friendlyname))
@@ -400,8 +402,14 @@ def edit_signature(request, mapID, msID, sigID):
             signature.sigid = request.POST['sigid'].upper()
             signature.updated = True
             signature.info = request.POST['info']
-            signature.sigtype = SignatureType.objects.get(pk=request.POST['sigtype'])
+            if request.POST['sigtype'] != '':
+                sigtype = SignatureType.objects.get(pk=request.POST['sigtype'])
+            else:
+                sigtype = None
+            signature.sigtype = sigtype
             signature.save()
+            mapsys.system.lastscanned = datetime.now(pytz.utc)
+            mapsys.system.save()
             mapsys.map.add_log(request.user, "Updated signature %s in %s (%s)" %
                     (signature.sigid, mapsys.system.name, mapsys.friendlyname))
             return TemplateResponse(request, "add_sig_form.html",
