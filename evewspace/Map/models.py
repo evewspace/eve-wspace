@@ -64,6 +64,9 @@ class System(SystemData):
     npckills = models.IntegerField(null=True, blank=True)
     podkills = models.IntegerField(null=True, blank=True)
     shipkills = models.IntegerField(null=True, blank=True)
+    updated = models.DateTimeField(null=True, blank=True)
+    first_visited = models.DateTimeField(null=True, blank=True)
+    last_visited = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         """Returns name of System as unicode representation"""
@@ -79,6 +82,15 @@ class System(SystemData):
         # Make sure any new lines in info or occupied are replaced with <br />
         self.info = self.info.replace("\n", "<br />")
         self.occupied = self.occupied.replace("\n", "<br />")
+        self.updated = datetime.now(pytz.utc)
+        if self.lastscanned < datetime.now(pytz.utc) - timedelta(days=3):
+            self.lastscanned = datetime.now(pytz.utc)
+        if not self.first_visited:
+            self.first_visited = datetime.now(pytz.utc)
+            self.last_visited = datetime.now(pytz.utc)
+        if self.last_visited < datetime.now(pytz.utc) - timedelta(days=2):
+            self.last_visited = datetime.now(pytz.utc)
+
         super(System, self).save(*args, **kwargs)
 
     def add_active_pilot(self, user, charname, shipname, shiptype):
@@ -285,7 +297,7 @@ class Wormhole(models.Model):
     time_status = models.IntegerField(choices = ((0, "Fine"), (1, "End of Life")))
     mass_status = models.IntegerField(choices = ((0, "No Shrink"),
         (1, "First Shrink"), (2, "Critical")))
-
+    updated = models.DateTimeField(auto_now=True)
 
 class SignatureType(models.Model):
     """

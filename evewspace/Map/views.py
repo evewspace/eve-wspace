@@ -514,10 +514,12 @@ def edit_system(request, mapID, msID):
             'occupied': occupied, 'info': info})
     if request.method == 'POST':
         mapSystem.friendlyname = request.POST.get('friendlyName', '')
-        mapSystem.system.info = request.POST.get('info', '')
-        mapSystem.system.occupied = request.POST.get('occupied', '')
-        mapSystem.system.save()
-        mapSystem.save()
+        if (mapSystem.system.info != request.POST.get('info','')) or (
+                mapSystem.system.occupied != request.POST.get('occupied','')):
+            mapSystem.system.info = request.POST.get('info', '')
+            mapSystem.system.occupied = request.POST.get('occupied', '')
+            mapSystem.system.save()
+            mapSystem.save()
         mapSystem.map.add_log(request.user, "Edited System: %s (%s)"
                 % (mapSystem.system.name, mapSystem.friendlyname))
         return HttpResponse()
