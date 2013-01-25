@@ -90,6 +90,10 @@ body .dialog
 {
     margin-left: 46px;
 }
+.wormholeInfo
+{
+    text-align: center;
+}
 .sysMenuDiv
 {
     z-index: 1;

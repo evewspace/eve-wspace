@@ -1,6 +1,8 @@
 {% load humanize %}
 <div class="wormholeInfo">
-    <div class="row">
+    {% load humanize %}
+        <span class="whUpdateTime label label-info">Updated: {{wh.updated|naturaltime}}</span>
+   <div class="row">
         <div class="wormholeSideDiv span2">
             <h4>{{wh.top.system.name}}</h4>
             <span class="wormholeType">Type: {{wh.top_type.name}} ({{wh.top_type.dest_string}})</span><br />
