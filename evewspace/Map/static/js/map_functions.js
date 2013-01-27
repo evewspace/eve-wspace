@@ -364,7 +364,7 @@ function EditSignature(msID, sigID){
 
 
 function GetEditSignatureBox(msID, sigID){
-    address = "system/" + msID + "/signatures/" + sigID + "/edit";
+    address = "system/" + msID + "/signatures/" + sigID + "/edit/";
     $.ajax({
         url: address,
         type: "GET",

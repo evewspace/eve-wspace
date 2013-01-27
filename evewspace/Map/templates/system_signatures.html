@@ -1,11 +1,3 @@
-<div clas="sysLSdiv">
-    <span class="sysLastScanned label {% if scanwarning  %} label-warning {% endif %}">
-        {% load humanize %}
-    Last Scanned: {{system.system.lastscanned|date:"Y-m-d H:i"}} ({{system.system.lastscanned|naturaltime}})
-    </span> &nbsp 
-    <i id="markScanned" onclick="MarkScanned({{system.pk}}, true, {{system.system.pk}});" class="icon-refresh" title="Mark Scanned"></i>
-    <br />
-</div>
 <table class="sysSigsTable">
     <tr>
     <th>Actions</th>
