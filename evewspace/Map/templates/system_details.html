@@ -59,9 +59,11 @@
     <span class="sysFirstVisit">First Visited: {{system.first_visited|naturaltime}}</span>
     <br />
     <br />
-    <p class="occupiedText label label-important"><span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p>
-    <p class="infoText label label-info"><span class="infoTitle">Info:</span> <br /> {{system.info|safe}} </p>
-    <p class="sysInfoUpdated label label-success">Info Updated: {{system.updated|naturaltime}}</p>
+    <div class="row detailsLeft">
+    <p class="occupiedText label label-important"><span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p><br />
+    <p class="infoText label label-info"><span class="infoTitle">Info:</span> <br /> {{system.info|safe}} </p><br />
+    <p class="sysInfoUpdated label label-success">Info Updated: {{system.updated|naturaltime}}</p><br />
+</div>
 </div>
     <div class="row sysDetailsFooter">
      <div id="systemStatsPanel" class="systemStatsPanel span2">

@@ -1,7 +1,3 @@
-body .dialog
-{
-    width: 40%;
-}
 .mapDiv
 {
     margin-top:10px;
@@ -40,20 +36,22 @@ body .dialog
 .occupiedText
 {
     text-align: left;
+    width: 100%;
+}
+.detailsLeft
+{
+    text-align: left;
 }
 .infoText
 {
     text-align: left;
+    width: 100%;
 }
 .sysInfoUpdated
 {
     text-align: left;
 }
 .infoTitle
-{
-    text-align: center;
-}
-.occupiedTitle
 {
     text-align: center;
 }

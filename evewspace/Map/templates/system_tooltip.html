@@ -36,12 +36,12 @@
     </span> 
     <br />
     <br />
-    <p class="statusText label label-success">SIG: {{system.signatures.count}} POS: {{system.poses.count}} Pilots: {{system.active_pilots.count}}</p>
+    <p class="statusText label label-success">SIG: {{system.signatures.count}} POS: {{system.poses.count}} Pilots: {{system.active_pilots.count}}</p><br />
     {% if system.occupied %}
-    <p class="occupiedTooltip label label-important"> Occupied: <br /> {{system.occupied|safe}}</p>
+    <p class="occupiedTooltip label label-important"> Occupied: <br /> {{system.occupied|safe}}</p><br />
     {% endif %}
     {% if system.info %}
-    <p class="infoTooltip label label-info"> Info: <br /> {{system.info|safe}} </p>
+    <p class="infoTooltip label label-info"> Info: <br /> {{system.info|safe}} </p> <br />
     {% endif %}
     <p class="statsText label label-inverse"> NPC: {{system.npckills}} Ship: {{system.shipkills}} Pod: {{system.podkills}}{% if system.sysclass > 6 %} Jumps: {{system.jumps}} {% endif %}</p> 
 </div>

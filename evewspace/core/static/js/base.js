@@ -22,36 +22,56 @@ $.ajaxSetup({
 });
 //Live binding for system name autocompletes
 $(document).on("focus", ".systemAuto", function(){
-       $(this).autocomplete({
-        source: "/search/system/",
-        minLength: 2
+       $(this).typeahead({
+            source: function(query, process){
+                 $.get('/search/system/', {'term': query}, function(data){
+                    process(JSON.parse(data));
+                });
+            }
        });
+       //$(this).autocomplete({
+       // source: "/search/system/",
+       // minLength: 2
+       //});
 });
 //Live binding for wormhole type autocompletes
 $(document).on("focus", ".wormholeAuto", function(){
-        $(this).autocomplete({
-            source: "/search/whtype/",
-            minLength: 1
-        });
+        $(this).typeahead({
+            source: function(query, process){
+                 $.get('/search/whtype/', {'term': query}, function(data){
+                    process(JSON.parse(data));
+                });
+            }
+       });
+
  });
 //Live binding for item type autocompletes
 $(document).on("focus", ".typeAuto", function(){
-        $(this).autocomplete({
-            source: "/search/item/",
-            minLength: 2
-        });
+      $(this).typeahead({
+            source: function(query, process){
+                 $.get('/search/item/', {'term': query}, function(data){
+                    process(JSON.parse(data));
+                });
+            }
+       });
 });
 //Live binding for site name autocompletes
 $(document).on("focus", ".siteAuto", function(){
-    $(this).autocomplete({
-        source: "/search/site",
-        minLength: 2
-    });
+       $(this).typeahead({
+            source: function(query, process){
+                 $.get('/search/site/', {'term': query}, function(data){
+                    process(JSON.parse(data));
+                });
+            }
+       });
 });
 //Live binding for corp name autocompletes
 $(document).on("focus", ".corpAuto", function(){
-    $(this).autocomplete({
-        source: "/search/corp",
-        minlength: 2
-    });
+        $(this).typeahead({
+            source: function(query, process){
+                 $.get('/search/corp/', {'term': query}, function(data){
+                    process(JSON.parse(data));
+                });
+            }
+       });
 });

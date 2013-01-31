@@ -471,16 +471,10 @@ function GetAddSystemDialog(msID){
     $.ajax({
         url: address,
         type: "GET",
-        async: false,
         success: function(data){
-            $(data).dialog({
-                autoOpen: false,
-                close: function(event, ui) { 
-                $(this).dialog("destroy");
-                $(this).remove();
-                }
-            });
-            $('#addSystemDialog').dialog('open');
+            $('#modalHolder').empty()
+            $('#modalHolder').html(data);
+            $('#modalHolder').modal('show');
         }
     });
 }
