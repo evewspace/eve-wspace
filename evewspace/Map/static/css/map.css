@@ -116,6 +116,7 @@ td
 }
 .tip {
   background: #eee;
+  opacity: 100%;
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 8px;
