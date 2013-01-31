@@ -35,7 +35,6 @@ function processAjax(data){
                 $('#modalHolder').html(data);
                 $('#modalHolder').modal();
             }
-    }
     if (data.logs){
         $('#logDiv').empty();
         $('#logDiv').html(data.logs);
