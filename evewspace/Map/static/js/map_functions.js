@@ -32,7 +32,7 @@ $(document).ready(function(){
 function processAjax(data){
     if (data.dialogHTML){
                 $('#modalHolder').empty();
-                $('#modalHolder').html(data);
+                $('#modalHolder').html(data.dialogHTML);
                 $('#modalHolder').modal();
             }
     if (data.logs){
