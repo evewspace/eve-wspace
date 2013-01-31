@@ -212,42 +212,29 @@ function GetSystemTooltip(msID){
 
 function GetAddPOSDialog(sysID){
     address = "/pos/" + sysID + "/add/";
-    $.ajax({
-        type: "GET",
+   $.ajax({
         url: address,
+        type: "GET",
         success: function(data){
-             $(data).dialog({
-                autoOpen: false,
-                close: function(event, ui) { 
-                $(this).dialog("destroy");
-                $(this).remove();
-                },
-                width: "400px"
-            });
-            $('#addPOSDialog').dialog('open');
+            $('#modalHolder').empty()
+            $('#modalHolder').html(data);
+            $('#modalHolder').modal('show');
         }
-            });
-
+    });
 }
 
 
 function GetSiteSpawns(msID, sigID){
     address = "system/" + msID + "/signatures/" + sigID + /spawns/;
-    $.ajax({
-        type: "GET",
+   $.ajax({
         url: address,
+        type: "GET",
         success: function(data){
-             $(data).dialog({
-                autoOpen: false,
-                close: function(event, ui) { 
-                $(this).dialog("destroy");
-                $(this).remove();
-                },
-                width: "400px"
-            });
-            $('#siteSpawnsDialog').dialog('open');
+            $('#modalHolder').empty()
+            $('#modalHolder').html(data);
+            $('#modalHolder').modal('show');
         }
-            });
+    });
 
 }
 
@@ -281,19 +268,13 @@ function DeletePOS(posID, sysID){
 
 function GetEditPOSDialog(posID, sysID){
     address= "/pos/" + sysID + "/" + posID + "/edit/";
-    $.ajax({
-        type: "GET",
+         $.ajax({
         url: address,
+        type: "GET",
         success: function(data){
-             $(data).dialog({
-                autoOpen: false,
-                width: "400px",
-                close: function(event, ui) { 
-                $(this).dialog("destroy");
-                $(this).remove();
-                },
-            });
-             $('#editPOSDialog').dialog('open');
+            $('#modalHolder').empty()
+            $('#modalHolder').html(data);
+            $('#modalHolder').modal('show');
         }
     });
 }
@@ -509,18 +490,13 @@ function BulkImport(msID){
 
 function GetBulkImport(msID){
     address= "system/" + msID + "/signatures/bulkadd/";
-    $.ajax({
-        type: "GET",
+     $.ajax({
         url: address,
+        type: "GET",
         success: function(data){
-            $(data).dialog({
-                autoOpen: false,
-                close: function(event, ui) { 
-                $(this).dialog("destroy");
-                $(this).remove();
-                }
-            });
-            $('#bulkSigDialog').dialog('open');
+            $('#modalHolder').empty()
+            $('#modalHolder').html(data);
+            $('#modalHolder').modal('show');
         }
     });
 }
@@ -528,20 +504,16 @@ function GetBulkImport(msID){
 
 function GetEditWormholeDialog(whID){
     address= "wormhole/" + whID + "/edit/";
-    $.ajax({
-        type: "GET",
+     $.ajax({
         url: address,
+        type: "GET",
         success: function(data){
-            $(data).dialog({
-                autoOpen: false,
-                close: function(event, ui) { 
-                $(this).dialog("destroy");
-                $(this).remove();
-                }
-            });
-            $('#editWormholeDialog').dialog('open');
+            $('#modalHolder').empty()
+            $('#modalHolder').html(data);
+            $('#modalHolder').modal('show');
         }
     });
+
 }
 
 
@@ -560,18 +532,13 @@ function EditWormhole(whID){
 
 function GetEditSystemDialog(msID){
     address= "system/" + msID + "/edit/";
-    $.ajax({
-        type: "GET",
+       $.ajax({
         url: address,
+        type: "GET",
         success: function(data){
-            $(data).dialog({
-                autoOpen: false,
-                close: function(event, ui) { 
-                $(this).dialog("destroy");
-                $(this).remove();
-                }
-            });
-            $('#editSystemDialog').dialog('open');
+            $('#modalHolder').empty()
+            $('#modalHolder').html(data);
+            $('#modalHolder').modal('show');
         }
     });
 }

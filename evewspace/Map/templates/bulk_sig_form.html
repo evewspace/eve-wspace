@@ -1,4 +1,8 @@
-<div id="bulkSigDialog" title="Signature Import: {{mapsys.system.name}}">
+<div id="bulkSigDialog">
+    <div class="modal-header">
+        <h4>Signature Import: {{mapsys.system.name}}</h4>
+    </div>
+    <div class="modal-body">
     <form id="bulkSigForm" class="bulkSigForm" method="port" action="system/{{mapsys.pk}}/signatures/bulkadd/">
         <p class="text-info">
         To use this feature, copy your in-game signature list and paste it here. Signature ID must be the first column in your signature list for this to work.<br /><br />
@@ -6,15 +10,21 @@
         </p>
         <textarea name="paste" id="pasteField" rows=8></textarea><br />
         <br />
-        <input class="btn btn-primary" type="submit" value="Import Sigs">
     </form>
+    <div class="modal-footer">
+        <a href="#" id="btnImport" class="btn btn-primary">Import Sigs</a>
+    </div>
+</div>
     <script type="text/javascript">
         $('#bulkSigForm').submit(function(e){
                     e.preventDefault();
                     BulkImport({{mapsys.pk}});
-                    $('#bulkSigDialog').dialog('close');
-                    $('#bulkSigDialog').remove();
+                    $('#modalHolder').modal('hide');
                     return false;
+                    });
+        $('#btnImport').click(function(e){
+                    BulkImport({{mapsys.pk}});
+                    $('#modalHolder').modal('hide');
                 });
     </script>
 </div>

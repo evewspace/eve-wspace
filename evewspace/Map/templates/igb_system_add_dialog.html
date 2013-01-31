@@ -1,4 +1,8 @@
-<div id="igbAddDialog" class="igbAddDialog" title="You've entered an unmapped system!">
+<div id="igbAddDialog" class="igbAddDialog">
+    <div class="modal-header">
+        <h4>You have entered an unmapped system!</h4>
+    </div>
+    <div class="modal-body">
     <form id="sysAddForm" action="system/new/" method="post">
         {% csrf_token %}
         <input type="hidden" class="sysAddInput" name="topMsID" value="{{oldsystem.pk}}">
@@ -43,14 +47,22 @@
         <br />
         <input id="sysAddSubmit" class="sysAddInput btn btn-primary" type="submit" value="Add System">
     </form>
+</div>
+<div class="modal-footer">
+    <a href="#" class="btn" id="btnClose">Don't Add</a>
+    <a href="#" class="btn btn-primary" id="btnIGBAdd">Add System</a>
+</div>
         <script type="text/javascript">
             $('#sysAddForm').submit(function(e){
                         e.preventDefault();
                         AddSystem();
-                        $('#igbAddDialog').dialog('close');
-                        $('#igbAddDialog').remove();
+                        $('#modalHolder').modal('hide');
                         return false;
-            });
+                        });
+            $('#btnIGBAdd').click(function(e){
+                        AddSystem();
+                        $('#modalHolder').modal('hide');
+                    });
         </script>
 
 </div>

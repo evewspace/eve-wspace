@@ -1,22 +1,36 @@
-<div id="editSystemDialog" title="Edit System Information">
+<div id="editSystemDialog">
+    <div class="modal-header">
+        <h4>Edit System: {{mapsys.system.name}}({{mapsys.friendlyname}})</h4>
+    </div>
+    <div class="modal-body">
     <form id="editSystemForm" class="editSystemForm" method="post" action="system/{{mapsys.pk}}/edit/">
         {% csrf_token %}
         <h4>Friendly Name:</h4> 
         <input type="text" id="friendlyField" name="friendlyName" value="{{mapsys.friendlyname}}">
         <h4>Info: </h4>
-        <textarea name="info" id="infoField" rows=8 cols=50>{{info}}</textarea> 
+        <textarea name="info" style="color: #000000;" id="infoField" rows=8 cols=50>{{info}}</textarea> 
         <h4>Occupied: </h4>
-        <textarea name="occupied" id="occupiedField" rows=8 cols=50 >{{occupied}}</textarea><br />
+        <textarea name="occupied" style="color: #000000;" id="occupiedField" rows=8 cols=50 >{{occupied}}</textarea><br />
         <br />
-        <input class="btn btn-primary" type="submit" value="Save Info">
     </form>
+</div>
+<div class="modal-footer">
+    <a href="#" class="btn" id="btnClose">Cancel</a>
+    <a href="#" class="btn btn-primary" id="btnEditSys">Edit Info</a>
+</div>
     <script type="text/javascript">
         $('#editSystemForm').submit(function(e){
             e.preventDefault();
             EditSystem({{mapsys.pk}});
-            $('#editSystemDialog').dialog('close');
-            $('#editSystemDialog').remove();
+            $('#modalHolder').modal('hide');
             return false;
+            });
+        $('#btnEditSys').click(function(e){
+            EditSystem({{mapsys.pk}});
+            $('#modalHolder').modal('hide');
+            });
+        $('#btnClose').click(function(e){
+            $('#modalHolder').modal('hide');
             });
     </script>
 </div>

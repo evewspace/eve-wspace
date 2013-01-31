@@ -1,4 +1,8 @@
 <div id="editWormholeDialog">
+    <div class="modal-header">
+        <h4>Edit Wormhole</h4>
+    </div>
+    <div class="modal-body">
     <form id="editWormholeForm" class="editWormholeForm" method="post" action="wormhole/{{wormhole.pk}}/edit/">
         {% csrf_token %}
         <h4>Wormhole Status:</h4>
@@ -13,36 +17,38 @@
         <br />
         <h4>Wormhole in: {{wormhole.top.system.name}}</h4>
         Type: &nbsp
-        <input type="text" id="topType" class="editWormholeInput" name="topType" value="{{wormhole.top_type.name}}">
+        <input type="text" id="topType" class="editWormholeInput wormholeAuto" name="topType" value="{{wormhole.top_type.name}}">
         <br />
         Bubbled: &nbsp <input type="radio" class="editWormholeInput" name="topBubbled" value="0" {% if not wormhole.top_bubbled %} checked="checked" {% endif %}> No &nbsp
         <input type="radio" class="editWormholeInput" name="topBubbled" value="1" {% if wormhole.top_bubbled %} checked="checked" {% endif %}> Yes
         <br />
         <h4>Wormhole in: {{wormhole.bottom.system.name}}</h4>
         Type: &nbsp
-        <input type="text" id="bottomType" class="editWormholeInput" name="bottomType" value="{{wormhole.bottom_type.name}}">
+        <input type="text" id="bottomType" class="editWormholeInput wormholeAuto" name="bottomType" value="{{wormhole.bottom_type.name}}">
         <br />
         Bubbled: &nbsp <input type="radio" class="editWormholeInput" name="bottomBubbled" value="0" {% if not wormhole.bottom_bubbled %} checked="checked" {% endif %}> No &nbsp
          <input type="radio" class="editWormholeInput" name="bottomBubbled" value="1" {% if wormhole.bottom_bubbled %} checked="checked" {% endif %}> Yes
         <br />
         <br />
-        <input class="btn btn-primary" type="submit" value="Save Wormhole">       
     </form>
+</div>
+<div class="modal-footer">
+    <a href="#" class="btn" id="btnClose">Cancel</a>
+    <a href="#" class="btn btn-primary" id="btnEditWH">Save Wormhole</a>
+</div>
     <script type="text/javascript">
-        $('#topType').autocomplete({
-                    source: "/search/whtype/",
-                    minLength: 1
-                    });
-        $('#bottomType').autocomplete({
-                    source: "/search/whtype/",
-                    minLength: 1
-                    });
         $('#editWormholeForm').submit(function(e){
                     e.preventDefault();
                     EditWormhole({{wormhole.pk}});
-                    $('#editWormholeDialog').dialog('close');
-                    $('#editWormholeDialog').remove();
+                    $('#modalHolder').modal('hide');
                     return false;
+                    });
+        $('#btnClose').click(function(e){
+                    $('#modalHolder').modal('hide');
+                    });
+        $('#btnEditWH').click(function(e){
+                    EditWormhole({{wormhole.pk}});
+                    $('#modalHolder').modal('hide');
                     });
     </script>
 </div>

@@ -1,4 +1,8 @@
 <div title="Add Starbase" id="addPOSDialog" class="addPOSDialog">
+    <div class="modal-header">
+        <h4>Add POS: {{system.name}}</h4>
+    </div>
+    <div class="modal-body">
     <form id="addPOSForm" action="/pos/{{system.pk}}/add" method="POST">
         {% csrf_token %}
         Full Corp Name: <input id="corpBox" class="corpAuto" name="corp" type="text" > <br />
@@ -21,8 +25,12 @@
         <br />Fitting: <br />
         <textarea cols=40 rows=10 name="fitting"></textarea><br />
         Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1"> <br />
-        <input class="btn btn-primary" type="submit" value="Add POS">
     </form>
+</div>
+    <div class="modal-footer">
+        <a href="#" class="btn" onclick="$('#modalHolder').modal('hide');">Cancel</a>
+        <a href="#" class="btn btn-primary" id="btnAddPOS">Add POS</a>
+    </div>
     <script type="text/javascript">
     function Test(rad){
         var rads=document.getElementsByName(rad.name);
@@ -31,9 +39,12 @@
     $('#addPOSForm').submit(function(e){
                 e.preventDefault();
                 AddPOS({{system.pk}});
-                $('#addPOSDialog').dialog('close');
-                $('#addPOSDialog').remove();
+                $('#modalHolder').modal('hide');
                 return false;
-            });
+                });
+    $('#btnAddPOS').click(function(e){
+                AddPOS({{system.pk}});
+                $('#modalHolder').modal('hide');
+                });
     </script>
 </div>

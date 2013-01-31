@@ -1,4 +1,8 @@
-<div title="Site Spawns" class="siteSpawnsDialog" id="siteSpawnsDialog">
+<div class="siteSpawnsDialog" id="siteSpawnsDialog">
+    <div class="modal-header">
+        <h4>Site Spawns</h4>
+    </div>
+    <div class="modal-body">
     <div class="accordion" id="spawnsAccordion">
     {% for s in spawns %}
     <div class="accordion-group">
@@ -12,5 +16,9 @@
     {% empty %}
         <span label="label label-inverse">There are no site spawns recorded for this signature.</span>
     {% endfor %}
+</div>
+</div>
+<div class="modal-footer">
+    <a href="#" class="btn btn-primary" onclick="$('#modalHolder').modal('hide');">Close</a>
 </div>
 </div>
