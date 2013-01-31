@@ -35,8 +35,6 @@ function processAjax(data){
                 $('#modalHolder').html(data);
                 $('#modalHolder').modal();
             }
-        });
-        $('#igbAddDialog').dialog('open');
     }
     if (data.logs){
         $('#logDiv').empty();
