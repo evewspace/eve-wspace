@@ -20,4 +20,38 @@ $.ajaxSetup({
         //}
     }
 });
-
+//Live binding for system name autocompletes
+$(document).on("focus", ".systemAuto", function(){
+       $(this).autocomplete({
+        source: "/search/system/",
+        minLength: 2
+       });
+});
+//Live binding for wormhole type autocompletes
+$(document).on("focus", ".wormholeAuto", function(){
+        $(this).autocomplete({
+            source: "/search/whtype/",
+            minLength: 1
+        });
+ });
+//Live binding for item type autocompletes
+$(document).on("focus", ".typeAuto", function(){
+        $(this).autocomplete({
+            source: "/search/item/",
+            minLength: 2
+        });
+});
+//Live binding for site name autocompletes
+$(document).on("focus", ".siteAuto", function(){
+    $(this).autocomplete({
+        source: "/search/site",
+        minLength: 2
+    });
+});
+//Live binding for corp name autocompletes
+$(document).on("focus", ".corpAuto", function(){
+    $(this).autocomplete({
+        source: "/search/corp",
+        minlength: 2
+    });
+});
