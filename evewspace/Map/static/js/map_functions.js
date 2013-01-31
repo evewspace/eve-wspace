@@ -31,11 +31,9 @@ $(document).ready(function(){
 
 function processAjax(data){
     if (data.dialogHTML){
-        $(data.dialogHTML).dialog({
-            autoOpen: false,
-            close: function(event, ui) { 
-                $(this).dialog("destroy");
-                $(this).remove();
+                $('#modalHolder').empty();
+                $('#modalHolder').html(data);
+                $('#modalHolder').modal();
             }
         });
         $('#igbAddDialog').dialog('open');
