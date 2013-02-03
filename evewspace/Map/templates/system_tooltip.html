@@ -1,6 +1,6 @@
-<div class="mapSysInfo">
+<div class="mapSysInfo row">
+   <div class="sysClassSpan span3">
          <h4 class="sysFriendlySpan">{{mapsys.friendlyname}}</h4>
-   <div class="sysClassSpan">
         {% if system.sysclass < 7 %}
         <div> 
             <strong>Class: {{system.sysclass}}</strong>
@@ -28,14 +28,13 @@
         <br />
         <strong>Sov: {{system.sov}}</strong>
     {% endif %}
-    </div>
     <br />
     {% load humanize %}
-    <span class="sysLastScanned label {% if scanwarning  %} label-warning {% endif %}">
+    <span class="sysLastScanned label {% if scanwarning  %} label-important {% endif %}">
         Last Scanned: {{system.lastscanned|naturaltime}}
-    </span> 
-    <br />
-    <br />
+    </span><br /> 
+     <span class="statsText label label-inverse"> NPC: {{system.npckills}} Ship: {{system.shipkills}} Pod: {{system.podkills}}{% if system.sysclass > 6 %} Jumps: {{system.jumps}} {% endif %}</span> 
+     <br /> 
     <p class="statusText label label-success">SIG: {{system.signatures.count}} POS: {{system.poses.count}} Pilots: {{system.active_pilots.count}}</p><br />
     {% if system.occupied %}
     <p class="occupiedTooltip label label-important"> Occupied: <br /> {{system.occupied|safe}}</p><br />
@@ -43,5 +42,29 @@
     {% if system.info %}
     <p class="infoTooltip label label-info"> Info: <br /> {{system.info|safe}} </p> <br />
     {% endif %}
-    <p class="statsText label label-inverse"> NPC: {{system.npckills}} Ship: {{system.shipkills}} Pod: {{system.podkills}}{% if system.sysclass > 6 %} Jumps: {{system.jumps}} {% endif %}</p> 
+</div>
+{% if system.active_pilots.all %}
+    <div class="span3">
+            <table>
+                <tr>
+                    <th>Pilot</th>
+                    <th>Ship Type</th>
+                </tr>
+            {% for p in system.active_pilots.all %}
+                {% if p.charactername != "OOG Browser" %}
+                <tr>
+                    <td>{{p.charactername}}</td>
+                    <td>{{p.shiptype}}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td>{{p.user.username}}</td>
+                    <td>OOG Browser</td>
+                </tr>
+                {% endif%}
+            {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+    </div>
 </div>
