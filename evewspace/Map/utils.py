@@ -72,6 +72,11 @@ class MapJSONGenerator(object):
             path = False
         activity_estimate = (system.system.podkills + system.system.npckills +
                 system.system.shipkills)
+        from Map.models import WSystem
+        if system.system.is_wspace():
+            effect = WSystem.objects.get(pk=system.system.pk).effect
+        else:
+            effect = None
         if system.parentsystem:
             parentWH = system.parent_wormholes.get()
             result = {'sysID': system.system.pk, 'Name': system.system.name,
@@ -87,7 +92,8 @@ class MapJSONGenerator(object):
                     'WhToParentBubbled': parentWH.bottom_bubbled,
                     'WhFromParentBubbled': parentWH.top_bubbled,
                     'imageURL': self.get_system_icon(system),
-                    'whID': parentWH.pk, 'msID': system.pk}
+                    'whID': parentWH.pk, 'msID': system.pk,
+                    'effect': effect}
         else:
             result = {'sysID': system.system.pk, 'Name': system.system.name,
                     'LevelX': levelX, 'activity': activity_estimate,
@@ -99,7 +105,8 @@ class MapJSONGenerator(object):
                     'WhMassStatus': None, 'WhTimeStatus': None,
                     'WhToParentBubbled': None, 'WhFromParentBubbled': None,
                     'imageURL': self.get_system_icon(system),
-                    'whID': None, 'msID': system.pk}
+                    'whID': None, 'msID': system.pk,
+                    'effect': effect}
         return result
 
 

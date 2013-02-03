@@ -12,14 +12,10 @@
 </table>
 <form id="addDestinationForm" method="post" action="/map/settings/destinations/new/">
     <h4>Add Destination:</h4>
-    System: <input type="text" id="sysNameBox" name="systemName"> &nbsp
-    <input type="submit" value="Add Destination">
+    System: <input type="text" class="systemAuto" id="sysNameBox" name="systemName"> &nbsp
+    <input type="submit" class="btn btn-primary" value="Add Destination">
 </form>
 <script type="text/javascript">
-    $('#sysNameBox').autocomplete({
-        source: "/search/system/",
-        minLength: 2
-        });
     $('#addDestinationForm').submit(function(e){
                 e.preventDefault();
                 AddDestination();

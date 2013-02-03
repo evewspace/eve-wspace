@@ -3,8 +3,10 @@
 var loadtime = null;
 var paper = null;
 var objSystems = [];
+var focusMS;
 var sigTimerID;
 var updateTimerID;
+var activityLimit = 100;
 var indentX = 150; //The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180.
 var indentY = 64; // The amount of space (in px) between system ellipses on the Y axis
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map.
@@ -54,6 +56,12 @@ function doMapAjaxCheckin() {
 }
 
 
+function HideSystemDetails(){
+    clearTimeout(sigTimerID);
+    $('#sysInfoDiv').empty();
+}
+
+
 function DisplaySystemDetails(msID, sysID){
     address = "system/" + msID + "/";
     $.ajax({
@@ -73,6 +81,8 @@ function DisplaySystemDetails(msID, sysID){
             GetPOSList(sysID);
             GetDestinations(msID);
             CloseSystemMenu();
+            focusMS = msID;
+            StartDrawing();
         }
     });
 }
@@ -560,6 +570,9 @@ function DeleteSystem(msID){
         type: "POST",
         url: address,
         success: function(){
+            if (msID == focusMS){
+                HideSystemDetails();            
+            }
             setTimeout(function(){RefreshMap();}, 500);
         }
     });
@@ -877,64 +890,61 @@ function ColorSystem(system, ellipseSystem, textSysName) {
         sysStrokeWidth = 7;
         sysStrokeDashArray = "--";
     }
-
-    if (system.LevelX < 1) {
-
-        // root
-        sysColor = "#A600A6";
-        //sysStroke = "#0657B9";
-        sysStroke = "#6A006A";
-        textColor = "#fff";
-        //textFontSize = 14;
-
-    } else {
+    if (system.msID === focusMS){
+        if (system.interest){
+            sysStrokeWidth = 7;
+        }else{
+            sysStrokeWidth = 4;
+        }
+        sysStrokeDashArray = "- ";
+    }
 
         // not selected
         switch (system.SysClass) {
 
             case 9:
                 sysColor = "#CC0000";
-                sysStroke = "#840000";
+                sysStroke = "#990000";
                 textColor = "#fff";
                 break;
             case 8:
                 sysColor = "#93841E";
-                sysStroke = "#7D5500";
+                sysStroke = "#60510A";
                 textColor = "#fff";
                 break;
             case 7:
                 sysColor = "#009F00";
-                sysStroke = "#006600";
+                sysStroke = "#006B00";
                 textColor = "#fff";
                 break;
              case 6:
                 sysColor = "#0022FF";
-                sysStroke = "#000000";
+                sysStroke = "#0000FF";
                 textColor = "#FFF";
                 break;
              case 5:
                 sysColor = "#0044FF";
-                sysStroke = "#000000";
+                sysStroke = "#0000FF";
                 textColor = "#FFF";
                 break; 
             case 4:
                 sysColor = "#0066FF";
-                sysStroke = "#000000";
+                sysStroke = "#0022FF";
                 textColor = "#FFF";
                 break;
             case 3:
                 sysColor = "#0088FF";
-                sysStroke = "#000000";
+                sysStroke = "#0044FF";
                 textColor = "#FFF";
                 break;
              case 2:
                 sysColor = "#00AAFF";
-                sysStroke = "#000000";
+                sysStroke = "#0066FF";
                 textColor = "#FFF";
                 break;
              case 1:
                 sysColor = "#00CDFF";
-                sysStroke = "#000000";
+                sysStroke = "#0088FF";
                 textColor = "#FFF"; 
                 break;
            default:
@@ -943,7 +953,6 @@ function ColorSystem(system, ellipseSystem, textSysName) {
                 textColor = "#0974EA";
                 break;
         }
-    }
     iconX = ellipseSystem.attr("cx")+40;
     iconY = ellipseSystem.attr("cy")-35;
     if (system.imageURL){
@@ -963,6 +972,51 @@ function ColorSystem(system, ellipseSystem, textSysName) {
         textSysName.hover(OnSysOver, OnSysOut);
         
     }
+}
+
+
+function WormholeEffectColor(system, defaultcolor){
+    switch (system.effect){
+        case "Wolf-Rayet Star":
+            return "#FF5500"
+            break;
+        case "Pulsar":
+            return "#0000FF"
+            break;
+        case "Magnetar":
+            return "#FF0000"
+            break;
+        case "Red Giant":
+            return "#FF00FF"
+            break;
+        case "Cataclysmic Variable":
+            return "#5555FF"
+            break;
+        case "Black Hole":
+            return "#000000"
+            break;
+        default:
+            return defaultcolor
+            break;
+    }
+}
+
+
+function GetBorderColor(startR, startB, startG, endR, endB, endG, system){
+    diffR = startR - endR;
+    diffB = startB - endB;
+    diffG = startG - endG;
+    factor = system.activity / activityLimit;
+    if (factor < 1){
+        newR = startR - (diffR * factor);
+        newB = startB - (diffB * factor);
+        newG = startG - (diffG * factor);
+    }else{
+        newR = endR;
+        newB = endB;
+        newG = endG;
+    }
+    return {'R': newR, 'G': newG, 'B': newB}
 }
 
 
