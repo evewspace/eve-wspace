@@ -75,3 +75,12 @@ $(document).on("focus", ".corpAuto", function(){
             }
        });
 });
+$(document).on("focus", ".towerAuto", function(){
+        $(this).typeahead({
+            source: function(query, process){
+                 $.get('/search/tower/', {'term': query}, function(data){
+                    process(JSON.parse(data));
+                });
+            }
+       });
+});
