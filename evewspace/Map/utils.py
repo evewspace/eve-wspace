@@ -70,10 +70,12 @@ class MapJSONGenerator(object):
                     path = True
         else:
             path = False
-
+        activity_estimate = (system.system.podkills + system.system.npckills +
+                system.system.shipkills)
         if system.parentsystem:
             parentWH = system.parent_wormholes.get()
-            result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
+            result = {'sysID': system.system.pk, 'Name': system.system.name,
+                    'LevelX': levelX,'activity': activity_estimate,
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
                     'interestpath': path, 'ParentID': system.parentsystem.pk,
@@ -87,7 +89,8 @@ class MapJSONGenerator(object):
                     'imageURL': self.get_system_icon(system),
                     'whID': parentWH.pk, 'msID': system.pk}
         else:
-            result = {'sysID': system.system.pk, 'Name': system.system.name, 'LevelX': levelX,
+            result = {'sysID': system.system.pk, 'Name': system.system.name,
+                    'LevelX': levelX, 'activity': activity_estimate,
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
                     'interestpath': path, 'ParentID': None,
