@@ -1,4 +1,4 @@
-<div class="mapSysInfo row">
+<div class="mapSysInfo container-fluid row">
    <div class="sysClassSpan span3">
          <h4 class="sysFriendlySpan">{{mapsys.friendlyname}}</h4>
         {% if system.sysclass < 7 %}
@@ -37,10 +37,10 @@
      <br /> 
     <p class="statusText label label-success">SIG: {{system.signatures.count}} POS: {{system.poses.count}} Pilots: {{system.active_pilots.count}}</p><br />
     {% if system.occupied %}
-    <p class="occupiedTooltip label label-important"> Occupied: <br /> {{system.occupied|safe}}</p><br />
+    <div class="occupiedTooltip label label-important"> Occupied: <br /> {{system.occupied|safe}}</div>
     {% endif %}
     {% if system.info %}
-    <p class="infoTooltip label label-info"> Info: <br /> {{system.info|safe}} </p> <br />
+    <div class="infoTooltip label label-info"> Info: <br /> {{system.info|safe}} </div>
     {% endif %}
 </div>
 {% if system.active_pilots.all %}
