@@ -770,8 +770,6 @@ function DrawSystem(system) {
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
         sysText.click(onSysClick);
-        actText = paper.text(sysX, sysY + 23, "A:"+system.activity).attr({"font-size": 8, "font-family": "Arial, Helvetica, sans-serif", "fill": "#ffffff"});
-        actText.click(onSysClick);
         ColorSystem(system, childSys, sysText);
         objSystems.push(childSys);
         var parentIndex = GetSystemIndex(system.ParentID);
@@ -798,8 +796,6 @@ function DrawSystem(system) {
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
         sysText.click(onSysClick);
-        actText = paper.text(sysX, sysY + 23, "A:"+system.activity).attr({"font-size": 8, "font-family": "Arial, Helvetica, sans-serif", "fill": "#ffffff"});
-        actText.click(onSysClick);
         ColorSystem(system, rootSys, sysText);
 
         objSystems.push(rootSys);
