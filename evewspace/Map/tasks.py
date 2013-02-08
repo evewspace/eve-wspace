@@ -1,10 +1,12 @@
 from celery import task
-from Map.models import System, KSystem, Signature
+from Map.models import System, KSystem, Signature, ActivePilot
 from core.models import Faction, SystemJump
 from POS.models import Alliance
 import eveapi
 from API import utils as handler
 from django.core.cache import cache
+from datetime import datetime, timedelta
+import pytz
 
 @task()
 def update_system_stats():
@@ -38,7 +40,7 @@ def update_system_stats():
 @task()
 def update_system_sov():
     """
-    Updates the Sov for K-Space systems. If any exceptions are raised 
+    Updates the Sov for K-Space systems. If any exceptions are raised
     (e.g. Alliance record doesn't exist), sov is just marked "None."
     """
     api = eveapi.EVEAPIConnection(cacheHandler=handler)
@@ -94,3 +96,13 @@ def downtime_site_update():
     for sig in Signature.objects.all():
         if sig.downtimes or sig.downtimes == 0:
             sig.increment_downtime()
+
+@task()
+def clear_stale_locations():
+    """
+    This task will clear any user location records older than 15 minutes.
+    """
+    limit = datetime.now(pytz.utc) - timedelta(minutes=15)
+    for record in ActivePilot.objects.all():
+        if record.timestamp < limit:
+            record.delete()
