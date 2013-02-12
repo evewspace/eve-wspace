@@ -455,7 +455,24 @@ class SiteSpawn(models.Model):
 
 
 # Model Forms
+
+class InlineModelChoiceField(forms.ModelChoiceField):
+    def __init__(self, *args, **kwargs):
+        kwargs['widget'] = kwargs.pop('widget', forms.widgets.TextInput)
+        super(InlineModelChoiceField, self).__init__(*args, **kwargs)
+
+    def clean(self, value):
+        if not value and not self.required:
+            return None
+        try:
+            return self.queryset.filter(name=value).get()
+        except self.queryset.model.DoesNotExist:
+            raise forms.ValidationError("Please enter a valid %s." % (self.queryset.model._meta.verbose_name,))
+
 class MapForm(ModelForm):
+    root = InlineModelChoiceField(queryset=System.objects.all(),
+            widget=forms.TextInput(attrs={'class': 'systemAuto'}))
+
     class Meta:
         model = Map
 

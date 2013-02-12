@@ -1,8 +1,27 @@
 {% extends "base.html" %}
 {% block title %}Eve W-Space: New Map{% endblock %}
 {% block content %}
-<form action="{% url Map.views.create_map %}" method="post">{% csrf_token %}
-    {{ form.as_p }}
+<form action="{% url Map.views.create_map %}" method="post">
+    {% csrf_token %}
+    {{form.non_field_errors}}
+    <table>
+        {{form.name_errors}}
+        <tr>
+            <td><label for="id_name">Map Name:</label></td>
+            <td><input type="text" id="id_name" name="name" /></td>
+        </tr>
+        {{form.root_errors}}
+        <tr>
+            <td><label for="id_root">Root System:</label></td>
+            <td><input type="text" id="id_root" name="root" class="systemAuto" /></td>
+        </tr>
+        {{form.explicitperms_errors}}
+        <tr>
+            <td><label for="id_explicitperms">Require Explicit Permissions:</label> </td>
+            <td><input type="checkbox" id="id_explicitperms" name="explicitperms" /></td>
+        </tr>
+
+    </table>
     <input class="btn btn-primary" type="submit" value="Submit" />
 </form>
 {% endblock %}
