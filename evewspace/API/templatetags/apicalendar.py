@@ -10,7 +10,7 @@ register = template.Library()
 def upcomingevents(user):
     #Get api character that corresponds with user's name, otherwise default to first
     subject = None
-    for key in user.apikeys.all():
+    for key in user.api_keys.all():
         for char in key.characters.all():
             if char.name.lower() == user.username.lower():
                 subject = char

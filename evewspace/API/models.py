@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+from POS.models import Corporation
 # Create your models here.
 
 
 class APIKey(models.Model):
     """API Key object relates to User and contains key id, vcode, and validation information."""
-    user = models.ForeignKey(User, related_name="apikeys")
     keyid = models.IntegerField()
     vcode = models.CharField(max_length=100)
     valid = models.BooleanField()
@@ -23,8 +23,22 @@ class APIKey(models.Model):
         return self.keyid
 
 
+class CorpAPIKey(APIKey):
+    """
+    Corp API keys used for corp stuff.
+    """
+    corp = models.ForeignKey(Corporation, related_name="api_keys")
+
+
+class MemberAPIKey(APIKey):
+    """
+    API key for individual member account.
+    """
+    user = models.ForeignKey(User, related_name="api_keys")
+
+
 class APICharacter(models.Model):
-    """API Character contains the API information of a single character."""
+    """API Character contains the API security information of a single character."""
     apikey = models.ForeignKey(APIKey, related_name="characters")
     charid = models.BigIntegerField()
     name = models.CharField(max_length=100)

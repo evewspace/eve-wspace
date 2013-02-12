@@ -52,10 +52,10 @@ class POS(models.Model):
     hardener = models.IntegerField(null=True, blank=True)
     # This is a short comment that is displayed as a warning
     warpin_notice = models.CharField(blank=True, null=True, max_length=64)
-    
+
     class Meta:
         ordering = ['system__name', 'planet', 'moon']
-    
+
     def clean(self):
         from django.core.exceptions import ValidationError
         if self.rftime and self.status != 3:
@@ -143,6 +143,8 @@ class CorpPOS(POS):
     #Let's store the CCP Item ID for the tower here to make API lookup easier
     #If it is null, then we are not tracking this POS via API
     apiitemid = models.BigIntegerField(null=True, blank=True)
+    from API.models import CorpAPIKey
+    apikey = models.ForeignKey(CorpAPIKey, null=True, blank=True, related_name='poses')
 
     class Meta:
         permissions = (('can_see_pos_pw', 'Can see corp POS passwords.'),
