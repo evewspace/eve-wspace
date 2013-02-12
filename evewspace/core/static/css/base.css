@@ -32,3 +32,8 @@ BODY
 	padding: 20px;
 	height: 1%;
 }
+
+.copyrightNotice
+{
+    font-size: 8pt;
+}

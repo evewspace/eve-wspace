@@ -5,6 +5,11 @@
 	padding: 0px;
 }
 
+#baseFooterDiv
+{
+    border: none;
+}
+
 #baseNavDiv
 {
 	visibility: hidden;
