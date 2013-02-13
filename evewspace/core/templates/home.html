@@ -12,11 +12,11 @@
 	    });
 </script>
 {% endblock %}
-{% block contentheader %} <h2> Welcome, {{user.username}}!</h2> {% endblock %}
+{% block contentheader %} <h3> Welcome, {{user.username}}!</h3> {% endblock %}
 {% block content%} 
-<p class="label label-success">Welcome to Eve-Wspace! This alpha test is primarily for mapping functions. This home page is a placeholder.</p>
+<p class="label label-success">Welcome to Eve-Wspace! This alpha test is primarily for mapping functions. This home page is under construction.</p>
 <div id="homeRow1" class="row">
-<div class="span6 homecollapse">
+<div class="span6 homecollapse well well-small">
 	{% load posstatus %}
 	<h3 class="active">My POSes:</h3>
 	<div>
@@ -27,7 +27,7 @@
 		{% corpposstatus user %}
 	</div>
 </div>
-<div class="span6 homecollapse">
+<div class="span6 homecollapse well well-small">
 	{% load apicalendar %}
 	<h3>Calendar:</h3>
 	<div>
@@ -36,16 +36,12 @@
    </div>
 </div>
 <div id="homeRow2" class="row">
-    <div class="span6 homecollapse">
-        <h3>Claims Status</h3>
+    {% load reddittags %}
+    <div id="redditBox" class="well well-small span6 homecollapse">
+        <h3><img height="25px" width="75px" src="{{STATIC_URL}}images/evereddit.png" /> Top 25 </h3>
         <div>
+            {% reddit_list %}
         </div>
-    </div>
-    <div class="span6 homecollapse">
-        <h3>Vital Statistics</h3>
-    <div>
-        <b>Time since last Legion loss by James:</b> [Placeholder]
- 
     </div>
 </div>
 {%endblock%}

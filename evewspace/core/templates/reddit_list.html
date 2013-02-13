@@ -1,0 +1,20 @@
+<div class="redditList">
+    {% if reddit_data %}
+    <table>
+        <tr>
+            <th>Score</th>
+            <th>Author</th>
+            <th>Link</th>
+            <th>Comments</th>
+        </tr>
+        {% for x in reddit_data %}
+        {% load reddittags %}
+        {% reddit_item x %}
+        {% endfor %}
+    </table>
+    {% else %}
+    <p class="label label-info">
+    Unable to load data from reddit at the moment :(
+    </p>
+    {% endif %}
+</div>
