@@ -48,7 +48,7 @@
             <td>
             {% if sig.sigtype.escalatable and sig.system.sysclass > 4 and sig.system.sysclass < 7 %}
                 {% if not sig.lastescalated %}
-                    {% if sig.downtimes > 2 %}
+                    {% if sig.downtimes > downtimes %}
                     <i class="icon-fire" onlick="MarkEscalated({{sig.pk}}, {{system.pk}});" title="Site will despawn at DT."></i>
                     {% else %}
                     <i class="icon-fullscreen" onclick="MarkEscalated({{sig.pk}}, {{system.pk}});" title="Clear escalation only."></i>

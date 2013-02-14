@@ -14,8 +14,18 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from django.contrib.sites.models import Site
+from core.models import ConfigEntry
 
-def site(request):
-    current_site = Site.objects.get_current()
-    return {'SITE_URL': current_site.domain}
+def get_config(name, user):
+    """
+    Gets the correct config value for the given key name.
+    Value with the given user has priority over any default value.
+    """
+    if ConfigEntry.objects.filter(name=name, user=user).count() != 0:
+        return ConfigEntry.objects.get(name=name, user=user)
+
+    # No user value, look for global / default
+    if ConfigEntry.objects.filter(name=name, user=None).count() != 0:
+        return ConfigEntry.objects.get(name=name, user=None)
+    else:
+        raise KeyError("No configuration entry with key %s was found." % name)

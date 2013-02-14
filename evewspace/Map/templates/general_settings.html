@@ -1,9 +1,5 @@
-<form id="mapGeneralSettingsForm" action="map/settings/general/" method="post">
+<form id="mapGeneralSettingsForm" action="/map/settings/general/" method="post">
     <table>
-        <tr>
-            <td>Default Display Mode (global):<br /><br /></td>
-            <td>Compact: <input type="radio" name="mapmode" value="compact">  Classic: <input type="radio" name="mapmode" value="classic"> <br /><br /></td>
-        </tr>
         <tr>
             <td>Last Scanned Warning Threshold (hours):</td>
             <td><input type="text" class="input-mini" name="scanwarn" value="{{scanwarn}}"></td>
@@ -28,4 +24,11 @@
     <br />
     <input type="submit" class="btn btn-primary" value="Save Changes">
 </form>
+<script type="text/javascript">
+    $('#mapGeneralSettingsForm').submit(function(e){
+                e.preventDefault();
+                SaveGlobalSettings();
+                return false;
+            });
+</script>
 

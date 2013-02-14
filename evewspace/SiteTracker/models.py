@@ -1,3 +1,19 @@
+#    Eve W-Space
+#    Copyright (C) 2013  Andrew Austin and other contributors
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version. An additional term under section
+#    7 of the GPL is included in the LICENSE file.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
 from django.contrib.auth.models import User
 from Map.models import Map, System, MapSystem
@@ -35,7 +51,7 @@ class SiteRecord(models.Model):
     system = models.ForeignKey(System, related_name="sitescompleted")
     boss = models.ForeignKey(User, related_name="sitescredited")
     fleetsize = models.IntegerField()
-    
+
     def __unicode__(self):
         return u"System: %s Time: %s  Type: %s" % (self.system.name, self.timestamp, self.type.shortname)
 
@@ -65,11 +81,11 @@ class ClaimPeriod(models.Model):
     loothauledby = models.ForeignKey(User, related_name="loothauled", null=True, blank=True)
     lootsoldby = models.ForeignKey(User, related_name="lootsold", null=True, blank=True)
     class Meta:
-        permissions = (("can_close_claims", "Close the claims period early."), 
+        permissions = (("can_close_claims", "Close the claims period early."),
                          ("can_reopen_claims", "Reopen the claims period."),
                          ("can_haul_loot", "Mark the claim period as hauled."),
                          ("can_sell_loot", "Mark the claim period as sold."),)
-                         
+
 
     def __unicode__(self):
         return self.name

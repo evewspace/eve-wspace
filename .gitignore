@@ -1,0 +1,9 @@
+*.swp
+*.pyc
+*.bak
+.vagrant
+celerybeat-schedule
+bin
+lib
+include
+local_settings.py

@@ -1,4 +1,4 @@
-# Tunnel - TODO
+# Tunnel
 #
 # (C) 2010 Luke Slater, Steve 'Ashcrow' Milner
 #
@@ -157,10 +157,10 @@ class Command(BaseCommand):
                         'Auth request being processed for ' + input[1])
                     self._handle_auth(input[0], input[2])
                 elif operation == 'isuser':
-                    logger.info('Asked if ' + input[0] + ' is a user')
-                    self._handle_isuser()
+                    logging.info('Asked if ' + input[0] + ' is a user')
+                    self._handle_isuser(input[0])
                 elif operation == 'setpass':
-                    logger.info('Asked if to change password for ' + input[0])
+                    logging.info('Asked if to change password for ' + input[0])
                     # Do not support this
                     self._generate_repsonse(False)
                 else:

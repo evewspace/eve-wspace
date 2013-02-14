@@ -1,18 +1,35 @@
+#    Eve W-Space
+#    Copyright (C) 2013  Andrew Austin and other contributors
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version. An additional term under section
+#    7 of the GPL is included in the LICENSE file.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
+from django.contrib.auth.models import User
 # Core models contains models used across multiple apps
 
 class ConfigEntry(models.Model):
     """A configuration setting that may be changed at runtime."""
     name = models.CharField(max_length=32, unique=True)
     value = models.CharField(max_length=255, null=True, blank=True)
-
+    user = models.ForeignKey(User, related_name='settings', null=True, blank=True)
 
 class MarketGroup(models.Model):
     """A market group from the Eve SDD."""
     id = models.IntegerField(primary_key=True, db_column='marketGroupID')
-    name = models.CharField(max_length = 100, null=True, blank=True, 
+    name = models.CharField(max_length = 100, null=True, blank=True,
             db_column='marketGroupName')
-    parentgroup = models.ForeignKey("self", related_name="childgroups", 
+    parentgroup = models.ForeignKey("self", related_name="childgroups",
             blank=True, null=True, db_column='parentGroupID')
     description = models.CharField(max_length = 200, null=True, blank=True)
     hasTypes = models.IntegerField()
@@ -22,7 +39,7 @@ class MarketGroup(models.Model):
 
     class Meta:
         db_table = 'invMarketGroups'
-
+        managed = False
 
 class Type(models.Model):
     """A type from the Eve SDD invTypes table."""
@@ -39,6 +56,7 @@ class Type(models.Model):
 
     class Meta:
         db_table = 'invTypes'
+        managed = False
 
 
 class Region(models.Model):
@@ -55,13 +73,14 @@ class Region(models.Model):
 
     class Meta:
         db_table = 'mapRegions'
+        managed = False
 
 
 class Constellation(models.Model):
     """Core model for static constellation data, references Region"""
     id = models.IntegerField(primary_key=True, db_column='constellationID')
     name = models.CharField(max_length=100, db_column='constellationName')
-    region = models.ForeignKey(Region, related_name='constellations', 
+    region = models.ForeignKey(Region, related_name='constellations',
             db_column='regionID')
     x = models.FloatField()
     y = models.FloatField()
@@ -72,6 +91,7 @@ class Constellation(models.Model):
 
     class Meta:
         db_table = 'mapConstellations'
+        managed = False
 
 
 class SystemData(models.Model):
@@ -91,6 +111,7 @@ class SystemData(models.Model):
 
     class Meta:
         db_table = 'mapSolarSystems'
+        managed = False
 
 
 class StarbaseResourcePurpose(models.Model):
@@ -103,14 +124,15 @@ class StarbaseResourcePurpose(models.Model):
 
     class Meta:
         db_table = 'invControlTowerResourcePurposes'
+        managed = False
 
 
 class StarbaseResource(models.Model):
-    """Core model for SDD invStarbaseResources table. Maps tower types 
+    """Core model for SDD invStarbaseResources table. Maps tower types
     to their fuel"""
-    towerType = models.ForeignKey(Type, related_name='posesfueled', 
+    towerType = models.ForeignKey(Type, related_name='posesfueled',
             db_column='controlTowerTypeID', primary_key=True)
-    resourceType = models.ForeignKey(Type, related_name='posfuel', 
+    resourceType = models.ForeignKey(Type, related_name='posfuel',
             db_column='resourceTypeID')
     purpose = models.ForeignKey(StarbaseResourcePurpose, related_name='usedby',
             db_column='purpose', blank=True, null=True)
@@ -122,6 +144,7 @@ class StarbaseResource(models.Model):
 
     class Meta:
         db_table = 'invControlTowerResources'
+        managed = False
 
 
 class Location(models.Model):
@@ -131,11 +154,11 @@ class Location(models.Model):
             db_column='typeID')
     system = models.ForeignKey(SystemData, null=True, blank=True, related_name='mapentries',
             db_column='solarSystemID')
-    constellation = models.ForeignKey(Constellation, null=True, blank=True, 
+    constellation = models.ForeignKey(Constellation, null=True, blank=True,
             related_name='mapentries', db_column='constellationID')
-    region = models.ForeignKey(Region, null=True, blank=True, related_name='mapentries', 
+    region = models.ForeignKey(Region, null=True, blank=True, related_name='mapentries',
             db_column='regionID')
-    orbitparent = models.ForeignKey('Location', null=True, blank=True, 
+    orbitparent = models.ForeignKey('Location', null=True, blank=True,
             related_name='satellites', db_column='orbitID')
     name = models.CharField(max_length=100, null=True, blank=True, db_column='itemName')
     x = models.FloatField(null=True, blank=True, db_column='x')
@@ -145,6 +168,7 @@ class Location(models.Model):
 
     class Meta:
         db_table='mapDenormalize'
+        managed = False
 
 
 class LocationWormholeClass(models.Model):
@@ -155,6 +179,7 @@ class LocationWormholeClass(models.Model):
 
     class Meta:
         db_table='mapLocationWormholeClasses'
+        managed = False
 
 
 class SystemJump(models.Model):
@@ -168,12 +193,14 @@ class SystemJump(models.Model):
 
     class Meta:
         db_table='mapSolarSystemJumps'
+        managed = False
 
 
 class Faction(models.Model):
-    id = models.IntegerField(primary_key=True, db_column='factionID') 
-    name = models.CharField(max_length=300, db_column='factionName', blank=True) 
+    id = models.IntegerField(primary_key=True, db_column='factionID')
+    name = models.CharField(max_length=300, db_column='factionName', blank=True)
     description = models.CharField(max_length=3000, blank=True)
     iconid = models.IntegerField(null=True, db_column='iconID', blank=True)
     class Meta:
+        managed = False
         db_table = u'chrFactions'

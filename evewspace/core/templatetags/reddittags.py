@@ -14,8 +14,23 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from django.contrib.sites.models import Site
+from django import template
+from django.core.cache import cache
 
-def site(request):
-    current_site = Site.objects.get_current()
-    return {'SITE_URL': current_site.domain}
+register=template.Library()
+
+@register.inclusion_tag('reddit_list.html')
+def reddit_list():
+    if cache.get('reddit'):
+        return {'reddit_data': cache.get('reddit')['data']['children']}
+    else:
+        return {'error': True}
+
+@register.inclusion_tag('reddit_item.html')
+def reddit_item(item):
+    score = int(item['data']['ups']) - int(item['data']['downs'])
+    comment_link = "%s%s" % ("http://www.reddit.com", item['data']['permalink'])
+    return {'upvotes': item['data']['ups'], 'downvotes': item['data']['downs'],
+            'target_url': item['data']['url'], 'author': item['data']['author'],
+            'score': score, 'comments': item['data']['num_comments'],
+            'comment_url': comment_link, 'title': item['data']['title']}

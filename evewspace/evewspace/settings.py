@@ -45,7 +45,12 @@ CELERYBEAT_SCHEDULE = {
                 'task': 'Map.tasks.check_server_status',
                 'schedule': timedelta(minutes=3),
                 'args': ()
-            }
+            },
+        'stale_locations':{
+                'task': 'Map.tasks.clear_stale_locations',
+                'schedule': timedelta(minutes=5),
+                'args': ()
+            },
         }
 
 
@@ -160,7 +165,7 @@ TEMPLATE_DIRS = (
         # Don't forget to use absolute paths, not relative paths.
 )
 
-INSTALLED_APPS = (    
+INSTALLED_APPS = (
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
@@ -192,11 +197,6 @@ API_CORP_KEY_VCODE='bbR0lFKHULzUuh7luVJlz22VUl4T4SkZmMLeveunrMcZxPdbwZqMXMffnUXv
 
 #Require a registration code to register
 ACCOUNT_REQUIRE_REG_CODE=True
-
-# Map Settings
-
-# Number of minutes that a sytem of interest remains flagged
-MAP_INTEREST_TIME=30
 
 AUTH_PROFILE_MODULE = 'account.UserProfile'
 import django.conf.global_settings as DEFAULT_SETTINGS

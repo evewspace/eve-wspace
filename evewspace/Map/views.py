@@ -1,9 +1,26 @@
+#    Eve W-Space
+#    Copyright (C) 2013  Andrew Austin and other contributors
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version. An additional term under section
+#    7 of the GPL is included in the LICENSE file.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from Map.models import *
 from Map import utils
 from API import utils as handler
 from POS import tasks as pos_tasks
 from POS.models import POS, Corporation
 from core.models import Type
+from core.utils import get_config
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.template.response import TemplateResponse
@@ -152,12 +169,15 @@ def get_system_context(msID):
     else:
         system = mapsys.system.wsystem
 
-    scanthreshold = datetime.now(pytz.utc) - timedelta(hours=3)
-    interestthreshold = datetime.now(pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
+    scanthreshold = datetime.now(pytz.utc) - timedelta(hours=int(get_config("MAP_SCAN_WARNING", None).value))
+    interest_offset = int(get_config("MAP_INTEREST_TIME", None).value)
+    interestthreshold = datetime.now(pytz.utc) - timedelta(minutes=interest_offset)
 
     scanwarning = system.lastscanned < scanthreshold
-    interest = mapsys.interesttime and mapsys.interesttime > interestthreshold
-
+    if  interest_offset > 0:
+        interest = mapsys.interesttime and mapsys.interesttime > interestthreshold
+    else:
+        interest = mapsys.interesttime
     return { 'system' : system, 'mapsys' : mapsys,
              'scanwarning' : scanwarning, 'isinterest' : interest }
 
@@ -431,8 +451,9 @@ def get_signature_list(request, mapID, msID):
     if not request.is_ajax():
         raise PermissionDenied
     system = get_object_or_404(MapSystem, pk=msID)
+    escalation_downtimes = int(get_config("MAP_ESCALATION_BURN", request.user).value)
     return TemplateResponse(request, "system_signatures.html",
-        {'system': system})
+            {'system': system, 'downtimes': escalation_downtimes})
 
 
 @login_required
@@ -624,8 +645,27 @@ def general_settings(request):
     """
     Returns and processes the general settings section.
     """
+    npcthreshold = get_config("MAP_NPC_THRESHOLD", None)
+    pvpthreshold = get_config("MAP_PVP_THRESHOLD", None)
+    scanthreshold = get_config("MAP_SCAN_WARNING", None)
+    interesttime = get_config("MAP_INTEREST_TIME", None)
+    escalation_burn = get_config("MAP_ESCALATION_BURN", None)
+    if request.method == "POST":
+        scanthreshold.value = int(request.POST['scanwarn'])
+        interesttime.value = int(request.POST['interesttimeout'])
+        pvpthreshold.value = int(request.POST['pvpthreshold'])
+        npcthreshold.value = int(request.POST['npcthreshold'])
+        escalation_burn.value = int(request.POST['escdowntimes'])
+        scanthreshold.save()
+        interesttime.save()
+        pvpthreshold.save()
+        npcthreshold.save()
+        escalation_burn.save()
+        return HttpResponse()
     return TemplateResponse(request, 'general_settings.html',
-            {})
+            {'npcthreshold': npcthreshold.value, 'pvpthreshold': pvpthreshold.value,
+                'scanwarn': scanthreshold.value, 'interesttimeout': interesttime.value,
+                'escdowntimes': escalation_burn.value})
 
 
 @permission_required('Map.map_admin')

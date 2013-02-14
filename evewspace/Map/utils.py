@@ -1,3 +1,19 @@
+#    Eve W-Space
+#    Copyright (C) 2013  Andrew Austin and other contributors
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version. An additional term under section
+#    7 of the GPL is included in the LICENSE file.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from Map.models import *
 from django.conf import settings
 import json
@@ -7,6 +23,7 @@ import pytz
 from django.contrib.sites.models import Site
 from math import pow, sqrt
 from core.models import SystemJump, Type, Location
+from core.utils import get_config
 from collections import OrderedDict
 from django.core.cache import cache
 
@@ -38,6 +55,8 @@ class MapJSONGenerator(object):
         Takes a MapSystem and returns the appropriate icon to display on the map
         as a realative URL.
         """
+        pvp_threshold = int(get_config("MAP_PVP_THRESHOLD", self.user).value)
+        npc_threshold = int(get_config("MAP_NPC_THRESHOLD", self.user).value)
         staticPrefix = "%s" % (settings.STATIC_URL + "images/")
         if system.system.active_pilots.filter(user=self.user).count():
             return staticPrefix + "mylocation.png"
@@ -45,10 +64,10 @@ class MapJSONGenerator(object):
         if system.stfleets.filter(ended__isnull=True).count() != 0:
             return staticPrefix + "farm.png"
 
-        if system.system.shipkills + system.system.podkills > 0:
+        if system.system.shipkills + system.system.podkills > pvp_threshold:
             return staticPrefix + "pvp.png"
 
-        if system.system.npckills > 10:
+        if system.system.npckills > npc_threshold:
             return staticPrefix + "carebears.png"
 
         return None
@@ -58,7 +77,8 @@ class MapJSONGenerator(object):
         Takes a MapSystem and X,Y data and returns the dict of information to be passed to
         the map JS as JSON.
         """
-        threshold = datetime.datetime.now(pytz.utc) - timedelta(minutes=settings.MAP_INTEREST_TIME)
+        interesttime = int(get_config("MAP_INTEREST_TIME", self.user).value)
+        threshold = datetime.datetime.now(pytz.utc) - timedelta(minutes=interesttime)
         if system.interesttime and system.interesttime > threshold:
             interest = True
         else:

@@ -1,3 +1,19 @@
+#    Eve W-Space
+#    Copyright (C) 2013  Andrew Austin and other contributors
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version. An additional term under section
+#    7 of the GPL is included in the LICENSE file.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 A registry module for registration of searches.
 
@@ -19,7 +35,7 @@ class SearchRegistry(dict):
             return self._models[model]
         except KeyError:
             return
-    
+
     def unregister(self, name):
         search = self[name]
         del self[name]
@@ -55,7 +71,7 @@ class SearchRegistry(dict):
         self._models[model] = search
 
 def _autodiscover(registry):
-    
+
     import copy
     from django.conf import settings
     from django.utils.importlib import import_module
