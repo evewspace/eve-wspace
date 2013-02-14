@@ -1,9 +1,8 @@
-# Django settings for WormholeSpace2 project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = ('Andrew Austin', 'acaustin@uark.edu'
+ADMINS = (
         # ('Your Name', 'your_email@example.com'),
 )
 
@@ -191,10 +190,6 @@ INSTALLED_APPS = (
         # Uncomment the next line to enable admin documentation:
         # 'django.contrib.admindocs',
 )
-#Corp API Key
-API_CORP_KEY_ID=325904
-API_CORP_KEY_VCODE='bbR0lFKHULzUuh7luVJlz22VUl4T4SkZmMLeveunrMcZxPdbwZqMXMffnUXvaRHF'
-
 #Require a registration code to register
 ACCOUNT_REQUIRE_REG_CODE=True
 
