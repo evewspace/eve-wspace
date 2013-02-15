@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
 from django.contrib.auth.models import User
-from POS.models import Corporation
+from core.models import Corporation
 # Create your models here.
 
 

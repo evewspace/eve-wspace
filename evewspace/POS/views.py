@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 import pytz
 import eveapi
 from API import utils as handler
-from POS import tasks
+from core import tasks as core_tasks
 
 @login_required
 def test_fit(request, posID):
@@ -85,7 +85,7 @@ def edit_pos(request, sysID, posID):
             try:
                 api = eveapi.EVEAPIConnection(cacheHandler=handler)
                 corpID = api.eve.CharacterID(names=request.POST['corp']).characters[0].characterID
-                result = tasks.update_corporation.delay(corpID)
+                result = core_tasks.update_corporation.delay(corpID)
                 corp = result.get()
             except:
                 # The corp doesn't exist
@@ -99,7 +99,7 @@ def edit_pos(request, sysID, posID):
         pos.fitting = request.POST['fitting']
 
         # Have the async worker update the corp just so that it is up to date
-        tasks.update_corporation.delay(corp.id)
+        core_tasks.update_corporation.delay(corp.id)
         if pos.status == 3:
             if request.POST['rfdays'] == '':
                 rf_days = 0
@@ -144,7 +144,7 @@ def add_pos(request, sysID):
             try:
                 api = eveapi.EVEAPIConnection(cacheHandler=handler)
                 corpID = api.eve.CharacterID(names=request.POST['corp']).characters[0].characterID
-                result = tasks.update_corporation.delay(corpID)
+                result = core_tasks.update_corporation.delay(corpID)
                 corp = result.get()
             except:
                 # The corp doesn't exist
@@ -154,7 +154,7 @@ def add_pos(request, sysID):
                 posname=request.POST['name'], fitting=request.POST['fitting'],
                 status=int(request.POST['status']), corporation=corp)
         # Have the async worker update the corp just so that it is up to date
-        tasks.update_corporation.delay(corp.id)
+        core_tasks.update_corporation.delay(corp.id)
         if pos.status == 3:
             if request.POST['rfdays'] == '':
                 rf_days = 0

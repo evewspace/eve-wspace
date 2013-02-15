@@ -18,6 +18,29 @@ from django.db import models
 from django.contrib.auth.models import User
 # Core models contains models used across multiple apps
 
+class Alliance(models.Model):
+    """Represents an alliance, data pulled from api"""
+    id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=100)
+    shortname = models.CharField(max_length=100)
+    executor = models.ForeignKey('Corporation', blank=True, null=True, related_name='+')
+
+    def __unicode__(self):
+        return self.name
+
+
+class Corporation(models.Model):
+    """Represents a corporation, data pulled from api"""
+    id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=100)
+    ticker = models.CharField(max_length=100)
+    alliance = models.ForeignKey(Alliance, null=True, blank=True, related_name='member_corps')
+    member_count = models.IntegerField()
+
+    def __unicode__(self):
+        return self.name
+
+
 class ConfigEntry(models.Model):
     """A configuration setting that may be changed at runtime."""
     name = models.CharField(max_length=32, unique=True)

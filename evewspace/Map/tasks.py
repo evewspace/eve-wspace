@@ -17,7 +17,7 @@
 from celery import task
 from Map.models import System, KSystem, Signature, ActivePilot
 from core.models import Faction, SystemJump
-from POS.models import Alliance
+from core.models import Alliance
 import eveapi
 from API import utils as handler
 from django.core.cache import cache

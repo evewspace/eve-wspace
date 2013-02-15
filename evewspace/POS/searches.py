@@ -15,7 +15,5 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from search import registry
-from models import Corporation, Alliance
 
-registry.register(Corporation, 'corp', 'name')
-registry.register(Alliance, 'alliance', 'name')
+

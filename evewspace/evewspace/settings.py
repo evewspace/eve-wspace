@@ -36,7 +36,7 @@ CELERYBEAT_SCHEDULE = {
                 'args': ()
             },
         'alliance_update':{
-                'task': 'POS.tasks.update_all_alliances',
+                'task': 'core.tasks.update_all_alliances',
                 'schedule': crontab(minute=30, hour=10, day_of_week="tue"),
                 'args': ()
             },

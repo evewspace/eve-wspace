@@ -16,32 +16,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
 from core.models import Type, Location
+from API.models import CorpAPIKey
+from core.models import Corporation, Alliance
 from Map.models import System
 import csv
 from django.contrib.auth.models import User
 import pytz
-
-class Alliance(models.Model):
-    """Represents an alliance, data pulled from api"""
-    id = models.BigIntegerField(primary_key=True)
-    name = models.CharField(max_length=100)
-    shortname = models.CharField(max_length=100)
-    executor = models.ForeignKey('Corporation', blank=True, null=True, related_name='+')
-
-    def __unicode__(self):
-        return self.name
-
-
-class Corporation(models.Model):
-    """Represents a corporation, data pulled from api"""
-    id = models.BigIntegerField(primary_key=True)
-    name = models.CharField(max_length=100)
-    ticker = models.CharField(max_length=100)
-    alliance = models.ForeignKey(Alliance, null=True, blank=True, related_name='member_corps')
-    member_count = models.IntegerField()
-
-    def __unicode__(self):
-        return self.name
 
 
 class POS(models.Model):
@@ -159,7 +139,6 @@ class CorpPOS(POS):
     #Let's store the CCP Item ID for the tower here to make API lookup easier
     #If it is null, then we are not tracking this POS via API
     apiitemid = models.BigIntegerField(null=True, blank=True)
-    from API.models import CorpAPIKey
     apikey = models.ForeignKey(CorpAPIKey, null=True, blank=True, related_name='poses')
 
     class Meta:

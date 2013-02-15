@@ -18,8 +18,8 @@ from Map.models import *
 from Map import utils
 from API import utils as handler
 from POS import tasks as pos_tasks
-from POS.models import POS, Corporation
-from core.models import Type
+from POS.models import POS
+from core.models import Type, Corporation
 from core.utils import get_config
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.http import Http404, HttpResponseRedirect, HttpResponse
