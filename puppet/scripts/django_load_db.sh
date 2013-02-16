@@ -6,4 +6,4 @@ mysql -u root -D djangotest < /home/vagrant/mysql55-inferno12-extended.sql
 rm /home/vagrant/mysql55-inferno12-extended.sql
 /vagrant/evewspace/manage.py syncdb --noinput
 /vagrant/evewspace/manage.py buildsystemdata
-/vagrant/evewspace/manage.py loaddata /vagrant/evewspace/Map/fixtures/*.json
+/vagrant/evewspace/manage.py loaddata /vagrant/evewspace/*/fixtures/*.json
