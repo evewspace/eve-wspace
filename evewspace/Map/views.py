@@ -548,7 +548,7 @@ def edit_system(request, mapID, msID):
             mapSystem.system.info = request.POST.get('info', '')
             mapSystem.system.occupied = request.POST.get('occupied', '')
             mapSystem.system.save()
-            mapSystem.save()
+        mapSystem.save()
         mapSystem.map.add_log(request.user, "Edited System: %s (%s)"
                 % (mapSystem.system.name, mapSystem.friendlyname))
         return HttpResponse()
