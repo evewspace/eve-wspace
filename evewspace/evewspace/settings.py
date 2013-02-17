@@ -55,6 +55,11 @@ CELERYBEAT_SCHEDULE = {
                 'schedule': timedelta(seconds=45),
                 'args': ()
             },
+        'cache_feeds':{
+                'task': 'core.tasks.update_feeds',
+                'schedule': timedelta(minutes=30),
+                'args': ()
+            },
         }
 
 
