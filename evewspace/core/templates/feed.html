@@ -1,0 +1,21 @@
+{% load newsfeeds %}
+<div class="accordion" id="news_accordion">
+    {% for feed in feeds %}
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#news_accordion" href="#feed{{feed.pk}}_collapse">
+                {{feed.name}}
+            </a>
+        </div>
+        <div class="accordion-body collapse" id="feed{{feed.pk}}_collapse">
+            <div class="accordion-inner">
+                {% feed_items feed %}
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="label label-info">
+        There are no news feeds to display!
+    </p>
+    {% endfor %}
+</div>

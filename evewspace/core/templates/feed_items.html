@@ -1,0 +1,22 @@
+{% load humanize %}
+<table class="feedItems" cellpadding="5px">
+    <tr class="feedHeaderRow">
+        <th class="feedHeader">Posted</th>
+        <th class="feedHeader">Article</th>
+    </tr>
+    {% for item in items %}
+    <tr class="feedItemRow">
+        <td class="feedItem">{{item.time|naturaltime}}</td>
+        <td class="feedItem">
+            <a href="{{item.url}}" target="_blank" title="{{item.summary}}">
+                {{item.title}}
+            </a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr class="feedItemRow">
+        <td></td>
+        <td class="feedItem">No items to display!</td>
+    </tr>
+    {% endfor %}
+</table>

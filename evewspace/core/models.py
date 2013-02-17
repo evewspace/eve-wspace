@@ -18,6 +18,19 @@ from django.db import models
 from django.contrib.auth.models import User
 # Core models contains models used across multiple apps
 
+class NewsFeed(models.Model):
+    """
+    Contains information about an RSS feed. If user is None, the feed is
+    global.
+    """
+    name = models.CharField(max_length=255, null=True, blank=True)
+    description = models.CharField(max_length=255, null=True, blank=True)
+    url = models.CharField(max_length=255)
+    user = models.ForeignKey(User, related_name='feeds', null=True)
+
+    class Meta:
+        ordering = ['name']
+
 class Alliance(models.Model):
     """Represents an alliance, data pulled from api"""
     id = models.BigIntegerField(primary_key=True)
@@ -47,6 +60,7 @@ class ConfigEntry(models.Model):
     value = models.CharField(max_length=255, null=True, blank=True)
     user = models.ForeignKey(User, related_name='settings', null=True, blank=True)
 
+
 class MarketGroup(models.Model):
     """A market group from the Eve SDD."""
     id = models.IntegerField(primary_key=True, db_column='marketGroupID')
@@ -63,6 +77,7 @@ class MarketGroup(models.Model):
     class Meta:
         db_table = 'invMarketGroups'
         managed = False
+
 
 class Type(models.Model):
     """A type from the Eve SDD invTypes table."""

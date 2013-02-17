@@ -18,9 +18,10 @@ from celery import task
 from django.core.cache import cache
 import urllib
 import json
-from models import Alliance, Corporation
+from models import Alliance, Corporation, NewsFeed
 from API import utils as handler
 import eveapi
+import feedparser
 
 @task()
 def update_alliance(allianceID):
@@ -136,3 +137,20 @@ def cache_eve_reddit():
         else:
             # Invalid response, refresh current data
             cache.set('reddit', current, 120)
+
+@task
+def update_feeds():
+    """
+    Caches and updates RSS feeds in NewsFeeds.
+    """
+    for feed in NewsFeed.objects.all():
+        try:
+            data = feedparser.parse(feed.url)
+            cache.set('feed_%s' % feed.pk, data, 7200)
+            feed.name = data['feed']['title']
+            feed.description = data['feed']['subtitle']
+            feed.save()
+        except:
+            # There shouldn't be any exceptions, but we want to continue
+            # if there are.
+            pass

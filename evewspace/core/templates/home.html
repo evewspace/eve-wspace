@@ -3,44 +3,42 @@
 {% block head %}
 <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css" />
 {% endblock %}
-{% block scripts %}
-<script src="{{STATIC_URL}}js/jquery.collapse.js"></script>
-<script src="{{STATIC_URL}}js/jquery.cookie.js"></script>
-<script>
-	$(function() {
-	    $(".homecollapse").collapse();
-	    });
-</script>
-{% endblock %}
 {% block contentheader %} <h3> Welcome, {{user.username}}!</h3> {% endblock %}
 {% block content%} 
 <p class="label label-success">Welcome to Eve-Wspace! This alpha test is primarily for mapping functions. This home page is under construction.</p>
 <div id="homeRow1" class="row">
-<div class="span6 homecollapse well well-small">
+<div class="span6 well well-small">
 	{% load posstatus %}
-	<h3 class="active">My POSes:</h3>
-	<div>
+	<h3 data-toggle="collapse" data-target="#myPosCollapse">My POSes:</h3>
+	<div id="myPosCollapse" class="collapse in">
 		{% myposstatus user %}
 	</div>
-	<h3>Corp POSes:</h3>
-	<div>
+	<h3 data-toggle="collapse" data-target="#corpPosCollapse">Corp POSes:</h3>
+	<div id="corpPosCollapse" class="collapse">
 		{% corpposstatus user %}
 	</div>
 </div>
-<div class="span6 homecollapse well well-small">
+<div class="span6  well well-small">
 	{% load apicalendar %}
-	<h3>Calendar:</h3>
-	<div>
+	<h3 data-toggle="collapse" data-target="#calendarCollapse">Calendar:</h3>
+	<div id="calendarCollapse" class="collapse in">
 		{% upcomingevents user %}
 	</div>
    </div>
 </div>
 <div id="homeRow2" class="row">
     {% load reddittags %}
-    <div id="redditBox" class="well well-small span6 homecollapse">
-        <h3><img height="25px" width="75px" src="{{STATIC_URL}}images/evereddit.png" /> Top 25 </h3>
-        <div>
+    <div id="redditBox" class="well well-small span6">
+        <h3 data-toggle="collapse" data-target="#redditCollapse"><img height="28px" width="75px" src="{{STATIC_URL}}images/evereddit.png" /> Top 25 </h3>
+        <div id="redditCollapse" class="collapse">
             {% reddit_list %}
+        </div>
+    </div>
+    {% load newsfeeds %}
+    <div id="newsBox" class="well well-small span6">
+        <h3 data-toggle="collapse" data-target="#newsCollapse"><img height="28px" width="28px" src="{{STATIC_URL}}images/rss.png" /> News Feeds </h3>
+        <div id="newsCollapse" class="collapse">
+            {% feeds %}
         </div>
     </div>
 </div>
