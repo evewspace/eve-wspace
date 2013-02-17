@@ -35,6 +35,7 @@ $(document).ready(function(){
 
 $(document).ready(function(){
     $('#mapDiv').html(ajax_image);
+    $('html').click(function(){ CloseSystemMenu(); });
     RefreshMap();
 });
 
@@ -143,6 +144,14 @@ function DisplaySystemMenu(msID, x, y){
             else{
                 $('#sysMenu').replaceWith(data);
             }
+            $('#intelButton').click(function(event){
+                event.stopPropagation();
+                $('#intelDropdown').toggle();
+            });
+            $('#deleteButton').click(function(event){
+                event.stopPropagation();
+                $('#deleteDropdown').toggle();
+            });
             var div = document.getElementById("sysMenu");
             div.style.position = "absolute";
             div.style.top = y + 'px';

@@ -8,12 +8,12 @@
     <a class="btn" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
     {% endif %}
     <a class="btn" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
-    <div class="btn-group dropdown">
+    <div id="intelButton" class="btn-group dropdown">
         <a class="btn dropdown-toggle" data-toggle="dropdown">
             Intel
             <span class="caret"></span>
         </a>
-        <ul class="dropdown-menu" role="menu">
+        <ul id="intelDropdown" class="dropdown-menu" role="menu">
         <li><a href="http://www.wormnav.com/index.php?locus={{system.name}}" target="_blank">Wormnav</a></li>
         <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
         <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
@@ -30,15 +30,14 @@
 
             {% endif %}
             <a class="btn" onclick="MarkScanned({{mapsys.pk}}, false, {{mapsys.system.pk}});">Mark Scanned</a>
-        <div class="btn-group dropdown">
+        <div id="deleteButton" class="btn-group dropdown">
             <a class="btn dropdown-toggle" data-toggle="dropdown">
                 Delete
             </a>
-            <ul class="dropdown-menu" role="menu">
+            <ul id="deleteDropdown" class="dropdown-menu" role="menu">
                 <li><a onclick="DeleteSystem({{mapsys.pk}});")>I'm sure!</a></li>
                 <li><a class="dropdown-toggle" data-toggle="dropdown")>Just Kidding!</a></li>
             </ul>
         </div>
-        <a class="btn" onclick="CloseSystemMenu();">Close Menu</a>
     </div>
 </div>
