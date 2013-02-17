@@ -15,7 +15,7 @@
             <td>{% jumps system d.system %}</td>
             <td>{% ly system d.system %}</td>
             {% if is_igb_trusted %}
-            <td><button class='btn' onclick="CCPEVE.setDestination(d.system.pk);">Set Destination </button></td>
+            <td><button class='btn btn-mini btn-info' onclick="CCPEVE.setDestination({{d.system.pk}});">Set</button></td>
             {% endif %}
         </tr>
     {% endfor %}
