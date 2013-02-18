@@ -44,7 +44,6 @@
         <input type="radio" class="sysAddInput" name="bottomBubbled" value="0" checked="checked">No <br />
         <input type="radio" class="sysAddInput" name="bottomBubbled" value="1">Yes
         <br />
-        <input id="sysAddSubmit" class="sysAddInput btn btn-primary" type="submit" value="Add System">
         <input type="submit" style="display: none;">
     </form>
 </div>
@@ -61,6 +60,9 @@
                         });
             $('#btnIGBAdd').click(function(e){
                         AddSystem();
+                        $('#modalHolder').modal('hide');
+                        });
+            $('#btnClose').click(function(e){
                         $('#modalHolder').modal('hide');
                     });
         </script>

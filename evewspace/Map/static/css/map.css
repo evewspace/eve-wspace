@@ -147,6 +147,10 @@ td
     padding-left: 15px;
     padding-right: 10px;
 }
+textarea
+{
+    color: #000000;
+}
 .tip {
   background: #eee;
   opacity: 100%;
