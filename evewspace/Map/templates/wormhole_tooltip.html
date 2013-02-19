@@ -21,7 +21,7 @@
     <div class="row">
         <div class="wormholeOverallInfo span2">
             {% if wh.mass_status = 0 %}
-            <span class="massStatus label label-success">Mass: Fine
+            <span class="massStatus label label-success">Mass: Normal
             {% elif wh.mass_status = 1 %}
             <span class="massStatus label label-warning">Mass: First Shrink
             {% else %}
@@ -31,7 +31,7 @@
         </div>
         <div class="wormholeOverallInfo span2">
             {% if wh.time_status = 0 %}
-            <span class="timeStatus label label-success">Time: Fine
+            <span class="timeStatus label label-success">Time: Normal
             {% else %}
             <span class="timeStatus label label-important">Time: End of Life
             {% endif %}

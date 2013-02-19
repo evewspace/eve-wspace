@@ -7,11 +7,11 @@
         {% csrf_token %}
         <h4>Wormhole Status:</h4>
         Time Status: &nbsp
-        <input type="radio" class="editWormholeInput" name="timeStatus" value="0" {% if wormhole.time_status == 0 %} checked="checked" {% endif %}> Fine &nbsp
+        <input type="radio" class="editWormholeInput" name="timeStatus" value="0" {% if wormhole.time_status == 0 %} checked="checked" {% endif %}> Normal &nbsp
         <input type="radio" class="editWormholeInput" name="timeStatus" value="1" {% if wormhole.time_status == 1 %} checked="checked" {% endif %}> End of Life
         <br />
         Mass Status: &nbsp
-        <input type="radio" class="editWormholeInput" name="massStatus" value="0" {% if wormhole.mass_status == 0 %} checked="checked" {% endif %}> Fine &nbsp
+        <input type="radio" class="editWormholeInput" name="massStatus" value="0" {% if wormhole.mass_status == 0 %} checked="checked" {% endif %}> Normal &nbsp
         <input type="radio" class="editWormholeInput" name="massStatus" value="1" {% if wormhole.mass_status == 1 %} checked="checked" {% endif %}> First Shrink &nbsp
         <input type="radio" class="editWormholeInput" name="massStatus" value="2" {% if wormhole.mass_status == 2 %} checked="checked" {% endif %}> Critical
         <br />
