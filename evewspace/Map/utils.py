@@ -61,7 +61,7 @@ class MapJSONGenerator(object):
         if system.system.active_pilots.filter(user=self.user).count():
             return staticPrefix + "mylocation.png"
 
-        if system.stfleets.filter(ended__isnull=True).count() != 0:
+        if system.system.stfleets.filter(ended__isnull=True).count() != 0:
             return staticPrefix + "farm.png"
 
         if system.system.shipkills + system.system.podkills > pvp_threshold:

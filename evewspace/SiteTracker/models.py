@@ -17,43 +17,114 @@
 from django.db import models
 from django.contrib.auth.models import User
 from Map.models import Map, System, MapSystem
+from core.utils import get_config
+from datetime import datetime
+import pytz
 
 # Create your models here.
 
 class Fleet(models.Model):
     """Represents a SiteTracker fleet."""
-    mapsystem = models.ForeignKey(MapSystem, related_name="stfleets")
-    boss = models.ForeignKey(User, related_name="bossfleets")
-    started = models.DateTimeField()
+    system = models.ForeignKey(System, related_name="stfleets")
+    initial_boss = models.ForeignKey(User, related_name="bossfleets")
+    current_boss = models.ForeignKey(User, related_name="currently_bossing")
+    started = models.DateTimeField(auto_now_add=True)
     ended = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         permissions = (("can_sitetracker", "Use the Site Tracker system."),)
 
     def __unicode__(self):
-        return u"MapSystem: %s Boss: %s  Started: %s  Ended: %s" %(self.mapsystem.system.name, self.boss.username, self.started, self.ended)
+        return u"MapSystem: %s Boss: %s  Started: %s  Ended: %s" %(self.system.name, self.boss.username, self.started, self.ended)
+
+    def credit_site(self, site_type, system, boss):
+        """
+        Credits a site.
+        """
+        # Get the fleet member weighting variable and multiplier
+        x = int(get_config("ST_SIZE_WEIGHT", None).value)
+        n = self.members.count()
+        if x > 1:
+            weight_factor = x / (n + (x - 1))
+        else:
+            # If the factor is set to anything equal to or less than 1,
+            # we will not weight the results by fleet size
+            weight_factor = 1
+        raw_points = SiteWeight.objects.get(site_type=site_type,
+                sysclass=system.sysclass).raw_points
+        site = SiteRecord(fleet=self, site_type=site_type, system=system,
+                boss=boss, fleetsize=self.members.count(),
+                raw_points=raw_points,
+                weighted_points = raw_points * weight_factor)
+        site.save()
+        for user in self.members.filter(leavetime=None).all():
+            site.members.add(user.user.pk)
+        return site
+
+    def close_fleet(self):
+        """
+        Closes the SiteTracker fleet.
+        """
+        for member in self.members.filter(leavetime=None):
+            member.leavetime = datetime.now(pytz.utc)
+        self.ended = datetime.now(pytz.utc)
+        self.save()
+
+    def join_fleet(self, user):
+        """
+        Adds user to fleet.
+        """
+        UserLog(fleet=self, user=user).save()
+
+    def leave_fleet(self, user):
+        """
+        Removes user from fleet.
+        """
+        if self.members.count() == 1:
+            # We're the only member left, close the fleet.
+            self.close_fleet()
+        else:
+            return UserLog.objects.filter(fleet=self,
+                user=user).update(leavetime=datetime.now(pytz))
+
 
 class SiteType(models.Model):
     """Represents a type of site that can be credited."""
-    shortname = models.CharField(max_length=8)
-    longname = models.CharField(max_length=80)
+    shortname = models.CharField(max_length=8, unique=True)
+    longname = models.CharField(max_length=80, unique=True)
     # Defunct site types are maintained in the databse for relational purposes but can no longer be credited
     defunct = models.BooleanField()
 
     def __unicode__(self):
         return self.longname
 
+
+class SiteWeight(models.Model):
+    """
+    Represents the raw points available for a site type / system class combo
+    """
+    site_type = models.ForeignKey(SiteType, related_name='weights')
+    sysclass = models.IntegerField(choices=[(1, "C1"), (2, "C2"), (3, "C3"),
+        (4, "C4"), (5, "C5"), (6, "C6"), (7, "High Sec"), (8, "Low Sec"),
+        (9, "Null Sec")])
+    raw_points = models.IntegerField()
+
+
 class SiteRecord(models.Model):
     """Represents the record of a site run."""
     fleet = models.ForeignKey(Fleet, related_name="sites")
-    type = models.ForeignKey(SiteType, related_name="sitesrun")
+    site_type = models.ForeignKey(SiteType, related_name="sitesrun")
     timestamp = models.DateTimeField(auto_now_add=True)
     system = models.ForeignKey(System, related_name="sitescompleted")
     boss = models.ForeignKey(User, related_name="sitescredited")
+    members = models.ManyToManyField(User, related_name="sites")
     fleetsize = models.IntegerField()
+    raw_points = models.IntegerField()
+    weighted_points = models.IntegerField()
 
     def __unicode__(self):
         return u"System: %s Time: %s  Type: %s" % (self.system.name, self.timestamp, self.type.shortname)
+
 
 class UserLog(models.Model):
     """Represents a user's sitetracker log."""
@@ -62,15 +133,6 @@ class UserLog(models.Model):
     jointime = models.DateTimeField(auto_now_add=True)
     leavetime = models.DateTimeField(null=True, blank=True)
 
-class UserExclusion(models.Model):
-    """Represents sites that a User does not get credit for regardless of their UserLog."""
-    user = models.ForeignKey(User, related_name="siteexclusions")
-    site = models.ForeignKey(SiteRecord, related_name="userexclusions")
-
-class UserInclusion(models.Model):
-    """Represents sites that a User does get credit for regardless of their UserLog."""
-    user = models.ForeignKey(User, related_name="siteinclusions")
-    site = models.ForeignKey(SiteRecord, related_name="userinclusions")
 
 class ClaimPeriod(models.Model):
     """Represents a claim period that Users can claim against."""
