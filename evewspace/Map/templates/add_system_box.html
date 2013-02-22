@@ -3,7 +3,7 @@
         <h4>Add System Connected To: {{topMs.system.name}}</h4>
     </div>
     <div class="modal-body">
-    <form id="sysAddForm" action="system/new" method="post">
+    <form id="sysAddForm" action="system/new/" method="post">
         {% csrf_token %}
         <input type="hidden" class="sysAddInput" name="topMsID" value="{{topMs.pk}}">
         System: &nbsp <input type="text" class="sysAddInput systemAuto" name="bottomSystem" id="sysNameBox" /> <br />
