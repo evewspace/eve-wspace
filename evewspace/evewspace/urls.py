@@ -34,4 +34,5 @@ urlpatterns = patterns('',
         # Uncomment the next line to enable the admin:
         url(r'^search/', include('search.urls')),
         url(r'^pos/', include('POS.urls')),
+        url(r'^sitetracker/', include('SiteTracker.urls')),
 )

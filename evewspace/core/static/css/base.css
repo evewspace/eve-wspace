@@ -37,3 +37,12 @@ BODY
 {
     font-size: 8pt;
 }
+.stStatusHeader
+{
+    text-align: left;
+}
+.stFleetListing
+{
+    text-align: left;
+}
+

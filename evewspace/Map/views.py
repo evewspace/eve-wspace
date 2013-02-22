@@ -178,8 +178,11 @@ def get_system_context(msID):
         interest = mapsys.interesttime and mapsys.interesttime > interestthreshold
     else:
         interest = mapsys.interesttime
+    # Include any SiteTracker fleets that are active
+    stfleets = mapsys.system.stfleets.filter(ended=None).all()
     return { 'system' : system, 'mapsys' : mapsys,
-             'scanwarning' : scanwarning, 'isinterest' : interest }
+             'scanwarning' : scanwarning, 'isinterest' : interest,
+             'stfleets': stfleets}
 
 
 @login_required

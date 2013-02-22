@@ -44,7 +44,15 @@
 		</div>
 
 		<div id="baseContentHeadDiv" class="contenthead">
-			{%block contentheader %}{%endblock%}
+            {% if perms.SiteTracker.can_sitetracker %}
+            {% load sitetracker %}
+            <div class="row">
+            <div id="stPlaceholderDiv" class="well well-small span9">
+                {% st_status_bar %}
+            </div>
+        </div>
+            {% endif %}
+            {%block contentheader %}{%endblock%}
 		</div>
 	
 		<div id="baseContentDiv" class="content">

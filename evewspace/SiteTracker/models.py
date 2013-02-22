@@ -30,12 +30,14 @@ class Fleet(models.Model):
     current_boss = models.ForeignKey(User, related_name="currently_bossing")
     started = models.DateTimeField(auto_now_add=True)
     ended = models.DateTimeField(blank=True, null=True)
+    roles_needed = models.ManyToManyField('SiteRole', related_name="fleets_need")
 
     class Meta:
         permissions = (("can_sitetracker", "Use the Site Tracker system."),)
 
     def __unicode__(self):
-        return u"MapSystem: %s Boss: %s  Started: %s  Ended: %s" %(self.system.name, self.boss.username, self.started, self.ended)
+        return u"MapSystem: %s Boss: %s  Started: %s  Ended: %s" % (self.name,
+                self.boss.username, self.started, self.ended)
 
     def credit_site(self, site_type, system, boss):
         """
@@ -58,7 +60,7 @@ class Fleet(models.Model):
                 weighted_points = raw_points * weight_factor)
         site.save()
         for user in self.members.filter(leavetime=None).all():
-            site.members.add(user.user.pk)
+            site.members.add(UserSite(site=site, user=user, pending=False))
         return site
 
     def close_fleet(self):
@@ -74,7 +76,17 @@ class Fleet(models.Model):
         """
         Adds user to fleet.
         """
-        UserLog(fleet=self, user=user).save()
+        if not self.members.filter(user=user, leavetime=None).count():
+            u = UserLog(fleet=self, user=user).save()
+        else:
+            u = self.members.get(user=user, leavetime=None)
+        return u
+
+    def active_members(self):
+        """
+        Return a list of active members.
+        """
+        return self.members.filter(leavetime=None)
 
     def leave_fleet(self, user):
         """
@@ -83,9 +95,18 @@ class Fleet(models.Model):
         if self.members.count() == 1:
             # We're the only member left, close the fleet.
             self.close_fleet()
+        elif self.current_boss == user:
+            self.current_boss = self.members.exclude(user=user).filter(
+                    leavetime=None).all()[0].user
         else:
             return UserLog.objects.filter(fleet=self,
                 user=user).update(leavetime=datetime.now(pytz))
+
+
+class SiteRole(models.Model):
+    """Represents a role for a sitetracker fleet."""
+    short_name = models.CharField(max_length=32, unique=True)
+    long_name = models.CharField(max_length=255, unique=True)
 
 
 class SiteType(models.Model):
@@ -117,13 +138,26 @@ class SiteRecord(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     system = models.ForeignKey(System, related_name="sitescompleted")
     boss = models.ForeignKey(User, related_name="sitescredited")
-    members = models.ManyToManyField(User, related_name="sites")
     fleetsize = models.IntegerField()
     raw_points = models.IntegerField()
     weighted_points = models.IntegerField()
 
     def __unicode__(self):
         return u"System: %s Time: %s  Type: %s" % (self.system.name, self.timestamp, self.type.shortname)
+
+
+class UserSite(models.Model):
+    """Represents a user's credit for a site."""
+    site = models.ForeignKey(SiteRecord, related_name="members")
+    user = models.ForeignKey(User, related_name="sites")
+    pending = models.BooleanField()
+
+    def approve(self):
+        """
+        Mark the site approved.
+        """
+        self.pending = False
+        self.save()
 
 
 class UserLog(models.Model):

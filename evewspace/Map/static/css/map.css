@@ -137,6 +137,10 @@ h5
 {
     text-align: center;
 }
+.stFleetHeader
+{
+    text-align: left;
+}
 th
 {
     padding-left: 10px;

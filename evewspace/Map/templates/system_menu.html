@@ -8,6 +8,9 @@
     <a class="btn" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
     {% endif %}
     <a class="btn" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
+    {% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
+    <a class="btn" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>
+    {% endif %}
     <div id="intelButton" class="btn-group dropdown">
         <a class="btn dropdown-toggle" data-toggle="dropdown">
             Intel
