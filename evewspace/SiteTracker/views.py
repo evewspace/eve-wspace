@@ -27,7 +27,7 @@ from datetime import datetime
 import pytz
 import csv
 
-def require_boss(view_func):
+def require_boss():
     def _dec(view_func):
         def _view(request, fleetID, *args, **kwargs):
             fleet = get_object_or_404(Fleet, pk=fleetID)
@@ -79,12 +79,12 @@ def leave_fleet(request, fleetID=None):
         fleet.leave_fleet(request.user)
         return HttpResponse()
     else:
-        for fleet in request.user.sitetrackerlogs.filter(leavetime=None).all():
-            fleet.leave_fleet(request.user)
+        for log in request.user.sitetrackerlogs.filter(leavetime=None).all():
+            log.fleet.leave_fleet(request.user)
         return HttpResponse()
 
 
-@require_boss
+@require_boss()
 def kick_member(request, fleetID, memberID):
     """
     Removes a member from the fleet.
@@ -108,7 +108,7 @@ def promote_member(request, fleetID, memberID):
         raise PermissionDenied
 
     fleet = get_object_or_404(Fleet, pk=fleetID)
-    member = get_object_or_404(Fleet.members, leavetime=None, user__pk=memberID)
+    member = get_object_or_404(User, pk=memberID)
     fleet.make_boss(member)
     return HttpResponse()
 
@@ -126,7 +126,7 @@ def join_fleet(request, fleetID):
     return HttpResponse()
 
 
-@require_boss
+@require_boss()
 def disband_fleet(request, fleetID):
     """
     Disband the fleet.
@@ -138,7 +138,7 @@ def disband_fleet(request, fleetID):
     return HttpResponse()
 
 
-@require_boss
+@require_boss()
 def credit_site(request, fleetID):
     """
     Credit a site to the given fleet. Takes POST input:
@@ -148,12 +148,12 @@ def credit_site(request, fleetID):
         raise PermissionDenied
 
     fleet = get_object_or_404(Fleet, pk=fleetID)
-    site_type = get_object_or_404(SiteType, short_name=request.POST.get('type', None))
+    site_type = get_object_or_404(SiteType, shortname=request.POST.get('type', None))
     fleet.credit_site(site_type, fleet.system, request.user)
     return HttpResponse()
 
 
-@require_boss
+@require_boss()
 def remove_site(request, fleetID, siteID):
     """
     Uncredit a site to the given fleet.
@@ -163,10 +163,10 @@ def remove_site(request, fleetID, siteID):
     fleet = get_object_or_404(Fleet, pk=fleetID)
     site = get_object_or_404(SiteRecord, pk=siteID)
     site.delete()
-    return HttpResponse
+    return HttpResponse()
 
 
-@require_boss
+@require_boss()
 def approve_fleet_site(request, fleetID, siteID, memberID):
     """
     Approve a pending site while the fleet is active.
@@ -198,10 +198,12 @@ def claim_site(request, fleetID, siteID, memberID):
 
     if fleet.current_boss == request.user:
         site.members.add(UserSite(site=site, user=member, pending=False))
+        return HttpResponse()
     elif member == request.user:
         site.members.add(UserSite(site=site, user=member, pending=True))
-    else:
-        raise PermissionDenied
+        return HttpResponse()
+
+    raise PermissionDenied
 
 
 def unclaim_site(request, fleetID, siteID, memberID):
@@ -219,8 +221,9 @@ def unclaim_site(request, fleetID, siteID, memberID):
         raise PermissionDenied
 
     if fleet.current_boss == request.user or member == request.user:
-        site.members.get(user=member).delete()
-    else:
-        raise PermissionDenied
+        site.members.filter(user=member).delete()
+        return HttpResponse()
+
+    raise PermissionDenied
 
 

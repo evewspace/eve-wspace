@@ -1,0 +1,35 @@
+    {% if not availfleets|length and not myfleets|length %} 
+    <p class="label label-info">There are no active fleets, start one from the map!</p>
+    {% elif not availfleets|length %}
+    <p class="label label-info">You are in all available fleets.</p>
+    {% else %}
+    <table class="stAvailFleetTable table">
+        <tr>
+            <th>System:</th>
+            <th>Boss:</th>
+            <th>Roles:</th>
+            <th>Sites Run:</th>
+            <th>Join</th>
+        </tr>
+    {% for x in availfleets %}
+        <tr>
+            <td>{{x.system.name}}</td>
+            <td>{{x.current_boss.username}}</td>
+            <td>
+                <ul>
+                    {% for role in x.roles_needed.all %}
+                    <li>{{role.short_name}}</li>
+                    {% empty %}
+                    None
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>{{x.sites.count}}</td>
+            <td>
+                <button class="btn btn-mini btn-primary" onclick="STJoinFleet({{x.pk}});">Join</button>
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+

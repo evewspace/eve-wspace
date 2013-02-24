@@ -1,0 +1,9 @@
+<p class="stStatusHeaderText">
+    <strong>SiteTracker Status:</strong> &nbsp
+    {% if myfleets|length %}
+    <span class="text-info">Active in {{myfleets|length}} fleet(s)! {% if availfleets|length > 1 %} There are {{fleetcount}} fleets active. {% endif %}</span>
+    {% else %}
+    <span class="text-error">Not active in any fleet! There are {{availfleets|length}} fleets active.</span>
+    {% endif %}
+</p>
+

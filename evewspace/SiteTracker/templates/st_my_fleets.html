@@ -1,0 +1,20 @@
+{% load sitetracker %}
+{% for x in myfleets %}
+<div id="fleet{{x.pk}}Details" class="fleetDetailsHolder">
+    <table class="table myFleetTable table-hover">
+        <tr>
+            <th>System</th>
+            <th>Boss</th>
+            <th>Sites</th>
+            <th>Members</th>
+            <th>Leave</th>
+            <th>Take Boss</th>
+        </tr>
+        {% if x.fleet.current_boss == user %}
+            {% st_fleet_details_boss x.fleet user %}
+        {% else %}
+            {% st_fleet_details x.fleet user %}
+        {% endif %}
+    </table>
+</div>
+{% endfor %}

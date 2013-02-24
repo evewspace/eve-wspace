@@ -1,0 +1,21 @@
+{% load sitetracker %}
+<ul class="stSitesList">
+            {% for site in fleet.sites.all %}
+            <li class="stSiteListing">
+                {% if user in site and site in pending_sites %}
+                <i class="icon-question-sign" title="Credit Pending. Click to unclaim."
+                    onclick="STUnclaimSite({{fleet.pk}}, {{site.pk}}, {{user.pk}});"></i>
+                {% elif user in site %}
+                <i class="icon-ok-sign" title="Credited. Click to unclaim."
+                    onclick="STUnclaimSite({{fleet.pk}}, {{site.pk}}, {{user.pk}});"></i>
+                {% else %}
+                <i class="icon-minus-sign" title="Not Credited. Click to claim."
+                    onclick="STClaimSite({{fleet.pk}}, {{site.pk}}, {{user.pk}});"></i>
+                {% endif %}
+                 {{site.timestamp|date:"H:i"}} {{site.site_type.shortname}}
+            </li>
+            {% empty %}
+            None yet!
+            {% endfor %}
+        </ul>
+

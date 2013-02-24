@@ -36,8 +36,24 @@ class Fleet(models.Model):
         permissions = (("can_sitetracker", "Use the Site Tracker system."),)
 
     def __unicode__(self):
-        return u"MapSystem: %s Boss: %s  Started: %s  Ended: %s" % (self.name,
-                self.boss.username, self.started, self.ended)
+        return u"MapSystem: %s Boss: %s  Started: %s  Ended: %s" % (self.system.name,
+                self.current_boss.username, self.started, self.ended)
+
+    def __contains__(self, user):
+        """
+        Allow for user in fleet syntax to determine both inactive and active
+        user records for a fleet.
+        """
+        if user is None:
+            return False
+        return self.members.filter(user=user).exists()
+
+    def __iter__(self):
+        """
+        Provide support for syntax: for User in fleet
+        """
+        for member_rec in self.members.all():
+            yield member_rec.user
 
     def credit_site(self, site_type, system, boss):
         """
@@ -60,7 +76,7 @@ class Fleet(models.Model):
                 weighted_points = raw_points * weight_factor)
         site.save()
         for user in self.members.filter(leavetime=None).all():
-            site.members.add(UserSite(site=site, user=user, pending=False))
+            site.members.add(UserSite(site=site, user=user.user, pending=False))
         return site
 
     def close_fleet(self):
@@ -69,6 +85,7 @@ class Fleet(models.Model):
         """
         for member in self.members.filter(leavetime=None):
             member.leavetime = datetime.now(pytz.utc)
+            member.save()
         self.ended = datetime.now(pytz.utc)
         self.save()
 
@@ -92,15 +109,24 @@ class Fleet(models.Model):
         """
         Removes user from fleet.
         """
-        if self.members.count() == 1:
+        if self.members.filter(leavetime=None).count() == 1:
             # We're the only member left, close the fleet.
             self.close_fleet()
+            return None
         elif self.current_boss == user:
+            # We're the boss, give it to the first schmuck we can.
             self.current_boss = self.members.exclude(user=user).filter(
                     leavetime=None).all()[0].user
-        else:
-            return UserLog.objects.filter(fleet=self,
-                user=user).update(leavetime=datetime.now(pytz))
+            self.save()
+        return UserLog.objects.filter(fleet=self,
+                user=user).update(leavetime=datetime.now(pytz.utc))
+
+    def make_boss(self, user):
+        """
+        Change the current fleet boss.
+        """
+        self.current_boss = user
+        self.save()
 
 
 class SiteRole(models.Model):
@@ -144,6 +170,27 @@ class SiteRecord(models.Model):
 
     def __unicode__(self):
         return u"System: %s Time: %s  Type: %s" % (self.system.name, self.timestamp, self.type.shortname)
+
+    def __contains__(self, user):
+        """
+        Allow for if user in siterecord to determine if a user has an entry.
+        """
+        if user is None:
+            return False
+        return self.members.filter(user=user).exists()
+
+    def __iter__(self):
+        """
+        Allow for syntax: for user in siterecord.
+        """
+        for log in self.members.all():
+            yield log.user
+
+    def is_pending(self, user):
+        """
+        Return True if user's credit is pending.
+        """
+        return self.members.get(user=user).pending
 
 
 class UserSite(models.Model):

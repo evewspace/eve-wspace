@@ -1,0 +1,33 @@
+<tr class="">
+    <td>{{fleet.system.name}}</td>
+    <td>You</td>
+    <td>
+        <ul class="stSitesList">
+            {% for site in fleet.sites.all %}
+            <li class="stSiteListing">
+            <i class="icon-remove" title="Click to uncredit." onclick="STRemoveSite({{fleet.pk}}, {{site.pk}});"></i> &nbsp
+            <i class="icon-repeat" title="Credit another." onclick="STCreditSite({{fleet.pk}}, '{{site.site_type.shortname}}');"></i> &nbsp
+            {{site.timestamp|date:"H:i"}} {{site.site_type.shortname}}
+            </li>
+            {% empty %}
+            None yet!
+            {% endfor %}
+            <li class="stSiteListing">
+            <strong>New: </strong>
+            <select class="input-small" id="fleet{{fleet.pk}}AddSiteType">
+                {% for type in site_types %}
+                <option value="{{type.shortname}}">{{type.shortname}}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-mini btn-default" onclick="STCreditSite({{fleet.pk}}, $('#fleet{{fleet.pk}}AddSiteType').val());">Credit Site</button>
+            </li>
+        </ul>
+    </td>
+    <td>{{fleet.active_members|length}}</td>
+    <td>
+        <button class="btn btn-mini error" onclick="STLeaveFleet({{fleet.pk}});">Leave</button>
+    </td>
+    <td>
+        <span class="info">Click to open boss panel.</span>
+    </td>
+</tr>

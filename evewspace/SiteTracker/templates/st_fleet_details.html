@@ -1,0 +1,15 @@
+{% load sitetracker %}
+<tr class="">
+    <td>{{fleet.system.name}}</td>
+    <td>{{fleet.current_boss.username}}</td>
+    <td>
+        {% st_member_site_list fleet user %}
+    </td>
+    <td>{{fleet.active_members|length}}</td>
+    <td>
+        <button class="btn btn-mini" onclick="STLeaveFleet({{fleet.pk}});">Leave</button>
+    </td>
+    <td>
+        <button class="btn btn-mini" onclick="STPromoteMember({{fleet.pk}}, {{user.pk}});">Take Boss</button>
+    </td>
+</tr>

@@ -1,56 +1,20 @@
 {% load static %}
 <script src="{% get_static_prefix %}js/sitetracker_functions.js" type="text/javascript"></script>
-<div class="stStatusHeader text-left" data-toggle="collapse" data-target="#stFleetListing">
-    <p class="stStatusHeaderText">
-    <strong>SiteTracker Status:</strong> &nbsp
-    {% if myfleets|length %}
-    <span class="text-info">Active in {{myfleets|length}} fleet(s)! {% if availfleets|length > 1 %} There are {{fleetcount}} fleets active. {% endif %}</span>
-    {% else %}
-    <span class="text-error">Not active in any fleet! There are {{availfleets|length}} fleets active.</span>
-    {% endif %}
-    </p>
+<link rel="stylesheet" type="text/css" href="{% get_static_prefix %}css/sitetracker.css" />
+{% load sitetracker %}
+<div id="stStatusHeader" class="stStatusHeader text-left" data-toggle="collapse" data-target="#stFleetListing">
+    {% st_status user %}
 </div>
-<div id="stFleetListing" class="collapse">
+<div id="stFleetListing" class="collapse {% if refresh %}in{% endif %}">
     {% if myfleets|length %}
     <h5 class="stFleetHeader">My Fleets:</h5>
-    {% for x in myfleets %}
-    {{x.system.name}}
-    {% endfor %}
+    <div id="myFleetsHolder" class="myFleetsHolder">
+        {% st_my_fleets user %}
+    </div>
     {% endif %}
     <h5 class="stFleetHeader">Available Fleets:</h5>
-    {% if not availfleets|length and not myfleets|length %} 
-    <p class="label label-info">There are no active fleets, start one from the map!</p>
-    {% elif not availfleets|length %}
-    <p class="label label-info">You are in all available fleets.</p>
-    {% else %}
-    <table class="stAvailFleetTable table">
-        <tr>
-            <th>System:</th>
-            <th>Boss:</th>
-            <th>Roles:</th>
-            <th>Sites Run:</th>
-            <th>Join</th>
-        </tr>
-    {% for x in availfleets %}
-        <tr>
-            <td>{{x.system.name}}</td>
-            <td>{{x.current_boss.username}}</td>
-            <td>
-                <ul>
-                    {% for role in x.roles_needed.all %}
-                    <li>{{role.short_name}}</li>
-                    {% empty %}
-                    None
-                    {% endfor %}
-                </ul>
-            </td>
-            <td>{{x.sites.count}}</td>
-            <td>
-                <button class="btn btn-mini btn-primary" onclick="STJoinFleet({{x.pk}});">Join</button>
-            </td>
-        </tr>
-    {% endfor %}
-    </table>
-    {% endif %}
+    <div id="availFleetsHolder" class="availFleetsHolder">
+        {% st_avail_fleets user %}
+    </div>
 </div>
 
