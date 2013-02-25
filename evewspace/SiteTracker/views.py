@@ -22,7 +22,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from datetime import datetime
 import pytz
 import csv
@@ -93,8 +93,9 @@ def kick_member(request, fleetID, memberID):
         raise PermissionDenied
 
     fleet = get_object_or_404(Fleet, pk=fleetID)
-    member = get_object_or_404(Fleet.members, leavetime=None, user__pk=memberID)
-    fleet.leave_fleet(member)
+    member = get_list_or_404(fleet.members, leavetime=None, user__pk=memberID)
+    for mem in member:
+        fleet.leave_fleet(mem.user)
     return HttpResponse()
 
 
@@ -195,13 +196,19 @@ def claim_site(request, fleetID, siteID, memberID):
 
     if fleet.ended:
         raise PermissionDenied
-
-    if fleet.current_boss == request.user:
-        site.members.add(UserSite(site=site, user=member, pending=False))
-        return HttpResponse()
-    elif member == request.user:
-        site.members.add(UserSite(site=site, user=member, pending=True))
-        return HttpResponse()
+    if member in site:
+        if fleet.current_boss == request.user:
+            site.members.get(user=member).approve()
+            return HttpResponse()
+        else:
+            raise PermissionDenied
+    else:
+        if fleet.current_boss == request.user:
+            site.members.add(UserSite(site=site, user=member, pending=False))
+            return HttpResponse()
+        elif member == request.user:
+            site.members.add(UserSite(site=site, user=member, pending=True))
+            return HttpResponse()
 
     raise PermissionDenied
 
@@ -235,3 +242,27 @@ def refresh_fleets(request):
         raise PermissionDenied
     myfleets = request.user.sitetrackerlogs.filter(leavetime=None)
     return TemplateResponse(request, "st_fleet_refresh.html", {'myfleets': myfleets})
+
+
+@require_boss()
+def boss_panel(request, fleetID):
+    """
+    Return the HTML for the boss control panel popup.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    fleet = get_object_or_404(Fleet, pk=fleetID)
+    return TemplateResponse(request, "st_boss_panel.html", {'fleet': fleet})
+
+
+@require_boss()
+def refresh_boss_member(request, fleetID, memberID):
+    """
+    Returns an updated details view for a boss panel member.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    fleet = get_object_or_404(Fleet, pk=fleetID)
+    member = get_object_or_404(User, pk=memberID)
+    return TemplateResponse(request, "st_boss_member_refresh.html",
+            {'member': fleet.members.filter(user=member).latest('jointime')})

@@ -25,9 +25,9 @@
     </td>
     <td>{{fleet.active_members|length}}</td>
     <td>
-        <button class="btn btn-mini error" onclick="STLeaveFleet({{fleet.pk}});">Leave</button>
+        <button class="btn btn-mini btn-error" onclick="STLeaveFleet({{fleet.pk}});">Leave</button>
     </td>
     <td>
-        <span class="info">Click to open boss panel.</span>
+        <button class="btn btn-primary btn-mini" onclick="STBossPanel({{fleet.pk}});">Fleet Management</button>
     </td>
 </tr>

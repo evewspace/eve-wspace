@@ -1,0 +1,44 @@
+{% load sitetracker %}
+    <div class="row">
+        <div class="span2">
+            <button class="btn btn-primary btn-small" onclick="STLeaveFleet({{member.fleet.pk}}, {{member.user.pk}}); 
+                {% if member.fleet.current_boss == member.user %}  
+                $('#modalHolder').modal('hide'); $('#modalHolder').empty();
+                {% else %}
+                ReloadBossPanel({{member.fleet.pk}});
+                {% endif %}
+                ">Kick Member</button><br /><br />
+            {% if member.fleet.current_boss != member.user %}
+            <button class="btn btn-small" onclick="STPromoteMember({{member.fleet.pk}}, {{member.user.pk}});
+                    $('#modalHolder').modal('hide'); ReloadSTBar(); $('#modalHolder').empty();">
+                Make Boss
+            </button>
+            {% endif %}
+
+        </div>
+        <div class="span2">
+            <span class="label label-inverse">All Sites</span>
+            {% include "st_boss_member_sitelist.html" %}
+            {% if member.pending_sites %}
+            <br /><br />
+            <span class="label label-inverse">Pending Sites</span>
+            <table class="table table-compact">
+                <tr>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Approve</th>
+                    <th>Deny</th>
+                </tr>
+            {% for site in member.pending_sites %}
+                <tr>
+                    <td>{{site.timestamp|date:"H:i"}}</td>  
+                    <td>{{site.site_type.short_name}}</td>
+                    <td><button class="btn btn-mini btn-primary" onclick="STClaimSite({{member.fleet.pk}}, {{site.pk}}, {{member.user.pk}}); setTimeout(function(){ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});}, 100);">Approve</button></td>
+                    <td><button class="btn btn-mini" onclick="STUnclaimSite({{member.fleet.pk}}, {{site.pk}}, {{member.user.pk}}); setTimeout(function(){ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});}, 100);">Deny</button></td>
+                </tr>
+            {% endfor %}
+            </table>
+            {% endif %}
+        </div>
+    </div>
+

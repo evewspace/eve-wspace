@@ -49,6 +49,13 @@ def st_status(user):
     """
     return get_st_context(user)
 
+@register.inclusion_tag("st_boss_member.html")
+def st_boss_member(member):
+    """
+    Displays the details for a fleet member in the boss panel.
+    """
+    return {'member': member}
+
 @register.inclusion_tag("st_my_fleets.html")
 def st_my_fleets(user):
     """

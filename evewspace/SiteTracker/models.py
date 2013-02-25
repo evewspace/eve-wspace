@@ -79,6 +79,7 @@ class Fleet(models.Model):
             site.members.add(UserSite(site=site, user=user.user, pending=False))
         return site
 
+
     def close_fleet(self):
         """
         Closes the SiteTracker fleet.
@@ -118,8 +119,8 @@ class Fleet(models.Model):
             self.current_boss = self.members.exclude(user=user).filter(
                     leavetime=None).all()[0].user
             self.save()
-        return UserLog.objects.filter(fleet=self,
-                user=user).update(leavetime=datetime.now(pytz.utc))
+        UserLog.objects.filter(fleet=self,
+                user=user, leavetime=None).update(leavetime=datetime.now(pytz.utc))
 
     def make_boss(self, user):
         """
@@ -214,6 +215,16 @@ class UserLog(models.Model):
     jointime = models.DateTimeField(auto_now_add=True)
     leavetime = models.DateTimeField(null=True, blank=True)
 
+    def pending_sites(self):
+        """
+        Returns a list of site records which are pending credit.
+        """
+        pending_sites = []
+        for site in self.fleet.sites.all():
+            if UserSite.objects.filter(user=self.user, site=site,
+                    pending=True).all():
+                pending_sites.append(site)
+        return pending_sites
 
 class ClaimPeriod(models.Model):
     """Represents a claim period that Users can claim against."""

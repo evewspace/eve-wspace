@@ -34,10 +34,16 @@ function STCreditSite(fleetID, siteType){
     });
 }
 
-function STLeaveFleet(fleetID){
+function STLeaveFleet(fleetID, memberID){
+    // memberID is null if we are leaving ourselves, otherwise we're kicking
+    if (memberID){
+        var address = "/sitetracker/fleet/" + fleetID + "/member/" + memberID + "/kick/";
+    }else{
+        var address = "/sitetracker/fleet/" + fleetID + "/leave/";
+    }
     $.ajax({
         type: "POST",
-        url: "/sitetracker/fleet/" + fleetID + "/leave/",
+        url: address,
         success: function(){
             ReloadSTBar();
         }
@@ -89,6 +95,50 @@ function STRemoveSite(fleetID, siteID){
 
 }
 
+function STBossPanel(fleetID){
+    $.ajax({
+        type: "GET",
+        url: "/sitetracker/fleet/" + fleetID + "/bosspanel/",
+        success: function(data){
+            $('#modalHolder').empty();
+            $('#modalHolder').html(data);
+            $('#modalHolder').modal('show');
+        }
+    });
+}
+
+function STDisbandFleet(fleetID){
+    $.ajax({
+        type: "POST",
+        url: "/sitetracker/fleet/" + fleetID + "/disband/",
+        success: function(data){
+            $('#modalHolder').modal('hide');
+            $('#modalHolder').empty();
+            ReloadSTBar();
+        }
+    });
+}
+
+function ReloadBossFleetMember(fleetID, memberID){
+    $.ajax({
+        type: "GET",
+        url: "/sitetracker/fleet/" + fleetID + "/member/" + memberID + "/",
+        success: function(data){
+            $('#member' + memberID + 'Details').html(data);
+        }
+    });
+}
+
+function ReloadBossPanel(fleetID){
+    $.ajax({
+        type: "GET",
+        url: "/sitetracker/fleet/" + fleetID + "/bosspanel/",
+        success: function(data){
+            $('#modalHolder').html(data);
+        }
+    });
+
+}
 
 function ReloadSTBar(){
     $.ajax({

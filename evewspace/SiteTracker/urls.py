@@ -19,7 +19,6 @@ from django.conf.urls.defaults import patterns, include, url
 
 fleetmembersitepatterns = patterns('SiteTracker.views',
         url(r'unclaim/$', 'unclaim_site'),
-        url(r'approve/$', 'approve_fleet_site'),
         url(r'claim/$', 'claim_site'),
         )
 
@@ -31,12 +30,14 @@ fleetsitepatterns = patterns('SiteTracker.views',
 fleetmemberpatterns = patterns('SiteTracker.views',
         url(r'kick/$', 'kick_member'),
         url(r'promote/$', 'promote_member'),
+        url(r'$', 'refresh_boss_member'),
         )
 
 fleetpatterns = patterns('SiteTracker.views',
         url(r'join/$', 'join_fleet'),
         url(r'leave/$', 'leave_fleet'),
         url(r'site/$', 'credit_site'),
+        url(r'bosspanel/$', 'boss_panel'),
         url(r'site/(?P<siteID>\d+)/', include(fleetsitepatterns)),
         url(r'member/(?P<memberID>\d+)/', include(fleetmemberpatterns)),
         url(r'disband/$', 'disband_fleet'),

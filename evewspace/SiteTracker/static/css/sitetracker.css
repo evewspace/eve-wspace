@@ -2,3 +2,11 @@
 {
     list-style: none;
 }
+.stBossMemberEntry
+{
+    margin-bottom: 0px;
+}
+.stBossMemberEntryItem
+{
+    width: 50%;
+}

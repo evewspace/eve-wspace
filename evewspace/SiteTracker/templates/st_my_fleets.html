@@ -8,7 +8,11 @@
             <th>Sites</th>
             <th>Members</th>
             <th>Leave</th>
+            {% if x.fleet.current_boss != user %}
             <th>Take Boss</th>
+            {% else %}
+            <th>Management</th>
+            {% endif %}
         </tr>
         {% if x.fleet.current_boss == user %}
             {% st_fleet_details_boss x.fleet user %}
