@@ -1,3 +1,7 @@
+var stRefreshTimerID = null;
+$(document).ready(function(){
+    ReloadSTBar();
+});
 function STCreateFleet(sysID){
     $.ajax({
         type: "POST",
@@ -89,9 +93,21 @@ function STRemoveSite(fleetID, siteID){
 function ReloadSTBar(){
     $.ajax({
         type: "GET",
-        url: "/sitetracker/",
+        url: "/sitetracker/fleet/",
         success: function(data){
-            $('#stPlaceholderDiv').html(data);
+            $('#stFleetListing').html(data);
         }
     });
+    // We're doing this as two calls because replacing collapsible divs 
+    // messes things up.
+    $.ajax({
+        type: "GET",
+        url: "/sitetracker/",
+        success: function(data){
+            $('#stStatusHeader').html(data);
+        }
+    });
+    // Start the timer again
+    clearTimeout(stRefreshTimerID);
+    stRefreshTimerID = setTimeout(ReloadSTBar, 15000);
 }

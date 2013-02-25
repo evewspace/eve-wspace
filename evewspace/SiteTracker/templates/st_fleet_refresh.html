@@ -1,0 +1,12 @@
+{% load sitetracker %}
+    {% if myfleets|length %}
+    <h5 class="stFleetHeader">My Fleets:</h5>
+    <div id="myFleetsHolder" class="myFleetsHolder">
+        {% st_my_fleets user %}
+    </div>
+    {% endif %}
+    <h5 class="stFleetHeader">Available Fleets:</h5>
+    <div id="availFleetsHolder" class="availFleetsHolder">
+        {% st_avail_fleets user %}
+    </div>
+

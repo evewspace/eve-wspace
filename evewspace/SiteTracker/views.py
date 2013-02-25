@@ -226,4 +226,12 @@ def unclaim_site(request, fleetID, siteID, memberID):
 
     raise PermissionDenied
 
-
+@permission_required('SiteTracker.can_sitetracker')
+def refresh_fleets(request):
+    """
+    Return a template with tags for the myfleets and availfleets lists.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+    myfleets = request.user.sitetrackerlogs.filter(leavetime=None)
+    return TemplateResponse(request, "st_fleet_refresh.html", {'myfleets': myfleets})
