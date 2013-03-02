@@ -16,11 +16,12 @@
             <td><input type="text" id="id_root" name="root" class="systemAuto" /></td>
         </tr>
         {{form.explicitperms_errors}}
+        {% if perms.Map.map_admin %}
         <tr>
             <td><label for="id_explicitperms">Require Explicit Permissions:</label> </td>
             <td><input type="checkbox" id="id_explicitperms" name="explicitperms" /></td>
         </tr>
-
+        {% endif %}
     </table>
     <input class="btn btn-primary" type="submit" value="Submit" />
 </form>
