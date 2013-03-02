@@ -110,9 +110,10 @@ class Command(BaseCommand):
         """
         logging.debug('Starting auth check')
         try:
-            user = User.objects.get(username=username)
-            logging.debug('Found username ' + str(username))
-            if check_password(password, user.password) and user.has_perm("Jabber.can_jabber"):
+            clean_name = username.replace('_',' ')
+            user = User.objects.get(username=clean_name)
+            logging.debug('Found username ' + str(clean_name))
+            if check_password(password, user.password) and user.has_perm("Alerts.can_alert"):
                 self._generate_response(True)
                 logging.info(username + ' has logged in')
             else:
