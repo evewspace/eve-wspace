@@ -85,8 +85,7 @@ def edit_pos(request, sysID, posID):
             try:
                 api = eveapi.EVEAPIConnection(cacheHandler=handler)
                 corpID = api.eve.CharacterID(names=request.POST['corp']).characters[0].characterID
-                result = core_tasks.update_corporation.delay(corpID)
-                corp = result.get()
+                corp = core_tasks.update_corporation(corpID)
             except:
                 # The corp doesn't exist
                 raise Http404
@@ -144,8 +143,7 @@ def add_pos(request, sysID):
             try:
                 api = eveapi.EVEAPIConnection(cacheHandler=handler)
                 corpID = api.eve.CharacterID(names=request.POST['corp']).characters[0].characterID
-                result = core_tasks.update_corporation.delay(corpID)
-                corp = result.get()
+                corp = core_tasks.update_corporation(corpID)
             except:
                 # The corp doesn't exist
                 raise Http404
