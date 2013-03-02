@@ -17,6 +17,7 @@
 from django import template
 from django.core.cache import cache
 from core.models import NewsFeed
+from core.tasks import update_feeds
 from datetime import datetime
 from time import mktime
 
@@ -31,15 +32,20 @@ def feeds(context):
     return {'feeds': feeds}
 
 @register.inclusion_tag('feed_items.html')
-def feed_items(feed):
+def feed_items(feed, retry=False):
     items = []
     data = cache.get('feed_%s' % feed.pk)
-    for entry in data['entries']:
-        dt = datetime.fromtimestamp(mktime(entry['published_parsed']))
-        item = {'title': entry['title'].replace('&amp;', '&').replace('&#039;', "'"),
-                'summary': entry['summary'],
-                'time': dt,
-                'url': entry['link']}
-        items.append(item)
-
+    if data:
+        for entry in data['entries']:
+            dt = datetime.fromtimestamp(mktime(entry['published_parsed']))
+            item = {'title': entry['title'].replace('&amp;', '&').replace('&#039;', "'"),
+                    'summary': entry['summary'],
+                    'time': dt,
+                    'url': entry['link']}
+            items.append(item)
+    if not items and retry == False:
+        update_feeds()
+        return feed_items(feed, True)
+    elif  not items and retry == True:
+        return {'error': True}
     return {'items': items}

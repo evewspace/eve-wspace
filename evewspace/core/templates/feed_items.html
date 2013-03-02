@@ -4,6 +4,7 @@
         <th class="feedHeader">Posted</th>
         <th class="feedHeader">Article</th>
     </tr>
+    {% if items %}
     {% for item in items %}
     <tr class="feedItemRow">
         <td class="feedItem">{{item.time|naturaltime}}</td>
@@ -19,4 +20,9 @@
         <td class="feedItem">No items to display!</td>
     </tr>
     {% endfor %}
+    {% else %}
+    <tr class="feedItemRow">
+        <td class="feedItem">Unable to get feed!</td>
+    </tr>
+    {% endif %}
 </table>
