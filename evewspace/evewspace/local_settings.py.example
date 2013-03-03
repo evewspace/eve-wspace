@@ -1,3 +1,18 @@
+# Set this to False for production or you'll leak memory
+DEBUG = True
+
+# Set this to a secret value, google "django secret key" will give you
+# plenty of generators to choose from
+
+SECRET_KEY = 'alan_please_add_secret_key'
+
+# Set this to the directory you are service static files out of so that
+# manage.py collectstatic can put them in the right place
+
+STATIC_ROOT = "/home/evewspace/static/"
+
+# Put your DB details here
+
 DATABASES = {
         'default': {
                 'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
@@ -7,4 +22,71 @@ DATABASES = {
                 'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
                 'PORT': '5432',                      # Set to empty string for default. Not used with sqlite3.
         }
+}
+
+# This is the default celery beat schedule, modify it to your liking
+
+from datetime import timedelta
+from celery.schedules import crontab
+CELERYBEAT_SCHEDULE = {
+        'map_stats':{
+                'task': 'Map.tasks.update_system_stats',
+                'schedule': timedelta(hours=1),
+                'args': ()
+            },
+        'map_sov':{
+                'task': 'Map.tasks.update_system_sov',
+                'schedule': crontab(minute=0, hour=10),
+                'args': ()
+            },
+        'jump_cache':{
+                'task': 'Map.tasks.fill_jumps_cache',
+                'schedule': timedelta(minutes=10),
+                'args': ()
+            },
+        'downtime_sites': {
+                'task': 'Map.tasks.downtime_site_update',
+                'schedule': crontab(minute=5, hour=11),
+                'args': ()
+            },
+        'alliance_update':{
+                'task': 'core.tasks.update_all_alliances',
+                'schedule': crontab(minute=30, hour=10, day_of_week="tue"),
+                'args': ()
+            },
+        'server_status':{
+                'task': 'Map.tasks.check_server_status',
+                'schedule': timedelta(minutes=3),
+                'args': ()
+            },
+        'stale_locations':{
+                'task': 'Map.tasks.clear_stale_locations',
+                'schedule': timedelta(minutes=5),
+                'args': ()
+            },
+        'cache_reddit':{
+                'task': 'core.tasks.cache_eve_reddit',
+                'schedule': timedelta(seconds=45),
+                'args': ()
+            },
+        'cache_feeds':{
+                'task': 'core.tasks.update_feeds',
+                'schedule': timedelta(minutes=30),
+                'args': ()
+            },
+        }
+
+# Location of the message broker for celery, defaults to local
+# AMQP with guest/guest and / vhost
+
+BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+
+# Django cahce settings, defaults to local memcached instance
+
+CACHES = {
+    'default': {
+        'BACKEND': 'infinite_memcached.cache.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+        'TIMEOUT': 0
+    }
 }
