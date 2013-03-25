@@ -8,5 +8,6 @@ rm /home/vagrant/mysql55-inferno12-extended.sql
 /vagrant/evewspace/manage.py migrate
 /vagrant/evewspace/manage.py buildsystemdata
 /vagrant/evewspace/manage.py loaddata /vagrant/evewspace/*/fixtures/*.json
+/vagrant/evewspace/manage.py defaultsettings
 /vagrant/evewspace/manage.py resetadmin
 /vagrant/evewspace/manage.py syncrss
