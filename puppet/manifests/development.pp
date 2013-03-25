@@ -4,43 +4,52 @@ group {'puppet':
 
 package {'build-essential':
 	ensure => present,
+	require => Exec['apt-get update']
 	}
 
 package {'python-pip':
 	ensure => latest,
-	require => Exec['apt-get update'],
+	require => Exec['apt-get update']
 	}
 
 package {'libmysqlclient-dev':
 	ensure => present,
+	require => Exec['apt-get update']
 	}
 
 package {'python-dev':
 	ensure => present,
+	require => Exec['apt-get update']
 	}
 
 package {'mysql-client':
 	ensure => present,
+	require => Exec['apt-get update']
 	}
 
 package {'git-core':
 	ensure => present,
+	require => Exec['apt-get update']
 	}
 
 package {'bzip2':
-	ensure => present
+	ensure => present,
+	require => Exec['apt-get update']
 	}
 
 package {'mysql-server':
 	ensure => present,
+	require => Exec['apt-get update']
 	}
 
 package {'memcached':
     ensure => present,
+	require => Exec['apt-get update']
     }
 
 package {'rabbitmq-server':
     ensure => present,
+	require => Exec['apt-get update']
     }
 
 service {'rabbitmq-server':
