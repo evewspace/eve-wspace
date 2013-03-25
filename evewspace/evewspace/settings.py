@@ -188,6 +188,7 @@ INSTALLED_APPS = (
         'Map',
         'Recruitment',
         'Alerts',
+        'Jabber',
         'SiteTracker',
         'Teamspeak',
         'Cart',
