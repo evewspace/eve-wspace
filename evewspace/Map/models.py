@@ -202,6 +202,12 @@ class Map(models.Model):
         1 = Read Access
         2 = Write Access
         """
+        #Anonymous users always return 0
+        if user.is_anonymous():
+            return 0
+        #Special case: If user is a map admin, always return 2
+        if user.has_perm('Map.map_admin'):
+            return 2
         #Special case: if user is unrestricted we don't care unless the map
         #requires explicit permissions
         if user.has_perm('Map.map_unrestricted') and not self.explicitperms:
