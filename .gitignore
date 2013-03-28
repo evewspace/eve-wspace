@@ -7,4 +7,3 @@ bin
 lib
 include
 local_settings.py
-.DS_Store
