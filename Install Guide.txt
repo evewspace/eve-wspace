@@ -30,7 +30,7 @@ Install some more stuff.
 
 Setup mysql.
 	mysql -u root
-		create database djangotest;
+		CREATE DATABASE djangotest CHARACTER SET utf8;
 		quit
 	cd ~
 	wget http://donbot.fcftw.org/mysql55-inferno12-extended.sql.bz2
