@@ -1,5 +1,5 @@
 #!/bin/bash
-mysql -u root -e "create database evewspace;"
+mysql -u root -e "create database evewspace character set utf8;"
 mysql -u root -D evewspace < /home/evewspace/staticdata.sql
 /home/evewspace/evewspace/evewspace/manage.py syncdb --noinput
 /home/evewspace/evewspace/evewspace/manage.py migrate
