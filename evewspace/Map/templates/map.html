@@ -8,7 +8,9 @@
     <script type="text/javascript">var ajax_image = "<img src= '{{STATIC_URL}}images/loading.gif'></img>"; </script>
 {% endblock %}
 {% block contentheader %}
+<div class="reload_hover">
 <img title="Refresh Map" height=32 width=32 src={{STATIC_URL}}images/reload.png onclick="RefreshMap();" />
+</div>
 <div id="mapDiv" class="mapDiv">
 
 </div>

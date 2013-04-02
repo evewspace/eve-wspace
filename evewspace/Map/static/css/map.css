@@ -33,6 +33,12 @@
 {
     width: 300px;
 }
+.reload_hover
+{
+	height: 32px;
+	width: 32px;
+	cursor: pointer;
+}
 .occupiedTooltip
 {
     width: 90%;
