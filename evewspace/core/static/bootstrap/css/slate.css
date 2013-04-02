@@ -5754,7 +5754,7 @@ button,
 select,
 textarea,
 legend {
-  color: #c8c8c8;
+  //color: #c8c8c8;
 }
 legend,
 label {
