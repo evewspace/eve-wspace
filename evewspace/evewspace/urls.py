@@ -35,4 +35,5 @@ urlpatterns = patterns('',
         url(r'^search/', include('search.urls')),
         url(r'^pos/', include('POS.urls')),
         url(r'^sitetracker/', include('SiteTracker.urls')),
+        url(r'^alerts/', include('Alerts.urls')),
 )

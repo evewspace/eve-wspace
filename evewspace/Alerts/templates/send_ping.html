@@ -1,0 +1,49 @@
+<div id="sendAlertDialog">
+    <div class="modal-header">
+        <h4>Send Alert</h4>
+    </div>
+    <div class="modal-body">
+        <form id="sendPingForm" method="POST" action="/alerts/send/">
+            <div class="row span6">
+                <div class="span2">
+                    Subject: 
+                </div>
+                <div class="span3">
+                    <input type="text" class="input input-med" name="alert_subject" />
+                </div>
+            </div>
+            <div class="row span6">
+                <div class="span2">
+                    Message: 
+                </div>
+                <div class="span3">
+                    <textarea name="alert_message"></textarea>
+                </div>
+            </div>
+            <div class="row span6">
+                <div class="span2">
+                    Group: 
+                </div>
+                <div class="span3">
+                    <select name="alert_group">
+                        {% for group in alert_groups %}
+                        <option value="{{group.pk}}">{{group.name}}</option>
+                        {% empty %}
+                        <option value="-1">You cannot ping any groups.</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" onclick="$('#modalHolder').modal('hide').empty();">Cancel</button>
+        <button class="btn btn-primary" onclick="SendAlert();">Send</button>
+    </div>
+    <script type="text/javascript">
+        $('#sendPingForm').submit(function(e){
+                    e.preventDefault();
+                    return false;
+                });
+    </script>
+</div>

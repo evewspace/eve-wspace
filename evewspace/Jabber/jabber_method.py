@@ -16,17 +16,42 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from Alerts.method_base import AlertMethodBase
 from models import JabberAccount, JabberSubscription
+from django.template.loader import render_to_string
+from core.utils import get_config
+from jabber_client import JabberClient
+from datetime import datetime
+import pytz
 
 class JabberAlertMethod(AlertMethodBase):
     """
     Alert method class for handling alerts via XMPP.
     """
+    def send_alert(self, to_users, subject, message, from_user, sub_group):
+        jid_list = []
+        from_jid = get_config("JABBER_FROM_JID", None).value
+        from_password = get_config("JABBER_FROM_PASSWORD", None).value
+        jid_space_char = get_config("JABBER_LOCAL_SPACE_CHAR", None).value
+        jabber_domain = get_config("JABBER_LOCAL_DOMAIN", None).value
+        local_jabber = get_config("JABBER_LOCAL_ENABLED", None).value == "1"
+        full_message = render_to_string("jabber_message.txt", {'subject': subject,
+            'message': message, 'sub_group': sub_group.name,
+            'from_user': from_user.username, 'time': datetime.now(pytz.utc)})
+        for user in to_users:
+            if self.is_registered(user, sub_group):
+                if local_jabber:
+                    jid_list.append(str("%s@%s" % (user.username.replace(" ",
+                        jid_space_char), jabber_domain)))
+                for jid in user.jabber_accounts.all():
+                    jid_list.append(str(jid.jid))
+        client = JabberClient(jid=str(from_jid), password=str(from_password), to_list=jid_list, message=str(full_message))
+        if client.connect():
+            client.process()
 
     def is_registered(self, user, group):
         """
         Returns True if there is a JabberSubscription for the given user/group.
         """
-        if JabberSubscription.filter(user=user, group=group).count():
+        if JabberSubscription.objects.filter(user=user, group=group).count():
             return True
         else:
             return False
@@ -46,7 +71,7 @@ class JabberAlertMethod(AlertMethodBase):
         Remove any existing registration for the user/group combo.
         """
         if self.is_registered(user, group):
-            JabberSubscription.filter(user=user, group=group).all().delete()
+            JabberSubscription.objects.filter(user=user, group=group).all().delete()
         return True
 
     def description(self):

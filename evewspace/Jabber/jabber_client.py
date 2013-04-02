@@ -39,8 +39,6 @@ class JabberClient(sleekxmpp.ClientXMPP):
         """
         self.send_presence()
         self.get_roster()
-
         for jid in self.recipient_list:
-            self.sent_message(mto=jid, mbody=self.msg, mtype='chat')
-
+            self.send_message(mto=jid, mbody=self.msg, mtype='chat')
         self.disconnect(wait=True)

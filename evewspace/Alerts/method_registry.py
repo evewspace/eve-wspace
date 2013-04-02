@@ -37,7 +37,7 @@ class MethodRegistry(dict):
             raise AttributeError("Module given to MethodRegistry not valid")
         if not name:
             raise AttributeError("MethodRegistry not given a name for module.")
-
+        module.name = name
         self[name] = module
 
 def _autodiscover(registry):
@@ -45,14 +45,14 @@ def _autodiscover(registry):
     import copy
     from django.conf import settings
     from django.utils.importlib import import_module
-    from django.utils.module_loading import module_has_submodules
+    from django.utils.module_loading import module_has_submodule
 
     for app in settings.INSTALLED_APPS:
         mod = import_module(app)
         # Import alert_methods from each app
         try:
             before_import_registry = copy.copy(registry)
-            impot_module('%s.alert_methods' % app)
+            import_module('%s.alert_methods' % app)
         except:
             registry = before_import_registry
             if module_has_submodule(mod, 'alert_methods'):

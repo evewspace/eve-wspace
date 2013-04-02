@@ -1,6 +1,7 @@
 {% if perms.Alerts.can_alert %}
+<script type="text/javascript" src="{{STATIC_URL}}js/alert_functions.js"></script>
 <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Alerts</a><ul class="dropdown-menu">
-	<li> <a href="#">Send Ping</a></li>
-	<li> <a href="#">My Subscriptions</a></li>
+	<li> <a href="#" onclick="GetSendPingDialog();">Send Alert</a></li>
+	<li> <a href="#" onclick="GetEditSubscriptionsDialog();">My Subscriptions</a></li>
 	</ul></li>
 {% endif %}

@@ -1,0 +1,41 @@
+{% load alert_tags %}
+<div id="editSubscriptionsDialog">
+    <div class="modal-header">
+        <h4>Edit Subscriptions</h4>
+    </div>
+    <div class="modal-body">
+        <h6>What pings would you like to get and where should they go?</h6>
+        <form id="editAlertSubsForm" action="/alerts/subscriptions/" method="POST">
+            <table class="table">
+                <tr>
+                    <th>Group</th>
+                    {% for method in all_methods %}
+                    <th>{{method}}</th>
+                    {% endfor %}
+                </tr>
+                {% for group in available_groups %}
+                <tr>
+                    <td>{{group.name}}</td>
+                    {% for method in all_methods %}
+                    <td><input name="{{group.pk}}_{{method}}" type="checkbox" {% if method in current_subs|keyvalue:group.name %} checked="checked" {% endif %} /></td>
+                    {% endfor %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td>You are not eligible for any alert groups!</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" onclick="$('#modalHolder').modal('hide').empty();">Cancel</button>
+        <button class="btn btn-primary" onclick="EditAlertSubscriptions();">Save</button>
+    </div>
+    <script type="text/javacript">
+        $('#editAlertSubsForm').submit(function(e){
+                    e.preventDefault();
+                    return false;
+                });
+    </script>
+</div>

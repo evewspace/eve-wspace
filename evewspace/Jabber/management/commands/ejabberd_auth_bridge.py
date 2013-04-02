@@ -27,6 +27,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User, check_password, Permission
 from django.conf import settings
 
+from core.utils import get_config
 
 class Command(BaseCommand):
     """
@@ -110,18 +111,24 @@ class Command(BaseCommand):
         """
         logging.debug('Starting auth check')
         try:
+            local_enabled = get_config("JABBER_LOCAL_ENABLED", False).value == "1"
             clean_name = username.replace('_',' ')
             user = User.objects.get(username=clean_name)
             logging.debug('Found username ' + str(clean_name))
-            if check_password(password, user.password) and user.has_perm("Alerts.can_alert"):
+            if local_enabled and check_password(password, user.password) and user.has_perm("Alerts.can_alert"):
                 self._generate_response(True)
                 logging.info(username + ' has logged in')
             else:
                 self._generate_response(False)
                 logging.info(username + ' failed auth')
         except User.DoesNotExist:
-            logging.info(username + ' is not a valid user')
-            self._generate_response(False)
+            local_user = get_config("JABBER_FROM_JID", False).value.split('@')[0]
+            local_pass = get_config("JABBER_FROM_PASSWORD", False).value
+            if username == local_user and password == local_pass:
+                self._generate_response(True)
+            else:
+                logging.info(username + ' is not a valid user')
+                self._generate_response(False)
         except Exception, ex:
             logging.fatal('Unhandled error: ' + str(ex))
 
