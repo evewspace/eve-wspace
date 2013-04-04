@@ -24,7 +24,7 @@ function GetEditSubscriptionsDialog(){
 
 function SendAlert(){
     $.ajax({
-        url: "alerts/send/",
+        url: "/alerts/send/",
         type: "POST",
         data: $("#sendPingForm").serialize(),
         success: function(data){
@@ -35,7 +35,7 @@ function SendAlert(){
 
 function EditAlertSubscriptions(){
     $.ajax({
-        url: "alerts/subscriptions/",
+        url: "/alerts/subscriptions/",
         type: "POST",
         data: $("#editAlertSubsForm").serialize(),
         success: function(data){
