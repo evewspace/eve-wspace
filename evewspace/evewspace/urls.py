@@ -18,6 +18,8 @@ from django.conf.urls import patterns, include, url
 
 # Uncomment the next two lines to enable the admin:
 from search import registry as search_registry
+from Alerts import method_registry
+method_registry.autodiscover()
 search_registry.autodiscover()
 #django_cron.autodiscover()
 urlpatterns = patterns('',
