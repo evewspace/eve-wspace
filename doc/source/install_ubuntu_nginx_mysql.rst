@@ -56,7 +56,8 @@ Create a User
 
 You should not run Eve W-Space as root for security. We will create a dedicated account called *maptool* with a home directory of */home/maptool*. You can name this user whatever you want, just replace all instances of */home/maptool* with your user's home directory.
 
-:command:`$ sudo useradd -m maptool`
+:command:`$ sudo useradd -m -s /bin/bash maptool`
+
 :command:`$ sudo passwd maptool`
 
 Set Up the Home Directory
@@ -96,7 +97,6 @@ Next, you should create and activate a virtual Python environment for Eve W-Spac
 :command:`$ virtualenv --no-site-packages /home/maptool/eve-wspace`
 
 :command:`$ source /home/maptool/eve-wspace/bin/activate`
-	If you use bash the command is $ . /home/maptool/eve-wspace/bin/activate
 
 You will notice that your shell changes to include *(eve-wspace)* when the virtual environment is active.
 
