@@ -57,6 +57,7 @@ Create a User
 You should not run Eve W-Space as root for security. We will create a dedicated account called *maptool* with a home directory of */home/maptool*. You can name this user whatever you want, just replace all instances of */home/maptool* with your user's home directory.
 
 :command:`$ sudo useradd -m maptool`
+:command:`$ sudo passwd maptool`
 
 Set Up the Home Directory
 -------------------------
