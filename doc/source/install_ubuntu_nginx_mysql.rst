@@ -160,7 +160,7 @@ CCP releases a Static Data Export for each major patch in MS SQL format. Steve R
     (eve-wspace)$ curl -O http://www.fuzzwork.co.uk/dump/mysql55-retribution-1.1-84566.tbz2
     (eve-wspace)$ bunzip2 mysql55-retribution-1.1-84566.tbz2
     (eve-wspace)$ tar xvf mysql55-retribution-1.1-84566.tar
-    (eve-wspace)$ mysql -u evewspace -p<password> < retribution-1.1-84566/mysql55-retribution-1.1-84566.sql
+    (eve-wspace)$ mysql -u maptool -p<password> < retribution-1.1-84566/mysql55-retribution-1.1-84566.sql
 
 The sql import will take a few minutes to run. When it completes, your MySQL database will have all of the Static Data Export tables available.
 
