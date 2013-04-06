@@ -47,7 +47,7 @@ Then, create the database and grant access to it to a new mysql user called *map
 
     mysql> CREATE DATABASE evewspace CHARACTER SET utf8;
 
-    mysql> GRANT ALL PRIVILEGES ON 'evewspace'.'*' TO 'maptool'@'localhost' IDENTIFIED BY '<insert a password>;
+    mysql> GRANT ALL PRIVILEGES ON evewspace.* TO 'maptool'@'localhost' IDENTIFIED BY '<insert a password>;
 
     mysql> quit
 
