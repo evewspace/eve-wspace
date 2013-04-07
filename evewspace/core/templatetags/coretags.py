@@ -17,6 +17,7 @@
 from django import template
 from core.models import Type
 from core.nav_registry import registry as nav_registry
+from core.admin_page_registry import registry as admin_registry
 
 register = template.Library()
 
@@ -36,3 +37,30 @@ def nav_entries(context):
     """
     context['nav_registry'] = nav_registry
     return context
+
+def get_active_tabs(context, registry):
+    user = context['user']
+    active_tabs = {}
+    for key, value in registry.items():
+        if not value[1]:
+            active_tabs[key] = value
+        elif user.has_perm(value[1]):
+            active_tabs[key] = value
+    return active_tabs
+
+@register.inclusion_tag('admin_entries.html', takes_context=True)
+def admin_entries(context):
+    """
+    Renders dynamic nav bar entries from nav_registry for the provided user.
+    """
+    context['admin_registry'] = get_active_tabs(context, admin_registry)
+    return context
+
+@register.inclusion_tag('admin_panels.html', takes_context=True)
+def admin_panels(context):
+    """
+    Renders dynamic nav bar entries from nav_registry for the provided user.
+    """
+    context['admin_registry'] = get_active_tabs(context, admin_registry)
+    return context
+

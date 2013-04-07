@@ -5,9 +5,8 @@
 {% block contentheader %}
     <ul class="nav nav-tabs">
         <li><a href="#profile" data-toggle="tab">My Settings</a></li>
-        {% if perms.Map.map_admin %}
-        <li><a href="#mapadmin" data-toggle="tab">Map Admin</a></li>
-        {% endif %}
+        {% load coretags %}
+        {% admin_entries %}
     </ul>
 {% endblock contentheader %}
 {% block content %}
@@ -16,12 +15,7 @@
         <h1>User Profile:</h1>
         <p class="label label-success">This section is under construction. Please check back later. </p>
     </div>
-    {% if perms.Map.map_admin %}
-    <div id="mapadmin" class="tab-pane">
-        {% load mapconfig %}
-        {% map_global_admin %}
-    </div>
-    {% endif %}
+    {% admin_panels %}
 </div>
 {% endblock %}
 

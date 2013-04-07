@@ -183,18 +183,17 @@ INSTALLED_APPS = (
         'django.contrib.staticfiles',
         'django.contrib.humanize',
         # Uncomment the next line to enable the admin:
-        'django.contrib.admin',
         'core',
         'Map',
-        'Recruitment',
+        'POS',
         'Alerts',
         'Jabber',
+        'Recruitment',
         'SiteTracker',
         'Teamspeak',
         'Cart',
         'API',
         'account',
-        'POS',
         'eveigb',
         'search',
         'djcelery',
@@ -246,3 +245,4 @@ except NameError:
         from local_settings import *
     except ImportError:
         pass
+

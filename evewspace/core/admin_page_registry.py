@@ -24,21 +24,20 @@ from django.template import TemplateDoesNotExist
 
 class AdminPageRegistry(dict):
     """
-    Dict with methods for handling template registration.
+    Dict with methods for handling admin template registration.
     """
     def unregister(self, name):
-        method = self[name]
         del self[name]
 
-    def register(self, name, template):
+    def register(self, name, template, permission):
         """
-        Registers a method with its name and module.
+        Registers a page with its template.
         """
         try:
-            template = get_template(template)
+            get_template(template)
         except TemplateDoesNotExist:
             raise AttributeError("Template %s does not exist!" % template)
-        self[name] = template
+        self[name] = (template, permission)
 
 def _autodiscover(registry):
 
@@ -63,6 +62,11 @@ registry = AdminPageRegistry()
 def autodiscover():
     _autodiscover(registry)
 
-def register(name, template):
-    """Proxy for register method."""
-    return registry.register(name, template)
+def register(nae, template, permission):
+    """
+    Register a tab for the admin page.
+        name - Name of the tab in the admin panel
+        template - Template that should be rendered in that tab
+        permission - Permission requried for the tab to appear
+    """
+    return registry.register(name, template, permissoin)
