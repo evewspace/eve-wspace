@@ -72,7 +72,8 @@ post_save.connect(create_group_profile, sender=Group)
 
 class RegistrationForm(UserCreationForm):
     """Extends the django registration form to add fields."""
-    username = forms.CharField(max_length=30, label="Character Name", help_text="<br /> This will act as your username as well.")
+    username = forms.CharField(max_length=30, label="Username")
+    email = forms.EmailField(required=False, label="E-Mail Address (Optional)")
     password2 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password:")
     regcode = forms.CharField(max_length=64, label="Registration Code")
 

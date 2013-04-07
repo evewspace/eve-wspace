@@ -33,12 +33,16 @@ def register(request):
             if settings.ACCOUNT_REQUIRE_REG_CODE:
                 if len(get_groups_for_code(form.cleaned_data['regcode'])) != 0:
                     newUser = form.save()
+                    newUser.email = form.cleaned_data['email']
+                    newUser.save()
                     register_groups(newUser, form.cleaned_data['regcode'])
                     return HttpResponseRedirect(reverse('login'))
                 else:
                     form._errors['regcode'] = ErrorList([u'Invalid Registration Code.'])
             else:
                 newUser = form.save()
+                newUser.email = form.cleaned_data['email']
+                newUser.save()
                 register_groups(newUser, form.cleaned_data['regcode'])
                 return HttpResponseRedirect(reverse('login'))
 
@@ -59,6 +63,7 @@ def edit_profile(request):
                 if form.cleaned_data['password1']:
                     request.user.set_password(form.cleaned_data['password1'])
                 request.user.save()
+                return HttpResponseRedirect('/settings/')
     else:
         form = EditProfileForm()
         form.fields['email'].initial = request.user.email
