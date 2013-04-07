@@ -16,12 +16,19 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.conf.urls import patterns, include, url
 
-# Uncomment the next two lines to enable the admin:
+# Run the autodiscovers for various registries to fill them
 from search import registry as search_registry
 from Alerts import method_registry
+from core import admin_page_registry, nav_registry
+from account import profile_section_registry
+
 method_registry.autodiscover()
 search_registry.autodiscover()
-#django_cron.autodiscover()
+admin_page_registry.autodiscover()
+profile_section_registry.autodiscover()
+nav_registry.autodiscover()
+
+# Actual URL definitions
 urlpatterns = patterns('',
         # Examples:
         # url(r'^$', 'eve-space.views.home', name='home'),
@@ -33,7 +40,6 @@ urlpatterns = patterns('',
         url(r'^settings/$', 'core.views.config_view', name='settings'),
         url(r'^account/', include('account.urls')),
         url(r'^map/', include('Map.urls')),
-        # Uncomment the next line to enable the admin:
         url(r'^search/', include('search.urls')),
         url(r'^pos/', include('POS.urls')),
         url(r'^sitetracker/', include('SiteTracker.urls')),

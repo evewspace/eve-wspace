@@ -15,7 +15,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django import template
-from core.models import *
+from core.models import Type
+from core.nav_registry import registry as nav_registry
 
 register = template.Library()
 
@@ -27,3 +28,11 @@ def typename(typeid):
         return ''
     except Type.MultipleObjectsReturned:
         return ''
+
+@register.inclusion_tag('nav_entries.html', takes_context=True)
+def nav_entries(context):
+    """
+    Renders dynamic nav bar entries from nav_registry for the provided user.
+    """
+    context['nav_registry'] = nav_registry
+    return context

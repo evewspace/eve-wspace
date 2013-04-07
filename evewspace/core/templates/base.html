@@ -30,14 +30,18 @@
             <div class="navbar-inner">
                 <ul class="nav">
                     <a class="brand" href="{% url core.views.home_view %}">Eve W-Space</a>
-				{% include "map_nav.html" %}
+                    {% load coretags %}
+                    {% nav_entries %}
+                    {% comment %}    
+                {% include "map_nav.html" %}
 				{% include "sitetracker_nav.html" %}
 				{% include "cart_nav.html"%}
 				{% include "alerts_nav.html" %}
 				{% include "pos_nav.html"%}
 				{% include "recruitment_nav.html" %}
 				{% include "api_nav.html" %}
-				{% include "account_nav.html" %}
+                {% include "account_nav.html" %}
+                {% endcomment %}
 				{%block navigation %}{%endblock%}
             </ul>
         </div>
