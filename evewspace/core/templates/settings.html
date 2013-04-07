@@ -4,7 +4,7 @@
 {% endblock %}
 {% block contentheader %}
     <ul class="nav nav-tabs">
-        <li><a href="#profile" data-toggle="tab">My Settings</a></li>
+        <li class="active"><a href="#profile" data-toggle="tab">My Settings</a></li>
         {% load coretags %}
         {% admin_entries %}
     </ul>
@@ -12,8 +12,7 @@
 {% block content %}
 <div class="tab-content">
     <div id="profile" class="tab-pane active">
-        <h1>User Profile:</h1>
-        <p class="label label-success">This section is under construction. Please check back later. </p>
+        {% profile_sections %}
     </div>
     {% admin_panels %}
 </div>

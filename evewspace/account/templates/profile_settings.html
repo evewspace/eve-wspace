@@ -1,0 +1,16 @@
+<div class="accordion" id="profile_accordion">
+{% for key, value in profile_registry.items %}
+<div class="accordion-group">
+<div class="accordion-heading">
+    <a class="accordion-toggle" data-toggle="collapse" data-parent="#profile_accordion" href="#{{key|slugify}}">
+        {{key}}
+    </a>
+</div>
+<div id="{{key|slugify}}" class="accordion-body collapse">
+    <div class="accordion-inner">
+        {% include value.0 %}
+    </div>
+</div>
+</div>
+{% endfor %}
+</div>

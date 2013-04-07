@@ -18,6 +18,7 @@ from django import template
 from core.models import Type
 from core.nav_registry import registry as nav_registry
 from core.admin_page_registry import registry as admin_registry
+from account.profile_section_registry import registry as profile_registry
 
 register = template.Library()
 
@@ -50,17 +51,16 @@ def get_active_tabs(context, registry):
 
 @register.inclusion_tag('admin_entries.html', takes_context=True)
 def admin_entries(context):
-    """
-    Renders dynamic nav bar entries from nav_registry for the provided user.
-    """
     context['admin_registry'] = get_active_tabs(context, admin_registry)
     return context
 
 @register.inclusion_tag('admin_panels.html', takes_context=True)
 def admin_panels(context):
-    """
-    Renders dynamic nav bar entries from nav_registry for the provided user.
-    """
     context['admin_registry'] = get_active_tabs(context, admin_registry)
+    return context
+
+@register.inclusion_tag('profile_settings.html', takes_context=True)
+def profile_sections(context):
+    context['profile_registry'] = get_active_tabs(context, profile_registry)
     return context
 

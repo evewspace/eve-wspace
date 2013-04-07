@@ -16,6 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from account.models import RegistrationForm
 from account.utils import *
+from account.forms import EditProfileForm
 from django.contrib.auth.models import User
 from django.template.response import TemplateResponse
 from django.http import HttpResponseRedirect
@@ -47,3 +48,19 @@ def register(request):
     context = {'form': form}
     return TemplateResponse(request, "register.html", context)
 
+def edit_profile(request):
+    if request.method == "POST":
+        form = EditProfileForm(request.POST)
+        if form.is_valid():
+            if not request.user.check_password(form.cleaned_data['password']):
+                form._errors['password'] = ErrorList([u'The password you entered is incorrect.'])
+            else:
+                request.user.email = form.cleaned_data['email']
+                if form.cleaned_data['password1']:
+                    request.user.set_password(form.cleaned_data['password1'])
+                request.user.save()
+    else:
+        form = EditProfileForm()
+        form.fields['email'].initial = request.user.email
+    return TemplateResponse(request, "edit_profile_form.html",
+            {'form': form})
