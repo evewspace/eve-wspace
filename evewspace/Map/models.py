@@ -258,7 +258,7 @@ class MapSystem(models.Model):
     """
     map = models.ForeignKey(Map, related_name="systems")
     system = models.ForeignKey(System, related_name="maps")
-    friendlyname = models.CharField(max_length = 10)
+    friendlyname = models.CharField(max_length = 255)
     interesttime = models.DateTimeField(null=True, blank=True)
     parentsystem = models.ForeignKey('self', related_name="childsystems",
             null=True, blank=True)
@@ -282,7 +282,7 @@ class MapSystem(models.Model):
         return wormhole
 
     def save(self, *args, **kwargs):
-        self.friendlyname = self.friendlyname.upper()[:8]
+        self.friendlyname = self.friendlyname.upper()
         super(MapSystem, self).save(*args, **kwargs)
 
     def remove_system(self, user):

@@ -27,6 +27,7 @@ var activityLimit = 100;
 var indentX = 150; //The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180.
 var indentY = 64; // The amount of space (in px) between system ellipses on the Y axis
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map.
+var sliceLastChars = true; // Friendly name should show last 8 chars if over 8, shows first 8 if false
 
 
 $(document).ready(function(){
@@ -779,6 +780,13 @@ function DrawSystem(system) {
             break;
     }
     if (system.Friendly){
+        if (system.Friendly.length > 8){
+            if (sliceLastChars == true){
+                system.Friendly = ".." + system.Friendly.slice(-8);
+            }else{
+                system.Friendly = system.Friendly.slice(0,8) + "..";
+            }
+        }
         var friendly = system.Friendly + "\n";
     }else{
         var friendly = "";
