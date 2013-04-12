@@ -284,14 +284,14 @@ config and start the services:
 
 :command:`$ sudo service supervisor start`
 
-And confirm that both started successfully:
+And confirm that celeryd started successfully:
 
 :command:`$ sudo supervisorctl status`::
 
     celeryd                          RUNNING    pid 4335, uptime 33 days, 19:16:02
 
-If either are not in the RUNNING state, either examine the log files in 
-*/var/log/supervisor/celeryd-stdout-xxxxxxxxxx.log* or try running them 
+If celeryd is not in the RUNNING state, either examine the log files in 
+*/var/log/supervisor/celeryd-stdout-xxxxxxxxxx.log* or try running it 
 interactively as discussed previously.
 
 Configuring Apache
