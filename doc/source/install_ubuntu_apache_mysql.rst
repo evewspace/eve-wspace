@@ -233,6 +233,7 @@ However, you need to have celery running as well for many tasks to work
 properly. In another shell:
 
 :command:`(eve-wspace)$ cd /home/maptool/eve-wspace/evewspace`
+
 :command:`(eve-wspace)$ ./manage.py celery worker -B --loglevel=info`
 
 When both are running at the same time, you should be able to use all functions. 
@@ -258,6 +259,7 @@ At this point, you can log out of the maptool user and go back to our normal
 account:
 
 :command:`(eve-wspace)$ deactivate`
+
 :command:`$ exit`
 
 You need to tell supervisor about the tools you want it to run, to do that, 
