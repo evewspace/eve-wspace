@@ -54,7 +54,7 @@ Then, create the database and grant access to it to a new mysql user called *map
 Create a User
 -------------
 
-You should not run Eve W-Space as root for security. We will create a dedicated account called *maptool* with a home directory of */home/maptool*. You can name this user whatever you want, just replace all instances of */home/maptool* with your user's home directory.
+You should not run Eve W-Space as root for security. You should create a dedicated account called *maptool* with a home directory of */home/maptool*. You can name this user whatever you want, just replace all instances of */home/maptool* with your user's home directory.
 
 :command:`$ sudo useradd -m -s /bin/bash maptool`
 
@@ -73,7 +73,7 @@ Now, let's create a directory to be used for serving static files later:
 
 :command:`$ mkdir /home/maptool/static`
 
-Next, you need to get the Eve W-Space files. We can either clone the latest revision from *git* or you can download a packaged release and unpack it.
+Next, you need to get the Eve W-Space files. You can either clone the latest revision from *git* or you can download a packaged release and unpack it.
 
 To clone from Github:
 
@@ -81,7 +81,7 @@ To clone from Github:
 
 To use a packaged release:
 
-We need to download eve-wspace from http://marbindrakon.github.com/eve-wspace/ to get latest zip or tarball package (0.1.1 at time of writing):
+You need to download eve-wspace from http://marbindrakon.github.com/eve-wspace/ to get latest zip or tarball package (0.1.1 at time of writing):
 	
 :command:`$ wget https://github.com/marbindrakon/eve-wspace/archive/v0.1.1.tar.gz`
 
@@ -194,6 +194,7 @@ To start the development server:
 Now you can navigate to your server on port 8000 and see your instance. However, you need to have celery running as well for many tasks to work properly. In another shell:
 
 :command:`(eve-wspace)$ cd /home/maptool/eve-wspace/evewspace`
+
 :command:`(eve-wspace)$ ./manage.py celery worker -B --loglevel=info`
 
 When both are running at the same time, you should be able to use all functions. If you want things to run a bit more permanently, continue reading.
@@ -217,9 +218,10 @@ Configuring Supervisor
 
 Unless you want to run celery and gunicorn through the console in *screen* or *tmux*, you will want to daemonize them in some way. This guide uses supervisor, but there are many other options available.
 
-At this point, you can log out of the maptool user and go back to our normal account:
+At this point, you can log out of the maptool user and go back to your normal account:
 
 :command:`(eve-wspace)$ deactivate`
+
 :command:`$ exit`
 
 You need to tell supervisor about the tools you want it to run, to do that, you need to create a config file in */etc/supervisor/conf.d* for gunicorn and celeryd:
@@ -249,6 +251,7 @@ You need to tell supervisor about the tools you want it to run, to do that, you 
 To finish it off, you need to stop and then start supervisor to reload the config and start the services:
 
 :command:`$ sudo service supervisor stop`
+
 :command:`$ sudo service supervisor start`
 
 And confirm that both started successfully:
@@ -290,7 +293,9 @@ Now that Eve W-Space itself is running, you need to get people to it. That's whe
 
 
 :command:`$ sudo rm /etc/nginx/sites-enabled/default`
+
 :command:`$ sudo ln -s /etc/nginx/sites-available/evewspace /etc/nginx/sites-enabled/evewspace`
+
 :command:`$	sudo service nginx reload`
 
 Congratulations! Your Eve W-Space instance should now be available at whatever 
