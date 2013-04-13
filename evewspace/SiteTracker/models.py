@@ -68,6 +68,8 @@ class Fleet(models.Model):
             # If the factor is set to anything equal to or less than 1,
             # we will not weight the results by fleet size
             weight_factor = 1
+        if SystemWeight.objects.filter(system=system).count():
+            weight_factor = weight_factor * system.st_weight.weight
         raw_points = SiteWeight.objects.get(site_type=site_type,
                 sysclass=system.sysclass).raw_points
         site = SiteRecord(fleet=self, site_type=site_type, system=system,
@@ -156,6 +158,14 @@ class SiteWeight(models.Model):
         (4, "C4"), (5, "C5"), (6, "C6"), (7, "High Sec"), (8, "Low Sec"),
         (9, "Null Sec")])
     raw_points = models.IntegerField()
+
+
+class SystemWeight(models.Model):
+    """
+    Respresents a multiplier for site credit for a system.
+    """
+    system = models.OneToOneField(System, primary_key=True, related_name='st_weight')
+    weight = models.FloatField()
 
 
 class SiteRecord(models.Model):
