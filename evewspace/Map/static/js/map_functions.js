@@ -54,7 +54,7 @@ function processAjax(data){
     if (data.dialogHTML){
                 $('#modalHolder').empty();
                 $('#modalHolder').html(data.dialogHTML);
-                $('#modalHolder').modal();
+                $('#modalHolder').modal('show');
             }
     if (data.logs){
         $('#logDiv').empty();
