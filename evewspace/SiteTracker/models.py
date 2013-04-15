@@ -60,14 +60,14 @@ class Fleet(models.Model):
         Credits a site.
         """
         # Get the fleet member weighting variable and multiplier
-        x = int(get_config("ST_SIZE_WEIGHT", None).value)
+        x = float(get_config("ST_SIZE_WEIGHT", None).value)
         n = self.members.count()
         if x > 1:
-            weight_factor = x / (n + (x - 1))
+            weight_factor = x / float(n + (x - 1))
         else:
             # If the factor is set to anything equal to or less than 1,
             # we will not weight the results by fleet size
-            weight_factor = 1
+            weight_factor = float(1)
         if SystemWeight.objects.filter(system=system).count():
             weight_factor = weight_factor * system.st_weight.weight
         raw_points = SiteWeight.objects.get(site_type=site_type,
@@ -177,7 +177,7 @@ class SiteRecord(models.Model):
     boss = models.ForeignKey(User, related_name="sitescredited")
     fleetsize = models.IntegerField()
     raw_points = models.IntegerField()
-    weighted_points = models.IntegerField()
+    weighted_points = models.FloatField()
 
     def __unicode__(self):
         return u"System: %s Time: %s  Type: %s" % (self.system.name, self.timestamp, self.type.shortname)
