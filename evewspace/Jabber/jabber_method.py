@@ -39,11 +39,11 @@ class JabberAlertMethod(AlertMethodBase):
         for user in to_users:
             if self.is_registered(user, sub_group):
                 if local_jabber:
-                    jid_list.append(str("%s@%s" % (user.username.replace(" ",
-                        jid_space_char), jabber_domain)))
+                    jid_list.append(("%s@%s" % (user.username.replace(" ",
+                        jid_space_char), jabber_domain)).encode('utf-8'))
                 for jid in user.jabber_accounts.all():
-                    jid_list.append(str(jid.jid))
-        client = JabberClient(jid=str(from_jid), password=str(from_password), to_list=jid_list, message=str(full_message))
+                    jid_list.append(jid.jid.encode('utf-8'))
+        client = JabberClient(jid=from_jid.encode('utf-8'), password=from_password.encode('utf-8'), to_list=jid_list, message=full_message.encode('utf-8'))
         if client.connect():
             client.process()
 
