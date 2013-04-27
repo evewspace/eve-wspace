@@ -410,6 +410,11 @@ def bulk_sig_import(request, mapID, msID):
     GET gets a bulk signature import form. POST processes it, creating sigs
     with blank info and type for each sig ID detected.
     """
+    COL_SIG = 0
+    COL_SIG_TYPE = 3
+    COL_SIG_STRENGTH = 4
+
+
     if not request.is_ajax():
         raise PermissionDenied
     mapsystem = get_object_or_404(MapSystem, pk=msID)
@@ -420,7 +425,11 @@ def bulk_sig_import(request, mapID, msID):
             if k < 75:
                 if not Signature.objects.filter(sigid=row[0],
                                                 system=mapsystem.system).count():
-                    Signature(sigid=row[0], system=mapsystem.system, info=" ").save()
+                    info = ""
+                    if len(row) >= 5 and row[COL_SIG_STRENGTH] == '100.00%':
+                        info = row[COL_SIG_TYPE]
+
+                    Signature(sigid=row[COL_SIG], system=mapsystem.system, info=info).save()
                     k += 1
         mapsystem.map.add_log(request.user,
                               "Imported %s signatures for %s(%s)." % (k, mapsystem.system.name,
