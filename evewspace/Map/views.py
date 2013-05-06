@@ -411,7 +411,7 @@ def add_signature(request, map_id, ms_id):
         if form.is_valid():
             new_sig = form.save(commit=False)
             new_sig.system = map_system.system
-            new_sig.sigid = newSig.sigid.upper()
+            new_sig.sigid = new_sig.sigid.upper()
             new_sig.updated = True
             new_sig.save()
             map_system.system.lastscanned = datetime.now(pytz.utc)
