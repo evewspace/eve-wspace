@@ -159,7 +159,7 @@ def _checkin_igb_trusted(request, current_map):
         and recently_active.count()
     ):
         context = {
-            'old_system': current_map.systems.filter(
+            'oldsystem': current_map.systems.filter(
                 system=old_system).all()[0],
             'newsystem': current_system,
             'wormholes': utils.get_possible_wh_types(old_system,
