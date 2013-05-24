@@ -410,20 +410,26 @@ def add_signature(request, map_id, ms_id):
         form = SignatureForm(request.POST)
         if form.is_valid():
             new_sig = form.save(commit=False)
-            new_sig.system = map_system.system
-            new_sig.sigid = new_sig.sigid.upper()
-            new_sig.updated = True
-            new_sig.save()
-            map_system.system.lastscanned = datetime.now(pytz.utc)
-            map_system.system.save()
+            new_sig.sigid = new_sig.sigid[:3].upper()
+            if Signature.objects.filter(system=map_system.system,
+                    sigid=new_sig.sigid).exists():
+                old_sig = Signature.objects.get(system=map_system.system,
+                        sigid=new_sig.sigid)
+                edit_signature(request, map_id, ms_id, old_sig.pk)
+            else:
+                new_sig.system = map_system.system
+                new_sig.updated = True
+                new_sig.save()
+                map_system.system.lastscanned = datetime.now(pytz.utc)
+                map_system.system.save()
+                map_system.map.add_log(
+                    request.user, "Added signature %s to %s (%s)."
+                    % (new_sig.sigid, map_system.system.name,
+                       map_system.friendlyname)
+                )
             new_form = SignatureForm()
-            map_system.map.add_log(
-                request.user, "Added signature %s to %s (%s)."
-                % (new_sig.sigid, map_system.system.name,
-                   map_system.friendlyname)
-            )
             return TemplateResponse(request, "add_sig_form.html",
-                                    {'form': new_form, 'system': map_system})
+                                {'form': new_form, 'system': map_system})
         else:
             return TemplateResponse(request, "add_sig_form.html",
                                     {'form': form, 'system': map_system})

@@ -410,6 +410,12 @@ class Signature(models.Model):
         self.updated = True
         self.save()
 
+    def save(self, *args, **kwargs):
+        """
+        Ensure that Sig IDs are proper.
+        """
+        self.sigid = self.sigid[:3].upper()
+        super(Signature, self).save(*args, **kwargs)
 
 class MapPermission(models.Model):
     """
