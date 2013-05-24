@@ -458,7 +458,7 @@ def bulk_sig_import(request, map_id, ms_id):
         )
         for row in reader:
             if k < 75:
-                if not Signature.objects.filter(sigid=row[0],
+                if not Signature.objects.filter(sigid=row[0][:3].upper(),
                                                 system=map_system.system
                                                 ).count():
                     Signature(sigid=row[0], system=map_system.system,
