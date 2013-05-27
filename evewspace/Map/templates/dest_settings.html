@@ -8,8 +8,10 @@
         <tr>
             {% if dest.user and user_context %}
             <td><i class="icon-ban-circle" onclick="RemoveProfileDestination({{dest.pk}});"></i></td>
-            {% elif not dest.user %}
+            {% elif not dest.user and not user_context %}
             <td><i class="icon-ban-circle" onclick="RemoveDestination({{dest.pk}});"></i></td>
+            {% else %}
+            <td>N/A</td>
             {% endif %}
             <td>{{dest.system.name}}</td>
             {% if dest.user %}
