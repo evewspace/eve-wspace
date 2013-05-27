@@ -468,8 +468,7 @@ class ActivePilot(models.Model):
 class Destination(models.Model):
     """Represents a corp-wide destination whose range should be shown in the map."""
     system = models.ForeignKey(KSystem, related_name='destinations')
-    # Capital destinations also show light year distance
-    capital = models.BooleanField()
+    user = models.ForeignKey(User, related_name='destinations', null=True)
 
 class SiteSpawn(models.Model):
     """Contains the site spawn list for a site as HTML."""

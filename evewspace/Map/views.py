@@ -28,6 +28,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, Permission
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 
 from Map.models import *
 from Map import utils
@@ -724,7 +725,8 @@ def destination_list(request, map_id, ms_id):
     """
     #if not request.is_ajax():
     #    raise PermissionDenied
-    destinations = Destination.objects.all()
+    destinations = Destination.objects.filter(Q(user=None) |
+                                              Q(user=request.user))
     map_system = get_object_or_404(MapSystem, pk=ms_id)
     try:
         system = KSystem.objects.get(pk=map_system.system.pk)
