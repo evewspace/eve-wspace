@@ -14,9 +14,11 @@
     </ul>
 </h4>
 </div>
+    {% if mapsys.friendlyname %}
     <div class="mapSysInfo">
         <h5 class="friendlyName"> Friendly Name: <small>{{mapsys.friendlyname}}</small> </h5> 
     </div>
+    {% endif %}
     <div class="sysClassSpan row">
         {% if system.sysclass < 7 %}
         <div class="span2"> 
@@ -50,25 +52,30 @@
         <br />
         Sov: {{system.sov}}
         {% endif %}
+        {% if system.sysclass > 6 %}
+        <ul class="inline"><li>Region: {{system.region}}</li><li>Constellation: {{system.constellation}}</li></ul>
+        {% endif %}
     </div>
     <br />
 <div>
     {% load humanize %}
-    <span class="sysLastVisit">Last Visited: {{system.last_visited|naturaltime}}</span>
-    <br />
-    <span class="sysFirstVisit">First Visited: {{system.first_visited|naturaltime}}</span>
-    <br />
-    <br />
+    <ul class="visited inline"><li>First Visit: {{system.first_visited|naturaltime}}</li><li> Last Visit: {{system.last_visited|naturaltime}}</li></ul>
     <div class="row detailsLeft">
+    {% if system.occupied %}
     <p class="occupiedText label label-important"><span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p><br />
+    {% endif %}
+    {% if system.info %}
     <p class="infoText label label-info"><span class="infoTitle">Info:</span> <br /> {{system.info|safe}} </p><br />
+    {% endif %}
+    {% if system.info or system.occupied %}
     <p class="sysInfoUpdated label label-success">Info Updated: {{system.updated|naturaltime}}</p><br />
+    {% endif %}
 </div>
 </div>
-    <div class="row sysDetailsFooter">
-     <div id="systemStatsPanel" class="systemStatsPanel span2">
-        <h6>System Statistics </h6>
-            <ul class="systemStatsList">
+<div class="row sysDetailsFooter">
+        <div id="systemStatsPanel" class="systemStatsPanel {% if system.sysclass > 6 %} span2 {% else %} span6 {% endif %}">
+         <h6>System Statistics <br /> (Last Hour) </h6>
+         <ul class="systemStatsList {% if system.sysclass < 7%} inline {% endif %}">
                 <li class="systemStatItem">NPC Kills: {{system.npckills}}</li>
                 <li class="systemStatItem">Ship Kills: {{system.shipkills}}</li>
                 <li class="systemStatItem">Pod Kills: {{system.podkills}}</li>
@@ -77,8 +84,10 @@
                 {% endif %}
             </ul>
         </div>
+        {% if system.sysclass > 6 %}
         <div id="systemDestinationsDiv" class="span4">
         </div>
+        {% endif %}
     </div>
      
 </div>
