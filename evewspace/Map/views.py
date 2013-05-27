@@ -819,14 +819,18 @@ def edit_spawns(request, spawn_id):
     return HttpResponse()
 
 
-@permission_required('Map.map_admin')
-def destination_settings(request):
+def destination_settings(request, user=None):
     """
     Returns the destinations section.
     """
+    if not user:
+        dest_list = Destination.objects.filter(user=None)
+    else:
+        dest_list = Destination.objects.filter(Q(user=None) |
+                                               Q(user=request.user))
     return TemplateResponse(request, 'dest_settings.html',
-                            {'destinations': Destination.objects.filter(
-                                user=None)})
+                            {'destinations': dest_list,
+                             'user_context': user})
 
 
 @permission_required('Map.map_admin')
@@ -838,15 +842,11 @@ def add_destination(request, dest_user=None):
     Destination(system=system, user=dest_user).save()
     return HttpResponse()
 
-def add_personal_destination(request, user):
+def add_personal_destination(request):
     """
     Add a personal destination.
     """
-    dest_user = get_object_or_404(User, pk=user)
-    if request.user == dest_user:
-        return add_destination(request, dest_user=dest_user)
-    else:
-        raise PermissionDenied
+    return add_destination(request, dest_user=request.user)
 
 
 def delete_destination(request, dest_id):
