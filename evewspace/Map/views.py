@@ -825,25 +825,39 @@ def destination_settings(request):
     Returns the destinations section.
     """
     return TemplateResponse(request, 'dest_settings.html',
-                            {'destinations': Destination.objects.all()})
+                            {'destinations': Destination.objects.filter(
+                                user=None)})
 
 
 @permission_required('Map.map_admin')
-def add_destination(request):
+def add_destination(request, dest_user=None):
     """
     Add a destination.
     """
     system = get_object_or_404(KSystem, name=request.POST['systemName'])
-    Destination(system=system, capital=False).save()
+    Destination(system=system, user=dest_user).save()
     return HttpResponse()
 
+def add_personal_destination(request, user):
+    """
+    Add a personal destination.
+    """
+    dest_user = get_object_or_404(User, pk=user)
+    if request.user == dest_user:
+        return add_destination(request, dest_user=dest_user)
+    else:
+        raise PermissionDenied
 
-@permission_required('Map.map_admin')
+
 def delete_destination(request, dest_id):
     """
     Deletes a destination.
     """
     destination = get_object_or_404(Destination, pk=dest_id)
+    if not request.user.has_perm('Map.map_admin') and not destination.user:
+        raise PermissionDenied
+    if destination.user and not request.user == destination.user:
+        raise PermissionDenied
     destination.delete()
     return HttpResponse()
 
