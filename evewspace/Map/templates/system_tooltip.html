@@ -28,9 +28,11 @@
         <br />
         <strong>Sov: {{system.sov}}</strong>
     {% endif %}
+    {% if system.sysclass > 6 %}
     <br />
     <strong>Region: {{system.region}}</strong>
     <br />
+    {% endif %}
     {% load humanize %}
     <span class="sysLastScanned label {% if scanwarning  %} label-important {% endif %}">
         Last Scanned: {{system.lastscanned|naturaltime}}
