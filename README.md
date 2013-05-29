@@ -1,4 +1,4 @@
-Eve W-Space v0.1
+Eve W-Space v0.2
 ===========
 
 NOTE: Eve W-Space is currently in alpha. Most features outside of Mapping 
@@ -14,6 +14,11 @@ the centerpiece of an entire alliance services infrastructure.
 Eve W-Space is designed to be a single-tenant soulution hosted by a single corp 
 or alliance. A fleixble permissions system allows for easily restricting data 
 where needed.
+
+Documentation
+-------------
+
+Documentation is available at http://eve-w-space.rtfd.org
 
 How do I use it?
 ----------------
