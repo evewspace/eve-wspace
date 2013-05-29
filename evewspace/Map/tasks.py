@@ -79,12 +79,13 @@ def fill_jumps_cache():
     """
     Ensures that the jumps cache is filled.
     """
-    if not cache.get('sysJumps'):
-        for sys in KSystem.objects.all():
-            cache.set(sys.pk, [i.tosystem for i in SystemJump.objects.filter(
-                fromsystem=sys.pk).all()])
-        cache.set('sysJumps', 1)
-
+    if not cache.get('route_graph'):
+        from Map.utils import RouteFinder
+        rf = RouteFinder()
+        # Initializing RouteFinder should be sufficient to cache the graph
+        # If it doesn't for some reason, we explicitly cache it
+        if not cache.get('route_graph'):
+            rf._cache_graph()
 @task()
 def check_server_status():
     """
