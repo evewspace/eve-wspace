@@ -232,6 +232,15 @@ class RouteFinder(object):
     for getting the shortest stargate jump route length, the light-year distance,
     and the shortest stargate route as a list of KSystem objects.
     """
+
+    def __init__(self):
+        from django.core.cache import cache
+        if not cache.get('route_graph'):
+            self._cache_graph()
+        else:
+            import cPickle
+            self.graph = cPickle.loads(cache.get('route_graph'))
+
     def _get_ly_distance(self, sys1, sys2):
         """
         Gets the distance in light years between two systems.
@@ -270,7 +279,8 @@ class RouteFinder(object):
             for from_system in KSystem.objects.all():
                 for to_system in SystemJump.objects.filter(fromsystem=from_system.pk):
                     graph.add_edge(from_system.pk, to_system.tosystem)
-            cache.set('route_graph', cPickle.dumps(graph).encode('zlib'), 0)
+            cache.set('route_graph', cPickle.dumps(graph, cPickle.HIGHEST_PROTOCOL), 0)
+            self.graph = graph
 
     def _find_route(self, sys1, sys2):
         """
@@ -278,9 +288,12 @@ class RouteFinder(object):
         Returns a list of system IDs that comprise the route.
         """
         import networkx as nx
-        from django.core.cache import cache
         import cPickle
-        if not cache.get('route_graph'):
-            self._cache_graph()
-        graph = cPickle.loads(cache.get('route_graph').decode('zlib'))
-        return nx.shortest_path(graph, source=sys1.pk, target=sys2.pk)
+        if not self.graph:
+            if not cache.get('route_graph'):
+                from django.core.cache import cache
+                self._cache_graph()
+                self.graph = cPickle.loads(cache.get('route_graph'))
+            else:
+                self.graph = cPickle.loads(cache.get('route_graph'))
+        return nx.shortest_path(self.graph, source=sys1.pk, target=sys2.pk)
