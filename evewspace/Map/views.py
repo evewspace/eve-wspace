@@ -47,7 +47,6 @@ def require_map_permission(permission=2):
                 raise PermissionDenied
             else:
                 return view_func(request, map_id, *args, **kwargs)
-
         _view.__name__ = view_func.__name__
         _view.__doc__ = view_func.__doc__
         _view.__dict__ = view_func.__dict__
@@ -110,6 +109,7 @@ def map_checkin(request, map_id):
     json_values.update({'logs': log_string})
 
     return HttpResponse(json.dumps(json_values), mimetype="application/json")
+
 
 
 @login_required
@@ -440,6 +440,37 @@ def add_signature(request, map_id, ms_id):
                             {'form': form, 'system': map_system})
 
 
+def _update_sig_from_tsv(signature, row):
+    COL_SIG = 0
+    COL_SIG_TYPE = 3
+    COL_SIG_GROUP = 2
+    COL_SIG_SCAN_GROUP = 1
+    COL_SIG_STRENGTH = 4
+    COL_DISTANCE = 5
+    info = row[COL_SIG_TYPE]
+    updated = False
+    sig_type = None
+    if (row[COL_SIG_SCAN_GROUP] == "Cosmic Signature"
+        or row[COL_SIG_SCAN_GROUP] == "Cosmic Anomaly"
+       ):
+        try:
+            sig_type = SignatureType.objects.get(
+                    longname=row[COL_SIG_GROUP])
+        except:
+            sig_type = None
+    else:
+        sig_type = None
+
+    if info and sig_type:
+        updated = True
+
+    signature.sigtype = sig_type
+    signature.updated = updated
+    signature.info = info
+
+    return signature
+
+
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=2)
@@ -448,27 +479,37 @@ def bulk_sig_import(request, map_id, ms_id):
     GET gets a bulk signature import form. POST processes it, creating sigs
     with blank info and type for each sig ID detected.
     """
+
+
     if not request.is_ajax():
         raise PermissionDenied
     map_system = get_object_or_404(MapSystem, pk=ms_id)
     k = 0
     if request.method == 'POST':
-        reader = csv.reader(
-            request.POST.get('paste', '').decode('utf-8').splitlines(),
-            delimiter="\t"
-        )
+        reader = csv.reader(request.POST.get('paste', '').decode(
+                'utf-8').splitlines(), delimiter="\t")
+        COL_SIG = 0
         for row in reader:
             if k < 75:
-                if not Signature.objects.filter(sigid=row[0][:3].upper(),
-                                                system=map_system.system
-                                                ).count():
-                    Signature(sigid=row[0], system=map_system.system,
-                              info=" ").save()
-                    k += 1
+                if not Signature.objects.filter(sigid=row[COL_SIG][:3].upper(),
+                        system=map_system.system).exists():
+
+                    new_sig = Signature(sigid=row[COL_SIG],
+                                        system=map_system.system)
+                    updated_sig = _update_sig_from_tsv(new_sig, row)
+                    updated_sig.save()
+                else:
+                    old_sig = Signature.objects.get(
+                            sigid=row[COL_SIG][:3].upper(),
+                            system=map_system.system)
+                    updated_sig = _update_sig_from_tsv(old_sig, row)
+                    updated_sig.save()
+
+                k += 1
         map_system.map.add_log(request.user,
-                               "Imported %s signatures for %s(%s)."
-                               % (k, map_system.system.name,
-                               map_system.friendlyname), True)
+                              "Imported %s signatures for %s(%s)."
+                              % (k, map_system.system.name,
+                                 map_system.friendlyname), True)
         map_system.system.lastscanned = datetime.now(pytz.utc)
         map_system.system.save()
         return HttpResponse()
