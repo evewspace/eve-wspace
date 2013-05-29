@@ -25,10 +25,15 @@ var sigTimerID;
 var updateTimerID;
 var activityLimit = 100;
 var indentX = 150; //The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180.
-var indentY = 64; // The amount of space (in px) between system ellipses on the Y axis
+var indentY = 70; // The amount of space (in px) between system ellipses on the Y axis
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map.
 var sliceLastChars = true; // Friendly name should show last 8 chars if over 8, shows first 8 if false
-
+var highlightActivePilots = true; // Draw a notification ring around systems with active pilots.
+var goodColor = "#00FF00"; // Color of good status connections
+var badColor = "#FF0000"; // Color of first shrink connections
+var bubbledColor = "#FF0000"; // Color of first shrink connections
+var clearWhColor = "#00FF00"; // Color of good status connections
+var warningColor = "#FF00FF"; // Color of mass critical connections
 
 $(document).ready(function(){
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
@@ -796,6 +801,10 @@ function DrawSystem(system) {
     var sysText;
     if (system.LevelX != null && system.LevelX > 0) {
         var childSys = paper.ellipse(sysX, sysY, 40, 28);
+        if (system.activePilots > 0 && highlightActivePilots === true){
+            notificationRing = paper.ellipse(sysX, sysY, 45, 33);
+            notificationRing.attr({'stroke-dasharray':'--', 'stroke-width': 2, 'stroke': '#ADFF2F'});
+        }
         childSys.msID = system.msID;
         childSys.whID = system.whID;
         childSys.WhFromParentBubbled = system.WhFromParentBubbled;
@@ -851,9 +860,6 @@ function GetConnectionDash(system){
 
 
 function GetConnectionColor(system){
-    var goodColor = "#009900";
-    var badColor = "#FF3300";
-    var warningColor = "#CC00CC";
     if (!system){
         return "#000";
     }
@@ -1104,17 +1110,17 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
     var whToColor = null;
     var decoration = null;
     if (systemTo.WhFromParentBubbled == true){
-        whFromColor = "#FF3300";
+        whFromColor = bubbledColor;
         decoration = "bold";
     }else{
-        whFromColor = textColor;
+        whFromColor = clearWhColor;
     }
 
     if (systemTo.WhToParentBubbled == true){
-        whToColor = "#FF3300";
+        whToColor = bubbledColor;
         decoration = "bold";
     }else{
-        whToColor = textColor;
+        whToColor = clearWhColor;
     }
     
     if (systemTo.WhFromParent) {

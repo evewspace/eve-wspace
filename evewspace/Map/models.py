@@ -118,13 +118,11 @@ class System(SystemData):
         if ActivePilot.objects.filter(timestamp__gt=threshold, user=user,
                 charactername=charname, shipname=shipname,
                 shiptype=shiptype, system=self).count() == 0:
-            # Flush other records for this character
-            ActivePilot.objects.filter(charactername=charname).delete()
+            # Flush other records for this character and user
+            ActivePilot.objects.filter(charactername=charname, user=user).delete()
             # Add new record
             record = ActivePilot(system=self, user=user, charactername=charname,
                     shipname=shipname, shiptype=shiptype).save()
-        # Purge old records while we're at it
-        ActivePilot.objects.filter(timestamp__lt=threshold).delete()
 
 class KSystem(System):
     sov = models.CharField(max_length = 100)
