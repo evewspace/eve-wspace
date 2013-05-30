@@ -34,6 +34,7 @@ var badColor = "#FF0000"; // Color of first shrink connections
 var bubbledColor = "#FF0000"; // Color of first shrink connections
 var clearWhColor = "#00FF00"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
+var renderCollapsedConnections = false; // Are collapsed connections shown?
 
 $(document).ready(function(){
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
@@ -185,14 +186,40 @@ function MarkScanned(msID, fromPanel, sysID){
         }
     });
 }
-
-function SetInterest(msID){
-    address = "system/" + msID + "/interest/";
+function CollapseSystem(msid){
+    address = "system/" + msid + "/collapse/";
     $.ajax({
-        type: "POST",
+        type: "post",
+        url: address,
+        async: false,
+        success: function(data) {
+            CloseSystemMenu();
+            RefreshMap();
+        }
+    });
+   
+}
+function SetInterest(msid){
+    address = "system/" + msid + "/interest/";
+    $.ajax({
+        type: "post",
         url: address,
         async: false,
         data: {"action": "set"},
+        success: function(data) {
+            CloseSystemMenu();
+            RefreshMap();
+        }
+    });
+   
+}
+
+function ResurrectSystem(msid){
+    address = "system/" + msid + "/resurrect/";
+    $.ajax({
+        type: "post",
+        url: address,
+        async: false,
         success: function(data) {
             CloseSystemMenu();
             RefreshMap();
@@ -814,6 +841,7 @@ function DrawSystem(system) {
         sysText.msID = system.msID;
         sysText.click(onSysClick);
         ColorSystem(system, childSys, sysText);
+        childSys.collapsed = system.collapsed;
         objSystems.push(childSys);
         var parentIndex = GetSystemIndex(system.ParentID);
         var parentSys = systemsJSON[parentIndex];
@@ -827,8 +855,10 @@ function DrawSystem(system) {
             if (system.interestpath === true || system.interest === true){
                 interest = true;
             }
-            ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", interest, dasharray);
-            DrawWormholes(parentSys, system, whColor);
+            if(childSys.collapsed === false || renderCollapsedConnections === true){
+                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", interest, dasharray);
+                DrawWormholes(parentSys, system, whColor);
+            }
         }else{
             alert("Error processing system " + system.Name);
         }
