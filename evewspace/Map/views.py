@@ -337,6 +337,40 @@ def wormhole_tooltip(request, map_id, wh_id):
 # noinspection PyUnusedLocal
 @login_required()
 @require_map_permission(permission=2)
+def collapse_system(request, map_id, ms_id):
+    """
+    Mark the system as collapsed.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+
+    map_sys = get_object_or_404(MapSystem, pk=ms_id)
+    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh.collapsed = True
+    parent_wh.save()
+    return HttpResponse()
+
+
+# noinspection PyUnusedLocal
+@login_required()
+@require_map_permission(permission=2)
+def resurrect_system(request, map_id, ms_id):
+    """
+    Unmark the system as collapsed.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+
+    map_sys = get_object_or_404(MapSystem, pk=ms_id)
+    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh.collapsed = False
+    parent_wh.save()
+    return HttpResponse()
+
+
+# noinspection PyUnusedLocal
+@login_required()
+@require_map_permission(permission=2)
 def mark_scanned(request, map_id, ms_id):
     """Takes a POST request from AJAX with a system ID and marks that system
     as scanned.
