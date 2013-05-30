@@ -323,6 +323,8 @@ class Wormhole(models.Model):
     def save(self, *args, **kwargs):
         if self.time_status == 1 and not self.eol_time:
             self.eol_time = datetime.now(pytz.utc)
+        elif self.time_status != 1:
+            self.eol_time = None
         super(Wormhole, self).save(*args, **kwargs)
 
 class SignatureType(models.Model):
