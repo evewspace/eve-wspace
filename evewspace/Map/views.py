@@ -918,11 +918,13 @@ def destination_settings(request, user=None):
                              'user_context': user})
 
 
-@permission_required('Map.map_admin')
 def add_destination(request, dest_user=None):
     """
     Add a destination.
     """
+    if not dest_user and not request.user.has_perm('Map.map_admin'):
+        raise PermissionDenied
+
     system = get_object_or_404(KSystem, name=request.POST['systemName'])
     Destination(system=system, user=dest_user).save()
     return HttpResponse()
