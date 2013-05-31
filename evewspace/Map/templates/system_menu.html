@@ -4,6 +4,11 @@
     {% if is_igb and mapsys.system.sysclass > 6 %}
     <a class="btn" onclick="CCPEVE.setDestination({{mapsys.system.pk}});">Set Autopilot</a>
     {% endif %}
+    {% if mapsys.parent_wormholes.get.collapsed and mapsys.parent_wormholes.get %}
+    <a class="btn" onclick="ResurrectSystem({{mapsys.pk}});">Resurrect System</a>
+    {% elif mapsys.parent_wormholes.get %}
+    <a class="btn" onclick="CollapseSystem({{mapsys.pk}});">Collapse System</a>
+    {% endif %}
     {% if not is_igb %}
     <a class="btn" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
     {% endif %}

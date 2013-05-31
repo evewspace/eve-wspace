@@ -40,6 +40,8 @@ syspatterns = patterns('Map.views',
         url(r'^signatures/new/$', 'add_signature'),
         url(r'^signatures/bulkadd/$', 'bulk_sig_import'),
         url(r'^signatures/(?P<sig_id>\d+)/', include(sigpatterns)),
+        url(r'^collapse/$', 'collapse_system'),
+        url(r'^resurrect/$', 'resurrect_system'),
         )
 
 wormholepatterns = patterns('Map.views',

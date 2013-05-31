@@ -47,7 +47,10 @@ class MapJSONGenerator(object):
         parent = system
         while parent:
             systemlist.append(parent)
-            parent = parent.parentsystem
+            if parent.parentsystem and not parent.parent_wormholes.get().collapsed:
+                parent = parent.parentsystem
+            else:
+                parent = None
         return systemlist
 
     def get_system_icon(self, system):
@@ -99,6 +102,10 @@ class MapJSONGenerator(object):
             effect = None
         if system.parentsystem:
             parentWH = system.parent_wormholes.get()
+            if parentWH.collapsed:
+                collapsed = True
+            else:
+                collapsed = False
             result = {'sysID': system.system.pk, 'Name': system.system.name,
                     'LevelX': levelX,'activity': activity_estimate,
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
@@ -113,7 +120,7 @@ class MapJSONGenerator(object):
                     'WhFromParentBubbled': parentWH.top_bubbled,
                     'imageURL': self.get_system_icon(system),
                     'whID': parentWH.pk, 'msID': system.pk,
-                    'effect': effect}
+                    'effect': effect, 'collapsed': collapsed}
         else:
             result = {'sysID': system.system.pk, 'Name': system.system.name,
                     'LevelX': levelX, 'activity': activity_estimate,
@@ -126,7 +133,7 @@ class MapJSONGenerator(object):
                     'WhToParentBubbled': None, 'WhFromParentBubbled': None,
                     'imageURL': self.get_system_icon(system),
                     'whID': None, 'msID': system.pk,
-                    'effect': effect}
+                    'effect': effect, 'collapsed': False}
         return result
 
 
