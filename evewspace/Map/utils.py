@@ -224,6 +224,15 @@ def get_possible_wh_types(system1, system2):
     return result
 
 
+def convert_signature_id(sigid):
+    """
+    Standardize the signature ID to XXX-XXX if info is available.
+    """
+    escaped_sigid = sigid.replace(' ','').replace('-','').upper()
+    if len(escaped_sigid) == 6:
+        return "%s-%s" % (escaped_sigid[:3], escaped_sigid[3:])
+    else:
+        return sigid.upper()
 
 
 class RouteFinder(object):

@@ -420,7 +420,7 @@ class Signature(models.Model):
         """
         Ensure that Sig IDs are proper.
         """
-        self.sigid = self.sigid[:3].upper()
+        self.sigid = utils.convert_signature_id(self.sigid)
         super(Signature, self).save(*args, **kwargs)
 
 class MapPermission(models.Model):
