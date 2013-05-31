@@ -319,6 +319,7 @@ class Wormhole(models.Model):
         (1, "First Shrink"), (2, "Critical")))
     updated = models.DateTimeField(auto_now=True)
     eol_time = models.DateTimeField(null=True)
+    collapsed = models.NullBooleanField(null=True)
 
     def save(self, *args, **kwargs):
         if self.time_status == 1 and not self.eol_time:
