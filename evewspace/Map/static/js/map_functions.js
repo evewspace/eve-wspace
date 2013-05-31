@@ -639,7 +639,8 @@ function DeleteSystem(msID){
 
 
 function CloseSystemMenu(){
-    $('#sysMenu').remove();
+    return false;
+    //$('#sysMenu').remove();
 }
 
 
@@ -1260,7 +1261,7 @@ function GetSelectedSysID() {
 function onSysClick(e) {
     var x = e.pageX;
     var y = e.pageY;
-    DisplaySystemMenu(this.msID, x, y);
+    DisplaySystemDetails(this.msID);
     var div = document.getElementById("sys"+this.msID+"Tip");
     div.style.display = 'none';
 }
