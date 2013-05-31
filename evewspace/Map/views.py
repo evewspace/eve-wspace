@@ -411,7 +411,7 @@ def add_signature(request, map_id, ms_id):
         form = SignatureForm(request.POST)
         if form.is_valid():
             new_sig = form.save(commit=False)
-            new_sig.sigid = new_sig.sigid[:3].upper()
+            new_sig.sigid = utils.convert_signature_id(new_sig.sigid)
             if Signature.objects.filter(system=map_system.system,
                     sigid=new_sig.sigid).exists():
                 old_sig = Signature.objects.get(system=map_system.system,
@@ -491,16 +491,17 @@ def bulk_sig_import(request, map_id, ms_id):
         COL_SIG = 0
         for row in reader:
             if k < 75:
-                if not Signature.objects.filter(sigid=row[COL_SIG][:3].upper(),
+                sig_id = utils.convert_signature_id(row[COL_SIG])
+                if not Signature.objects.filter(sigid=sig_id,
                         system=map_system.system).exists():
 
-                    new_sig = Signature(sigid=row[COL_SIG],
+                    new_sig = Signature(sigid=sig_id,
                                         system=map_system.system)
                     updated_sig = _update_sig_from_tsv(new_sig, row)
                     updated_sig.save()
                 else:
                     old_sig = Signature.objects.get(
-                            sigid=row[COL_SIG][:3].upper(),
+                            sigid=sig_id,
                             system=map_system.system)
                     updated_sig = _update_sig_from_tsv(old_sig, row)
                     updated_sig.save()
