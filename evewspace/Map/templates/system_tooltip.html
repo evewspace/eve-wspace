@@ -1,60 +1,62 @@
+{% for mapsys in map_systems %}
+<div id="sys{{mapsys.pk}}Tip" class="systemTooltip tip">
 <div class="mapSysInfo row">
    <div class="sysClassSpan span3">
        <h4 class="sysFriendlySpan">{{mapsys.friendlyname}}{% if mapsys.parent_wormholes.get.collapsed %} - COLLAPSED{% endif %}</h4>
-        {% if system.sysclass < 7 %}
+        {% if mapsys.system.sysclass < 7 %}
         <div> 
-            <strong>Class: {{system.sysclass}}</strong>
+            <strong>Class: {{mapsys.system.sysclass}}</strong>
         </div>
         <div>
-            <strong>Effect: {{system.effect}}</strong>
+            <strong>Effect: {{mapsys.system.effect}}</strong>
         </div>
         <div>
             <strong>Probable Statics: <br />
-                {{system.static1}} ({{system.static1.dest_string}}) &nbsp {% if system.static2 %}{{system.static2}} ({{system.static2.dest_string}}){% endif %}</strong>
+                {{mapsys.system.get_spec.static1}} ({{mapsys.system.get_spec.static1.dest_string}}) &nbsp {% if mapsys.system.get_spec.static2 %}{{mapsys.system.get_spec.static2}} ({{mapsys.system.get_spec.static2.dest_string}}){% endif %}</strong>
         </div>
         {% endif %}
         <strong>
-        {% if system.sysclass = 7 %}
-        High Sec ({{system.security|floatformat}})
+        {% if mapsys.system.sysclass = 7 %}
+        High Sec ({{mapsys.system.security|floatformat}})
         {% endif %}
-        {% if system.sysclass = 8 %}
-        Low Sec ({{system.security|floatformat}})
+        {% if mapsys.system.sysclass = 8 %}
+        Low Sec ({{mapsys.system.security|floatformat}})
         {% endif %}
-        {% if system.sysclass = 9 %}
-        Null Sec ({{system.security|floatformat}})
+        {% if mapsys.system.sysclass = 9 %}
+        Null Sec ({{mapsys.system.security|floatformat}})
         {% endif %}
     </strong>
-    {% if system.sov %}
+    {% if mapsys.system.sov %}
         <br />
-        <strong>Sov: {{system.sov}}</strong>
+        <strong>Sov: {{mapsys.system.get_spec.sov}}</strong>
     {% endif %}
-    {% if system.sysclass > 6 %}
+    {% if mapsys.system.sysclass > 6 %}
     <br />
-    <strong>Region: {{system.region}}</strong>
+    <strong>Region: {{mapsys.system.region}}</strong>
     <br />
     {% endif %}
     {% load humanize %}
     <span class="sysLastScanned label {% if scanwarning  %} label-important {% endif %}">
-        Last Scanned: {{system.lastscanned|naturaltime}}
+        Last Scanned: {{mapsys.system.lastscanned|naturaltime}}
     </span><br /> 
-     <span class="statsText label label-inverse"> NPC: {{system.npckills}} Ship: {{system.shipkills}} Pod: {{system.podkills}}{% if system.sysclass > 6 %} Jumps: {{system.jumps}} {% endif %}</span> 
+     <span class="statsText label label-inverse"> NPC: {{mapsys.system.npckills}} Ship: {{mapsys.system.shipkills}} Pod: {{mapsys.system.podkills}}{% if mapsys.system.sysclass > 6 %} Jumps: {{mapsys.system.jumps}} {% endif %}</span> 
      <br /> 
-    <p class="statusText label label-success">SIG: {{system.signatures.count}} POS: {{system.poses.count}} Pilots: {{system.active_pilots.count}}</p><br />
-    {% if system.occupied %}
-    <div class="occupiedTooltip label label-important"> Occupied: <br /> {{system.occupied|safe}}</div>
+    <p class="statusText label label-success">SIG: {{mapsys.system.signatures.count}} POS: {{mapsys.system.poses.count}} Pilots: {{mapsys.system.active_pilots.count}}</p><br />
+    {% if mapsys.system.occupied %}
+    <div class="occupiedTooltip label label-important"> Occupied: <br /> {{mapsys.system.occupied|safe}}</div>
     {% endif %}
-    {% if system.info %}
-    <div class="infoTooltip label label-info"> Info: <br /> {{system.info|safe}} </div>
+    {% if mapsys.system.info %}
+    <div class="infoTooltip label label-info"> Info: <br /> {{mapsys.system.info|safe}} </div>
     {% endif %}
 </div>
-{% if system.active_pilots.all %}
+{% if mapsys.system.active_pilots.all %}
     <div class="span3">
             <table>
                 <tr>
                     <th>Pilot</th>
                     <th>Ship Type</th>
                 </tr>
-            {% for p in system.active_pilots.all %}
+            {% for p in mapsys.system.active_pilots.all %}
                 {% if p.charactername != "OOG Browser" %}
                 <tr>
                     <td>{{p.charactername}}</td>
@@ -72,3 +74,5 @@
         {% endif %}
     </div>
 </div>
+</div>
+{% endfor %}
