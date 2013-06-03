@@ -1,22 +1,22 @@
 <div id="sysMenu" class="sysMenuDiv">
 <div class="btn-group btn-group">
     {% if is_igb and mapsys.system.sysclass > 6 %}
-    <a class="btn" onclick="CCPEVE.setDestination({{mapsys.system.pk}});">Set Autopilot</a>
+    <a class="btn btn-small" onclick="CCPEVE.setDestination({{mapsys.system.pk}});">Set Autopilot</a>
     {% endif %}
     {% if mapsys.parent_wormholes.get.collapsed and mapsys.parent_wormholes.get %}
-    <a class="btn" onclick="ResurrectSystem({{mapsys.pk}});">Resurrect System</a>
+    <a class="btn btn-small" onclick="ResurrectSystem({{mapsys.pk}});">Resurrect System</a>
     {% elif mapsys.parent_wormholes.get %}
-    <a class="btn" onclick="CollapseSystem({{mapsys.pk}});">Collapse System</a>
+    <a class="btn btn-small" onclick="CollapseSystem({{mapsys.pk}});">Collapse System</a>
     {% endif %}
     {% if not is_igb %}
-    <a class="btn" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
+    <a class="btn btn-small"" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
     {% endif %}
-    <a class="btn" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
+    <a class="btn btn-small" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
     {% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
-    <a class="btn" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>
+    <a class="btn btn-small" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>
     {% endif %}
     <div id="intelButton" class="btn-group dropdown">
-        <a class="btn dropdown-toggle" data-toggle="dropdown">
+        <a class="btn  btn-small dropdown-toggle" data-toggle="dropdown">
             Intel
             <span class="caret"></span>
         </a>
@@ -24,6 +24,7 @@
         <li><a href="http://www.wormnav.com/index.php?locus={{system.name}}" target="_blank">Wormnav</a></li>
         <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
         <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
+        <li><a href="http://www.zkillboard.com/system/{{system.pk}}" target="_blank">zKillboard</a></li>
         {% if system.sysclass < 7 %}
         <li><a href="http://www.wormhol.es/{{system.name}}" target="_blank">Wormhol.es</a></li>
         {% endif %}
@@ -31,14 +32,14 @@
     </ul>
 </div>
             {% if isinterest %}
-            <a class="btn" onclick="RemoveInterest({{mapsys.pk}});" >Remove Interest </a>
+            <a class="btn btn-small" onclick="RemoveInterest({{mapsys.pk}});" >Remove Interest </a>
             {% else %}
-            <a class="btn" onclick="SetInterest({{mapsys.pk}});" >Set Interest</a>
+            <a class="btn btn-small" onclick="SetInterest({{mapsys.pk}});" >Set Interest</a>
 
             {% endif %}
-            <a class="btn" onclick="MarkScanned({{mapsys.pk}}, false, {{mapsys.system.pk}});">Mark Scanned</a>
+            <a class="btn btn-small" onclick="MarkScanned({{mapsys.pk}}, false, {{mapsys.system.pk}});">Mark Scanned</a>
         <div id="deleteButton" class="btn-group dropdown">
-            <a class="btn dropdown-toggle" data-toggle="dropdown">
+            <a class="btn btn-small dropdown-toggle" data-toggle="dropdown">
                 Delete
             </a>
             <ul id="deleteDropdown" class="dropdown-menu" role="menu">

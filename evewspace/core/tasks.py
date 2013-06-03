@@ -66,7 +66,7 @@ def update_alliance(allianceID):
         alliance.save()
 
 @task()
-def update_corporation(corpID):
+def update_corporation(corpID, sync=False):
     """
     Updates a corporation from the API. If it's alliance doesn't exist,
     update that as well.
@@ -86,8 +86,15 @@ def update_corporation(corpID):
             # If the alliance doesn't exist, we start a task to add it
             # and terminate this task since the alliance task will call
             # it after creating the alliance object
-            update_alliance.delay(corpapi.allianceID)
-            return
+            if not sync:
+                update_alliance.delay(corpapi.allianceID)
+                return
+            else:
+                # Something is waiting and requires the corp object
+                # We set alliance to None and kick off the
+                # update_alliance task to fix it later
+                alliance = None
+                update_alliance.delay(corpapi.allianceID)
     else:
         alliance = None
 
