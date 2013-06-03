@@ -46,7 +46,6 @@ $(document).ready(function(){
 
 $(document).ready(function(){
     $('#mapDiv').html(ajax_image);
-    $('html').click(function(){ CloseSystemMenu(); });
     RefreshMap();
 });
 
@@ -109,7 +108,6 @@ function DisplaySystemDetails(msID, sysID){
             });
             GetPOSList(sysID);
             GetDestinations(msID);
-            CloseSystemMenu();
             focusMS = msID;
             StartDrawing();
         }
@@ -143,31 +141,13 @@ function GetDestinations(msID){
 }
 
 
-function DisplaySystemMenu(msID, x, y){
+function DisplaySystemMenu(msID){
     address = "system/" + msID + "/menu/";
     $.ajax({
         type: "GET",
         url: address,
         success: function(data) { 
-            if (!document.getElementById("sysMenu")){
-                $('#mapDiv').append(data);
-            }
-            else{
-                $('#sysMenu').replaceWith(data);
-            }
-            $('#intelButton').click(function(event){
-                event.stopPropagation();
-                $('#intelDropdown').toggle();
-            });
-            $('#deleteButton').click(function(event){
-                event.stopPropagation();
-                $('#deleteDropdown').toggle();
-            });
-            var div = document.getElementById("sysMenu");
-            div.style.position = "absolute";
-            div.style.top = y + 'px';
-            div.style.left = x + 10 + 'px';
-            div.style.visibility = "visible";
+            $('#sysMenu').html(data);
         }
     });
 }
@@ -185,7 +165,6 @@ function MarkScanned(msID, fromPanel, sysID){
             if (fromPanel){
                 LoadSignatures(msID, false);
             }
-            CloseSystemMenu();
 
         }
     });
@@ -197,7 +176,7 @@ function CollapseSystem(msid){
         url: address,
         async: false,
         success: function(data) {
-            CloseSystemMenu();
+            DisplaySystemMenu(msid);
             RefreshMap();
         }
     });
@@ -211,7 +190,7 @@ function SetInterest(msid){
         async: false,
         data: {"action": "set"},
         success: function(data) {
-            CloseSystemMenu();
+            DisplaySystemMenu(msid);
             RefreshMap();
         }
     });
@@ -225,7 +204,7 @@ function ResurrectSystem(msid){
         url: address,
         async: false,
         success: function(data) {
-            CloseSystemMenu();
+            DisplaySystemMenu(msid);
             RefreshMap();
         }
     });
@@ -240,7 +219,7 @@ function RemoveInterest(msID){
         async: false,
         data: {"action": "remove"},
         success: function(data) { 
-            CloseSystemMenu();
+            DisplaySystemMenu(msID);
             RefreshMap();
         }
     });
@@ -374,7 +353,6 @@ function RefreshMap(){
         type: "GET",
         url: address,
         success: function(data){
-            CloseSystemMenu();
             objSystems = new Array();
             newData = $.parseJSON(data);
             systemsJSON = $.parseJSON(newData[1]);
@@ -617,7 +595,6 @@ function EditSystem(msID){
 
 
 function DeleteSystem(msID){
-    CloseSystemMenu();
     address = "system/" + msID + "/remove/";
     $.ajax({
         type: "POST",
@@ -629,12 +606,6 @@ function DeleteSystem(msID){
             setTimeout(function(){RefreshMap();}, 500);
         }
     });
-}
-
-
-function CloseSystemMenu(){
-    return false;
-    //$('#sysMenu').remove();
 }
 
 
@@ -828,11 +799,13 @@ function DrawSystem(system) {
         }
         childSys.msID = system.msID;
         childSys.whID = system.whID;
+        childSys.sysID = system.sysID;
         childSys.WhFromParentBubbled = system.WhFromParentBubbled;
         childSys.WhToParentBubbled = system.WhToParentBubbled;
         childSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
+        sysText.sysID = system.sysID;
         sysText.click(onSysClick);
         ColorSystem(system, childSys, sysText);
         childSys.collapsed = system.collapsed;
@@ -859,9 +832,11 @@ function DrawSystem(system) {
     }else{
         var rootSys = paper.ellipse(sysX, sysY, 40, 30);
         rootSys.msID = system.msID;
+        rootSys.sysID = system.sysID;
         rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
+        sysText.sysID = system.sysID;
         sysText.click(onSysClick);
         ColorSystem(system, rootSys, sysText);
 
@@ -939,12 +914,6 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     var textFontSize = 12;
     var sysStrokeDashArray = "none";
     var textColor = "#000";
-    if (system.sysID == GetSelectedSysID()) {
-
-        // selected
-        sysStrokeWidth = 5;
-        selected = true;
-    }
     if (system.interest == true) {
         sysStrokeWidth = 7;
         sysStrokeDashArray = "--";
@@ -1253,7 +1222,7 @@ function GetSelectedSysID() {
 function onSysClick(e) {
     var x = e.pageX;
     var y = e.pageY;
-    DisplaySystemDetails(this.msID);
+    DisplaySystemDetails(this.msID, this.sysID);
     var div = document.getElementById("sys"+this.msID+"Tip");
     div.style.display = 'none';
 }

@@ -813,8 +813,8 @@ def destination_list(request, map_id, ms_id):
                            round(rf.ly_distance(system,
                                         destination.system), 3)
                            ))
-    except:
-        raise
+    except ObjectDoesNotExist:
+        return HttpResponse()
     return render(request, 'system_destinations.html',
                   {'system': system, 'destinations': result})
 
