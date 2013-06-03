@@ -1,5 +1,5 @@
 <p class="stStatusHeaderText">
-    <strong>SiteTracker Status:</strong> &nbsp
+<i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i> <strong>SiteTracker Status:</strong> &nbsp
     {% if myfleets|length %}
     <span class="text-info">Active in {{myfleets|length}} fleet(s)! {% if availfleets|length > 1 %} There are {{fleetcount}} fleets active. {% endif %}</span>
     {% else %}
