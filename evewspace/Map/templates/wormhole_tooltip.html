@@ -1,4 +1,6 @@
 {% load humanize %}
+{% for wh in wormholes %}
+<div id="wh{{wh.pk}}Tip" class="wormholeTooltip tip">
 <div class="wormholeInfo">
     {% load humanize %}
         <span class="whUpdateTime label label-info">Updated: {{wh.updated|naturaltime}}</span>
@@ -51,3 +53,5 @@
         </div>
     </div>
 </div>
+</div>
+{% endfor %}

@@ -305,33 +305,31 @@ def system_menu(request, map_id, ms_id):
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=1)
-def system_tooltip(request, map_id, ms_id):
+def system_tooltips(request, map_id):
     """
-    Returns a system tooltip for ms_id in map_id
+    Returns the system tooltips for map_id
     """
     if not request.is_ajax():
         raise PermissionDenied
-
-    return render(request, 'system_tooltip.html', get_system_context(ms_id))
+    cur_map = get_object_or_404(Map, pk=map_id)
+    ms_list = cur_map.systems.all()
+    return render(request, 'system_tooltip.html', {'map_systems': ms_list})
 
 
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=1)
-def wormhole_tooltip(request, map_id, wh_id):
+def wormhole_tooltips(request, map_id):
     """Takes a POST request from AJAX with a Wormhole ID and renders the
     wormhole tooltip for that ID to response.
 
     """
-    if request.is_ajax():
-        wh = get_object_or_404(Wormhole, pk=wh_id)
-        return HttpResponse(render_to_string(
-            "wormhole_tooltip.html",
-            {'wh': wh},
-            context_instance=RequestContext(request)
-        ))
-    else:
+    if not request.is_ajax():
         raise PermissionDenied
+    cur_map = get_object_or_404(Map, pk=map_id)
+    ms_list = MapSystem.objects.filter(map=cur_map).all()
+    whs = Wormhole.objects.filter(top__in=ms_list).all()
+    return render(request, 'wormhole_tooltip.html', {'wormholes': whs})
 
 
 # noinspection PyUnusedLocal

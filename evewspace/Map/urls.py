@@ -28,7 +28,6 @@ sigpatterns = patterns('Map.views',
 syspatterns = patterns('Map.views',
         url(r'^$', 'system_details'),
         url(r'^menu/$', 'system_menu'),
-        url(r'^tooltip/$', 'system_tooltip'),
         url(r'^interest/$','set_interest'),
         url(r'^location/$', 'manual_location'),
         url(r'^scanned/$', 'mark_scanned'),
@@ -45,7 +44,6 @@ syspatterns = patterns('Map.views',
         )
 
 wormholepatterns = patterns('Map.views',
-        url(r'^tooltip/$', 'wormhole_tooltip'),
         url(r'^edit/$$', 'edit_wormhole'),
         )
 
@@ -56,7 +54,9 @@ mappatterns = patterns('Map.views',
         url(r'^edit/$', 'edit_map'),
         url(r'^delete/$', 'delete_map'),
         url(r'^system/new/$', 'add_system'),
+        url(r'^system/tooltips/$', 'system_tooltips'),
         url(r'^system/(?P<ms_id>\d+)/', include(syspatterns)),
+        url(r'^wormhole/tooltips/$', 'wormhole_tooltips'),
         url(r'^wormhole/(?P<wh_id>\d+)/', include(wormholepatterns)),
         url(r'^settings/$', 'map_settings'),
         )
