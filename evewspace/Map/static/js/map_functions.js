@@ -35,9 +35,13 @@ var bubbledColor = "#FF0000"; // Color of first shrink connections
 var clearWhColor = "#00FF00"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
 var renderCollapsedConnections = false; // Are collapsed connections shown?
+var autoRefresh = true; // Does map automatically refresh every 15s?
 
 $(document).ready(function(){
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
+    if (autoRefresh === true){
+        refreshTimerID = setInterval(RefreshMap, 15000);
+    }
 });
 
 $(document).ready(function(){
@@ -177,7 +181,7 @@ function MarkScanned(msID, fromPanel, sysID){
         async: false,
         data: {},
         success: function(data) { 
-            GetSystemTooltip(msID);
+            GetSystemTooltips();
             if (fromPanel){
                 LoadSignatures(msID, false);
             }
@@ -256,19 +260,13 @@ function AssertLocation(msID){
     });
 }
 
-function GetSystemTooltip(msID){
-    address = "system/" + msID + "/tooltip/";
+function GetSystemTooltips(){
+    address = "system/tooltips/";
     $.ajax({
         type: "GET",
         url: address,
         success: function(data){
-               var divName = "#sys" + msID + "Tip";
-                if ($(divName).length == 0){
-                    div = $('<div></div>').html(data).attr('id','sys' + msID + 'Tip').addClass('systemTooltip').addClass('tip').appendTo('body');
-               }else{
-                $(divName).empty();
-                $(divName).html(data);
-               }
+            $('#systemTooltipHolder').html(data);
         }
             });
 }
@@ -358,19 +356,13 @@ function EditPOS(posID, sysID){
 }
 
 
-function GetWormholeTooltip(whID){
-    address = "wormhole/" + whID + "/tooltip/";
+function GetWormholeTooltips(){
+    address = "wormhole/tooltips/";
     $.ajax({
         type: "GET",
         url: address,
         success: function(data){
-               var divName = "#wh" + whID + "Tip";
-                if ($(divName).length == 0){
-                    div = $('<div></div>').html(data).attr('id','wh' + whID + 'Tip').addClass('wormholeTooltip').addClass('tip').appendTo('body');
-               }else{
-                $(divName).empty();
-                $(divName).html(data);
-               }
+            $('#wormholeTooltipHolder').html(data);
         }
             });
 }
@@ -387,6 +379,8 @@ function RefreshMap(){
             newData = $.parseJSON(data);
             systemsJSON = $.parseJSON(newData[1]);
             loadtime = newData[0];
+            GetWormholeTooltips();
+            GetSystemTooltips();
             StartDrawing();
         }
     });
@@ -728,7 +722,6 @@ function ConnectSystems(obj1, obj2, line, bg, interest, dasharray) {
         } else {
             var lineObj = paper.path(path).attr({ stroke: color, fill: "none", "stroke-dasharray": dasharray, "stroke-width": strokeWidth });
         }
-        GetWormholeTooltip(systemTo.whID);
         lineObj.toBack();
         lineObj.mouseover(OnWhOver);
         lineObj.mouseout(OnWhOut);
@@ -946,7 +939,6 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     var textFontSize = 12;
     var sysStrokeDashArray = "none";
     var textColor = "#000";
-    GetSystemTooltip(ellipseSystem.msID);
     if (system.sysID == GetSelectedSysID()) {
 
         // selected
