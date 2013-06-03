@@ -1,25 +1,21 @@
 {% load humanize %}
+{% include 'system_menu.html' %}
+<ul class="nav nav-pills" id="sysInfoTab">
+    <li class="active"><a href="#sysDetails" data-toggle="tab">Details</a></li>
+    <li><a href="#sigsPanel" data-toggle="tab">Signatures ({{mapsys.system.signatures.count}})</a></li>
+    <li><a href="#activePlayerPanel" data-toggle="tab">Pilots ({{mapsys.system.active_pilots.count}})</a></li>
+    <li><a href="#systemPosPanel" data-toggle="tab">Starbases ({{mapsys.system.poses.count}})</a></li>
+</ul>
+<div id="sysTabHolder" class="tab-content well">
+<div id="sysDetails" class="tab-pane active">
 <div id="sysPanelHeader" class="systemPanelHeader row">
-    <div class="span6 page-header well well-large">
-    <div class="dropdown">
-        <h4> <i title="Edit Info" class="icon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i> System Details: <a class="dropdown-toggle" data-toggle="dropdown"> {{system.name}}</a>
-    <ul class="dropdown-menu pull-right" role="menu">
-        <li><a href="http://www.wormnav.com/index.php?locus={{system.name}}" target="_blank">Wormnav</a></li>
-        <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
-        <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
-        {% if system.sysclass < 7 %}
-        <li><a href="http://www.wormhol.es/{{system.name}}" target="_blank">Wormhol.es</a></li>
-        {% endif %}
-
-    </ul>
-</h4>
-</div>
+    <h4> <i title="Edit Info" class="icon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i> System Details: {{mapsys.system.name}} </h4>
     {% if mapsys.friendlyname %}
     <div class="mapSysInfo">
         <h5 class="friendlyName"> Friendly Name: <small>{{mapsys.friendlyname}}</small> </h5> 
     </div>
     {% endif %}
-    <div class="sysClassSpan row">
+    <div class="sysClassSpan">
         {% if system.sysclass < 7 %}
         <div class="span2"> 
             <strong>Class: {{system.sysclass}}</strong>
@@ -57,10 +53,11 @@
         {% endif %}
     </div>
     <br />
-<div>
+</div>
+    <div class="row span6">
     {% load humanize %}
     <ul class="visited inline"><li>First Visit: {{system.first_visited|naturaltime}}</li><li> Last Visit: {{system.last_visited|naturaltime}}</li></ul>
-    <div class="row detailsLeft">
+    <div class="detailsLeft">
     {% if system.occupied %}
     <p class="occupiedText label label-important"><span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p><br />
     {% endif %}
@@ -71,9 +68,8 @@
     <p class="sysInfoUpdated label label-success">Info Updated: {{system.updated|naturaltime}}</p><br />
     {% endif %}
 </div>
-</div>
-<div class="row sysDetailsFooter">
-        <div id="systemStatsPanel" class="systemStatsPanel {% if system.sysclass > 6 %} span2 {% else %} span6 {% endif %}">
+<div class="sysDetailsFooter row">
+    <div id="systemStatsPanel" class="systemStatsPanel {% if system.sysclass > 6 %}span3{%endif%}">
          <h6>System Statistics <br /> (Last Hour) </h6>
          <ul class="systemStatsList {% if system.sysclass < 7%} inline {% endif %}">
                 <li class="systemStatItem">NPC Kills: {{system.npckills}}</li>
@@ -85,28 +81,25 @@
             </ul>
         </div>
         {% if system.sysclass > 6 %}
-        <div id="systemDestinationsDiv" class="span4">
+        <div id="systemDestinationsDiv" class="span3">
         </div>
         {% endif %}
     </div>
      
 </div>
-  <div id="sigsPanel" class="sigsPanel page-header well well-small span8">
-       <div id=systemSigsWell class="systemSigsWell">
-            <h5>Signatures ({{system.signatures.count}} Total)</h5>
+</div>
+  <div id="sigsPanel" class="sigsPanel tab-pane">
             <div id="sigAddPanel" class"sigAddPanel">
-                <h6>Add Signature <i class="icon-download" onclick="GetBulkImport({{mapsys.pk}});"></i></h6>
+                <div style="margin-bottom: 10px; text-align: center;">
+                    <button class="btn" onclick="GetBulkImport({{mapsys.pk}});"><i class="icon-download"></i> Bulk Import</button>
+                </div>
                 <div id="sys{{mapsys.pk}}SigAddForm">
                 </div>
             </div>
             <div id="sys{{mapsys.pk}}Signatures" class="signatureListDiv">
             </div>
-        </div>
     </div>
-</div>
-    <div class="row">
-    <div id="activePlayerPanel" class="activePlayerPanel page-header well well-small span6 offset 1">
-        <h5>Active Pilots ({{system.active_pilots.all.count}} total) </h5>
+    <div id="activePlayerPanel" class="activePlayerPanel tab-pane">
         <div id="activePlayerList" class="activePlayerList">
             <table class="activePilotsTable" cellpadding="10">
                 <tr>
@@ -126,13 +119,14 @@
             </table>
         </div>
     </div>
-
         {% load poslist %}    
-    <div id="systemPosPanel" class="systemPosPanel page-header well well-small span6">
-        <h5>Starbases ({{system.poses.all.count}} Total) <img height=32 width=32 title="Add POS" src='{{STATIC_URL}}images/plus.png' onclick="GetAddPOSDialog({{mapsys.system.pk}});" /></h5>
+    <div id="systemPosPanel" class="systemPosPanel tab-pane">
+        <div style="text-align: center; margin-bottom: 10px;">
+            <button class="btn" onclick="GetAddPOSDialog({{mapsys.system.pk}});"><img height=32 width=32 title="Add POS" src='{{STATIC_URL}}images/plus.png'/>Add POS</button>
+        </div>
         <div id="systemPosWell" class="systemPosWell">
             <div id="sys{{system.pk}}POSDiv">
             </div>
         </div>
     </div>
-    </div>
+</div>
