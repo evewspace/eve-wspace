@@ -35,9 +35,13 @@ var bubbledColor = "#FF0000"; // Color of first shrink connections
 var clearWhColor = "#00FF00"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
 var renderCollapsedConnections = false; // Are collapsed connections shown?
+var autoRefresh = true; // Does map automatically refresh every 15s?
 
 $(document).ready(function(){
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
+    if (autoRefresh === true){
+        refreshTimerID = setInterval(RefreshMap, 15000);
+    }
 });
 
 $(document).ready(function(){
