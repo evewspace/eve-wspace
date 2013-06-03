@@ -22,12 +22,12 @@
     <script type="text/javascript">
         $('#editSystemForm').submit(function(e){
             e.preventDefault();
-            EditSystem({{mapsys.pk}});
+            EditSystem({{mapsys.pk}}, {{mapsys.system.pk}});
             $('#modalHolder').modal('hide');
             return false;
             });
         $('#btnEditSys').click(function(e){
-            EditSystem({{mapsys.pk}});
+                EditSystem({{mapsys.pk}}, {{mapsys.system.pk}});
             $('#modalHolder').modal('hide');
             });
         $('#btnClose').click(function(e){

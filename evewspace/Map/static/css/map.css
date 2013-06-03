@@ -10,9 +10,13 @@
 {
     margin-bottom: 150px;
 }
+#sysTabHolder
+{
+    width: 600px;
+}
 .sysDetailsFooter
 {
-    text-align: center;
+    text-align: left;
 }
 .systemTooltip
 {

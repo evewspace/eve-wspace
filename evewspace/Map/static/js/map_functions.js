@@ -580,7 +580,7 @@ function GetEditSystemDialog(msID){
 }
 
 
-function EditSystem(msID){
+function EditSystem(msID, sysID){
     address = "system/" + msID + "/edit/";
     $.ajax({
         type: 'POST',
@@ -588,7 +588,7 @@ function EditSystem(msID){
         data: $('#editSystemForm').serialize(),
         success: function(){
             RefreshMap();
-            DisplaySystemDetails(msID);
+            DisplaySystemDetails(msID, sysID);
         }
     });
 }
