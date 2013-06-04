@@ -31,6 +31,7 @@ Contents:
    tutorials
    administration
    development
+   release_notes
 
 Indices and tables
 ==================
