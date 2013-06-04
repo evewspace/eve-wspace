@@ -523,7 +523,15 @@ def bulk_sig_import(request, map_id, ms_id):
         reader = csv.reader(request.POST.get('paste', '').decode(
                 'utf-8').splitlines(), delimiter="\t")
         COL_SIG = 0
+        COL_STRENGTH = 4
         for row in reader:
+            # To prevent pasting of POSes into the sig importer, make sure
+            # the strength column is present
+            try:
+                test_var =  row[COL_STRENGTH]
+            except IndexError:
+                return HttpResponse('A valid signature paste was not found',
+                        status=400)
             if k < 75:
                 sig_id = utils.convert_signature_id(row[COL_SIG])
                 if not Signature.objects.filter(sigid=sig_id,
