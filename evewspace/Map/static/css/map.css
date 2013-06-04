@@ -5,11 +5,14 @@
 .systemPanelHeader
 {
     text-align:center;
-    margin-left: 20px;
 }
 .footer
 {
     margin-bottom: 150px;
+}
+#sysTabHolder
+{
+    width: 600px;
 }
 .sysDetailsFooter
 {
@@ -137,7 +140,6 @@
 }
 .sysMenuDiv
 {
-    z-index: 1;
 }
 h5
 {
@@ -169,6 +171,7 @@ textarea
   border-radius: 8px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   position: relative;
+  z-index: 3;
   width: auto;
 }
 

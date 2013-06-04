@@ -29,14 +29,14 @@
 <div id="homeRow2" class="row">
     {% load reddittags %}
     <div id="redditBox" class="well well-small span6">
-        <h3 data-toggle="collapse" data-target="#redditCollapse"><img height="28px" width="75px" src="{{STATIC_URL}}images/evereddit.png" /> Top 25 </h3>
+        <h3 data-toggle="collapse" data-target="#redditCollapse"><i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="28px" width="75px" src="{{STATIC_URL}}images/evereddit.png" /> Top 25 </h3>
         <div id="redditCollapse" class="collapse">
             {% reddit_list %}
         </div>
     </div>
     {% load newsfeeds %}
     <div id="newsBox" class="well well-small span6">
-        <h3 data-toggle="collapse" data-target="#newsCollapse"><img height="28px" width="28px" src="{{STATIC_URL}}images/rss.png" /> Feeds </h3>
+        <h3 data-toggle="collapse" data-target="#newsCollapse"><i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="28px" width="28px" src="{{STATIC_URL}}images/rss.png" /> Feeds </h3>
         <div id="newsCollapse" class="collapse">
             {% feeds %}
         </div>

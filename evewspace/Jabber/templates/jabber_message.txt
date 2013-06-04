@@ -1,5 +1,7 @@
+{% autoescape off %}
 SBJ: {{subject}}
 
 {{message}}
 
-FROM: {{from_user}}  TO: {{sub_group}}  TIME: {{time|date:"Y-m-d H:m"}}
+FROM: {{from_user}}  TO: {{sub_group}}  TIME: {{time|date:"Y-m-d H:i"}}
+{% endautoescape %}

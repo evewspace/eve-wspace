@@ -1,19 +1,19 @@
-//    Eve W-Space
-//    Copyright (C) 2013  Andrew Austin and other contributors
+//    eve w-space
+//    copyright (c) 2013  andrew austin and other contributors
 //
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version. An additional term under section
-//    7 of the GPL is included in the LICENSE file.
+//    this program is free software: you can redistribute it and/or modify
+//    it under the terms of the gnu general public license as published by
+//    the free software foundation, either version 3 of the license, or
+//    (at your option) any later version. an additional term under section
+//    7 of the gpl is included in the license file.
 //
-//   This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
+//   this program is distributed in the hope that it will be useful,
+//    but without any warranty; without even the implied warranty of
+//    merchantability or fitness for a particular purpose.  see the
+//    gnu general public license for more details.
 //
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    you should have received a copy of the gnu general public license
+//    along with this program.  if not, see <http://www.gnu.org/licenses/>.
 
 $(document).ready(function(){
     GetGeneralSettings();
@@ -42,6 +42,8 @@ function GetDestinationSettings(){
         url: "/map/settings/destinations/",
         success: function(data){
             $("#destinationsDiv").html(data);
+            //If global destinations change, we want to reload Profile as well
+            GetProfileDestinationSettings();
         },
         error: function(data){
             alert("There was an error getting the destination settings.");

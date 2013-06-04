@@ -25,18 +25,27 @@ var sigTimerID;
 var updateTimerID;
 var activityLimit = 100;
 var indentX = 150; //The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180.
-var indentY = 64; // The amount of space (in px) between system ellipses on the Y axis
+var indentY = 70; // The amount of space (in px) between system ellipses on the Y axis
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map.
-var sliceLastChars = true; // Friendly name should show last 8 chars if over 8, shows first 8 if false
-
+var sliceLastChars = false; // Friendly name should show last 8 chars if over 8, shows first 8 if false
+var highlightActivePilots = true; // Draw a notification ring around systems with active pilots.
+var goodColor = "#00FF00"; // Color of good status connections
+var badColor = "#FF0000"; // Color of first shrink connections
+var bubbledColor = "#FF0000"; // Color of first shrink connections
+var clearWhColor = "#00FF00"; // Color of good status connections
+var warningColor = "#FF00FF"; // Color of mass critical connections
+var renderCollapsedConnections = false; // Are collapsed connections shown?
+var autoRefresh = true; // Does map automatically refresh every 15s?
 
 $(document).ready(function(){
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
+    if (autoRefresh === true){
+        refreshTimerID = setInterval(RefreshMap, 15000);
+    }
 });
 
 $(document).ready(function(){
     $('#mapDiv').html(ajax_image);
-    $('html').click(function(){ CloseSystemMenu(); });
     RefreshMap();
 });
 
@@ -99,7 +108,6 @@ function DisplaySystemDetails(msID, sysID){
             });
             GetPOSList(sysID);
             GetDestinations(msID);
-            CloseSystemMenu();
             focusMS = msID;
             StartDrawing();
         }
@@ -133,31 +141,13 @@ function GetDestinations(msID){
 }
 
 
-function DisplaySystemMenu(msID, x, y){
+function DisplaySystemMenu(msID){
     address = "system/" + msID + "/menu/";
     $.ajax({
         type: "GET",
         url: address,
         success: function(data) { 
-            if (!document.getElementById("sysMenu")){
-                $('#mapDiv').append(data);
-            }
-            else{
-                $('#sysMenu').replaceWith(data);
-            }
-            $('#intelButton').click(function(event){
-                event.stopPropagation();
-                $('#intelDropdown').toggle();
-            });
-            $('#deleteButton').click(function(event){
-                event.stopPropagation();
-                $('#deleteDropdown').toggle();
-            });
-            var div = document.getElementById("sysMenu");
-            div.style.position = "absolute";
-            div.style.top = y + 'px';
-            div.style.left = x + 10 + 'px';
-            div.style.visibility = "visible";
+            $('#sysMenu').html(data);
         }
     });
 }
@@ -171,25 +161,50 @@ function MarkScanned(msID, fromPanel, sysID){
         async: false,
         data: {},
         success: function(data) { 
-            GetSystemTooltip(msID);
+            GetSystemTooltips();
             if (fromPanel){
                 LoadSignatures(msID, false);
             }
-            CloseSystemMenu();
 
         }
     });
 }
-
-function SetInterest(msID){
-    address = "system/" + msID + "/interest/";
+function CollapseSystem(msid){
+    address = "system/" + msid + "/collapse/";
     $.ajax({
-        type: "POST",
+        type: "post",
+        url: address,
+        async: false,
+        success: function(data) {
+            DisplaySystemMenu(msid);
+            RefreshMap();
+        }
+    });
+   
+}
+function SetInterest(msid){
+    address = "system/" + msid + "/interest/";
+    $.ajax({
+        type: "post",
         url: address,
         async: false,
         data: {"action": "set"},
         success: function(data) {
-            CloseSystemMenu();
+            DisplaySystemMenu(msid);
+            RefreshMap();
+        }
+    });
+   
+}
+
+function ResurrectSystem(msid){
+    address = "system/" + msid + "/resurrect/";
+    $.ajax({
+        type: "post",
+        url: address,
+        async: false,
+        success: function(data) {
+            DisplaySystemMenu(msid);
             RefreshMap();
         }
     });
@@ -204,7 +219,7 @@ function RemoveInterest(msID){
         async: false,
         data: {"action": "remove"},
         success: function(data) { 
-            CloseSystemMenu();
+            DisplaySystemMenu(msID);
             RefreshMap();
         }
     });
@@ -224,19 +239,13 @@ function AssertLocation(msID){
     });
 }
 
-function GetSystemTooltip(msID){
-    address = "system/" + msID + "/tooltip/";
+function GetSystemTooltips(){
+    address = "system/tooltips/";
     $.ajax({
         type: "GET",
         url: address,
         success: function(data){
-               var divName = "#sys" + msID + "Tip";
-                if ($(divName).length == 0){
-                    div = $('<div></div>').html(data).attr('id','sys' + msID + 'Tip').addClass('systemTooltip').addClass('tip').appendTo('body');
-               }else{
-                $(divName).empty();
-                $(divName).html(data);
-               }
+            $('#systemTooltipHolder').html(data);
         }
             });
 }
@@ -326,19 +335,13 @@ function EditPOS(posID, sysID){
 }
 
 
-function GetWormholeTooltip(whID){
-    address = "wormhole/" + whID + "/tooltip/";
+function GetWormholeTooltips(){
+    address = "wormhole/tooltips/";
     $.ajax({
         type: "GET",
         url: address,
         success: function(data){
-               var divName = "#wh" + whID + "Tip";
-                if ($(divName).length == 0){
-                    div = $('<div></div>').html(data).attr('id','wh' + whID + 'Tip').addClass('wormholeTooltip').addClass('tip').appendTo('body');
-               }else{
-                $(divName).empty();
-                $(divName).html(data);
-               }
+            $('#wormholeTooltipHolder').html(data);
         }
             });
 }
@@ -350,11 +353,12 @@ function RefreshMap(){
         type: "GET",
         url: address,
         success: function(data){
-            CloseSystemMenu();
             objSystems = new Array();
             newData = $.parseJSON(data);
             systemsJSON = $.parseJSON(newData[1]);
             loadtime = newData[0];
+            GetWormholeTooltips();
+            GetSystemTooltips();
             StartDrawing();
         }
     });
@@ -516,6 +520,9 @@ function BulkImport(msID){
         success: function(data){
             LoadSignatures(msID, false);
         },
+        error: function(data){
+            alert(data.responseText);
+        }
     });
 }
 
@@ -576,7 +583,7 @@ function GetEditSystemDialog(msID){
 }
 
 
-function EditSystem(msID){
+function EditSystem(msID, sysID){
     address = "system/" + msID + "/edit/";
     $.ajax({
         type: 'POST',
@@ -584,14 +591,13 @@ function EditSystem(msID){
         data: $('#editSystemForm').serialize(),
         success: function(){
             RefreshMap();
-            DisplaySystemDetails(msID);
+            DisplaySystemDetails(msID, sysID);
         }
     });
 }
 
 
 function DeleteSystem(msID){
-    CloseSystemMenu();
     address = "system/" + msID + "/remove/";
     $.ajax({
         type: "POST",
@@ -603,11 +609,6 @@ function DeleteSystem(msID){
             setTimeout(function(){RefreshMap();}, 500);
         }
     });
-}
-
-
-function CloseSystemMenu(){
-    $('#sysMenu').remove();
 }
 
 
@@ -695,7 +696,6 @@ function ConnectSystems(obj1, obj2, line, bg, interest, dasharray) {
         } else {
             var lineObj = paper.path(path).attr({ stroke: color, fill: "none", "stroke-dasharray": dasharray, "stroke-width": strokeWidth });
         }
-        GetWormholeTooltip(systemTo.whID);
         lineObj.toBack();
         lineObj.mouseover(OnWhOver);
         lineObj.mouseout(OnWhOut);
@@ -796,15 +796,22 @@ function DrawSystem(system) {
     var sysText;
     if (system.LevelX != null && system.LevelX > 0) {
         var childSys = paper.ellipse(sysX, sysY, 40, 28);
+        if (system.activePilots > 0 && highlightActivePilots === true){
+            notificationRing = paper.ellipse(sysX, sysY, 45, 33);
+            notificationRing.attr({'stroke-dasharray':'--', 'stroke-width': 2, 'stroke': '#ADFF2F'});
+        }
         childSys.msID = system.msID;
         childSys.whID = system.whID;
+        childSys.sysID = system.sysID;
         childSys.WhFromParentBubbled = system.WhFromParentBubbled;
         childSys.WhToParentBubbled = system.WhToParentBubbled;
         childSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
+        sysText.sysID = system.sysID;
         sysText.click(onSysClick);
         ColorSystem(system, childSys, sysText);
+        childSys.collapsed = system.collapsed;
         objSystems.push(childSys);
         var parentIndex = GetSystemIndex(system.ParentID);
         var parentSys = systemsJSON[parentIndex];
@@ -818,17 +825,21 @@ function DrawSystem(system) {
             if (system.interestpath === true || system.interest === true){
                 interest = true;
             }
-            ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", interest, dasharray);
-            DrawWormholes(parentSys, system, whColor);
+            if(childSys.collapsed === false || renderCollapsedConnections === true){
+                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", interest, dasharray);
+                DrawWormholes(parentSys, system, whColor);
+            }
         }else{
             alert("Error processing system " + system.Name);
         }
     }else{
         var rootSys = paper.ellipse(sysX, sysY, 40, 30);
         rootSys.msID = system.msID;
+        rootSys.sysID = system.sysID;
         rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
+        sysText.sysID = system.sysID;
         sysText.click(onSysClick);
         ColorSystem(system, rootSys, sysText);
 
@@ -851,9 +862,6 @@ function GetConnectionDash(system){
 
 
 function GetConnectionColor(system){
-    var goodColor = "#009900";
-    var badColor = "#FF3300";
-    var warningColor = "#CC00CC";
     if (!system){
         return "#000";
     }
@@ -909,13 +917,6 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     var textFontSize = 12;
     var sysStrokeDashArray = "none";
     var textColor = "#000";
-    GetSystemTooltip(ellipseSystem.msID);
-    if (system.sysID == GetSelectedSysID()) {
-
-        // selected
-        sysStrokeWidth = 5;
-        selected = true;
-    }
     if (system.interest == true) {
         sysStrokeWidth = 7;
         sysStrokeDashArray = "--";
@@ -1104,17 +1105,17 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
     var whToColor = null;
     var decoration = null;
     if (systemTo.WhFromParentBubbled == true){
-        whFromColor = "#FF3300";
+        whFromColor = bubbledColor;
         decoration = "bold";
     }else{
-        whFromColor = textColor;
+        whFromColor = clearWhColor;
     }
 
     if (systemTo.WhToParentBubbled == true){
-        whToColor = "#FF3300";
+        whToColor = bubbledColor;
         decoration = "bold";
     }else{
-        whToColor = textColor;
+        whToColor = clearWhColor;
     }
     
     if (systemTo.WhFromParent) {
@@ -1224,7 +1225,7 @@ function GetSelectedSysID() {
 function onSysClick(e) {
     var x = e.pageX;
     var y = e.pageY;
-    DisplaySystemMenu(this.msID, x, y);
+    DisplaySystemDetails(this.msID, this.sysID);
     var div = document.getElementById("sys"+this.msID+"Tip");
     div.style.display = 'none';
 }
