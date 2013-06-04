@@ -520,6 +520,9 @@ function BulkImport(msID){
         success: function(data){
             LoadSignatures(msID, false);
         },
+        error: function(data){
+            alert(data.responseText);
+        }
     });
 }
 
