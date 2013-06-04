@@ -1,7 +1,16 @@
 <div id="sysMenu" class="sysMenuDiv">
 <div class="btn-group btn-group">
     {% if is_igb and mapsys.system.sysclass > 6 %}
-    <a class="btn btn-small" onclick="CCPEVE.setDestination({{mapsys.system.pk}});">Set Autopilot</a>
+    <div id="autopilotButton" class="btn-group dropdown">
+        <a class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+            Autopilot
+            <span class="caret"></span>
+        </a>
+        <ul is="autopilotDropdown" class="dropdown-menu" role="menu">
+            <li><a href="#" onclick="CCPEVE.setDestination({{mapsys.system.pk}});">Set Destination</a></li>
+            <li><a href="#" onclick="CCPEVE.addWaypoint({{mapsys.system.pk}});">Add Waypoint</a></li>
+        </ul>
+    </div>
     {% endif %}
     {% if mapsys.parent_wormholes.get.collapsed and mapsys.parent_wormholes.get %}
     <a class="btn btn-small" onclick="ResurrectSystem({{mapsys.pk}});">Resurrect System</a>

@@ -1,4 +1,3 @@
-{% load cache %}
 <table class="destinationTable">
     <tr>
         <th>System</th>
@@ -14,7 +13,7 @@
             <td>{{jumps}}</td>
             <td>{{ly}}</td>
             {% if is_igb_trusted %}
-            <td><button class='btn btn-mini btn-info' onclick="CCPEVE.setDestination({{d.system.pk}});">Set</button></td>
+            <td><button class='btn btn-mini btn-info' onclick="CCPEVE.setDestination({{dest.pk}});">D</button>&nbsp<button class='btn btn-mini btn-info' onclick="CCPEVE.addWaypoint({{dest.pk}});">W</button></td>
             {% endif %}
         </tr>
     {% endfor %}
