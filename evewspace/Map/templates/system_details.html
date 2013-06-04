@@ -56,7 +56,7 @@
 </div>
     <div class="row span6">
     {% load humanize %}
-    <ul class="visited inline"><li>First Visit: {{system.first_visited|naturaltime}}</li><li> Last Visit: {{system.last_visited|naturaltime}}</li></ul>
+    <ul class="visited"><li>First Visit: {{system.first_visited|naturaltime}}</li><li> Last Visit: {{system.last_visited|naturaltime}}</li></ul>
     <div class="detailsLeft">
     {% if system.occupied %}
     <p class="occupiedText label label-important"><span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p><br />
