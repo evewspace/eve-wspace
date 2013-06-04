@@ -2,23 +2,35 @@
     <tr>
         <th>Remove</th>
         <th>System</th>
+        <th>Scope</th>
     </tr>
     {% for dest in destinations %}
         <tr>
+            {% if dest.user and user_context %}
+            <td><i class="icon-ban-circle" onclick="RemoveProfileDestination({{dest.pk}});"></i></td>
+            {% elif not dest.user and not user_context %}
             <td><i class="icon-ban-circle" onclick="RemoveDestination({{dest.pk}});"></i></td>
+            {% else %}
+            <td>N/A</td>
+            {% endif %}
             <td>{{dest.system.name}}</td>
+            {% if dest.user %}
+            <td>User</td>
+            {% else %}
+            <td>Global</td>
+            {% endif %}
         </tr>
     {% endfor %}
 </table>
-<form id="addDestinationForm" method="post" action="/map/settings/destinations/new/">
+<form id="add{% if user_context %}Profile{% endif %}DestinationForm" method="post" action="/map/settings/{% if user_context %}user-{% endif %}destinations/new/">
     <h4>Add Destination:</h4>
     System: <input type="text" class="systemAuto" id="sysNameBox" name="systemName"> &nbsp
     <input type="submit" class="btn btn-primary" value="Add Destination">
 </form>
 <script type="text/javascript">
-    $('#addDestinationForm').submit(function(e){
+    $('#add{% if user_context %}Profile{% endif %}DestinationForm').submit(function(e){
                 e.preventDefault();
-                AddDestination();
+                Add{% if user_context %}Profile{% endif %}Destination();
                 return false;
             });
 </script>

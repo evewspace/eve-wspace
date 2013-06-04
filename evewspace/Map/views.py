@@ -28,6 +28,7 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, Permission
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 
 from Map.models import *
 from Map import utils
@@ -46,7 +47,6 @@ def require_map_permission(permission=2):
                 raise PermissionDenied
             else:
                 return view_func(request, map_id, *args, **kwargs)
-
         _view.__name__ = view_func.__name__
         _view.__doc__ = view_func.__doc__
         _view.__dict__ = view_func.__dict__
@@ -109,6 +109,7 @@ def map_checkin(request, map_id):
     json_values.update({'logs': log_string})
 
     return HttpResponse(json.dumps(json_values), mimetype="application/json")
+
 
 
 @login_required
@@ -304,33 +305,65 @@ def system_menu(request, map_id, ms_id):
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=1)
-def system_tooltip(request, map_id, ms_id):
+def system_tooltips(request, map_id):
     """
-    Returns a system tooltip for ms_id in map_id
+    Returns the system tooltips for map_id
     """
     if not request.is_ajax():
         raise PermissionDenied
-
-    return render(request, 'system_tooltip.html', get_system_context(ms_id))
+    cur_map = get_object_or_404(Map, pk=map_id)
+    ms_list = cur_map.systems.all()
+    return render(request, 'system_tooltip.html', {'map_systems': ms_list})
 
 
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=1)
-def wormhole_tooltip(request, map_id, wh_id):
+def wormhole_tooltips(request, map_id):
     """Takes a POST request from AJAX with a Wormhole ID and renders the
     wormhole tooltip for that ID to response.
 
     """
-    if request.is_ajax():
-        wh = get_object_or_404(Wormhole, pk=wh_id)
-        return HttpResponse(render_to_string(
-            "wormhole_tooltip.html",
-            {'wh': wh},
-            context_instance=RequestContext(request)
-        ))
-    else:
+    if not request.is_ajax():
         raise PermissionDenied
+    cur_map = get_object_or_404(Map, pk=map_id)
+    ms_list = MapSystem.objects.filter(map=cur_map).all()
+    whs = Wormhole.objects.filter(top__in=ms_list).all()
+    return render(request, 'wormhole_tooltip.html', {'wormholes': whs})
+
+
+# noinspection PyUnusedLocal
+@login_required()
+@require_map_permission(permission=2)
+def collapse_system(request, map_id, ms_id):
+    """
+    Mark the system as collapsed.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+
+    map_sys = get_object_or_404(MapSystem, pk=ms_id)
+    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh.collapsed = True
+    parent_wh.save()
+    return HttpResponse()
+
+
+# noinspection PyUnusedLocal
+@login_required()
+@require_map_permission(permission=2)
+def resurrect_system(request, map_id, ms_id):
+    """
+    Unmark the system as collapsed.
+    """
+    if not request.is_ajax():
+        raise PermissionDenied
+
+    map_sys = get_object_or_404(MapSystem, pk=ms_id)
+    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh.collapsed = False
+    parent_wh.save()
+    return HttpResponse()
 
 
 # noinspection PyUnusedLocal
@@ -410,20 +443,26 @@ def add_signature(request, map_id, ms_id):
         form = SignatureForm(request.POST)
         if form.is_valid():
             new_sig = form.save(commit=False)
-            new_sig.system = map_system.system
-            new_sig.sigid = new_sig.sigid.upper()
-            new_sig.updated = True
-            new_sig.save()
-            map_system.system.lastscanned = datetime.now(pytz.utc)
-            map_system.system.save()
+            new_sig.sigid = utils.convert_signature_id(new_sig.sigid)
+            if Signature.objects.filter(system=map_system.system,
+                    sigid=new_sig.sigid).exists():
+                old_sig = Signature.objects.get(system=map_system.system,
+                        sigid=new_sig.sigid)
+                edit_signature(request, map_id, ms_id, old_sig.pk)
+            else:
+                new_sig.system = map_system.system
+                new_sig.updated = True
+                new_sig.save()
+                map_system.system.lastscanned = datetime.now(pytz.utc)
+                map_system.system.save()
+                map_system.map.add_log(
+                    request.user, "Added signature %s to %s (%s)."
+                    % (new_sig.sigid, map_system.system.name,
+                       map_system.friendlyname)
+                )
             new_form = SignatureForm()
-            map_system.map.add_log(
-                request.user, "Added signature %s to %s (%s)."
-                % (new_sig.sigid, map_system.system.name,
-                   map_system.friendlyname)
-            )
             return TemplateResponse(request, "add_sig_form.html",
-                                    {'form': new_form, 'system': map_system})
+                                {'form': new_form, 'system': map_system})
         else:
             return TemplateResponse(request, "add_sig_form.html",
                                     {'form': form, 'system': map_system})
@@ -431,6 +470,39 @@ def add_signature(request, map_id, ms_id):
         form = SignatureForm()
     return TemplateResponse(request, "add_sig_form.html",
                             {'form': form, 'system': map_system})
+
+
+def _update_sig_from_tsv(signature, row):
+    COL_SIG = 0
+    COL_SIG_TYPE = 3
+    COL_SIG_GROUP = 2
+    COL_SIG_SCAN_GROUP = 1
+    COL_SIG_STRENGTH = 4
+    COL_DISTANCE = 5
+    info = row[COL_SIG_TYPE]
+    updated = False
+    sig_type = None
+    if (row[COL_SIG_SCAN_GROUP] == "Cosmic Signature"
+        or row[COL_SIG_SCAN_GROUP] == "Cosmic Anomaly"
+       ):
+        try:
+            sig_type = SignatureType.objects.get(
+                    longname=row[COL_SIG_GROUP])
+        except:
+            sig_type = None
+    else:
+        sig_type = None
+
+    if info and sig_type:
+        updated = True
+
+    if sig_type:
+        signature.sigtype = sig_type
+    signature.updated = updated or signature.updated
+    if info:
+        signature.info = info
+
+    return signature
 
 
 # noinspection PyUnusedLocal
@@ -441,27 +513,46 @@ def bulk_sig_import(request, map_id, ms_id):
     GET gets a bulk signature import form. POST processes it, creating sigs
     with blank info and type for each sig ID detected.
     """
+
+
     if not request.is_ajax():
         raise PermissionDenied
     map_system = get_object_or_404(MapSystem, pk=ms_id)
     k = 0
     if request.method == 'POST':
-        reader = csv.reader(
-            request.POST.get('paste', '').decode('utf-8').splitlines(),
-            delimiter="\t"
-        )
+        reader = csv.reader(request.POST.get('paste', '').decode(
+                'utf-8').splitlines(), delimiter="\t")
+        COL_SIG = 0
+        COL_STRENGTH = 4
         for row in reader:
+            # To prevent pasting of POSes into the sig importer, make sure
+            # the strength column is present
+            try:
+                test_var =  row[COL_STRENGTH]
+            except IndexError:
+                return HttpResponse('A valid signature paste was not found',
+                        status=400)
             if k < 75:
-                if not Signature.objects.filter(sigid=row[0],
-                                                system=map_system.system
-                                                ).count():
-                    Signature(sigid=row[0], system=map_system.system,
-                              info=" ").save()
-                    k += 1
+                sig_id = utils.convert_signature_id(row[COL_SIG])
+                if not Signature.objects.filter(sigid=sig_id,
+                        system=map_system.system).exists():
+
+                    new_sig = Signature(sigid=sig_id,
+                                        system=map_system.system)
+                    updated_sig = _update_sig_from_tsv(new_sig, row)
+                    updated_sig.save()
+                else:
+                    old_sig = Signature.objects.get(
+                            sigid=sig_id,
+                            system=map_system.system)
+                    updated_sig = _update_sig_from_tsv(old_sig, row)
+                    updated_sig.save()
+
+                k += 1
         map_system.map.add_log(request.user,
-                               "Imported %s signatures for %s(%s)."
-                               % (k, map_system.system.name,
-                               map_system.friendlyname), True)
+                              "Imported %s signatures for %s(%s)."
+                              % (k, map_system.system.name,
+                                 map_system.friendlyname), True)
         map_system.system.lastscanned = datetime.now(pytz.utc)
         map_system.system.save()
         return HttpResponse()
@@ -713,19 +804,29 @@ def create_map(request):
 @require_map_permission(permission=1)
 def destination_list(request, map_id, ms_id):
     """
-    Returns the destinations of interest list for K-space systems and
+    Returns the destinations of interest tuple for K-space systems and
     a blank response for w-space systems.
     """
-    #if not request.is_ajax():
-    #    raise PermissionDenied
-    destinations = Destination.objects.all()
+    if not request.is_ajax():
+        raise PermissionDenied
+    destinations = Destination.objects.filter(Q(user=None) |
+                                              Q(user=request.user))
     map_system = get_object_or_404(MapSystem, pk=ms_id)
     try:
         system = KSystem.objects.get(pk=map_system.system.pk)
-    except:
+        rf = utils.RouteFinder()
+        result = []
+        for destination in destinations:
+            result.append((destination.system,
+                           rf.route_length(system,
+                                           destination.system) - 1,
+                           round(rf.ly_distance(system,
+                                        destination.system), 3)
+                           ))
+    except ObjectDoesNotExist:
         return HttpResponse()
     return render(request, 'system_destinations.html',
-                  {'system': system, 'destinations': destinations})
+                  {'system': system, 'destinations': result})
 
 
 # noinspection PyUnusedLocal
@@ -811,31 +912,47 @@ def edit_spawns(request, spawn_id):
     return HttpResponse()
 
 
-@permission_required('Map.map_admin')
-def destination_settings(request):
+def destination_settings(request, user=None):
     """
     Returns the destinations section.
     """
+    if not user:
+        dest_list = Destination.objects.filter(user=None)
+    else:
+        dest_list = Destination.objects.filter(Q(user=None) |
+                                               Q(user=request.user))
     return TemplateResponse(request, 'dest_settings.html',
-                            {'destinations': Destination.objects.all()})
+                            {'destinations': dest_list,
+                             'user_context': user})
 
 
-@permission_required('Map.map_admin')
-def add_destination(request):
+def add_destination(request, dest_user=None):
     """
     Add a destination.
     """
+    if not dest_user and not request.user.has_perm('Map.map_admin'):
+        raise PermissionDenied
+
     system = get_object_or_404(KSystem, name=request.POST['systemName'])
-    Destination(system=system, capital=False).save()
+    Destination(system=system, user=dest_user).save()
     return HttpResponse()
 
+def add_personal_destination(request):
+    """
+    Add a personal destination.
+    """
+    return add_destination(request, dest_user=request.user)
 
-@permission_required('Map.map_admin')
+
 def delete_destination(request, dest_id):
     """
     Deletes a destination.
     """
     destination = get_object_or_404(Destination, pk=dest_id)
+    if not request.user.has_perm('Map.map_admin') and not destination.user:
+        raise PermissionDenied
+    if destination.user and not request.user == destination.user:
+        raise PermissionDenied
     destination.delete()
     return HttpResponse()
 

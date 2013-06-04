@@ -22,7 +22,7 @@ from django.http import HttpResponse, Http404
 from django.template.response import TemplateResponse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, get_object_or_404
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import pytz
 import eveapi
 from API import utils as handler
@@ -143,7 +143,7 @@ def add_pos(request, sysID):
             try:
                 api = eveapi.EVEAPIConnection(cacheHandler=handler)
                 corpID = api.eve.CharacterID(names=request.POST['corp']).characters[0].characterID
-                corp = core_tasks.update_corporation(corpID)
+                corp = core_tasks.update_corporation(corpID, True)
             except:
                 # The corp doesn't exist
                 raise Http404

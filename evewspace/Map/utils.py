@@ -47,7 +47,10 @@ class MapJSONGenerator(object):
         parent = system
         while parent:
             systemlist.append(parent)
-            parent = parent.parentsystem
+            if parent.parentsystem and not parent.parent_wormholes.get().collapsed:
+                parent = parent.parentsystem
+            else:
+                parent = None
         return systemlist
 
     def get_system_icon(self, system):
@@ -99,6 +102,10 @@ class MapJSONGenerator(object):
             effect = None
         if system.parentsystem:
             parentWH = system.parent_wormholes.get()
+            if parentWH.collapsed:
+                collapsed = True
+            else:
+                collapsed = False
             result = {'sysID': system.system.pk, 'Name': system.system.name,
                     'LevelX': levelX,'activity': activity_estimate,
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
@@ -113,7 +120,7 @@ class MapJSONGenerator(object):
                     'WhFromParentBubbled': parentWH.top_bubbled,
                     'imageURL': self.get_system_icon(system),
                     'whID': parentWH.pk, 'msID': system.pk,
-                    'effect': effect}
+                    'effect': effect, 'collapsed': collapsed}
         else:
             result = {'sysID': system.system.pk, 'Name': system.system.name,
                     'LevelX': levelX, 'activity': activity_estimate,
@@ -126,7 +133,7 @@ class MapJSONGenerator(object):
                     'WhToParentBubbled': None, 'WhFromParentBubbled': None,
                     'imageURL': self.get_system_icon(system),
                     'whID': None, 'msID': system.pk,
-                    'effect': effect}
+                    'effect': effect, 'collapsed': False}
         return result
 
 
@@ -224,6 +231,15 @@ def get_possible_wh_types(system1, system2):
     return result
 
 
+def convert_signature_id(sigid):
+    """
+    Standardize the signature ID to XXX-XXX if info is available.
+    """
+    escaped_sigid = sigid.replace(' ','').replace('-','').upper()
+    if len(escaped_sigid) == 6:
+        return "%s-%s" % (escaped_sigid[:3], escaped_sigid[3:])
+    else:
+        return sigid.upper()
 
 
 class RouteFinder(object):
@@ -232,70 +248,68 @@ class RouteFinder(object):
     for getting the shortest stargate jump route length, the light-year distance,
     and the shortest stargate route as a list of KSystem objects.
     """
-    def _get_ly_distance(self):
+
+    def __init__(self):
+        from django.core.cache import cache
+        if not cache.get('route_graph'):
+            self._cache_graph()
+        else:
+            import cPickle
+            self.graph = cPickle.loads(cache.get('route_graph'))
+
+    def _get_ly_distance(self, sys1, sys2):
         """
         Gets the distance in light years between two systems.
         """
-        x1 = self.sys1.x
-        y1 = self.sys1.y
-        z1 = self.sys1.z
-        x2 = self.sys2.x
-        y2 = self.sys2.y
-        z2 = self.sys2.z
+        x1 = sys1.x
+        y1 = sys1.y
+        z1 = sys1.z
+        x2 = sys2.x
+        y2 = sys2.y
+        z2 = sys2.z
 
         distance = sqrt(pow(x1 - x2 ,2) + pow(y1-y2,2) + pow(z1-z2,2)) / 9.4605284e+15
         return distance
 
-    def __init__(self, sys1, sys2):
-        self.sys1 = sys1
-        self.sys2 = sys2
+    def ly_distance(self, sys1, sys2):
+        return self._get_ly_distance(sys1, sys2)
 
-    def ly_distance(self):
-        return self._get_ly_distance()
+    def route_as_ids(self, sys1, sys2):
+        return self._find_route(sys1, sys2)
 
-    def route_as_ids(self):
-        return self._dijkstra_route()
-
-    def route(self):
+    def route(self, sys1, sys2):
         from Map.models import KSystem
-        return [KSystem.objects.get(pk=sysid) for sysid in self._dijkstra_route()]
+        return [KSystem.objects.get(pk=sysid) for sysid in self._find_route(sys1, sys2)]
 
-    def route_length(self):
-        return len(self._dijkstra_route())
+    def route_length(self, sys1, sys2):
+        return len(self._find_route(sys1, sys2))
 
-    def _cache_system_jumps(self):
+    def _cache_graph(self):
         from Map.models import KSystem
         from core.models import SystemJump
-        cache.set('sysJumps', 1)
-        for sys in KSystem.objects.all():
-            cache.set(sys.pk,
-                    [i.tosystem for i in SystemJump.objects.filter(fromsystem=sys.pk).all()])
+        from django.core.cache import cache
+        import cPickle
+        import networkx as nx
+        if not cache.get('route_graph'):
+            graph = nx.Graph()
+            for from_system in KSystem.objects.all():
+                for to_system in SystemJump.objects.filter(fromsystem=from_system.pk):
+                    graph.add_edge(from_system.pk, to_system.tosystem)
+            cache.set('route_graph', cPickle.dumps(graph, cPickle.HIGHEST_PROTOCOL), 0)
+            self.graph = graph
 
-    def _dijkstra_route(self):
+    def _find_route(self, sys1, sys2):
         """
-        Employs Dijkstra's algorithm to find the shortest route between two systems.
         Takes two system objects (can be KSystem or SystemData).
         Returns a list of system IDs that comprise the route.
         """
-        openList = OrderedDict()
-        visitedList = OrderedDict()
-        openList.update({self.sys1.pk: {'pk': self.sys1.pk, 'parent': None}})
-        # The cache should be populated by an asynch worker, but we check anyway
-        if cache.get('sysJumps') is not 1:
-            self._cache_system_jumps()
-        target = self.sys2.pk
-        while openList:
-            current = openList.popitem(last=False)[1]
-            if current['pk'] == target:
-                route = []
-                parent = current
-                while parent:
-                    route.append(parent['pk'])
-                    parent = parent['parent']
-                return route
-            for adjacentSystem in cache.get(current['pk']):
-                newNode = {adjacentSystem: {'pk': adjacentSystem, 'parent': current}}
-                if not adjacentSystem in visitedList:
-                    openList.update(newNode)
-                    visitedList.update(newNode)
-        return []
+        import networkx as nx
+        import cPickle
+        if not self.graph:
+            if not cache.get('route_graph'):
+                from django.core.cache import cache
+                self._cache_graph()
+                self.graph = cPickle.loads(cache.get('route_graph'))
+            else:
+                self.graph = cPickle.loads(cache.get('route_graph'))
+        return nx.shortest_path(self.graph, source=sys1.pk, target=sys2.pk)

@@ -1,1 +1,62 @@
-[{"pk": 1, "model": "Map.signaturetype", "fields": {"shortname": "GRAV", "escalatable": false, "sleeprsite": true, "longname": "Gravimetric"}}, {"pk": 2, "model": "Map.signaturetype", "fields": {"shortname": "LADAR", "escalatable": false, "sleeprsite": true, "longname": "Ladar"}}, {"pk": 3, "model": "Map.signaturetype", "fields": {"shortname": "RADAR", "escalatable": true, "sleeprsite": true, "longname": "Radar"}}, {"pk": 4, "model": "Map.signaturetype", "fields": {"shortname": "MAG", "escalatable": true, "sleeprsite": true, "longname": "Magnetometric"}}, {"pk": 5, "model": "Map.signaturetype", "fields": {"shortname": "ANOM", "escalatable": true, "sleeprsite": true, "longname": "Anomolay"}}, {"pk": 6, "model": "Map.signaturetype", "fields": {"shortname": "WH", "escalatable": false, "sleeprsite": false, "longname": "Wormhole"}}]
+[
+    {
+        "pk": 1, 
+        "model": "Map.signaturetype", 
+        "fields": {
+            "shortname": "ORE", 
+            "escalatable": false, 
+            "sleeprsite": true, 
+            "longname": "Ore Site"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "Map.signaturetype", 
+        "fields": {
+            "shortname": "GAS", 
+            "escalatable": false, 
+            "sleeprsite": true, 
+            "longname": "Gas Site"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "Map.signaturetype", 
+        "fields": {
+            "shortname": "DATA", 
+            "escalatable": true, 
+            "sleeprsite": true, 
+            "longname": "Radar"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "Map.signaturetype", 
+        "fields": {
+            "shortname": "RELIC", 
+            "escalatable": true, 
+            "sleeprsite": true, 
+            "longname": "Relic Site"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "Map.signaturetype", 
+        "fields": {
+            "shortname": "COMBAT", 
+            "escalatable": true, 
+            "sleeprsite": true, 
+            "longname": "Combat Site"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "Map.signaturetype", 
+        "fields": {
+            "shortname": "WH", 
+            "escalatable": false, 
+            "sleeprsite": false, 
+            "longname": "Wormhole"
+        }
+    }
+]

@@ -1,4 +1,6 @@
 {% load humanize %}
+{% for wh in wormholes %}
+<div id="wh{{wh.pk}}Tip" class="wormholeTooltip tip">
 <div class="wormholeInfo">
     {% load humanize %}
         <span class="whUpdateTime label label-info">Updated: {{wh.updated|naturaltime}}</span>
@@ -33,7 +35,7 @@
             {% if wh.time_status = 0 %}
             <span class="timeStatus label label-success">Time: Normal
             {% else %}
-            <span class="timeStatus label label-important">Time: End of Life
+            <span class="timeStatus label label-important">Time: End of Life <br /> as of {{wh.eol_time|naturaltime}}
             {% endif %}
             </span>
         </div>
@@ -51,3 +53,5 @@
         </div>
     </div>
 </div>
+</div>
+{% endfor %}
