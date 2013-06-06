@@ -489,19 +489,10 @@ def bulk_sig_import(request, map_id, ms_id):
                         status=400)
             if k < 75:
                 sig_id = utils.convert_signature_id(row[COL_SIG])
-                if not Signature.objects.filter(sigid=sig_id,
-                        system=map_system.system).exists():
-
-                    new_sig = Signature(sigid=sig_id,
-                                        system=map_system.system)
-                    updated_sig = _update_sig_from_tsv(new_sig, row)
-                    updated_sig.save()
-                else:
-                    old_sig = Signature.objects.get(
-                            sigid=sig_id,
-                            system=map_system.system)
-                    updated_sig = _update_sig_from_tsv(old_sig, row)
-                    updated_sig.save()
+                sig = Signature.objects.get_or_create(sigid=sig_id,
+                        system=map_system.system)[0]
+                sig = _update_sig_from_tsv(sig, row)
+                sig.save()
 
                 k += 1
         map_system.map.add_log(request.user,
