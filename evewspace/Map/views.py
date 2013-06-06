@@ -426,12 +426,6 @@ def set_interest(request, map_id, ms_id):
         raise PermissionDenied
 
 
-# noinspection PyUnusedLocal
-@login_required()
-@require_map_permission(permission=2)
-def add_signature(*args, **kwargs):
-    return edit_signature(*args, **kwargs)
-
 
 def _update_sig_from_tsv(signature, row):
     COL_SIG = 0
