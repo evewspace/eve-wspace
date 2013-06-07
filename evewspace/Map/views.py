@@ -758,7 +758,7 @@ def create_map(request):
         form = MapForm
         return TemplateResponse(request, 'new_map.html', {'form': form, })
 
-def sortDestinations(destinations):
+def _sort_destinations(destinations):
 
     """
     Takes a list of destination tuples and returns the same list, sorted in order of the jumps.
@@ -810,7 +810,7 @@ def destination_list(request, map_id, ms_id):
     except ObjectDoesNotExist:
         return HttpResponse()
     return render(request, 'system_destinations.html',
-                  {'system': system, 'destinations': sortDestinations(result)})
+                  {'system': system, 'destinations': _sort_destinations(result)})
 
 
 # noinspection PyUnusedLocal
