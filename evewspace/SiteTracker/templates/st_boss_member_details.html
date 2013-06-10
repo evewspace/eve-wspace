@@ -3,7 +3,7 @@
     <li><a data-toggle="tab" href="#member{{member.user.pk}}Sites" onclick="ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});"><i class="icon-chevron-down"></i>Site List</a></li>
 </ul>
 <div class="tab-content">
-    <div class="tab-pane active" id="member{{member.pk}}Actions">
+    <div class="tab-pane active" id="member{{member.user.pk}}Actions">
         <button class="btn btn-info" onclick="STPromoteMember({{member.fleet.pk}}, {{member.user.pk}});">Make Boss</button>
         <button class="btn btn-danger" onclick="STLeaveFleet({{member.fleet.pk}}, {{member.user.pk}});">Kick Member</button>
     </div>
