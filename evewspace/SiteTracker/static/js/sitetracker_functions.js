@@ -79,6 +79,7 @@ function STPromoteMember(fleetID, memberID){
         url: "/sitetracker/fleet/" + fleetID + "/member/" + memberID + "/promote/",
         success: function(){
             ReloadSTBar();
+            $('#modalHolder').modal('hide');
         }
     });
 
