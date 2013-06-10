@@ -124,7 +124,7 @@ function ReloadBossFleetMember(fleetID, memberID){
         type: "GET",
         url: "/sitetracker/fleet/" + fleetID + "/member/" + memberID + "/",
         success: function(data){
-            $('#member' + memberID + 'Details').html(data);
+            $('#member' + memberID + 'Sites').html(data);
         }
     });
 }

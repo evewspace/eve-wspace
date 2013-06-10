@@ -2,7 +2,7 @@
 <ul class="stSitesList">
             {% for site in member.fleet.sites.all %}
             <li class="stSiteListing">
-                {% if member.user in site and site in member.pending_sites %}
+                {% if member.user in site and site.is_pending.user %}
                 <i class="icon-question-sign" title="Credit Pending."></i>
                 {% elif member.user in site %}
                 <i class="icon-ok-sign" title="Credited. Click to unclaim."
