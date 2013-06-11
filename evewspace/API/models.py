@@ -14,9 +14,11 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from django.db import models
-from django.contrib.auth.models import User
 from core.models import Corporation
+
+from django.db import models
+from django.db.models import Q
+from django.contrib.auth.models import User, Group
 # Create your models here.
 
 
@@ -90,17 +92,36 @@ class APIShipLog(models.Model):
         return self.shiptype
 
 
-class APICachedDocument(models.Model):
-    """APICachedDocument represents a chached API document for our cache handler."""
-    host = models.CharField(max_length=100)
-    params = models.CharField(max_length=200)
-    path = models.CharField(max_length=100)
-    xml = models.TextField()
-    cacheduntil = models.DateTimeField()
+class APIAccessGroup(models.Model):
+    """Stores the access mask access groups from the CallList call."""
+    group_id = models.IntegerField(primary_key=True)
+    group_name = models.CharField(max_length=255)
+    group_description = models.TextField(blank=True, null=True)
 
-    class Meta:
-        permissions = (("clear_api_cache", "Clear the API document cache."),)
 
-    def __unicode__(self):
-        """Return path name as unicode representation."""
-        return self.path
+class APIAccessType(models.Model):
+    """Stores the access masks and types pulled from the CallList call."""
+    call_type = models.IntegerField(choices=[(1,'Character'),
+                                             (2,'Corporation')])
+    call_name = models.CharField(max_length=255)
+    call_description = models.TextField(blank=True, null=True)
+    call_group = models.ForeignKey(APIAccessGroup,
+            related_name="calls")
+    call_mask = models.IntegerField()
+
+    def is_required_for_user(self, user, corp):
+        """
+        Returns True if the APIAccessType is required for this user / corp.
+        Also returns True if the APIAccessType is required for any of the
+        user's groups.
+        """
+        return APIAccessRequirement.objects.filter(Q(corp=corp) |
+                        Q(groups_required__in=user.groups.all()),
+                        requirement=self).exists()
+
+
+class APIAccessRequirement(models.Model):
+    """Stores the required access for member API keys for a corp."""
+    corp = models.ForeignKey(Corporation, related_name="api_requirements")
+    requirement = models.ForeignKey(APIAccessType, related_name="required_by")
+    groups_required = models.ManyToManyField(Group, null=True)

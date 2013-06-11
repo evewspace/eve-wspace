@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django import template
 import eveapi
-from API import utils as handler
+from API import cache_handler as handler
 from API.utils import timestamp_to_datetime
 from API.models import *
 register = template.Library()
