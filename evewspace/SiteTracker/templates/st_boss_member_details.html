@@ -1,0 +1,13 @@
+<ul class="nav nav-tabls" id="member{{member.user.pk}}Tab">
+    <li class="active"><a href="#member{{member.user.pk}}Actions" data-toggle="tab"><i class="icon-chevron-down"></i>Actions</a></li>
+    <li><a data-toggle="tab" href="#member{{member.user.pk}}Sites" onclick="ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});"><i class="icon-chevron-down"></i>Site List</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="member{{member.user.pk}}Actions">
+        <button class="btn btn-info" onclick="STPromoteMember({{member.fleet.pk}}, {{member.user.pk}});">Make Boss</button>
+        <button class="btn btn-danger" onclick="STLeaveFleet({{member.fleet.pk}}, {{member.user.pk}});">Kick Member</button>
+    </div>
+    <div class="tab-pane" id="member{{member.user.pk}}Sites">
+        <img src="/static/images/loading.gif"></img>
+    </div>
+</div>
