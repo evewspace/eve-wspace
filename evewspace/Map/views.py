@@ -519,7 +519,7 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
     if not request.is_ajax():
         raise PermissionDenied
     map_system = get_object_or_404(MapSystem, pk=ms_id)
-    
+    action = None
     if sig_id != None:
         signature = get_object_or_404(Signature, pk=sig_id)
         created = False
@@ -556,7 +556,7 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
                                     {'form': form,
                                     'system': map_system, 'sig': signature})
     form = SignatureForm()
-    if sig_id == None:
+    if sig_id == None or action == 'Updated':
         return TemplateResponse(request, "add_sig_form.html",
                         {'form': form, 'system': map_system})
     else:
@@ -781,7 +781,7 @@ def _sort_destinations(destinations):
                     else:
                         results.insert(onVal, dest)
                         onVal = 0
-                        break                    
+                        break
     return results
 
 # noinspection PyUnusedLocal
