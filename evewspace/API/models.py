@@ -28,6 +28,7 @@ class APIKey(models.Model):
     vcode = models.CharField(max_length=100)
     valid = models.BooleanField()
     lastvalidated = models.DateTimeField()
+    access_mask = models.IntegerField()
     proxykey = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
@@ -108,6 +109,12 @@ class APIAccessType(models.Model):
     call_group = models.ForeignKey(APIAccessGroup,
             related_name="calls")
     call_mask = models.IntegerField()
+
+    def key_allows(self, key_mask):
+        """
+        Returns True if the provided key allows this APIAccessType.
+        """
+        return (self.call_mask & key_mask) == self.call_mask
 
     def is_required_for_user(self, user, corp):
         """
