@@ -483,7 +483,7 @@ def bulk_sig_import(request, map_id, ms_id):
             # To prevent pasting of POSes into the sig importer, make sure
             # the strength column is present
             try:
-                test_var =  row[COL_STRENGTH]
+                test_var = row[COL_STRENGTH]
             except IndexError:
                 return HttpResponse('A valid signature paste was not found',
                         status=400)
