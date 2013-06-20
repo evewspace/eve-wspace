@@ -311,8 +311,9 @@ def system_tooltips(request, map_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-    cur_map = get_object_or_404(Map, pk=map_id)
-    ms_list = cur_map.systems.all()
+    ms_list = MapSystem.objects.filter(map_id=map_id)\
+                    .select_related('parent_wormhole', 'system__region')\
+                    .iterator()
     return render(request, 'system_tooltip.html', {'map_systems': ms_list})
 
 
