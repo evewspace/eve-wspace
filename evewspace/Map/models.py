@@ -22,6 +22,8 @@ from django.forms import ModelForm
 from datetime import datetime, timedelta, time
 import pytz
 from Map import utils
+from Map.utils import MapJSONGenerator
+from django.core.cache import cache
 # Create your models here.
 
 class WormholeType(models.Model):
@@ -287,6 +289,7 @@ class MapSystem(models.Model):
 
     def save(self, *args, **kwargs):
         self.friendlyname = self.friendlyname.upper()
+        cache.delete(MapJSONGenerator._get_cache_key(self.map))
         super(MapSystem, self).save(*args, **kwargs)
 
     def remove_system(self, user):

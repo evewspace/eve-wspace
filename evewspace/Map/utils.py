@@ -38,6 +38,10 @@ class MapJSONGenerator(object):
         self.user = user
         self.levelY = 0
 
+    @staticmethod
+    def _get_cache_key(map_inst):
+        return '%s_map' % map_inst.pk
+    
     def get_path_to_map_system(self, system):
         """
         Returns a list of MapSystems on the route between the map root and
@@ -139,11 +143,17 @@ class MapJSONGenerator(object):
 
     def get_systems_json(self):
         """Returns a JSON string representing the systems in a map."""
-        syslist = []
-        root = self.map.systems.get(parentsystem__isnull=True)
-        syslist.append(self.system_to_dict(root, 0))
-        self.recursive_system_data_generator(root.childsystems.all(), syslist, 1)
-        return json.dumps(syslist, sort_keys=True)
+        cache_key = self._get_cache_key(self.map)
+        cached = cache.get(cache_key)
+        if cached == None:
+            syslist = []
+            root = self.map.systems.get(parentsystem__isnull=True)
+            syslist.append(self.system_to_dict(root, 0))
+            self.recursive_system_data_generator(root.childsystems.all(),
+                                                 syslist, 1)
+            cached = json.dumps(syslist, sort_keys=True)
+            cache.set(cache_key, cached, 300)
+        return cached
 
 
     def recursive_system_data_generator(self, mapSystems, syslist, levelX):
