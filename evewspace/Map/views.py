@@ -343,7 +343,7 @@ def collapse_system(request, map_id, ms_id):
         raise PermissionDenied
 
     map_sys = get_object_or_404(MapSystem, pk=ms_id)
-    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh = map_sys.parent_wormhole
     parent_wh.collapsed = True
     parent_wh.save()
     return HttpResponse()
@@ -360,7 +360,7 @@ def resurrect_system(request, map_id, ms_id):
         raise PermissionDenied
 
     map_sys = get_object_or_404(MapSystem, pk=ms_id)
-    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh = map_sys.parent_wormhole
     parent_wh.collapsed = False
     parent_wh.save()
     return HttpResponse()
