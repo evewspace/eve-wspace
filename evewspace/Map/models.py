@@ -95,10 +95,10 @@ class System(SystemData):
         return self.sysclass < 7
 
     def get_spec(self):
-        if self.sysclass >= 7:
-            return KSystem.objects.get(pk=self.pk)
+        if self.sysclass < 7:
+            return self.wsystem
         else:
-            return WSystem.objects.get(pk=self.pk)
+            return self.ksystem
 
     def save(self, *args, **kwargs):
         # Make sure any new lines in info or occupied are replaced with <br />
