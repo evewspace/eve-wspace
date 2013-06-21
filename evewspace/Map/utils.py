@@ -37,6 +37,9 @@ class MapJSONGenerator(object):
         self.map = map
         self.user = user
         self.levelY = 0
+        self.pvp_threshold = int(get_config("MAP_PVP_THRESHOLD", user).value)
+        self.npc_threshold = int(get_config("MAP_NPC_THRESHOLD", user).value)
+        self.interest_time = int(get_config("MAP_INTEREST_TIME", user).value)
 
     @staticmethod
     def get_cache_key(map_inst):
@@ -62,8 +65,8 @@ class MapJSONGenerator(object):
         Takes a MapSystem and returns the appropriate icon to display on the map
         as a realative URL.
         """
-        pvp_threshold = int(get_config("MAP_PVP_THRESHOLD", self.user).value)
-        npc_threshold = int(get_config("MAP_NPC_THRESHOLD", self.user).value)
+        pvp_threshold = self.pvp_threshold
+        npc_threshold = self.npc_threshold
         staticPrefix = "%s" % (settings.STATIC_URL + "images/")
         if system.system.active_pilots.filter(user=self.user).count():
             return staticPrefix + "mylocation.png"
@@ -84,21 +87,19 @@ class MapJSONGenerator(object):
         Takes a MapSystem and X,Y data and returns the dict of information to be passed to
         the map JS as JSON.
         """
-        interesttime = int(get_config("MAP_INTEREST_TIME", self.user).value)
+        interesttime = self.interest_time
         threshold = datetime.datetime.now(pytz.utc) - timedelta(minutes=interesttime)
         if system.interesttime and system.interesttime > threshold:
             interest = True
         else:
             interest = False
-        if system.map.systems.filter(interesttime__gt=threshold).count() != 0:
+        if system.map.systems.filter(interesttime__gt=threshold).exists():
             path = False
             for sys in system.map.systems.filter(interesttime__gt=threshold).all():
                 if system in self.get_path_to_map_system(sys):
                     path = True
         else:
             path = False
-        activity_estimate = (system.system.podkills + system.system.npckills +
-                system.system.shipkills)
         from Map.models import WSystem
         if system.system.is_wspace():
             effect = WSystem.objects.get(pk=system.system.pk).effect
@@ -111,7 +112,7 @@ class MapJSONGenerator(object):
             else:
                 collapsed = False
             result = {'sysID': system.system.pk, 'Name': system.system.name,
-                    'LevelX': levelX,'activity': activity_estimate,
+                    'LevelX': levelX,
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
                     'interestpath': path, 'ParentID': system.parentsystem.pk,
@@ -127,7 +128,7 @@ class MapJSONGenerator(object):
                     'effect': effect, 'collapsed': collapsed}
         else:
             result = {'sysID': system.system.pk, 'Name': system.system.name,
-                    'LevelX': levelX, 'activity': activity_estimate,
+                    'LevelX': levelX,
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
                     'interestpath': path, 'ParentID': None,
