@@ -5,6 +5,7 @@ These pages contain auto-generated module and funciton definitions for the curre
 .. toctree::
     :maxdepth: 1
     
+    vagrant    
     models
     views
     utils
