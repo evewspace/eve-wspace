@@ -39,7 +39,7 @@ class MapJSONGenerator(object):
         self.levelY = 0
 
     @staticmethod
-    def _get_cache_key(map_inst):
+    def get_cache_key(map_inst):
         return '%s_map' % map_inst.pk
     
     def get_path_to_map_system(self, system):
@@ -143,7 +143,7 @@ class MapJSONGenerator(object):
 
     def get_systems_json(self):
         """Returns a JSON string representing the systems in a map."""
-        cache_key = self._get_cache_key(self.map)
+        cache_key = self.get_cache_key(self.map)
         cached = cache.get(cache_key)
         if cached == None:
             syslist = []

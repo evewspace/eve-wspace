@@ -289,7 +289,7 @@ class MapSystem(models.Model):
 
     def save(self, *args, **kwargs):
         self.friendlyname = self.friendlyname.upper()
-        cache.delete(MapJSONGenerator._get_cache_key(self.map))
+        cache.delete(MapJSONGenerator.get_cache_key(self.map))
         super(MapSystem, self).save(*args, **kwargs)
 
     def remove_system(self, user):
