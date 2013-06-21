@@ -335,6 +335,7 @@ class Wormhole(models.Model):
             self.eol_time = datetime.now(pytz.utc)
         elif self.time_status != 1:
             self.eol_time = None
+        cache.delete(MapJSONGenerator.get_cache_key(self.map))
         super(Wormhole, self).save(*args, **kwargs)
 
 class SignatureType(models.Model):
