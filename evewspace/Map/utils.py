@@ -15,17 +15,17 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #from Map.models import *
-from django.conf import settings
-import json
-import datetime
-from datetime import timedelta
-import pytz
-from django.contrib.sites.models import Site
-from math import pow, sqrt
+from collections import OrderedDict, defaultdict
 from core.models import SystemJump, Type, Location
 from core.utils import get_config
-from collections import OrderedDict
+from datetime import timedelta
+from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.cache import cache
+from math import pow, sqrt
+import datetime
+import json
+import pytz
 
 class MapJSONGenerator(object):
     """
@@ -147,31 +147,31 @@ class MapJSONGenerator(object):
         cache_key = self.get_cache_key(self.map)
         cached = cache.get(cache_key)
         if cached == None:
-            syslist = []
-            root = self.map.systems.get(parentsystem__isnull=True)
-            syslist.append(self.system_to_dict(root, 0))
-            self.recursive_system_data_generator(root.childsystems.all(),
-                                                 syslist, 1)
+            self.systems = defaultdict(list)
+            for system in self.map.systems.all().iterator():
+                self.systems[system.parentsystem_id].append(system)
+            root = self.systems[None][0]
+            syslist = [self.system_to_dict(root, 0),]
+            self.recursive_system_data_generator(root, syslist, 1)
             cached = json.dumps(syslist, sort_keys=True)
             cache.set(cache_key, cached, 300)
         return cached
 
-
-    def recursive_system_data_generator(self, mapSystems, syslist, levelX):
+    def recursive_system_data_generator(self, start_sys, syslist, levelX):
         """
         Prepares a list of MapSystem objects for conversion to JSON for map JS.
         Takes a queryset of MapSystems and the current list of systems prepared
         for JSON.
         """
         # We will need an index later, so let's enumerate the mapSystems
-        enumSystems = enumerate(mapSystems, start=0)
+        enumSystems = enumerate(self.systems[start_sys.pk], start=0)
         for item in enumSystems:
             i = item[0]
             system = item[1]
             if i > 0:
                 self.levelY +=1
             syslist.append(self.system_to_dict(system, levelX))
-            self.recursive_system_data_generator(system.childsystems.all(),
+            self.recursive_system_data_generator(system,
                     syslist, levelX + 1)
 
 
