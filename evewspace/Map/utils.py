@@ -161,7 +161,7 @@ class MapJSONGenerator(object):
         if cached == None:
             self.systems = defaultdict(list)
             for system in self.map.systems.all()\
-                    .select_related('system', 'parentsystem')\
+                    .select_related('system', 'parentsystem', 'parent_womrhole')\
                     .iterator():
                 self.systems[system.parentsystem_id].append(system)
             root = self.systems[None][0]
