@@ -93,16 +93,13 @@ class MapJSONGenerator(object):
             interest = True
         else:
             interest = False
+        path = False
         if system.map.systems.filter(interesttime__gt=threshold).exists():
-            path = False
             for sys in system.map.systems.filter(interesttime__gt=threshold).all():
                 if system in self.get_path_to_map_system(sys):
                     path = True
-        else:
-            path = False
-        from Map.models import WSystem
         if system.system.is_wspace():
-            effect = WSystem.objects.get(pk=system.system.pk).effect
+            effect = system.system.wsystem.effect
         else:
             effect = None
         if system.parentsystem:
