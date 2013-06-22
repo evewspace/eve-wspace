@@ -145,7 +145,9 @@ class MapJSONGenerator(object):
         cached = cache.get(cache_key)
         if cached == None:
             self.systems = defaultdict(list)
-            for system in self.map.systems.all().iterator():
+            for system in self.map.systems.all()\
+                    .select_related('system', 'parentsystem')\
+                    .iterator():
                 self.systems[system.parentsystem_id].append(system)
             root = self.systems[None][0]
             syslist = [self.system_to_dict(root, 0),]
