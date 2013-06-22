@@ -26,7 +26,7 @@ DATABASES = {
 }
 
 # Set your E-mail options below if you need to override the defaults
-
+#SERVER_EMAIL='bob@J100820.wh'
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #EMAIL_HOST = 'localhost'
 #EMAIL_PORT = 25
