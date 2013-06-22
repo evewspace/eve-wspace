@@ -15,10 +15,17 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.models import Corporation
+from core.tasks import update_corporation
+from core.utils import get_config
+import cache_handler as handler
 
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User, Group
+from datetime import datetime
+import eveapi
+
+import pytz
 # Create your models here.
 
 
@@ -30,6 +37,7 @@ class APIKey(models.Model):
     lastvalidated = models.DateTimeField()
     access_mask = models.IntegerField()
     proxykey = models.CharField(max_length=100, null=True, blank=True)
+    validation_error = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         permissions = (("add_keys", "Add API keys for others."),
@@ -47,6 +55,37 @@ class CorpAPIKey(APIKey):
     Corp API keys used for corp stuff.
     """
     corp = models.ForeignKey(Corporation, related_name="api_keys")
+    character_name = models.CharField(max_length=255, null=True, blank=True)
+
+    def validate(self):
+        """
+        Validate a corp API key. Return False if invalid, True if valid.
+
+        :returns: bool -- True if valid, False if invalid
+        """
+        api = eveapi.EVEAPIConnection(cacheHandler=handler)
+        auth = api.auth(keyID=self.keyid, vCode=self.vcode)
+        self.lastvalidated = datetime.now(pytz.utc)
+        try:
+            result = auth.account.APIKeyInfo()
+        except eveapi.AuthenticationError:
+            self.valid = False
+            self.validation_error("Access Denied: Key not valid.")
+            self.save()
+            return False
+        if result.key.type == u'Corporation':
+            self.valid = True
+            self.character_name = result.key.characters[0].characterName
+            self.access_mask = result.key.accessMask
+            self.corp = update_corporation(
+                    result.key.characters[0].corporationID, sync=True)
+            self.validation_error = True
+            self.save()
+            return True
+        else:
+            self.valid = False
+            self.validation_error = "API Key is not a corporation key."
+            return False
 
 
 class MemberAPIKey(APIKey):
@@ -54,6 +93,112 @@ class MemberAPIKey(APIKey):
     API key for individual member account.
     """
     user = models.ForeignKey(User, related_name="api_keys")
+
+    def validate(self):
+        """
+        Validate a character API key. Return False if invalid, True
+        if valid.
+
+        :reutrns: bool -- True if valid, False if invalid
+        """
+        char_allowed = int(get_config("API_ALLOW_CHARACTER_KEY",
+                None).value) == 1
+        expire_allowed = int(get_config("API_ALLOW_EXPIRING_KEY",
+                None).value) == 1
+        api = eveapi.EVEAPIConnection(cacheHandler=handler)
+        auth = api.auth(keyID=self.keyid, vCode=self.vcode)
+        self.lastvalidated = datetime.now(pytz.utc)
+        try:
+            result = auth.account.APIKeyInfo()
+        except eveapi.AuthenticationError:
+            self.valid = False
+            self.validation_error("Access Denied: Key not valid.")
+            self.save()
+            return False
+        if result.key.type == u'Character' and not char_allowed:
+            self.valid = False
+            self.validation_error = ("API Key is a character key which is not "
+                        "allowed by the administrator.")
+            self.save()
+            return False
+        if result.key.expires and not expire_allowed:
+            self.valid = False
+            self.validation_error = ("API Key has an expiration date which is "
+                        "not allowed by the administrator.")
+            self.save()
+            return False
+        self.access_mask = result.key.accessMask
+        corp_list = []
+        access_error_list = []
+        for character in result.key.characters:
+            corp_list.append(character.corporationID)
+        access_required = _build_access_req_list(self.user, corp_list)
+        for access in access_required:
+            if not access.requirement.key_allows(self.access_mask):
+                access_error_list.append("Endpoint %s required but "
+                        "not allowed." % access.requirement.call_name)
+        if len(access_error_list):
+            self.valid = False
+            self.validation_error = ("The API Key does not meet "
+                    "access requirements: \n\n")
+            for x in access_error_list:
+                self.validation_error = "%s \n %s" % (
+                        self.validation_error, x)
+            self.save()
+            return False
+        else:
+            self.valid = True
+            self.validation_error = ""
+            self.save()
+            return True
+
+    def update_characters(self):
+        api = eveapi.EVEAPIConnection(cacheHandler=handler)
+        auth = api.auth(keyID=self.keyid, vCode=self.vcode)
+        key_info = auth.account.APIKeyInfo()
+        for character in key_info.key.characters:
+            char_info = auth.eve.CharacterInfo(
+                    characterID=character.characterID)
+            char_name = char_info.characterName
+            corp = char_info.corporation
+            if 'alliance' in char_info.__dict__:
+                alliance = char_info.alliance
+            if 'lastKnownLocation' in char_info.__dict__:
+                location = char_info.lastKnownLocation
+            if 'shipName' in char_info.__dict__:
+                lastshipname = char_info.shipName
+                lastshiptype = char_info.shipTypeName
+            api_char = APICharacter.objects.get_or_create(
+                    charid=char_info.characterID)
+            #TODO Finish
+
+
+
+def _build_access_req_list(user, corp_list):
+    """
+    :param: user -- User object
+    :param: corp_list -- List of corporation IDs to consider
+    :returns: list(APIAccessType) -- List of API Access Types required
+    """
+    result = []
+    # Corp-wide requirements
+    for access in APIAccessRequirement.objects.filter(
+            corps_required__in=corp_list,
+            groups_required__isnull=True):
+        result.append(access)
+    # Group-wide requirements
+    for access in APIAccessRequirement.objects.filter(
+            groups_required__in=user.groups.all(),
+            corps_required__isnull=True):
+        if access not in result:
+            result.append(access)
+    # Group-Corp requirements
+    for access in APIAccessRequirement.objects.filter(
+            groups_required__in=user.groups.all(),
+            corps_required__in=corp_list):
+        if access not in result:
+            result.append(access)
+    return result
 
 
 class APICharacter(models.Model):
@@ -129,6 +274,9 @@ class APIAccessType(models.Model):
 
 class APIAccessRequirement(models.Model):
     """Stores the required access for member API keys for a corp."""
-    corp = models.ForeignKey(Corporation, related_name="api_requirements")
-    requirement = models.ForeignKey(APIAccessType, related_name="required_by")
-    groups_required = models.ManyToManyField(Group, null=True)
+    corps_required  = models.ManyToManyField(Corporation,
+            related_name="api_requirements", null=True)
+    requirement = models.ForeignKey(APIAccessType,
+            related_name="required_by")
+    groups_required = models.ManyToManyField(Group, null=True,
+            related_name="api_requirements")

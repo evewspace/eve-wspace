@@ -33,10 +33,17 @@ class Migration(SchemaMigration):
         # Adding model 'APIAccessRequirement'
         db.create_table('API_apiaccessrequirement', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('corp', self.gf('django.db.models.fields.related.ForeignKey')(related_name='api_requirements', to=orm['core.Corporation'])),
             ('requirement', self.gf('django.db.models.fields.related.ForeignKey')(related_name='required_by', to=orm['API.APIAccessType'])),
         ))
         db.send_create_signal('API', ['APIAccessRequirement'])
+
+        # Adding M2M table for field corps_required on 'APIAccessRequirement'
+        db.create_table('API_apiaccessrequirement_corps_required', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('apiaccessrequirement', models.ForeignKey(orm['API.apiaccessrequirement'], null=False)),
+            ('corporation', models.ForeignKey(orm['core.corporation'], null=False))
+        ))
+        db.create_unique('API_apiaccessrequirement_corps_required', ['apiaccessrequirement_id', 'corporation_id'])
 
         # Adding M2M table for field groups_required on 'APIAccessRequirement'
         db.create_table('API_apiaccessrequirement_groups_required', (
@@ -45,6 +52,21 @@ class Migration(SchemaMigration):
             ('group', models.ForeignKey(orm['auth.group'], null=False))
         ))
         db.create_unique('API_apiaccessrequirement_groups_required', ['apiaccessrequirement_id', 'group_id'])
+
+        # Adding field 'CorpAPIKey.character_name'
+        db.add_column('API_corpapikey', 'character_name',
+                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'APIKey.access_mask'
+        db.add_column('API_apikey', 'access_mask',
+                      self.gf('django.db.models.fields.IntegerField')(default=0),
+                      keep_default=False)
+
+        # Adding field 'APIKey.validation_error'
+        db.add_column('API_apikey', 'validation_error',
+                      self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
@@ -68,8 +90,20 @@ class Migration(SchemaMigration):
         # Deleting model 'APIAccessRequirement'
         db.delete_table('API_apiaccessrequirement')
 
+        # Removing M2M table for field corps_required on 'APIAccessRequirement'
+        db.delete_table('API_apiaccessrequirement_corps_required')
+
         # Removing M2M table for field groups_required on 'APIAccessRequirement'
         db.delete_table('API_apiaccessrequirement_groups_required')
+
+        # Deleting field 'CorpAPIKey.character_name'
+        db.delete_column('API_corpapikey', 'character_name')
+
+        # Deleting field 'APIKey.access_mask'
+        db.delete_column('API_apikey', 'access_mask')
+
+        # Deleting field 'APIKey.validation_error'
+        db.delete_column('API_apikey', 'validation_error')
 
 
     models = {
@@ -81,8 +115,8 @@ class Migration(SchemaMigration):
         },
         'API.apiaccessrequirement': {
             'Meta': {'object_name': 'APIAccessRequirement'},
-            'corp': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'api_requirements'", 'to': "orm['core.Corporation']"}),
-            'groups_required': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'null': 'True', 'symmetrical': 'False'}),
+            'corps_required': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'api_requirements'", 'null': 'True', 'to': "orm['core.Corporation']"}),
+            'groups_required': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'api_requirements'", 'null': 'True', 'to': "orm['auth.Group']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'requirement': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'required_by'", 'to': "orm['API.APIAccessType']"})
         },
@@ -110,11 +144,13 @@ class Migration(SchemaMigration):
         },
         'API.apikey': {
             'Meta': {'object_name': 'APIKey'},
+            'access_mask': ('django.db.models.fields.IntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'keyid': ('django.db.models.fields.IntegerField', [], {}),
             'lastvalidated': ('django.db.models.fields.DateTimeField', [], {}),
             'proxykey': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'valid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'validation_error': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'vcode': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'API.apishiplog': {
@@ -129,6 +165,7 @@ class Migration(SchemaMigration):
         'API.corpapikey': {
             'Meta': {'object_name': 'CorpAPIKey', '_ormbases': ['API.APIKey']},
             'apikey_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['API.APIKey']", 'unique': 'True', 'primary_key': 'True'}),
+            'character_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'corp': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'api_keys'", 'to': "orm['core.Corporation']"})
         },
         'API.memberapikey': {
