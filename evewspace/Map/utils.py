@@ -41,6 +41,23 @@ class MapJSONGenerator(object):
         self.npc_threshold = int(get_config("MAP_NPC_THRESHOLD", user).value)
         self.interest_time = int(get_config("MAP_INTEREST_TIME", user).value)
 
+    def _get_interest_path(self):
+        """
+        Returns a list of MapSystems that are on the path to any system of
+        interest
+        """
+        try:
+            return self._interest_path
+        except AttributeError:
+            threshold = datetime.datetime.now(pytz.utc)\
+                        - timedelta(minutes=self.interest_time)
+            systems =[]
+            for system in self.map.systems.filter(
+                interesttime__gt=threshold).iterator():
+                systems.extend(self.get_path_to_map_system(system))
+            self._interest_path = systems
+            return systems
+
     @staticmethod
     def get_cache_key(map_inst):
         return '%s_map' % map_inst.pk
@@ -94,10 +111,8 @@ class MapJSONGenerator(object):
         else:
             interest = False
         path = False
-        if system.map.systems.filter(interesttime__gt=threshold).exists():
-            for sys in system.map.systems.filter(interesttime__gt=threshold).all():
-                if system in self.get_path_to_map_system(sys):
-                    path = True
+        if system in self._get_interest_path():
+            path = True
         if system.system.is_wspace():
             effect = system.system.wsystem.effect
         else:
