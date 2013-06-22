@@ -85,10 +85,10 @@ class MapJSONGenerator(object):
         pvp_threshold = self.pvp_threshold
         npc_threshold = self.npc_threshold
         staticPrefix = "%s" % (settings.STATIC_URL + "images/")
-        if system.system.active_pilots.filter(user=self.user).count():
+        if system.system.active_pilots.filter(user=self.user).exists():
             return staticPrefix + "mylocation.png"
 
-        if system.system.stfleets.filter(ended__isnull=True).count() != 0:
+        if system.system.stfleets.filter(ended__isnull=True).exists():
             return staticPrefix + "farm.png"
 
         if system.system.shipkills + system.system.podkills > pvp_threshold:
