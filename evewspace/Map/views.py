@@ -31,7 +31,7 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 
 from Map.models import *
-from Map import utils
+from Map import utils, signals
 from core.utils import get_config
 
 # Decorator to check map permissions. Takes request and map_id
@@ -311,8 +311,9 @@ def system_tooltips(request, map_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-    cur_map = get_object_or_404(Map, pk=map_id)
-    ms_list = cur_map.systems.all()
+    ms_list = MapSystem.objects.filter(map_id=map_id)\
+                    .select_related('parent_wormhole', 'system__region')\
+                    .iterator()
     return render(request, 'system_tooltip.html', {'map_systems': ms_list})
 
 
@@ -343,7 +344,7 @@ def collapse_system(request, map_id, ms_id):
         raise PermissionDenied
 
     map_sys = get_object_or_404(MapSystem, pk=ms_id)
-    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh = map_sys.parent_wormhole
     parent_wh.collapsed = True
     parent_wh.save()
     return HttpResponse()
@@ -360,7 +361,7 @@ def resurrect_system(request, map_id, ms_id):
         raise PermissionDenied
 
     map_sys = get_object_or_404(MapSystem, pk=ms_id)
-    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh = map_sys.parent_wormhole
     parent_wh.collapsed = False
     parent_wh.save()
     return HttpResponse()
@@ -426,51 +427,6 @@ def set_interest(request, map_id, ms_id):
         raise PermissionDenied
 
 
-# noinspection PyUnusedLocal
-@login_required()
-@require_map_permission(permission=2)
-def add_signature(request, map_id, ms_id):
-    """
-    This function processes the Add Signature form. GET gets the form
-    and POST submits it and returns either a blank form or one with errors.
-    All requests should be AJAX.
-    """
-    if not request.is_ajax():
-        raise PermissionDenied
-    map_system = get_object_or_404(MapSystem, pk=ms_id)
-
-    if request.method == 'POST':
-        form = SignatureForm(request.POST)
-        if form.is_valid():
-            new_sig = form.save(commit=False)
-            new_sig.sigid = utils.convert_signature_id(new_sig.sigid)
-            if Signature.objects.filter(system=map_system.system,
-                    sigid=new_sig.sigid).exists():
-                old_sig = Signature.objects.get(system=map_system.system,
-                        sigid=new_sig.sigid)
-                edit_signature(request, map_id, ms_id, old_sig.pk)
-            else:
-                new_sig.system = map_system.system
-                new_sig.updated = True
-                new_sig.save()
-                map_system.system.lastscanned = datetime.now(pytz.utc)
-                map_system.system.save()
-                map_system.map.add_log(
-                    request.user, "Added signature %s to %s (%s)."
-                    % (new_sig.sigid, map_system.system.name,
-                       map_system.friendlyname)
-                )
-            new_form = SignatureForm()
-            return TemplateResponse(request, "add_sig_form.html",
-                                {'form': new_form, 'system': map_system})
-        else:
-            return TemplateResponse(request, "add_sig_form.html",
-                                    {'form': form, 'system': map_system})
-    else:
-        form = SignatureForm()
-    return TemplateResponse(request, "add_sig_form.html",
-                            {'form': form, 'system': map_system})
-
 
 def _update_sig_from_tsv(signature, row):
     COL_SIG = 0
@@ -528,25 +484,19 @@ def bulk_sig_import(request, map_id, ms_id):
             # To prevent pasting of POSes into the sig importer, make sure
             # the strength column is present
             try:
-                test_var =  row[COL_STRENGTH]
+                test_var = row[COL_STRENGTH]
             except IndexError:
                 return HttpResponse('A valid signature paste was not found',
                         status=400)
             if k < 75:
                 sig_id = utils.convert_signature_id(row[COL_SIG])
-                if not Signature.objects.filter(sigid=sig_id,
-                        system=map_system.system).exists():
-
-                    new_sig = Signature(sigid=sig_id,
-                                        system=map_system.system)
-                    updated_sig = _update_sig_from_tsv(new_sig, row)
-                    updated_sig.save()
-                else:
-                    old_sig = Signature.objects.get(
-                            sigid=sig_id,
-                            system=map_system.system)
-                    updated_sig = _update_sig_from_tsv(old_sig, row)
-                    updated_sig.save()
+                sig = Signature.objects.get_or_create(sigid=sig_id,
+                        system=map_system.system)[0]
+                sig = _update_sig_from_tsv(sig, row)
+                sig.save()
+                signals.signature_update.send_robust(sig, user=request.user,
+                                                 map=map_system.map,
+                                                 signal_strength=row[COL_STRENGTH])
 
                 k += 1
         map_system.map.add_log(request.user,
@@ -564,7 +514,7 @@ def bulk_sig_import(request, map_id, ms_id):
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=2)
-def edit_signature(request, map_id, ms_id, sig_id):
+def edit_signature(request, map_id, ms_id, sig_id=None):
     """
     GET gets a pre-filled edit signature form.
     POST updates the signature with the new information and returns a
@@ -572,34 +522,49 @@ def edit_signature(request, map_id, ms_id, sig_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-    signature = get_object_or_404(Signature, pk=sig_id)
     map_system = get_object_or_404(MapSystem, pk=ms_id)
+    action = None
+    if sig_id != None:
+        signature = get_object_or_404(Signature, pk=sig_id)
+        created = False
 
     if request.method == 'POST':
         form = SignatureForm(request.POST)
         if form.is_valid():
-            signature.sigid = request.POST['sigid'].upper()
+            ingame_id = utils.convert_signature_id(form.cleaned_data['sigid'])
+            if sig_id == None:
+                signature, created = Signature.objects.get_or_create(
+                            system=map_system.system, sigid=ingame_id)
+
+            signature.sigid = ingame_id
             signature.updated = True
-            signature.info = request.POST['info']
+            signature.info = form.cleaned_data['info']
             if request.POST['sigtype'] != '':
-                sigtype = SignatureType.objects.get(pk=request.POST['sigtype'])
+                sigtype = form.cleaned_data['sigtype']
             else:
                 sigtype = None
             signature.sigtype = sigtype
             signature.save()
             map_system.system.lastscanned = datetime.now(pytz.utc)
             map_system.system.save()
+            if created:
+                action = 'Created'
+            else:
+                action = 'Updated'
             map_system.map.add_log(request.user,
-                                   "Updated signature %s in %s (%s)" %
-                                   (signature.sigid, map_system.system.name,
+                                   "%s signature %s in %s (%s)" %
+                                   (action, signature.sigid, map_system.system.name,
                                     map_system.friendlyname))
-            return TemplateResponse(request, "add_sig_form.html",
-                                    {'form': SignatureForm(),
-                                    'system': map_system})
+            signals.signature_update.send_robust(signature, user=request.user,
+                                                 map=map_system.map)
         else:
             return TemplateResponse(request, "edit_sig_form.html",
                                     {'form': form,
                                     'system': map_system, 'sig': signature})
+    form = SignatureForm()
+    if sig_id == None or action == 'Updated':
+        return TemplateResponse(request, "add_sig_form.html",
+                        {'form': form, 'system': map_system})
     else:
         return TemplateResponse(request, "edit_sig_form.html",
                                 {'form': SignatureForm(instance=signature),
@@ -799,6 +764,31 @@ def create_map(request):
         form = MapForm
         return TemplateResponse(request, 'new_map.html', {'form': form, })
 
+def _sort_destinations(destinations):
+
+    """
+    Takes a list of destination tuples and returns the same list, sorted in order of the jumps.
+    """
+    results = []
+    onVal = 0
+
+    for dest in destinations:
+        if len(results) == 0:
+            results.append(dest)
+        else:
+            while onVal <= len(results):
+                if onVal == len(results):
+                    results.append(dest)
+                    onVal = 0
+                    break
+                else:
+                    if dest[1] > results[onVal][1]:
+                        onVal += 1
+                    else:
+                        results.insert(onVal, dest)
+                        onVal = 0
+                        break
+    return results
 
 # noinspection PyUnusedLocal
 @require_map_permission(permission=1)
@@ -826,7 +816,7 @@ def destination_list(request, map_id, ms_id):
     except ObjectDoesNotExist:
         return HttpResponse()
     return render(request, 'system_destinations.html',
-                  {'system': system, 'destinations': result})
+                  {'system': system, 'destinations': _sort_destinations(result)})
 
 
 # noinspection PyUnusedLocal

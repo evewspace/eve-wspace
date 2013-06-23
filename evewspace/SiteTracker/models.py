@@ -232,7 +232,7 @@ class UserLog(models.Model):
         pending_sites = []
         for site in self.fleet.sites.all():
             if UserSite.objects.filter(user=self.user, site=site,
-                    pending=True).all():
+                    pending=True).exists():
                 pending_sites.append(site)
         return pending_sites
 

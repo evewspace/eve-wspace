@@ -1,22 +1,4 @@
 {% load sitetracker %}
-    <div class="row">
-        <div class="span2">
-            <button class="btn btn-primary btn-small" onclick="STLeaveFleet({{member.fleet.pk}}, {{member.user.pk}}); 
-                {% if member.fleet.current_boss == member.user %}  
-                $('#modalHolder').modal('hide'); $('#modalHolder').empty();
-                {% else %}
-                ReloadBossPanel({{member.fleet.pk}});
-                {% endif %}
-                ">Kick Member</button><br /><br />
-            {% if member.fleet.current_boss != member.user %}
-            <button class="btn btn-small" onclick="STPromoteMember({{member.fleet.pk}}, {{member.user.pk}});
-                    $('#modalHolder').modal('hide'); ReloadSTBar(); $('#modalHolder').empty();">
-                Make Boss
-            </button>
-            {% endif %}
-
-        </div>
-        <div class="span2">
             <span class="label label-inverse">All Sites</span>
             {% include "st_boss_member_sitelist.html" %}
             {% if member.pending_sites %}
@@ -39,6 +21,3 @@
             {% endfor %}
             </table>
             {% endif %}
-        </div>
-    </div>
-

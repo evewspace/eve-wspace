@@ -91,6 +91,7 @@
   <div id="sigsPanel" class="sigsPanel tab-pane">
             <div id="sigAddPanel" class"sigAddPanel">
                 <div style="margin-bottom: 10px; text-align: center;">
+                    <h4>Signatures: {{system.name}}</h4>
                     <button class="btn" onclick="GetBulkImport({{mapsys.pk}});"><i class="icon-download"></i> Bulk Import</button>
                 </div>
                 <div id="sys{{mapsys.pk}}SigAddForm">
@@ -101,6 +102,7 @@
     </div>
     <div id="activePlayerPanel" class="activePlayerPanel tab-pane">
         <div id="activePlayerList" class="activePlayerList">
+            <h4 style="margin-left: 120px;">Active Pilots: {{system.name}}</h4>
             <table class="activePilotsTable" cellpadding="10">
                 <tr>
                     <th>Member</th>
@@ -122,6 +124,7 @@
         {% load poslist %}    
     <div id="systemPosPanel" class="systemPosPanel tab-pane">
         <div style="text-align: center; margin-bottom: 10px;">
+            <h4>Starbases: {{system.name}}</h4>
             <button class="btn" onclick="GetAddPOSDialog({{mapsys.system.pk}});"><img height=32 width=32 title="Add POS" src='{{STATIC_URL}}images/plus.png'/>Add POS</button>
         </div>
         <div id="systemPosWell" class="systemPosWell">
