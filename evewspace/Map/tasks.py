@@ -37,20 +37,18 @@ def update_system_stats():
     # Update jumps from Jumps API for K-space systems
     for entry in jumpapi.solarSystems:
         try:
-            sys = KSystem.objects.get(pk=entry.solarSystemID)
-            sys.jumps = entry.shipJumps
-            sys.save()
-        except:
+            KSystem.objects.filter(pk=entry.solarSystemID).update(
+                    jumps=entry.shipJumps)
+        except Exception:
             pass
     # Update kills from Kills API
     for entry in killapi.solarSystems:
         try:
-            sys = System.objects.get(pk=entry.solarSystemID)
-            sys.shipkills = entry.shipKills
-            sys.podkills = entry.podKills
-            sys.npckills = entry.factionKills
-            sys.save()
-        except:
+            System.objects.filter(pk=entry.solarSystemID).update(
+                    shipkills = entry.shipKills,
+                    podkills = entry.podKills,
+                    npckills = entry.factionKills)
+        except Exception:
             pass
 
 @task()
@@ -61,17 +59,21 @@ def update_system_sov():
     """
     api = eveapi.EVEAPIConnection(cacheHandler=handler)
     sovapi = api.map.Sovereignty()
+    alliance_list = api.eve.AllianceList().alliances
+    lookup_table = {}
+    for alliance in alliance_list:
+        lookup_table[alliance.allianceID] = alliance.name
     KSystem.objects.all().update(sov="None")
     for sys in sovapi.solarSystems:
         try:
-            system = KSystem.objects.get(pk=sys.solarSystemID)
             if sys.factionID:
-                system.sov = Faction.objects.get(pk=sys.factionID).name
-                system.save()
+                KSystem.objects.filter(pk=sys.solarSystemID).update(
+                        sov = Faction.objects.get(pk=sys.factionID).name)
             elif sys.allianceID:
-                system.sov = Alliance.objects.get(pk=sys.allianceID).name
-                system.save()
-        except:
+                if sys.allianceID in lookup_table:
+                    KSystem.objects.filter(pk=sys.solarSystemID).update(
+                            sov = lookup_table[sys.allianceID])
+        except Exception:
             pass
 
 @task()
