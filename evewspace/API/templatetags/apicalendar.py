@@ -32,7 +32,7 @@ def upcomingevents(user):
                 subject = char
     if not subject:
         try:
-            subject = user.apikeys.all()[0].characters.all()[0]
+            subject = user.api_keys.all()[0].characters.all()[0]
         except:
             return {'error': 'No API Key was found.'}
 
