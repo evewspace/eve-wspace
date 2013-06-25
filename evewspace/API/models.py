@@ -112,7 +112,7 @@ class MemberAPIKey(APIKey):
             result = auth.account.APIKeyInfo()
         except eveapi.AuthenticationError:
             self.valid = False
-            self.validation_error("Access Denied: Key not valid.")
+            self.validation_error = "Access Denied: Key not valid."
             self.save()
             return False
         if result.key.type == u'Character' and not char_allowed:
