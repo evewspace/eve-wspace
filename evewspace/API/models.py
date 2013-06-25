@@ -145,11 +145,17 @@ class MemberAPIKey(APIKey):
                 self.validation_error = "%s \n %s" % (
                         self.validation_error, x)
             self.save()
+            # Still try to get character details for security
+            try:
+                self.update_characters()
+            except Exception:
+                pass
             return False
         else:
             self.valid = True
             self.validation_error = ""
             self.save()
+            self.update_characters()
             return True
 
     def update_characters(self):
@@ -163,15 +169,37 @@ class MemberAPIKey(APIKey):
             corp = char_info.corporation
             if 'alliance' in char_info.__dict__:
                 alliance = char_info.alliance
+            else:
+                alliance = "None"
             if 'lastKnownLocation' in char_info.__dict__:
                 location = char_info.lastKnownLocation
+            else:
+                location = "Unknown"
             if 'shipName' in char_info.__dict__:
+                log_enabled = True
                 lastshipname = char_info.shipName
                 lastshiptype = char_info.shipTypeName
-            api_char = APICharacter.objects.get_or_create(
-                    charid=char_info.characterID)
-            #TODO Finish
+            else:
+                log_enabled = False
+                lastshipname = "Unknown"
+                lastshiptype = "Unknown"
 
+            api_char = APICharacter.objects.get_or_create(
+                    charid=char_info.characterID, defaults={
+                        'apikey': self, 'name': char_name})[0]
+            APICharacter.objects.filter(
+                    charid=char_info.characterID).update(
+                            apikey=self, name=char_name,
+                            corp=corp, alliance=alliance,
+                            location=location, lastshipname=lastshipname,
+                            lastshiptype=lastshiptype, visible=True)
+            if log_enabled:
+                # Log this character data for security reference
+                APIShipLog(character=api_char,
+                        timestamp=datetime.now(pytz.utc),
+                        shiptype=lastshiptype,
+                        shipname=lastshipname,
+                        location=location).save()
 
 
 def _build_access_req_list(user, corp_list):
@@ -204,14 +232,14 @@ def _build_access_req_list(user, corp_list):
 class APICharacter(models.Model):
     """API Character contains the API security information of a single character."""
     apikey = models.ForeignKey(APIKey, related_name="characters")
-    charid = models.BigIntegerField()
-    name = models.CharField(max_length=100)
-    corp = models.CharField(max_length=100)
-    alliance = models.CharField(max_length=100)
-    lastshipname = models.CharField(max_length=100)
-    lastshiptype = models.CharField(max_length=100)
-    location = models.CharField(max_length=100)
-    visible = models.BooleanField()
+    charid = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=100, blank=True, null=True)
+    corp = models.CharField(max_length=100, blank=True, null=True)
+    alliance = models.CharField(max_length=100, blank=True, null=True)
+    lastshipname = models.CharField(max_length=100, blank=True, null=True)
+    lastshiptype = models.CharField(max_length=100, blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    visible = models.NullBooleanField()
 
     class Meta:
         permissions = (("view_limited_data", "View limited character API."),
