@@ -133,11 +133,11 @@ def cache_eve_reddit():
     current = cache.get('reddit')
     if not current:
         # No reddit data is cached, grab it.
-        data = json.loads(urllib.urlopen('http://www.reddit.com/r/Eve/top.json').read())
+        data = json.loads(urllib.urlopen('http://www.reddit.com/r/Eve/hot.json').read())
         cache.set('reddit', data, 120)
     else:
         # There is cached data, let's try to update it
-        data = json.loads(urllib.urlopen('http://www.reddit.com/r/Eve/top.json').read())
+        data = json.loads(urllib.urlopen('http://www.reddit.com/r/Eve/hot.json').read())
         if 'data' in data:
             # Got valid response, store it
             cache.set('reddit', data, 120)

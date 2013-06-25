@@ -1,6 +1,35 @@
 Release Notes
 =============
 
+v0.2.2 (23 June 2013)
+---------------------
+
+Version 0.2.2 brings bug fixes and minor features. Special thanks to Joshua Blake for extensive contributions on this release.
+
+Core
+....
+
+- Added ability for users who have set an e-mail address to reset forgotten passwords (requries SMTP setup)
+- Added experimental signals in Map that are precursors to the full logging system
+- Updated example local_settings.py file to include e-mail settings
+
+Map
+...
+
+- Extend destinations list to allow setting waypoints as well as destinations when run in a tursted IGB session
+- Destinations list is now sorted by number of jumps
+- Add logging signal for signature additions and updates
+- Fix regression introduced in v0.2 which caused Sov and WH Effect to not display on system tooltips
+- Performance enhancements for map refreshes
+- Added system name to Signatures, Active Pilots, and Starbases tabs in System Details view
+- Added GATE wormhole type to fixtures. Run ./manage.py loaddata Map/fixtures/wormholetypes.json to add it to your installation.
+
+SiteTracker
+...........
+
+- Full site list for each member is no longer loaded automatically for the boss control panel for performance reasons. Select "Sites" under a member to load their site list.
+
+
 v0.2 (4 June 2013)
 ------------------
 

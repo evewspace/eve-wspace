@@ -25,6 +25,18 @@ DATABASES = {
         }
 }
 
+# Set your E-mail options below if you need to override the defaults
+#SERVER_EMAIL='bob@J100820.wh'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_HOST = 'localhost'
+#EMAIL_PORT = 25
+#EMAIL_USER = ''
+#EMAIL_PASSWORD = ''
+#EMAIL_USE_TLS = False
+#
+#If you use the file e-mail backend, set this:
+#EMAIL_FILE_PATH = '/tmp/ews-email-dump'
+
 # This is the default celery beat schedule, modify it to your liking
 
 from datetime import timedelta

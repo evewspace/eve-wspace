@@ -31,7 +31,7 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 
 from Map.models import *
-from Map import utils
+from Map import utils, signals
 from core.utils import get_config
 
 # Decorator to check map permissions. Takes request and map_id
@@ -311,8 +311,9 @@ def system_tooltips(request, map_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-    cur_map = get_object_or_404(Map, pk=map_id)
-    ms_list = cur_map.systems.all()
+    ms_list = MapSystem.objects.filter(map_id=map_id)\
+                    .select_related('parent_wormhole', 'system__region')\
+                    .iterator()
     return render(request, 'system_tooltip.html', {'map_systems': ms_list})
 
 
@@ -343,7 +344,7 @@ def collapse_system(request, map_id, ms_id):
         raise PermissionDenied
 
     map_sys = get_object_or_404(MapSystem, pk=ms_id)
-    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh = map_sys.parent_wormhole
     parent_wh.collapsed = True
     parent_wh.save()
     return HttpResponse()
@@ -360,7 +361,7 @@ def resurrect_system(request, map_id, ms_id):
         raise PermissionDenied
 
     map_sys = get_object_or_404(MapSystem, pk=ms_id)
-    parent_wh = map_sys.parent_wormholes.get()
+    parent_wh = map_sys.parent_wormhole
     parent_wh.collapsed = False
     parent_wh.save()
     return HttpResponse()
@@ -483,7 +484,7 @@ def bulk_sig_import(request, map_id, ms_id):
             # To prevent pasting of POSes into the sig importer, make sure
             # the strength column is present
             try:
-                test_var =  row[COL_STRENGTH]
+                test_var = row[COL_STRENGTH]
             except IndexError:
                 return HttpResponse('A valid signature paste was not found',
                         status=400)
@@ -493,6 +494,9 @@ def bulk_sig_import(request, map_id, ms_id):
                         system=map_system.system)[0]
                 sig = _update_sig_from_tsv(sig, row)
                 sig.save()
+                signals.signature_update.send_robust(sig, user=request.user,
+                                                 map=map_system.map,
+                                                 signal_strength=row[COL_STRENGTH])
 
                 k += 1
         map_system.map.add_log(request.user,
@@ -551,6 +555,8 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
                                    "%s signature %s in %s (%s)" %
                                    (action, signature.sigid, map_system.system.name,
                                     map_system.friendlyname))
+            signals.signature_update.send_robust(signature, user=request.user,
+                                                 map=map_system.map)
         else:
             return TemplateResponse(request, "edit_sig_form.html",
                                     {'form': form,

@@ -869,5 +869,18 @@
             "source": "K",
             "destination": 1
         }
+    },
+    {
+        "pk": 135,
+        "model": "Map.wormholetype",
+        "fields": {
+            "target": "K-Space",
+            "lifetime": 0,
+            "jumpmass": 0,
+            "name": "GATE",
+            "maxmass": 0,
+            "source": "K",
+            "destination": 0
+        }
     }
 ]
