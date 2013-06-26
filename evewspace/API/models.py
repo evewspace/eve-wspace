@@ -22,6 +22,7 @@ import cache_handler as handler
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User, Group
+from django.utils.html import strip_tags
 from datetime import datetime
 import eveapi
 
@@ -43,11 +44,22 @@ class APIKey(models.Model):
         permissions = (("add_keys", "Add API keys for others."),
                          ("purge_keys", "Purge API Keys."),
                          ("audit_keys", "View Users with no API keys assigned."),
-                         ("key_required", "Nag if no API key registered."))
+                         ("soft_key_fail", "Nag if no valid API key."),
+                         ("hard_key_fail",
+                             "Revoke access if no valid API Key."))
 
     def __unicode__(self):
         """Return key ID as unicode representation."""
         return self.keyid
+
+    def get_authenticated_api(self, cache_handler=handler):
+        """
+        Returns an eveapi api object with the proper auth context for
+        this key. Uses the built-in cacheHandler by default.
+        """
+        api = eveapi.EVEAPIConnection(cacheHandler=cache_handler)
+        auth = api.auth(keyID=self.keyid, vCode=self.vcode)
+        return auth
 
 
 class CorpAPIKey(APIKey):
@@ -63,8 +75,7 @@ class CorpAPIKey(APIKey):
 
         :returns: bool -- True if valid, False if invalid
         """
-        api = eveapi.EVEAPIConnection(cacheHandler=handler)
-        auth = api.auth(keyID=self.keyid, vCode=self.vcode)
+        auth = self.get_authenticated_api()
         self.lastvalidated = datetime.now(pytz.utc)
         try:
             result = auth.account.APIKeyInfo()
@@ -87,6 +98,16 @@ class CorpAPIKey(APIKey):
             self.validation_error = "API Key is not a corporation key."
             return False
 
+    def get_titles(self):
+        """
+        Returns a list of title names for this Corporation.
+        """
+        auth = self.get_authenticated_api()
+        title_list = {}
+        for title in auth.corp.Titles().titles:
+            title_list[title.titleID] = strip_tags(title.titleName)
+        return title_list
+
 
 class MemberAPIKey(APIKey):
     """
@@ -105,8 +126,7 @@ class MemberAPIKey(APIKey):
                 None).value) == 1
         expire_allowed = int(get_config("API_ALLOW_EXPIRING_KEY",
                 None).value) == 1
-        api = eveapi.EVEAPIConnection(cacheHandler=handler)
-        auth = api.auth(keyID=self.keyid, vCode=self.vcode)
+        auth = self.get_authenticated_api()
         self.lastvalidated = datetime.now(pytz.utc)
         try:
             result = auth.account.APIKeyInfo()
@@ -159,8 +179,7 @@ class MemberAPIKey(APIKey):
             return True
 
     def update_characters(self):
-        api = eveapi.EVEAPIConnection(cacheHandler=handler)
-        auth = api.auth(keyID=self.keyid, vCode=self.vcode)
+        auth = self.get_authenticated_api()
         key_info = auth.account.APIKeyInfo()
         for character in key_info.key.characters:
             char_info = auth.eve.CharacterInfo(
@@ -201,6 +220,38 @@ class MemberAPIKey(APIKey):
                         shipname=lastshipname,
                         location=location).save()
 
+    def get_groups(self):
+        """
+        Returns a list of Groups that this key is authorized for.
+        The list will be empty if the key fails validation and the
+        hard_fail permission is set.
+        """
+        group_list = []
+        validated = self.validate()
+        auth = self.get_authenticated_api()
+        if self.user.has_perm('API.hard_key_fail') and not validated:
+            return group_list
+        for character in self.characters.all():
+            title_list = character.get_titles()
+            if Corporation.objects.filter(name=character.corp).exists():
+                for group_map in APIGroupMapping.objects.filter(
+                        corp=Corporation.objects.get(
+                            name=character.corp)).all():
+                    if group_map.title_id and group_map.title_id in title_list:
+                        group_list.append(group_map.group)
+                    if not group_map.title_id:
+                        group_list.append(group_map.group)
+        return group_list
+
+
+class APIGroupMapping(models.Model):
+    """
+    Maps API-obtained corps and titles to Django groups.
+    """
+    group = models.ForeignKey(Group, related_name='api_mappings')
+    corp = models.ForeignKey(Corporation, related_name="api_mappings")
+    title_id = models.IntegerField(null=True)
+
 
 def _build_access_req_list(user, corp_list):
     """
@@ -231,7 +282,7 @@ def _build_access_req_list(user, corp_list):
 
 class APICharacter(models.Model):
     """API Character contains the API security information of a single character."""
-    apikey = models.ForeignKey(APIKey, related_name="characters")
+    apikey = models.ForeignKey(MemberAPIKey, related_name="characters")
     charid = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=100, blank=True, null=True)
     corp = models.CharField(max_length=100, blank=True, null=True)
@@ -248,6 +299,17 @@ class APICharacter(models.Model):
     def __unicode__(self):
         """Return character name as unicode representation."""
         return self.name
+
+    def get_titles(self):
+        """
+        Returns a list of titles for this character.
+        """
+        auth = self.apikey.get_authenticated_api()
+        result = {}
+        char_sheet = auth.char.CharacterSheet(characterID=self.charid)
+        for title in char_sheet.corporationTitles:
+            result[title.titleID]= strip_tags(title.titleName)
+        return result
 
 
 class APIShipLog(models.Model):
