@@ -16,6 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django import template
 from core.models import Type
+from core.utils import get_config
 from core.nav_registry import registry as nav_registry
 from core.admin_page_registry import registry as admin_registry
 from account.profile_section_registry import registry as profile_registry
@@ -64,3 +65,7 @@ def profile_sections(context):
     context['profile_registry'] = get_active_tabs(context, profile_registry)
     return context
 
+@register.inclusion_tag('feedback_panel.html')
+def feedback_panel():
+    return {'render': get_config("CORE_FEEDBACK_ENABLED",
+        None).value == "1"}

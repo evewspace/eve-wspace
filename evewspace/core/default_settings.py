@@ -16,7 +16,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.models import ConfigEntry
 #defaults = [("TEST_SETTING", "BOB")]
-defaults = []
+defaults = [
+        ("CORE_FEEDBACK_ENABLED", "0"),
+        ]
 
 def load_defaults():
     for setting in defaults:
