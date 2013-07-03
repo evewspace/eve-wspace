@@ -15,30 +15,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django import template
-from core.models import Type
-from core.utils import get_config
-from core.nav_registry import registry as nav_registry
-from core.admin_page_registry import registry as admin_registry
 from account.profile_section_registry import registry as profile_registry
-
+from account.user_admin_section_registry import registry as user_admin_registry
+from account.group_admin_section_registry import registry as group_admin_registry
 register = template.Library()
-
-@register.simple_tag()
-def typename(typeid):
-    try:
-        return Type.objects.get(id=typeid).name
-    except Type.DoesNotExist:
-        return ''
-    except Type.MultipleObjectsReturned:
-        return ''
-
-@register.inclusion_tag('nav_entries.html', takes_context=True)
-def nav_entries(context):
-    """
-    Renders dynamic nav bar entries from nav_registry for the provided user.
-    """
-    context['nav_registry'] = nav_registry
-    return context
 
 def get_active_tabs(context, registry):
     user = context['user']
@@ -50,17 +30,31 @@ def get_active_tabs(context, registry):
             active_tabs[key] = value
     return active_tabs
 
-@register.inclusion_tag('admin_entries.html', takes_context=True)
-def admin_entries(context):
-    context['admin_registry'] = get_active_tabs(context, admin_registry)
+@register.inclusion_tag('user_admin_entries.html', takes_context=True)
+def user_admin_entries(context):
+    context['user_admin_registry'] = get_active_tabs(context,
+            user_admin_registry)
     return context
 
-@register.inclusion_tag('admin_panels.html', takes_context=True)
-def admin_panels(context):
-    context['admin_registry'] = get_active_tabs(context, admin_registry)
+@register.inclusion_tag('user_admin_panels.html', takes_context=True)
+def user_admin_panels(context):
+    context['user_admin_registry'] = get_active_tabs(context,
+            user_admin_registry)
     return context
 
-@register.inclusion_tag('feedback_panel.html')
-def feedback_panel():
-    return {'render': get_config("CORE_FEEDBACK_ENABLED",
-        None).value == "1"}
+@register.inclusion_tag('group_admin_entries.html', takes_context=True)
+def group_admin_entries(context):
+    context['group_admin_registry'] = get_active_tabs(context,
+            group_admin_registry)
+    return context
+
+@register.inclusion_tag('group_admin_panels.html', takes_context=True)
+def group_admin_panels(context):
+    context['group_admin_registry'] = get_active_tabs(context,
+            group_admin_registry)
+    return context
+
+@register.inclusion_tag('profile_settings.html', takes_context=True)
+def profile_sections(context):
+    context['profile_registry'] = get_active_tabs(context, profile_registry)
+    return context

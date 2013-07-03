@@ -20,12 +20,10 @@ from django.conf.urls import patterns, include, url
 from search import registry as search_registry
 from Alerts import method_registry
 from core import admin_page_registry, nav_registry
-from account import profile_section_registry
 
 method_registry.autodiscover()
 search_registry.autodiscover()
 admin_page_registry.autodiscover()
-profile_section_registry.autodiscover()
 nav_registry.autodiscover()
 
 # Actual URL definitions
