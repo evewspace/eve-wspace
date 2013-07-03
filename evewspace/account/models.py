@@ -39,6 +39,9 @@ class UserProfile(models.Model):
     currentsystem = models.ForeignKey(System, related_name="activepilots", blank=True, null=True)
     lastactive = models.DateTimeField()
 
+    class Meta:
+        permissions = (('account_admin', 'Administer users and groups'),)
+
     def update_location(self, system):
         """
         updates the current location and last active timestamp for this user
@@ -53,6 +56,7 @@ class GroupProfile(models.Model):
     group = models.ForeignKey(Group, related_name='profile', unique=True)
     description = models.CharField(max_length=200, blank=True, null=True)
     regcode = models.CharField(max_length=64, blank=True, null=True)
+    visible = models.BooleanField(default=True)
 
 def create_user_profile(sender, instance, created, **kwargs):
     """Handle user creation event and create a new profile to match the new user"""

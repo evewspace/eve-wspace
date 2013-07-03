@@ -41,7 +41,8 @@ class APIKey(models.Model):
     validation_error = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
-        permissions = (("add_keys", "Add API keys for others."),
+        permissions = (("api_key_admin", "Can see API Key section."),
+                         ("add_keys", "Add API keys for others."),
                          ("purge_keys", "Purge API Keys."),
                          ("audit_keys", "View Users with no API keys assigned."),
                          ("soft_key_fail", "Nag if no valid API key."),

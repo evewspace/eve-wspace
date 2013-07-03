@@ -40,6 +40,11 @@ BODY
 {
     font-size: 8pt;
 }
+body .modal
+{
+    width: 580px;
+    margin-left: -270px;
+}
 .stStatusHeader
 {
     text-align: left;

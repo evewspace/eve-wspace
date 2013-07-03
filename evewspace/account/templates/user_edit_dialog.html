@@ -1,0 +1,15 @@
+{% load account_tags %}
+<div class="modal-header" style="text-align: center;">
+    <h3>Edit Member: {{member.username}}</h3>
+</div>
+<div class="modal-body">
+    <ul class="nav nav-pills">
+        {% user_admin_entries %}
+    </ul>
+    <div class="tab-content">
+        {% user_admin_panels %}
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-info" onclick='$("#modalHolder").modal("hide");'>Close Panel</button>
+</div>
