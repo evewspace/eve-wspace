@@ -50,6 +50,9 @@
         <label class="control-label" for="userEnabled">Active:</label>
         <div class="controls">
             <input type="checkbox" id="userEnabled" name="enabled" {% if member.is_active %} checked="checked" {% endif %} {% if user == member %} disabled="disabled" {% endif %}>
+            {% if user == member %}
+            <input type="hidden" id="userHiddenEnabled" name="enabled" value="on">
+            {% endif %}
         </div>
     </div>
     <div class="control-group">
