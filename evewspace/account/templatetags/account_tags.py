@@ -58,3 +58,7 @@ def group_admin_panels(context):
 def profile_sections(context):
     context['profile_registry'] = get_active_tabs(context, profile_registry)
     return context
+
+@register.filter
+def group_visible(groups, visible=True):
+    return groups.filter(profile__visible=visible).all()

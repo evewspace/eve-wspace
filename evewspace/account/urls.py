@@ -28,6 +28,7 @@ userpatterns = patterns('account.views',
         url(r'^$', 'user_edit'),
         url(r'^profile/$', 'profile_admin'),
         url(r'^delete/$', 'delete_user'),
+        url(r'^groups/$', 'user_group_list'),
         )
 
 

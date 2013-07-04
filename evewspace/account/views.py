@@ -58,6 +58,7 @@ def register(request):
     context = {'form': form}
     return TemplateResponse(request, "register.html", context)
 
+
 def edit_profile(request):
     if request.method == "POST":
         form = EditProfileForm(request.POST)
@@ -76,15 +77,18 @@ def edit_profile(request):
     return TemplateResponse(request, "edit_profile_form.html",
             {'form': form})
 
+
 def password_reset_confirm(*args, **kwargs):
     from django.contrib.auth import views
     return views.password_reset_confirm(*args, post_reset_redirect=reverse('login'),
             template_name='password_reset_confirm.html',
             **kwargs)
 
+
 @permission_required('account.account_admin')
 def user_admin(request):
     return HttpResponse()
+
 
 @permission_required('account.account_admin')
 def user_list(request, page_number):
@@ -105,23 +109,50 @@ def user_list(request, page_number):
     return TemplateResponse(request, "user_list.html",
             {'member_list': page_list, 'filter': is_filtered})
 
+
 @permission_required('account.account_admin')
 def group_list(request, page_number):
     return HttpResponse()
+
 
 @permission_required('account.account_admin')
 def group_admin(request):
     return HttpResponse()
 
+
 @permission_required('account.account_admin')
 def user_edit(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     return TemplateResponse(request, 'user_edit_dialog.html',
-            {'member': user})
+            {'member': user, 'group_list': Group.objects.all()})
+
 
 @permission_required('account.account_admin')
 def group_edit(request, user_id):
     return HttpResponse()
+
+
+@permission_required('account.account_admin')
+def user_group_list(request, user_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    user = get_object_or_404(User, pk=user_id)
+    saved = False
+    if request.method == "POST":
+        saved = True
+        visible_groups = Group.objects.filter(profile__visible=True).all()
+        for group in visible_groups:
+            if request.POST.get('group_%s' % group.pk, None):
+                if group not in user.groups.all():
+                    user.groups.add(group)
+            elif group in user.groups.all():
+                user.groups.remove(group)
+        user.save()
+
+    return TemplateResponse(request, 'user_admin_groups.html',
+            {'member': user, 'group_list': Group.objects.all(),
+                'saved': saved})
+
 
 @permission_required('account.account_admin')
 def profile_admin(request, user_id):
