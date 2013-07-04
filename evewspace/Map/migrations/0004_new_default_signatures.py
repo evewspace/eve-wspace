@@ -26,7 +26,7 @@ class Migration(DataMigration):
         try:
             sig_type = orm.SignatureType.objects.get(shortname="RADAR")
             sig_type.shortname = "DATA"
-            sig_type.logname = "Data Site"
+            sig_type.longname = "Data Site"
             sig_type.save()
         except:
             pass
@@ -64,7 +64,7 @@ class Migration(DataMigration):
         try:
             sig_type = orm.SignatureType.objects.get(shortname="DATA")
             sig_type.shortname = "RADAR"
-            sig_type.logname = "Radar"
+            sig_type.longname = "Radar"
             sig_type.save()
         except:
             pass
