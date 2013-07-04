@@ -56,7 +56,7 @@ function SaveUser(user_id) {
         type: "POST",
         data: $('#userSettingsForm').serialize(),
         success: function(data){
-            $('#account-settings').html(data);
+            $('#useradmin-account-settings').html(data);
         },
         error: function(error){
             alert("Could not save the profile: " + error.responseText);
@@ -74,6 +74,20 @@ function DeleteUser(user_id) {
         },
         error: function(error){
             alert("Could not delete the user: " + error.responseText);
+        }
+    });
+}
+
+function SaveUserGroups(user_id) {
+    $.ajax({
+        url: "/account/admin/user/" + user_id + "/groups/",
+        type: "POST",
+        data: $('#UserGroupsForm').serialize(),
+        success: function(data){
+            $('#useradmin-group-memberships').html(data);
+        },
+        error: function(error){
+            alert('Unable to get the group list:' + error.responseText);
         }
     });
 }

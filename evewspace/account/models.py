@@ -53,7 +53,7 @@ class UserProfile(models.Model):
 
 class GroupProfile(models.Model):
     """GroupProfile defines custom fields tied to each Group record."""
-    group = models.ForeignKey(Group, related_name='profile', unique=True)
+    group = models.OneToOneField(Group, related_name='profile')
     description = models.CharField(max_length=200, blank=True, null=True)
     regcode = models.CharField(max_length=64, blank=True, null=True)
     visible = models.BooleanField(default=True)
