@@ -49,13 +49,13 @@
     <div class="control-group">
         <label class="control-label" for="userEnabled">Active:</label>
         <div class="controls">
-            <input type="checkbox" id="userEnabled" name="enabled" {% if member.is_active %} checked="checked" {% endif %}>
+            <input type="checkbox" id="userEnabled" name="enabled" {% if member.is_active %} checked="checked" {% endif %} {% if user == member %} disabled="disabled" {% endif %}>
         </div>
     </div>
     <div class="control-group">
         <div class="controls">
             <button class="btn btn-success" onclick="SaveUser({{member.pk}});" id="saveUserButton">Save User</button>
-            <button class="btn btn-danger" id="deleteUserButton">Delete User</button>
+            <button class="btn btn-danger" id="deleteUserButton" {% if user == member %} disabled="disabled" {% endif %}>Delete User</button>
             <button class="btn btn-danger" style="display: none;" id="reallyDeleteUser">Really Delete</button>
             <button class="btn btn-danger" style="display: none;" id="reallyReallyDeleteUser" onclick="DeleteUser({{member.pk}});">Really Really Delete</button>
         </div>
