@@ -882,5 +882,18 @@
             "source": "K",
             "destination": 0
         }
+    },
+    {
+        "pk": 136,
+        "model": "Map.wormholetype",
+        "fields": {
+            "target": "Lowsec",
+            "lifetime": 24,
+            "jumpmass": 1350000000,
+            "name": "N944",
+            "maxmass": 3000000000,
+            "source": "NH",
+            "destination": 8
+        }
     }
 ]
