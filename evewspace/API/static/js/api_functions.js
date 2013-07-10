@@ -26,6 +26,16 @@ function GetAPIKeyDialog(){
     });
 }
 
+function RefreshAdminAPISection(user_id){
+    $.ajax({
+        url: '/api/user/' + user_id + '/',
+        type: 'GET',
+        success: function(data){
+            $('#useradmin-api-keys').html(data);
+        }
+    });
+}
+
 function GetNewAPIKeyForm(){
     $.ajax({
         url: '/api/key/new/',
@@ -43,6 +53,9 @@ function SaveAPIKey(key_id){
         data: $('#apiKeyForm').serialize(),
         success: function(data){
             GetAPIKeyDialog();
+        },
+        error: function(){
+            alert('There was an error saving the key. Please check the key and try again.');
         }
     });
 }
@@ -54,6 +67,47 @@ function SaveNewAPIKey(){
         data: $('#apiKeyForm').serialize(),
         success: function(data){
             GetAPIKeyDialog();
+        },
+        error: function(){
+            alert('There was an error saving the key. Please check the key and try again.');
+        }
+    });
+}
+
+function SaveAdminAPIKey(key_id, user_id){
+    $.ajax({
+        url: '/api/key/' + key_id + '/edit/',
+        type: 'POST',
+        data: $('#apiAdminKeyForm').serialize(),
+        success: function(data){
+            RefreshAdminAPISection(user_id);
+        },
+        error: function(){
+            alert('There was an error saving the key. Please check the key and try again.');
+        }
+    });
+}
+
+function SaveNewAdminAPIKey(user_id){
+    $.ajax({
+        url: '/api/key/new/',
+        type: 'POST',
+        data: $('#apiAdminKeyForm').serialize(),
+        success: function(data){
+            RefreshAdminAPISection(user_id);
+        },
+        error: function(){
+            alert('There was an error adding the key. Please check the key and try again.');
+        }
+    });
+}
+
+function APIAdminEditKey(key_id, user_id){
+    $.ajax({
+        url: "/api/user/" + user_id + "/key/" + key_id + "/",
+        type: 'GET',
+        success: function(data){
+            $('#apiKeyFormHolder').html(data);
         }
     });
 }
@@ -68,9 +122,29 @@ function APIEditKey(key_id){
     });
 }
 
+function APIPurgeKey(key_id, user_id){
+    $.ajax({
+        url: '/api/key/' + key_id + '/purge/',
+        type: 'POST',
+        success: function(data){
+            RefreshAdminAPISection(user_id);
+        }
+    });
+}
+
+function APIAdminDeleteKey(key_id, user_id){
+    $.ajax({
+        url: '/api/key/' + key_id + '/delete/',
+        type: 'POST',
+        success: function(data){
+            RefreshAdminAPISection(user_id);
+        }
+    });
+}
+
 function APIDeleteKey(key_id){
     $.ajax({
-        url: 'api/key/' + key_id + '/delete/',
+        url: '/api/key/' + key_id + '/delete/',
         type: 'POST',
         success: function(data){
             GetAPIKeyDialog();

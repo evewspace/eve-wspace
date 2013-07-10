@@ -1,1 +1,39 @@
-<h3>API KEYS YAY</h3><h3>API KEYS YAY</h3><h3>API KEYS YAY</h3>
+{% load humanize %}
+    <h5>API Keys</h5>
+        
+    <div id="apiKeyFormHolder">
+        {% include "api_key_form.html" %}
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>Key ID</th>
+            <th>Access</th>
+            <th>Characters</th>
+            <th>Valid</th>
+            <th>Actions</th>
+        </tr>
+        {% for api_key in member.api_keys.all %}
+        <tr>
+            <td>{{api_key.keyid}}</td>
+            <td>{{api_key.access_mask}}</td>
+            <td>
+                {% for character in api_key.characters.all %}
+                {{character.name}},&nbsp
+                {% empty %}
+                None!
+                {% endfor %}
+            </td>
+            <td><span title="{{api_key.validation_error}}">{% if api_key.valid %} Yes {% else %} No {% endif %}</span></td>
+            <td>
+                <button class="btn-small btn-danger" title="Remove key, but keep log entries."  onclick="APIAdminDeleteKey({{api_key.keyid}}, {{member.pk}});">Delete</button>
+                <button class="btn-small btn-danger" title="Remove key and all log entries for associated characters"  onclick="APIPurgeKey({{api_key.keyid}}, {{member.pk}});">Purge</button>
+                <button class="btn-small btn-success" onclick="APIAdminEditKey({{api_key.keyid}}, {{member.pk}});">Edit</button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td>No Keys!</td>
+        </tr>
+        {% endfor %}
+    </table>

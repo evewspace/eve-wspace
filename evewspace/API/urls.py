@@ -10,4 +10,6 @@ urlpatterns = patterns('API.views',
         url(r'^key/$', 'api_key_dialog'),
         url(r'^key/new/$', 'edit_keys'),
         url(r'^key/(?P<key_id>\d+)/', include(key_patterns)),
+        url(r'^user/(?P<user_id>\d+)/$', 'api_key_admin'),
+        url(r'^user/(?P<user_id>\d+)/key/(?P<key_id>\d+)/$', 'edit_keys'),
         )

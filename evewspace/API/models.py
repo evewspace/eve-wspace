@@ -32,7 +32,7 @@ import pytz
 
 class APIKey(models.Model):
     """API Key object relates to User and contains key id, vcode, and validation information."""
-    keyid = models.IntegerField()
+    keyid = models.IntegerField(primary_key=True)
     vcode = models.CharField(max_length=100)
     valid = models.BooleanField()
     lastvalidated = models.DateTimeField()
@@ -283,7 +283,7 @@ def _build_access_req_list(user, corp_list):
 
 class APICharacter(models.Model):
     """API Character contains the API security information of a single character."""
-    apikey = models.ForeignKey(MemberAPIKey, related_name="characters")
+    apikey = models.ForeignKey(MemberAPIKey, related_name="characters", null=True)
     charid = models.BigIntegerField(primary_key=True)
     name = models.CharField(max_length=100, blank=True, null=True)
     corp = models.CharField(max_length=100, blank=True, null=True)

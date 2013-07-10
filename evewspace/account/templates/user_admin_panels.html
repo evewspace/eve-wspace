@@ -1,5 +1,5 @@
-{% for key, value in user_admin_registry.items %}
-<div id="useradmin-{{key|slugify}}" class="tab-pane">
-    {% include value.0 %}
+{% for name, template in user_admin_registry.items %}
+<div id="useradmin-{{name|slugify}}" class="tab-pane">
+    {% include template.0 %}
 </div>
 {% endfor %}
