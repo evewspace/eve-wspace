@@ -31,6 +31,15 @@ userpatterns = patterns('account.views',
         url(r'^groups/$', 'user_group_list'),
         )
 
+grouppatterns = patterns('account.views',
+        url(r'^$', 'group_edit'),
+        url(r'^profile/$', 'group_profile_admin'),
+        url(r'^delete/$', 'delete_group'),
+        url(r'^disableusers/$', 'disable_group_users'),
+        url(r'^enableusers/$', 'enable_group_users'),
+        url(r'^user/(?P<user_id>\d+)/add/$', 'add_group_user'),
+        url(r'^user/(?P<user_id>\d+)/remove/$', 'remove_user'),)
+
 
 urlpatterns = patterns('',
     url(r'^login/$', 'django.contrib.auth.views.login',
@@ -42,10 +51,11 @@ urlpatterns = patterns('',
     url(r'^admin/user/list/(?P<page_number>\d+)/$',
         'account.views.user_list'),
     url(r'^admin/group/$', 'account.views.group_admin'),
+    url(r'^admin/group/new/$', 'account.views.create_group'),
     url(r'^admin/group/list/(?P<page_number>\d+)/$',
         'account.views.group_list'),
     url(r'^admin/user/(?P<user_id>\d+)/', include(userpatterns)),
-    url(r'^admin/group/(?P<group_id>\d+)/$', 'account.views.group_edit'),
+    url(r'^admin/group/(?P<group_id>\d+)/', include(grouppatterns)),
     url(r'^password/reset$', 'django.contrib.auth.views.password_reset',
         {'template_name': 'password_reset.html',
          'email_template_name': 'password_reset_email.html',

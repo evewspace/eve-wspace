@@ -1,0 +1,15 @@
+{% load account_tags %}
+<div class="modal-header" style="text-align: center;">
+    <h3>Edit Group: {{group.name}}</h3>
+</div>
+<div class="modal-body">
+    <ul class="nav nav-pills">
+        {% group_admin_entries %}
+    </ul>
+    <div class="tab-content">
+        {% group_admin_panels %}
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-info" onclick='$("#modalHolder").modal("hide");'>Close Panel</button>
+</div>
