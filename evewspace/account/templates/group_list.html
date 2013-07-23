@@ -25,7 +25,7 @@
     <script type="text/javascript">
         $('#groupPreviousLink').click(function(){
                 $.ajax({
-                    url: "/account/admin/group/list/{{member_list.previous_page_number}}/",
+                    url: "/account/admin/group/list/{{group_list.previous_page_number}}/",
                     {% if filter %}
                     type: "POST",
                     data: $('#groupnameFilterForm').serialize(),
@@ -39,7 +39,7 @@
                });
          $('#groupNextLink').click(function(){
                 $.ajax({
-                    url: "/account/admin/group/list/{{member_list.next_page_number}}/",
+                    url: "/account/admin/group/list/{{group_list.next_page_number}}/",
                     {% if filter %}
                     type: "POST",
                     data: $('#groupnameFilterForm').serialize(),
