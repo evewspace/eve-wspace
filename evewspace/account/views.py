@@ -112,7 +112,26 @@ def user_list(request, page_number):
 
 @permission_required('account.account_admin')
 def group_list(request, page_number):
-    return HttpResponse()
+    if request.method == "POST":
+        show_system = request.POST.get('system_groups', None)
+        filter_text = request.POST.get('filter', "")
+        if not show_system:
+            group_list = Group.objects.filter(name__icontains=filter_text, profile__visible=True)
+        else:
+            group_list = Group.objects.filter(name__icontains=filter_text)
+        is_filtered = True
+    else:
+        group_list = Group.objects.filter(profile__visible=True)
+        is_filtered = False
+    paginator = Paginator(group_list, 15)
+    try:
+        page_list = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_list = paginator.page(1)
+    except EmptyPage:
+        page_list = paginator.page(paginator.num_pages)
+    return TemplateResponse(request, "group_list.html",
+            {'group_list': page_list, 'filter': is_filtered})
 
 
 @permission_required('account.account_admin')
@@ -128,8 +147,10 @@ def user_edit(request, user_id):
 
 
 @permission_required('account.account_admin')
-def group_edit(request, user_id):
-    return HttpResponse()
+def group_edit(request, group_id):
+    group = get_object_or_404(Group, pk=group_id)
+    return TemplateResponse(request, 'group_edit_dialog.html',
+            {'group': group, 'member_list': group.user_set.all()})
 
 
 @permission_required('account.account_admin')
@@ -190,7 +211,29 @@ def profile_admin(request, user_id):
     return TemplateResponse(request, 'user_admin_profile.html',
             {'member': user, 'saved': saved, 'errors': error_list})
 
-@permission_required('auth.delete_user')
+
+@permission_required('account.account_admin')
+def group_profile_admin(request, group_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    group = get_object_or_404(Group, pk=group_id)
+    error_list = []
+    saved = False
+    if request.method == "POST":
+        group.name = request.POST.get('group_name', group.name)
+        new_regcode = request.POST.get('new_regcode', group.profile.regcode)
+        group.profile.regcode = new_regcode
+        if group.name:
+            group.profile.save()
+            group.save()
+            saved = True
+        else:
+            error_list.append('Group name cannot be blank!')
+    return TemplateResponse(request, 'group_admin_profile.html',
+            {'group': group, 'saved': saved, 'errors': error_list})
+
+
+@permission_required('account.account_admin')
 def delete_user(request, user_id):
     if not request.is_ajax():
         raise PermissionDenied
@@ -199,4 +242,83 @@ def delete_user(request, user_id):
         user.delete()
         return HttpResponse()
     else:
-        return HttResponse(status="400")
+        return HttResponse(status=400)
+
+@permission_required('account.account_admin')
+def delete_group(request, group_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    group = get_object_or_404(Group, pk=group_id)
+    if request.method == "POST":
+        group.delete()
+        return HttpResponse()
+    else:
+        return HttpResponse(status=400)
+
+
+@permission_required('account.account_admin')
+def disable_group_users(request, group_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    group = get_object_or_404(Group, pk=group_id)
+    if request.method == "POST":
+        group.user_set.exclude(username=request.user.username).update(
+                is_active=False)
+        return HttpResponse()
+    else:
+        return HttpResponse(status=400)
+
+
+@permission_required('account.account_admin')
+def enable_group_users(request, group_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    group = get_object_or_404(Group, pk=group_id)
+    if request.method == "POST":
+        group.user_set.exclude(username=request.user.username).update(
+                is_active=True)
+        return HttpResponse()
+    else:
+        return HttpResponse(status=400)
+
+
+@permission_required('account.account_admin')
+def remove_user(request, group_id, user_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    group = get_object_or_404(Group, pk=group_id)
+    user = get_object_or_404(User, pk=user_id)
+    if request.method == "POST":
+        user.groups.remove(group)
+    else:
+        return HttpResponse(status=400)
+
+
+@permission_required('account.account_admin')
+def add_group_user(request, group_id, user_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    group = get_object_or_404(Group, pk=group_id)
+    user = get_object_or_404(User, pk=user_id)
+    if request.method == "POST":
+        user.groups.add(group)
+    else:
+        return HttpResponse(status=400)
+
+
+@permission_required('account.account_admin')
+def create_group(request):
+    if not request.is_ajax():
+        raise PermissionDenied
+    if request.method == "POST":
+        group_name = request.POST.get('group_name', None)
+        if not group_name:
+            return HttpResponse(status=400, response='No group name!')
+        else:
+            group = Group(name=group_name)
+            group.save()
+            group.profile.regcode = request.POST.get('regcode', None)
+            group.profile.save()
+            return HttpResponse()
+    else:
+        return TemplateResponse(request, 'create_group.html')

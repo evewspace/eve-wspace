@@ -1,1 +1,25 @@
-<h3>Group Admin</h3>
+<h3>Groups</h3>
+<script type="text/javascript" src="{{STATIC_URL}}js/group_admin.js"></script>
+<form id="groupFilterForm" class="form-search" action="/account/admin/group/list/1/" method="POST">
+    <input type="text" name="filter" class="input-medium search-query">
+    <button type="submit" class="btn btn-default">Filter</button>
+    <br /><br />
+    Show System Groups: <input type="checkbox" name="system_groups">
+</form>
+<script type="text/javascript">
+    $('#groupFilterForm').submit(function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: "/account/admin/group/list/1/",
+                    type: "POST",
+                    data: $('#groupFilterForm').serialize(),
+                    success: function(data) {
+                        $('#groupTableHolder').html(data);
+                    }
+                    });
+            });
+</script>
+<button class="btn btn-success" onclick="GetCreateGroupDialog()">Create Group <i class="icon-plus"></i></button>
+<br />
+<div id="groupTableHolder">
+</div>

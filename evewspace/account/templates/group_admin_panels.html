@@ -1,5 +1,5 @@
 {% for key, value in group_admin_registry.items %}
-<div id="{{key|slugify}}" class="tab-pane">
+<div id="group-admin-{{key|slugify}}" class="tab-pane">
     {% include value.0 %}
 </div>
 {% endfor %}

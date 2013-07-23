@@ -1,0 +1,68 @@
+{% if saved %}
+<div style="text-align: center;">
+    <span class="label label-info" style="width: 50%;">Profile Saved.</span>
+</div>
+<br />
+{% endif %}
+{% if errors %}
+<div style="text-align: center;">
+    {% for error in errors %}
+    <span class="label">{{error}}</span>
+    <br />
+    {% endfor %}
+</div>
+{% endif %}
+<form id="groupSettingsForm" class="form-horizontal" action="/account/admin/group/{{group.pk}}/" method="POST">
+    {% csrf_token %}
+    {% if group.profile.visible %}
+    <div class="control-group">
+        <label class="control-label" for="usernameInput">Group Name:</label>
+        <div class="controls">
+            <input type="text" class="input-medium" name="group_name" value="{{group.name}}" id="groupnameInput">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="newRegcode">Registration Code:</label>
+        <div class="controls">
+            <input type="text" id="newRegcode" class="input-medium" name="new_regcode" value="{% if group.profile.regcode %}{{group.profile.regcode}}{% endif %}">
+            <button class="btn btn-info" onclick="SetRandomRegcode();">Randomize</button>
+            <div>
+                <span id="randomRegcodeSpan" style="display:none;" class="label label-info"></span>
+            </div>
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="deleteGroupButton">Group Actions:</label>
+        <div class="controls">
+            <button class="btn btn-success" onclick="SaveGroup({{group.pk}});" id="saveGroupButton">Save Group</button>
+            <button class="btn btn-danger" id="deleteGroupButton">Delete Group</button>
+            <button class="btn btn-danger" style="display: none;" id="reallyDeleteGroup">Really Delete</button>
+            <button class="btn btn-danger" style="display: none;" id="reallyReallyDeleteGroup" onclick="DeleteGroup({{group.pk}});">Really Really Delete</button>
+        </div>
+    </div>
+     {% else %}
+     <span class="label label-info">This is a system-generated group and cannot be edited.</span>
+     <br /><br />
+    {% endif %}
+   <div class="control-group">
+        <label class="control-label" for="disableGroupUsers">Global Member Actions (<b>CHECK MEMBER LIST BEFORE USING</b>):</label>
+        <div class="controls">    
+            <button class="btn btn-danger" id="disableGroupUsers" onclick="DisableGroupUsers({{group.pk}});">Disable Member Accounts</button>
+            <button class="btn btn-danger" id="enableGroupUsers" onclick="EnableGroupUsers({{group.pk}});">Enable Member Accounts</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    $('#groupSettingsForm').submit(function(e){
+                e.preventDefault();
+                return false;
+                });
+    $('#deleteGroupButton').click(function(e){
+                $(this).hide();
+                $('#reallyDeleteGroup').show();
+                });
+    $('#reallyDeleteGroup').click(function(e){
+                $(this).hide();
+                $('#reallyReallyDeleteGroup').show();
+                });
+</script>

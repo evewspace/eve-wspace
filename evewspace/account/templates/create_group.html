@@ -1,0 +1,28 @@
+<div class="modal-header">
+    <h3>Create Group</h3>
+</div>
+<div class="modal-body">
+    <form class="form" id="createGroupForm" action="/account/admin/group/new/" method="POST">
+        <div class="control-group">
+            <label class="control-label" for="groupnameInput">Group Name:</label>
+            <div class="controls">
+                <input type="text" class="input-medium" name="group_name" id="groupnameInput">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="regcodeInput">Registration Code (<b>Leave blank to disable registration</b>)</label>
+            <div class="controls">
+                <input type="text" name="regcode" id="regcodeInput">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-info">Create</button>
+        <button class="btn" onclick="$('#modalHolder').modal('hide'); return false;">Close</button>
+    </form>
+    <script type="text/javascript">
+        $('#createGroupForm').submit(function(e){
+                e.preventDefault();
+                CreateGroup();
+                return false;
+                });
+    </script>
+</div>
