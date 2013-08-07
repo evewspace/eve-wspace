@@ -35,7 +35,7 @@
             {% if wh.time_status = 0 %}
             <span class="timeStatus label label-success">Time: Normal
             {% else %}
-            <span class="timeStatus label label-important">Time: End of Life <br /> as of {{wh.eol_time|naturaltime}}
+            <span class="timeStatus label label-important">Time: End of Life at: <br /> {{wh.eol_time|date:'H:i d M Y'}}
             {% endif %}
             </span>
         </div>
