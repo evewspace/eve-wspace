@@ -57,6 +57,7 @@ function SaveUser(user_id) {
         data: $('#userSettingsForm').serialize(),
         success: function(data){
             $('#useradmin-account-settings').html(data);
+            GetUserList(1);
         },
         error: function(error){
             alert("Could not save the profile: " + error.responseText);
