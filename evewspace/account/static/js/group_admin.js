@@ -57,6 +57,7 @@ function SaveGroup(group_id) {
         data: $('#groupSettingsForm').serialize(),
         success: function(data){
             $('#group-admin-group-settings').html(data);
+            GetGroupList(1);
         },
         error: function(error){
             alert("Could not save the profile: " + error.responseText);
