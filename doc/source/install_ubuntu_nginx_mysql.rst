@@ -22,26 +22,25 @@ Requirements
     * rabbitmq-server
     * supervisor
 
-You can install all required packages with the following. You will be prompted for a mysql root password. You may leave this blank if you wish, but it is recommended that you set a secure password and remember it for later.
+You can install all required packages with the following. You will be prompted for a mysql root password. You may leave this blank if you wish, but it is recommended that you set a secure password and remember it for later.::
 
-:command:`$ sudo apt-get install git-core build-essential python-dev python-pip nginx bzip2 memcached libmysqlclient-dev mysql-server libxml2-dev libxslt-dev rabbitmq-server supervisor`
+    $ sudo apt-get install git-core build-essential python-dev python-pip \
+      nginx bzip2 memcached libmysqlclient-dev mysql-server libxml2-dev \
+      libxslt-dev rabbitmq-server supervisor
 
 You will also be needing to edit text, so make sure to install your favorite text editor if *nano* or *vi* (not *vim*) aren't your cup of tea:
 
-:command:`$ sudo apt-get install vim` 
+Next, you will need to upgrade *distribute* and install *virtualenv*:::
+    $ sudo easy_install -U distribute
+    $ sudo pip install virtualenv
 
-Next, you will need to upgrade *distribute* and install *virtualenv*:
-:command:`$ sudo easy_install -U distribute`
+Finally, you must create the MySQL database for Eve-Wspace to use:::
 
-:command:`$ sudo pip install virtualenv`
-
-Finally, you must create the MySQL database for Eve-Wspace to use:
-
-:command:`$ mysql -u root -p`
+    $ mysql -u root -p
+    Password:
 
 Enter the root password you set when installing MySQL before:
 
-:command:`Password:`
 
 Then, create the database and grant access to it to a new mysql user called *maptool* with a password you should remember for later. If you want to simply use the root MySQL user, simply ignore the *GRANT PRIVILEGES* command.::
 
@@ -54,66 +53,61 @@ Then, create the database and grant access to it to a new mysql user called *map
 Create a User
 -------------
 
-You should not run Eve W-Space as root for security. You should create a dedicated account called *maptool* with a home directory of */home/maptool*. You can name this user whatever you want, just replace all instances of */home/maptool* with your user's home directory.
+You should not run Eve W-Space as root for security. You should create a dedicated account called *maptool* with a home directory of */home/maptool*. You can name this user whatever you want, just replace all instances of */home/maptool* with your user's home directory.::
 
-:command:`$ sudo useradd -m -s /bin/bash maptool`
-
-:command:`$ sudo passwd maptool`
+    $ sudo useradd -m -s /bin/bash maptool
+    $ sudo passwd maptool
 
 Set Up the Home Directory
 -------------------------
 
-Let's become our user for this part to ensure permissions are proper and switch to the install location:
+Let's become our user for this part to ensure permissions are proper and switch to the install location:::
 
-:command:`$ sudo su maptool`
+    $ sudo su maptool
+    $ cd /home/maptool
 
-:command:`$ cd /home/maptool`
+Now, let's create a directory to be used for serving static files later::
 
-Now, let's create a directory to be used for serving static files later:
-
-:command:`$ mkdir /home/maptool/static`
+    $ mkdir /home/maptool/static
 
 Next, you need to get the Eve W-Space files. You can either clone the latest revision from *git* or you can download a packaged release and unpack it.
 
-To clone from Github:
+To clone from Github:::
 
-:command:`$ git clone https://github.com/marbindrakon/eve-wspace.git`
+    $ git clone https://github.com/marbindrakon/eve-wspace.git
 
 To use a packaged release:
 
-You need to download eve-wspace from http://marbindrakon.github.com/eve-wspace/ to get latest zip or tarball package (0.1.1 at time of writing):
+You need to download eve-wspace from http://marbindrakon.github.com/eve-wspace/ to get latest zip or tarball package (0.2.2 at time of writing):::
 	
-:command:`$ wget https://github.com/marbindrakon/eve-wspace/archive/v0.1.1.tar.gz`
+    $ wget https://github.com/marbindrakon/eve-wspace/archive/v0.2.2.tar.gz
 
-Then you can unpack the file and rename the directory to *eve-wspace* to match the clone method:
+Then you can unpack the file and rename the directory to *eve-wspace* to match the clone method:::
 
-:command:`$ tar xvzf v0.1.1.tar.gz && mv eve-wspace-0.1.1 eve-wspace`
+    $ tar xvzf v0.1.1.tar.gz && mv eve-wspace-0.1.1 eve-wspace
 
 Install Eve-Wspace Environment
 ------------------------------
 
-Next, you should create and activate a virtual Python environment for Eve W-Space so that it cannot conflict with any system Python packages: 
+Next, you should create and activate a virtual Python environment for Eve W-Space so that it cannot conflict with any system Python packages::: 
 
-:command:`$ virtualenv --no-site-packages /home/maptool/eve-wspace`
-
-:command:`$ source /home/maptool/eve-wspace/bin/activate`
+    $ virtualenv --no-site-packages /home/maptool/eve-wspace
+    $ source /home/maptool/eve-wspace/bin/activate
 
 You will notice that your shell changes to include *(eve-wspace)* when the virtual environment is active.
 
-Now you can install the required Python packages:
+Now you can install the required Python packages:::
 
-:command:`(eve-wspace)$ pip install -r /home/maptool/eve-wspace/requirements.txt`
+    (eve-wspace)$ pip install -r /home/maptool/eve-wspace/requirements.txt
 
 Configuring local_settings.py
 -----------------------------
 
-Now for the fun part, copy the local_settings.py.example file to local_settings.py in the same directory, open it up, and edit it to suit your enviornment:
+Now for the fun part, copy the local_settings.py.example file to local_settings.py in the same directory, open it up, and edit it to suit your enviornment:::
 
-:command:`(eve-wspace)$ cd /home/maptool/eve-wspace/evewspace/evewspace`
-
-:command:`(eve-wspace)$ cp local_settings.py.example local_settings.py`
-
-:command:`(eve-wspace)$ nano local_settings.py`
+    (eve-wspace)$ cd /home/maptool/eve-wspace/evewspace/evewspace
+    (eve-wspace)$ cp local_settings.py.example local_settings.py
+    (eve-wspace)$ nano local_settings.py
 
 While editing, you should pay particular attention to the top part of th efile, ensuring that the database statement matches the database, user, and password you created in MySQL earlier and that you add a SECRET_KEY and set the STATIC_ROOT value:::
 
@@ -157,10 +151,10 @@ Static Data
 CCP releases a Static Data Export for each major patch in MS SQL format. Steve Ronuken makes MySQL conversions available shortly thereafter. These conversions can be downloaded from http://www.fuzzwork.co.uk/dump/ if you are going to be installing multiple instances, you should download the dump once and re-use it if at all possible.::
 
     (eve-wspace)$ cd /home/maptool
-    (eve-wspace)$ curl -O http://www.fuzzwork.co.uk/dump/mysql55-retribution-1.1-84566.tbz2
-    (eve-wspace)$ bunzip2 mysql55-retribution-1.1-84566.tbz2
-    (eve-wspace)$ tar xvf mysql55-retribution-1.1-84566.tar
-    (eve-wspace)$ mysql -u maptool -p evewspace < retribution-1.1-84566/mysql55-retribution-1.1-84566.sql
+    (eve-wspace)$ curl -O https://www.fuzzwork.co.uk/dump/mysql55-odyssey-1.0.12-89967.tgz
+    (eve-wspace)$ gunzip mysql55-odyssey-1.0.12-89967.tgz
+    (eve-wspace)$ tar xvf mysql55-odyssey-1.0.12-89967.tgz
+    (eve-wspace)$ mysql -u maptool -p evewspace < odyssey-1.0.12-89967/mysql55-odyssey-1.0.12-89967.sql
 
 The sql import will take a few minutes to run. When it completes, your MySQL database will have all of the Static Data Export tables available.
 
@@ -185,17 +179,15 @@ Using the Development Server
 
 If you've made it this far, congratulations! Eve W-Space is set up. From here, you can run the console development server directly or continue with setting up the rest of a production environment (Nginx, Gunicorn, Supervisor).
 
-To start the development server:
+To start the development server:::
 
-:command:`(eve-wspace)$ cd /home/maptool/eve-wspace/evewspace`
+    (eve-wspace)$ cd /home/maptool/eve-wspace/evewspace
+    (eve-wspace$ ./manage.py runserver 0.0.0.0:8000
 
-:command:`(eve-wspace$ ./manage.py runserver 0.0.0.0:8000`
+Now you can navigate to your server on port 8000 and see your instance. However, you need to have celery running as well for many tasks to work properly. In another shell:::
 
-Now you can navigate to your server on port 8000 and see your instance. However, you need to have celery running as well for many tasks to work properly. In another shell:
-
-:command:`(eve-wspace)$ cd /home/maptool/eve-wspace/evewspace`
-
-:command:`(eve-wspace)$ ./manage.py celery worker -B --loglevel=info`
+    (eve-wspace)$ cd /home/maptool/eve-wspace/evewspace
+    (eve-wspace)$ ./manage.py celery worker -B --loglevel=info
 
 When both are running at the same time, you should be able to use all functions. If you want things to run a bit more permanently, continue reading.
 
@@ -209,24 +201,23 @@ Installing Gunicorn
 
 This guide uses Gunicorn, a lightweight wsgi server written in Python to serve the Django app itself.
 
-To install:
+To install:::
 
-:command:`(eve-wspace)$ pip install gunicorn`
+    (eve-wspace)$ pip install gunicorn
 
 Configuring Supervisor
 ^^^^^^^^^^^^^^^^^^^^^^
 
 Unless you want to run celery and gunicorn through the console in *screen* or *tmux*, you will want to daemonize them in some way. This guide uses supervisor, but there are many other options available.
 
-At this point, you can log out of the maptool user and go back to your normal account:
+At this point, you can log out of the maptool user and go back to your normal account:::
 
-:command:`(eve-wspace)$ deactivate`
+    (eve-wspace)$ deactivate
+    $ exit
 
-:command:`$ exit`
+You need to tell supervisor about the tools you want it to run, to do that, you need to create a config file in */etc/supervisor/conf.d* for gunicorn and celeryd:::
 
-You need to tell supervisor about the tools you want it to run, to do that, you need to create a config file in */etc/supervisor/conf.d* for gunicorn and celeryd:
-
-:command:`$ sudo nano /etc/supervisor/conf.d/celeryd.conf`::
+    $ sudo nano /etc/supervisor/conf.d/celeryd.conf
 
     [program:celeryd]
     command=python manage.py celery worker -B --loglevel=info
@@ -237,10 +228,10 @@ You need to tell supervisor about the tools you want it to run, to do that, you 
     autorestart=true
     redirect_stderr=True
 
-:command:`$ sudo nano /etc/supervisor/conf.d/gunicorn.conf`::
+    $ sudo nano /etc/supervisor/conf.d/gunicorn.conf`
 
     [program:gunicorn]
-    command=gunicorn_django --workers=4 -b 0.0.0.0:8000 settings.py
+    command=/home/maptool/eve-wspace/bin/gunicorn_django --workers=4 -b 0.0.0.0:8000 settings.py
     directory=/home/maptool/eve-wspace/evewspace/evewspace
     environment=PATH=/home/maptool/eve-wspace/bin
     user=maptool
@@ -248,15 +239,14 @@ You need to tell supervisor about the tools you want it to run, to do that, you 
     autorestart=true
     redirect_stderr=True
 
-To finish it off, you need to stop and then start supervisor to reload the config and start the services:
+To finish it off, you need to stop and then start supervisor to reload the config and start the services:::
 
-:command:`$ sudo service supervisor stop`
+    $ sudo service supervisor stop
+    $ sudo service supervisor start
 
-:command:`$ sudo service supervisor start`
+And confirm that both started successfully:::
 
-And confirm that both started successfully:
-
-:command:`$ sudo supervisorctl status`::
+    $ sudo supervisorctl status
 
     celeryd                          RUNNING    pid 4335, uptime 33 days, 19:16:02
     gunicorn                         RUNNING    pid 4302, uptime 33 days, 19:16:03
@@ -266,9 +256,9 @@ If either are not in the RUNNING state, either examine the log files in */var/lo
 Configuring Nginx
 ^^^^^^^^^^^^^^^^^
 
-Now that Eve W-Space itself is running, you need to get people to it. That's where Nginx comes into play. Configuring Nginx is as simple as filling in one config file, creatng a symlink, and reloading the daemon.
+Now that Eve W-Space itself is running, you need to get people to it. That's where Nginx comes into play. Configuring Nginx is as simple as filling in one config file, creatng a symlink, and reloading the daemon.::
 
-:command:`$ sudo nano /etc/nginx/sites-available/evewspace`::
+    $ sudo nano /etc/nginx/sites-available/evewspace
 
 	#Example - replace x.x.x.x with your IP or host name if doing name-based vhosts
     server {
@@ -292,11 +282,9 @@ Now that Eve W-Space itself is running, you need to get people to it. That's whe
     }
 
 
-:command:`$ sudo rm /etc/nginx/sites-enabled/default`
-
-:command:`$ sudo ln -s /etc/nginx/sites-available/evewspace /etc/nginx/sites-enabled/evewspace`
-
-:command:`$	sudo service nginx reload`
+    $ sudo rm /etc/nginx/sites-enabled/default`
+    $ sudo ln -s /etc/nginx/sites-available/evewspace /etc/nginx/sites-enabled/evewspace
+    $ sudo service nginx reload
 
 Congratulations! Your Eve W-Space instance should now be available at whatever 
 your ip or host name was from the Nginx config. Please see the :doc:`getting_started` page for your next steps. Keep in mind that your instance 
