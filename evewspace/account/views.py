@@ -193,15 +193,16 @@ def profile_admin(request, user_id):
                 send_pass = True
             else:
                 send_pass = False
-            message = EmailMessage(
-                    subject="Password Reset",
-                    body=render_to_string(
-                        'password_admin_reset_email.txt',
-                        {'admin': request.user, 'member': user,
-                            'password': password,
-                            'notify': send_pass}),
-                    to=[user.email,])
-            message.send(fail_silently=False)
+            if user.email:
+                message = EmailMessage(
+                        subject="Password Reset",
+                        body=render_to_string(
+                            'password_admin_reset_email.txt',
+                            {'admin': request.user, 'member': user,
+                                'password': password,
+                                'notify': send_pass}),
+                        to=[user.email,])
+                message.send(fail_silently=False)
         elif password or password_confirm:
             error_list.append("Passwords do not match. Non-Password changes saved.")
         user.save()
