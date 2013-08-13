@@ -1,6 +1,10 @@
-.mapDiv
+#baseHeadDiv
 {
-    margin-top:10px;
+    display: none;
+}
+#baseNavDiv
+{
+    margin-bottom: 5px;
 }
 .systemPanelHeader
 {
@@ -144,6 +148,10 @@
 h5
 {
     text-align: center;
+}
+#stPlaceholderDiv
+{
+    margin-bottom: 5px;
 }
 .stFleetHeader
 {
