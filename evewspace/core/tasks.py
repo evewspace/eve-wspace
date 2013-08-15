@@ -151,13 +151,11 @@ def update_feeds():
     Caches and updates RSS feeds in NewsFeeds.
     """
     for feed in NewsFeed.objects.all():
+        data = feedparser.parse(feed.url)
+        cache.set('feed_%s' % feed.pk, data, 7200)
+        feed.name = data['feed']['title']
         try:
-            data = feedparser.parse(feed.url)
-            cache.set('feed_%s' % feed.pk, data, 7200)
-            feed.name = data['feed']['title']
             feed.description = data['feed']['subtitle']
-            feed.save()
-        except:
-            # There shouldn't be any exceptions, but we want to continue
-            # if there are.
-            pass
+        except KeyError:
+            feed.decription = "None Provided"
+        feed.save()
