@@ -1,0 +1,55 @@
+<table id="groupAdminTable" class="table table-hover">
+    <tr>
+        <th>Name</th>
+        <th>Registration Code</th>
+        <th>System Group</th>
+        <th>Members</th>
+    </tr>
+    {% for group in group_list %}
+    <tr onclick="GetEditGroupDialog({{group.pk}});">
+        <td>{{group.name}}</td>
+        <td>{% if group.profile.regcode %}{{group.profile.regcode}}{% else %}[Not Set]{% endif %}</td>
+        <td>{% if group.profile.visible %}No{% else %} Yes {% endif %}</td>
+        <td>{{group.user_set.count}}</td>
+    </tr>
+    {% endfor %}
+</table>
+<div class="pagination">
+    {% if group_list.number != 1 %}
+    <button class="btn btn-mini btn-danger" id="groupPreviousLink">previous</button>
+    {% endif %}
+    <span>Page {{group_list.number}} of {{group_list.paginator.num_pages}}</span>
+    {% if group_list.has_next %}
+        <button class="btn btn-mini btn-danger" id="groupNextLink">next</button>
+    {% endif %}
+    <script type="text/javascript">
+        $('#groupPreviousLink').click(function(){
+                $.ajax({
+                    url: "/account/admin/group/list/{{group_list.previous_page_number}}/",
+                    {% if filter %}
+                    type: "POST",
+                    data: $('#groupnameFilterForm').serialize(),
+                    {% else %}
+                    type: "GET",
+                    {% endif %}
+                    success: function(data){
+                        $('#groupTableHolder').html(data);
+                    }
+                    });
+               });
+         $('#groupNextLink').click(function(){
+                $.ajax({
+                    url: "/account/admin/group/list/{{group_list.next_page_number}}/",
+                    {% if filter %}
+                    type: "POST",
+                    data: $('#groupnameFilterForm').serialize(),
+                    {% else %}
+                    type: "GET",
+                    {% endif %}
+                    success: function(data){
+                        $('#groupTableHolder').html(data);
+                    }
+                    });
+                });
+    </script>
+</div>

@@ -1,0 +1,80 @@
+{% if saved %}
+<div style="text-align: center;">
+    <span class="label label-info" style="width: 50%;">Profile Saved.</span>
+</div>
+<br />
+{% endif %}
+{% if errors %}
+<div style="text-align: center;">
+    {% for error in errors %}
+    <span class="label">{{error}}</span>
+    <br />
+    {% endfor %}
+</div>
+{% endif %}
+<form id="userSettingsForm" class="form-horizontal" action="/account/admin/user/{{member.pk}}/" method="POST">
+    {% csrf_token %}
+    <div class="control-group">
+        <label class="control-label" for="usernameInput">Username:</label>
+        <div class="controls">
+            <input type="text" class="input-medium" name="username" value="{{member.username}}" id="usernameInput">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="emailInput">Email Address:</label>
+        <div class="controls">
+            <input type="text" class="input-email" name="email" id="emailInput" value="{{member.email}}">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="newPassword">Set Password:</label>
+        <div class="controls">
+            <input type="password" id="newPassword" class="input-medium" name="new_password">
+            <input type="password" id="passwordConfirm" class="input-medium" name="confirm_password"><br /><br />
+            <button class="btn btn-info" onclick="SetRandomPassword();">Randomize</button>
+            <div>
+                <span id="randomPasswordSpan" style="display:none;" class="label label-info"></span>
+            </div>
+        </div>
+    </div>
+            {% if member.email %}
+        <div class="control-group">
+
+            <label class="control-label" for="emailPassword">Email New Password</label>
+        <div class="controls">
+            <input type="checkbox" id="emailPassword" name="email_password">
+            </div>
+        </div>
+            {% endif %}
+    <div class="control-group">
+        <label class="control-label" for="userEnabled">Active:</label>
+        <div class="controls">
+            <input type="checkbox" id="userEnabled" name="enabled" {% if member.is_active %} checked="checked" {% endif %} {% if user == member %} disabled="disabled" {% endif %}>
+            {% if user == member %}
+            <input type="hidden" id="userHiddenEnabled" name="enabled" value="on">
+            {% endif %}
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="controls">
+            <button class="btn btn-success" onclick="SaveUser({{member.pk}});" id="saveUserButton">Save User</button>
+            <button class="btn btn-danger" id="deleteUserButton" {% if user == member %} disabled="disabled" {% endif %}>Delete User</button>
+            <button class="btn btn-danger" style="display: none;" id="reallyDeleteUser">Really Delete</button>
+            <button class="btn btn-danger" style="display: none;" id="reallyReallyDeleteUser" onclick="DeleteUser({{member.pk}});">Really Really Delete</button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    $('#userSettingsForm').submit(function(e){
+                e.preventDefault();
+                return false;
+                });
+    $('#deleteUserButton').click(function(e){
+                $(this).hide();
+                $('#reallyDeleteUser').show();
+                });
+    $('#reallyDeleteUser').click(function(e){
+                $(this).hide();
+                $('#reallyReallyDeleteUser').show();
+                });
+</script>

@@ -1,0 +1,51 @@
+{% load account_tags %}
+{% if saved %}
+<div>
+    <span class="label label-info">Groups saved.</span>
+</div>
+{% endif %}
+<div class="systemGroupsContainer">
+    <h5>System Groups:</h5>
+    <span class="label label-info">System group memberships are automatically assigned and cannot be changed here.</span>
+    <br /><br />
+    <form class="form-horizontal" id="systemGroupsForm">
+        {% for group in member.groups.all|group_visible:0 %}
+        <div class="control-group">
+            <label class="control-label" for="#group{{group.pk}}Active">
+                {{group.name}}
+            </label>
+            <div class="controls">
+                <input type="checkbox" disabled="disabled" checked="checked" id="group{{group.pk}}Active">
+            </div>
+        </div>
+        {% empty %}
+        <span class="label label-success" style="margin-left: 100px;">No Groups</span>
+        {% endfor %}
+    </form>
+</div>
+<div class="UserGroupsContainer">
+    <h5>Normal Groups:</h5>
+    <form class="form-horizontal" id="UserGroupsForm" method="POST" action="/account/admin/user/{{member.pk}}/groups/">
+        {% for group in group_list|group_visible:1 %}
+        <div class="control-group">
+            <label class="control-label" for="#group{{group.pk}}Active">{{group.name}}</label>
+            <div class="controls">
+                <input type="checkbox" {% if group in member.groups.all %}checked="checked"{% endif %} name="group_{{group.pk}}" id="group{{group.pk}}Active">
+            </div>
+        </div>
+        {% empty %}
+        <span class="label">No Groups</span>
+        {% endfor %}
+        <button class="btn btn-success" onclick="SaveUserGroups({{member.pk}});">Save</button>
+    </form>
+</div>
+<script type="text/javascript">
+    $('#UserGroupsForm').submit(function(e){
+            e.preventDefault();
+            return false;
+            });
+    $('#systemGroupsForm').submit(function(e){
+            e.preventDefault();
+            return false;
+            });
+</script>

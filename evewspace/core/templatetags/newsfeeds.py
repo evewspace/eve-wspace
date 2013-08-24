@@ -37,11 +37,18 @@ def feed_items(feed, retry=False):
     data = cache.get('feed_%s' % feed.pk)
     if data:
         for entry in data['entries']:
-            dt = datetime.fromtimestamp(mktime(entry['published_parsed']))
+            try:
+                dt = datetime.fromtimestamp(mktime(entry['published_parsed']))
+            except KeyError:
+                dt = None
+            try:
+                url = entry['link']
+            except KeyError:
+                url = "#"
             item = {'title': entry['title'].replace('&amp;', '&').replace('&#039;', "'"),
                     'summary': entry['summary'],
                     'time': dt,
-                    'url': entry['link']}
+                    'url': url}
             items.append(item)
     if not items and retry == False:
         update_feeds()

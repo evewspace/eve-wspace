@@ -1,0 +1,3 @@
+{% for data in user_admin_registry %}
+    <li><a href="#useradmin-{{data|slugify}}" data-toggle="tab">{{data}}</a></li>
+{% endfor %}

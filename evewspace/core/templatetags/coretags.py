@@ -60,11 +60,6 @@ def admin_panels(context):
     context['admin_registry'] = get_active_tabs(context, admin_registry)
     return context
 
-@register.inclusion_tag('profile_settings.html', takes_context=True)
-def profile_sections(context):
-    context['profile_registry'] = get_active_tabs(context, profile_registry)
-    return context
-
 @register.inclusion_tag('feedback_panel.html')
 def feedback_panel():
     return {'render': get_config("CORE_FEEDBACK_ENABLED",

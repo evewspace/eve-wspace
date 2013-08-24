@@ -10,77 +10,17 @@ class Migration(DataMigration):
         "Write your forwards methods here."
         # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
         try:
-            sig_type = orm.SignatureType.objects.get(shortname="GRAV")
-            sig_type.shortname = "ORE"
-            sig_type.longname = "Ore Site"
-            sig_type.save()
-        except:
-            pass
-        try:
-            sig_type = orm.SignatureType.objects.get(shortname="LADAR")
-            sig_type.shortname = "GAS"
-            sig_type.longname = "Gas Site"
-            sig_type.save()
-        except:
-            pass
-        try:
-            sig_type = orm.SignatureType.objects.get(shortname="RADAR")
-            sig_type.shortname = "DATA"
-            sig_type.longname = "Data Site"
-            sig_type.save()
-        except:
-            pass
-        try:
-            sig_type = orm.SignatureType.objects.get(shortname="MAG")
-            sig_type.shortname = "RELIC"
-            sig_type.longname = "Relic Site"
-            sig_type.save()
-        except:
-            pass
-        try:
-            sig_type = orm.SignatureType.objects.get(shortname="ANOM")
-            sig_type.shortname = "COMBAT"
-            sig_type.longname = "Combat Site"
-            sig_type.save()
-        except:
+            orm.SignatureType.objects.filter(longname="Radar").update(
+                    longname="Data Site")
+        except Exception:
             pass
 
     def backwards(self, orm):
         "Write your backwards methods here."
         try:
-            sig_type = orm.SignatureType.objects.get(shortname="ORE")
-            sig_type.shortname = "GRAV"
-            sig_type.longname = "Gravimetric"
-            sig_type.save()
-        except:
-            pass
-        try:
-            sig_type = orm.SignatureType.objects.get(shortname="GAS")
-            sig_type.shortname = "LADAR"
-            sig_type.longname = "Ladar"
-            sig_type.save()
-        except:
-            pass
-        try:
-            sig_type = orm.SignatureType.objects.get(shortname="DATA")
-            sig_type.shortname = "RADAR"
-            sig_type.longname = "Radar"
-            sig_type.save()
-        except:
-            pass
-        try:
-            sig_type = orm.SignatureType.objects.get(shortname="RELIC")
-            sig_type.shortname = "MAG"
-            sig_type.longname = "Magnetometric"
-            sig_type.save()
-        except:
-            pass
-        try:
-            sig_type = orm.SignatureType.objects.get(shortname="COMBAT")
-            sig_type.shortname = "ANOM"
-            sig_type.longname = "Anomaly"
-            sig_type.save()
-        except:
+            orm.SignatureType.objects.filter(longname="Data Site").update(
+                    longname="Radar")
+        except Exception:
             pass
 
     models = {
@@ -192,9 +132,11 @@ class Migration(DataMigration):
         },
         'Map.wormhole': {
             'Meta': {'object_name': 'Wormhole'},
-            'bottom': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'parent_wormholes'", 'null': 'True', 'to': "orm['Map.MapSystem']"}),
+            'bottom': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'parent_wormhole'", 'unique': 'True', 'null': 'True', 'to': "orm['Map.MapSystem']"}),
             'bottom_bubbled': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
             'bottom_type': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['Map.WormholeType']"}),
+            'collapsed': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'eol_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'map': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'wormholes'", 'to': "orm['Map.Map']"}),
             'mass_status': ('django.db.models.fields.IntegerField', [], {}),

@@ -1,0 +1,60 @@
+<table id="userAdminTable" class="table table-hover">
+    <tr>
+        <th>Name</th>
+        <th>E-Mail</th>
+        <th>Active</th>
+        <th>Joined</th>
+        <th>Last Login</th>
+        <th>API Keys</th>
+    </tr>
+    {% for member in member_list %}
+    <tr onclick="GetEditUserDialog({{member.pk}});">
+        <td>{{member.username}}</td>
+        <td>{{member.email}}</td>
+        <td>{% if member.is_active %}Yes{% else %} No {% endif %}</td>
+        <td>{{member.date_joined}}</td>
+        <td>{{member.last_login}}</td>
+        <td>{{member.api_keys.count}}</td>
+    </tr>
+    {% endfor %}
+</table>
+<div class="pagination">
+    {% if member_list.number != 1 %}
+    <button class="btn btn-mini btn-danger" id="userPreviousLink">previous</button>
+    {% endif %}
+    <span>Page {{member_list.number}} of {{member_list.paginator.num_pages}}</span>
+    {% if member_list.has_next %}
+        <button class="btn btn-mini btn-danger" id="userNextLink">next</button>
+    {% endif %}
+    <script type="text/javascript">
+        $('#userPreviousLink').click(function(){
+                $.ajax({
+                    url: "/account/admin/user/list/{{member_list.previous_page_number}}/",
+                    {% if filter %}
+                    type: "POST",
+                    data: $('#usernameFilterForm').serialize(),
+                    {% else %}
+                    type: "GET",
+                    {% endif %}
+                    success: function(data){
+                        $('#userTableHolder').html(data);
+                    }
+                    });
+               });
+         $('#userNextLink').click(function(){
+                $.ajax({
+                    url: "/account/admin/user/list/{{member_list.next_page_number}}/",
+                    {% if filter %}
+                    type: "POST",
+                    data: $('#usernameFilterForm').serialize(),
+                    {% else %}
+                    type: "GET",
+                    {% endif %}
+                    success: function(data){
+                        $('#userTableHolder').html(data);
+                    }
+                    });
+                });
+    </script>
+
+</div>

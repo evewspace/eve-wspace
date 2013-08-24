@@ -1,17 +1,18 @@
-<form class="form-inline" id="apiKeyForm" action="/api/key/" method="POST">
+<form class="form-inline" id="api{% if member %}Admin{% endif %}KeyForm" action="/api/key/" method="POST">
     {% csrf_token %}
+    <input type="hidden" name="user_id" value="{% if member %}{{member.pk}}{% else %}{{user.pk}}{% endif %}">
     Key ID: <input type="text" class="input-small" value="{{key.keyid}}" name="key_id"></input>
     vCode: <input type="text" class="input" name="vcode" value="{{key.vcode}}"></input>
-    <input id="apiKeySubmit" type="submit" class="btn btn-success" value="Submit"></input>
+    <input id="api{% if member %}Admin{% endif %}KeySubmit" type="submit" class="btn btn-success" value="Submit"></input>
 </form>
 <script type="text/javascript">
-    $('#apiKeyForm').submit(function(e){
+    $('#api{% if member%}Admin{% endif %}KeyForm').submit(function(e){
                 e.preventDefault();
-                $("#apiKeySubmit").attr("disabled", "true");
+                $("#api{% if member %}Admin{% endif %}KeySubmit").attr("disabled", "true");
                 {% if key %}
-                SaveAPIKey({{key.keyid}});
+                Save{% if member %}Admin{% endif %}APIKey({{key.keyid}}{% if member %}, {{member.pk}}{% endif %});
                 {% else %}
-                SaveNewAPIKey();
+                SaveNew{% if member %}Admin{% endif %}APIKey({% if member %}{{member.pk}}{% endif %});
                 {% endif %}
                 return false;
             });

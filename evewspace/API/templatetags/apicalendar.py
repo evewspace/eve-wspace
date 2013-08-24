@@ -45,6 +45,8 @@ def upcomingevents(user):
         return {'events': result.upcomingEvents}
     except eveapi.Error:
         return {'error': 'Your API Key does not allow calendar access.'}
+    except RuntimeError:
+        return {'error': 'There was a problem contacting the API server.'}
 
 
 @register.inclusion_tag("apicalendar_detail.html")
