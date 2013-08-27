@@ -24,7 +24,6 @@ from django.contrib.sites.models import Site
 from math import pow, sqrt
 from core.models import SystemJump, Type, Location
 from core.utils import get_config
-from collections import OrderedDict
 from django.core.cache import cache
 
 class MapJSONGenerator(object):
