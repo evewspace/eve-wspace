@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #from Map.models import *
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from core.models import SystemJump, Type, Location
 from core.utils import get_config
 from datetime import timedelta
