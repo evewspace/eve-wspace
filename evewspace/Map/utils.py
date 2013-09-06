@@ -168,7 +168,7 @@ class MapJSONGenerator(object):
             syslist = [self.system_to_dict(root, 0),]
             self.recursive_system_data_generator(root, syslist, 1)
             cached = json.dumps(syslist, sort_keys=True)
-            cache.set(cache_key, cached, 300)
+            cache.set(cache_key, cached, 15)
         return cached
 
     def recursive_system_data_generator(self, start_sys, syslist, levelX):
