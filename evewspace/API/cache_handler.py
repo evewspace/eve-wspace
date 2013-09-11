@@ -31,14 +31,14 @@ def store(host, path, params, doc, obj):
     # We will set a default cache timer of 60 seconds
     if cacheTimer <= 0:
         cacheTimer = 60
-    cache.set(hash(cacheKey), zlib.compress(pickle.dumps(obj)), cacheTimer)
+    cache.set(hash(cacheKey), zlib.compress(unicode(doc)), cacheTimer)
 
 
 def retrieve(host, path, params):
     """Get an API document from our cache."""
     cacheKey = "%s%s%s" % (host, path, params)
     if cache.get(hash(cacheKey)):
-        return pickle.loads(zlib.decompress(cache.get(hash(cacheKey))))
+        return zlib.decompress(cache.get(hash(cacheKey)))
     else:
         return None
 
