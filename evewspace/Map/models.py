@@ -359,6 +359,7 @@ class SignatureType(models.Model):
 class Signature(models.Model):
     """Stores the signatures active in all systems. Relates to System model."""
     system = models.ForeignKey(System, related_name="signatures")
+    modified_by = models.ForeignKey(User, related_name="signatures", null=True)
     sigtype = models.ForeignKey(SignatureType, related_name="sigs", null=True, blank=True)
     sigid = models.CharField(max_length = 10)
     updated = models.BooleanField()
@@ -372,6 +373,7 @@ class Signature(models.Model):
     downtimes = models.IntegerField(null=True, blank=True)
     ratscleared = models.DateTimeField(null=True, blank=True)
     lastescalated = models.DateTimeField(null=True, blank=True)
+    modified_time = models.DateTimeField(auto_now=True, null=True)
 
     class Meta:
         ordering = ['sigid']
