@@ -1,14 +1,13 @@
-<table class="sysSigsTable">
+{% load humanize %}
+<table class="table sysSigsTable" cellspacing="0">
     <tr>
     <th>Actions</th>
-    <th>Upd.</th>
+    <th title="Updated Since Downtme">Upd.</th>
     <th>Sig ID</th>
     <th>Type</th>
     <th>Info</th>
-    <th>Act. / Rats</th>
-    <th>Escl.</th>
-    <th>ModAge</th>
-    <th>Who</th>
+    <th title="Activated / Rats">Act.</th>
+    <th title="Capital Escalation Tracking">Escl.</th>
     </tr>
     {% for sig in system.system.signatures.all %}
     <tr>
@@ -16,7 +15,7 @@
             <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> </td>
         <td>
             {% if sig.updated %}
-                <i class="icon-ok-sign" title="Signature Updated"></i> &nbsp
+            <i class="icon-ok-sign" title="Updated {{sig.modified_time|naturaltime}} by {{sig.modified_by}}."></i> &nbsp
             {% else %}
                 <i class="icon-remove-sign" title="Signature Not Updated"></i> &nbsp
             {% endif %}
@@ -60,9 +59,6 @@
                 {% endif %}    
                 {% endif %}
             </td>
-            <td><span class="editTime">{{sig.time_since_modification}}</span> </td>
-            <td><span class="editName">{{sig.user.username}}</span> </td>
-
         {% empty %}
         <tr><td>No Signatures!</td></tr>
     </tr>

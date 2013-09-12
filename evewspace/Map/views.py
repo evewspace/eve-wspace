@@ -83,7 +83,7 @@ def map_checkin(request, map_id):
         return HttpResponse(json.dumps({'error': "No loadtime"}),
                             mimetype="application/json")
     time_string = request.POST['loadtime']
- 
+
     load_time = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S.%f")
     load_time = load_time.replace(tzinfo=pytz.utc)
 
@@ -484,6 +484,7 @@ def bulk_sig_import(request, map_id, ms_id):
                 sig = Signature.objects.get_or_create(sigid=sig_id, user=request.user,
                         system=map_system.system)[0]
                 sig = _update_sig_from_tsv(sig, row)
+                sig.modified_by = request.user
                 sig.save()
                 signals.signature_update.send_robust(sig, user=request.user,
                                                  map=map_system.map,
@@ -535,7 +536,7 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
             else:
                 sigtype = None
             signature.sigtype = sigtype
-            signature.user = request.user
+            signature.modified_by = request.user
             signature.save()
             map_system.system.lastscanned = datetime.now(pytz.utc)
             map_system.system.save()
