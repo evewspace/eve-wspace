@@ -481,7 +481,8 @@ def bulk_sig_import(request, map_id, ms_id):
                         status=400)
             if k < 75:
                 sig_id = utils.convert_signature_id(row[COL_SIG])
-                sig = Signature.objects.get_or_create(sigid=sig_id, user=request.user,
+                sig = Signature.objects.get_or_create(sigid=sig_id,
+                        modified_by=request.user,
                         system=map_system.system)[0]
                 sig = _update_sig_from_tsv(sig, row)
                 sig.modified_by = request.user
