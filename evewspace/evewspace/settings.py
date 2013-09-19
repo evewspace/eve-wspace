@@ -46,7 +46,7 @@ CELERYBEAT_SCHEDULE = {
                 'args': ()
             },
         'stale_locations':{
-                'task': 'Map.tasks.clear_stale_locations',
+                'task': 'Map.tasks.clear_stale_records',
                 'schedule': timedelta(minutes=5),
                 'args': ()
             },

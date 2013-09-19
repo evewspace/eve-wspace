@@ -117,11 +117,11 @@ def downtime_site_update():
             sig.increment_downtime()
 
 @task()
-def clear_stale_locations():
+def clear_stale_records():
     """
     This task will clear any user location records older than 15 minutes.
     """
     limit = datetime.now(pytz.utc) - timedelta(minutes=15)
-    for record in ActivePilot.objects.all():
-        if record.timestamp < limit:
-            record.delete()
+    ActivePilot.objects.filter(timestamp__lt=limit).delete()
+    Signature.objects.filter(owned_time__isnull=False,
+            owned_time__lt=limit).update(owned_time=None, owned_by=None)

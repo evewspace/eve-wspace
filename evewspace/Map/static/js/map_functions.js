@@ -380,6 +380,18 @@ function EditSignature(msID, sigID){
 }
 
 
+function OwnSignature(msID, sigID){
+    address = "system/" + msID + "/signatures/" + sigID + "/own/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        success: function(data){
+            LoadSignatures(msID, false);
+        }
+    });
+}
+
+
 function GetEditSignatureBox(msID, sigID){
     address = "system/" + msID + "/signatures/" + sigID + "/edit/";
     $.ajax({
@@ -388,6 +400,7 @@ function GetEditSignatureBox(msID, sigID){
         success: function(data){
             $('#sys' + msID + "SigAddFOrm").empty();
             $('#sys' + msID + "SigAddForm").html(data);
+            LoadSignatures(msID, false);
         }
     });
 }

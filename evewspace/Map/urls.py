@@ -22,7 +22,8 @@ sigpatterns = patterns('Map.views',
         url(r'^clear/$', 'mark_signature_cleared'),
         url(r'^remove/$', 'delete_signature'),
         url(r'^edit/$', 'edit_signature'),
-        url(r'^spawns/$', 'site_spawns')
+        url(r'^spawns/$', 'site_spawns'),
+        url(r'^own/$', 'toggle_sig_owner'),
         )
 
 syspatterns = patterns('Map.views',
