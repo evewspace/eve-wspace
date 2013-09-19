@@ -10,9 +10,16 @@
     <th title="Capital Escalation Tracking">Escl.</th>
     </tr>
     {% for sig in system.system.signatures.all %}
-    <tr>
-        <td><i class="icon-pencil" title="Edit" onclick="GetEditSignatureBox({{system.pk}}, {{sig.pk}}, {{system.pk}});"></i> &nbsp
-            <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> </td>
+    <tr {% if sig.owned_by %}class="success"{% endif %}>
+        <td>
+            <i class="icon-pencil" title="Edit" onclick="GetEditSignatureBox({{system.pk}}, {{sig.pk}}, {{system.pk}});"></i> &nbsp;
+            <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> &nbsp; 
+            {% if sig.owned_by %}
+            <i class="icon-lock" title="Owned by {{sig.owned_by.username}}" onclick="OwnSignature({{system.pk}}, {{sig.pk}});"></i>
+            {% else %}
+            <i class="icon-star-empty" title="Not Owned (Click to Own)" onclick="OwnSignature({{system.pk}}, {{sig.pk}});"></i>
+            {% endif %}
+        </td>
         <td>
             {% if sig.updated %}
             <i class="icon-ok-sign" title="Updated {{sig.modified_time|naturaltime}} by {{sig.modified_by}}."></i> &nbsp

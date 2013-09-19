@@ -504,6 +504,16 @@ def bulk_sig_import(request, map_id, ms_id):
                                 {'mapsys': map_system})
 
 
+@login_required
+@require_map_permission(permission=2)
+def toggle_sig_owner(request, map_id, ms_id, sig_id=None):
+    if not request.is_ajax():
+        raise PermissionDenied
+    sig = get_object_or_404(Signature, pk=sig_id)
+    sig.toggle_ownership(request.user)
+    return HttpResponse()
+
+
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=2)
@@ -520,7 +530,8 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
     if sig_id != None:
         signature = get_object_or_404(Signature, pk=sig_id)
         created = False
-
+        if not signature.owned_by:
+            signature.toggle_ownership(request.user)
     if request.method == 'POST':
         form = SignatureForm(request.POST)
         if form.is_valid():
@@ -545,6 +556,8 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
                 action = 'Created'
             else:
                 action = 'Updated'
+            if signature.owned_by:
+                signature.toggle_ownership(request.user)
             map_system.map.add_log(request.user,
                                    "%s signature %s in %s (%s)" %
                                    (action, signature.sigid, map_system.system.name,
