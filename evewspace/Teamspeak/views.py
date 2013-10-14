@@ -17,9 +17,19 @@
 # Create your views here.
 
 from django.template.response import TemplateResponse
+import PyTS3
+from core.utils import get_config
 
 def show_online(request):
-    """
-    Return a template with just the ST status bar tag.
-    """
-    return TemplateResponse(request, 'ts_userlist.html')
+    ts3hostname = get_config("TS3_HOSTNAME", None).value
+    Port = get_config("TS3_PORT", None).value
+    QueryLoginUsername = get_config("TS3_QUERYUSER", None).value
+    QueryLoginPasswort = get_config("TS3_QUERYPASS", None).value
+    QueryPort = get_config("TS3_QUERYPORT", None).value
+
+    server = PyTS3.ServerQuery(ts3hostname, QueryPort)
+    server.connect()
+    server.command('login', {'client_login_name': QueryLoginUsername, 'client_login_password': QueryLoginPasswort})
+    server.command('use', {'port': Port})
+    clientlist = server.command('clientlist')
+    return TemplateResponse(request, 'ts_userlist.html',{'clientlist': clientlist})
