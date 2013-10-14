@@ -15,3 +15,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # Create your views here.
+
+from django.template.response import TemplateResponse
+
+def show_online(request):
+    """
+    Return a template with just the ST status bar tag.
+    """
+    return TemplateResponse(request, 'ts_userlist.html')
