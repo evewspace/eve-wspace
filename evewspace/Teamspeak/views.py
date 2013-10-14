@@ -31,5 +31,7 @@ def show_online(request):
     server.connect()
     server.command('login', {'client_login_name': QueryLoginUsername, 'client_login_password': QueryLoginPasswort})
     server.command('use', {'port': Port})
-    clientlist = server.command('clientlist')
+    server.command('clientupdate', {'client_nickname': 'evewspace'})
+
+    clientlist = server.command('clientlist -away')
     return TemplateResponse(request, 'ts_userlist.html',{'clientlist': clientlist})
