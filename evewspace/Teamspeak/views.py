@@ -19,19 +19,16 @@
 from django.template.response import TemplateResponse
 from django.http import HttpResponse
 import PyTS3
+from Teamspeak.models import TeamspeakServer
 from core.utils import get_config
 
 def show_online(request):
-    ts3hostname = get_config("TS3_HOSTNAME", None).value
-    Port = get_config("TS3_PORT", None).value
-    QueryLoginUsername = get_config("TS3_QUERYUSER", None).value
-    QueryLoginPasswort = get_config("TS3_QUERYPASS", None).value
-    QueryPort = get_config("TS3_QUERYPORT", None).value
+    serversettings = TeamspeakServer.objects.get(id=1)
 
-    server = PyTS3.ServerQuery(ts3hostname, QueryPort)
+    server = PyTS3.ServerQuery(serversettings['host'], serversettings['queryport'])
     server.connect()
-    server.command('login', {'client_login_name': QueryLoginUsername, 'client_login_password': QueryLoginPasswort})
-    server.command('use', {'port': Port})
+    server.command('login', {'client_login_name': serversettings['queryuser'], 'client_login_password': serversettings['querypass']})
+    server.command('use', {'port': serversettings['voiceport']})
     server.command('clientupdate', {'client_nickname': 'evewspace'})
 
     clientlist = server.command('clientlist -away')
@@ -42,7 +39,8 @@ def general_settings(request):
     """
     Returns and processes the general settings section.
     """
-    ts3hostname = get_config("TS3_HOSTNAME", None)
+    serversettings = TeamspeakServer.objects.get(id=1)
+    ts3hostname = serversettings['host']
     Port = get_config("TS3_PORT", None)
     QueryLoginUsername = get_config("TS3_QUERYUSER", None)
     QueryLoginPasswort = get_config("TS3_QUERYPASS", None)
