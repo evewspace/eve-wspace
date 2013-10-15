@@ -17,6 +17,7 @@
 # Create your views here.
 
 from django.template.response import TemplateResponse
+from django.http import HttpResponse
 import PyTS3
 from core.utils import get_config
 
@@ -35,3 +36,35 @@ def show_online(request):
 
     clientlist = server.command('clientlist -away')
     return TemplateResponse(request, 'ts_userlist.html',{'clientlist': clientlist})
+
+#@permission_required('Map.map_admin')
+def general_settings(request):
+    """
+    Returns and processes the general settings section.
+    """
+    ts3hostname = get_config("TS3_HOSTNAME", None)
+    Port = get_config("TS3_PORT", None)
+    QueryLoginUsername = get_config("TS3_QUERYUSER", None)
+    QueryLoginPasswort = get_config("TS3_QUERYPASS", None)
+    QueryPort = get_config("TS3_QUERYPORT", None)
+
+    if request.method == "POST":
+        ts3hostname.value = request.POST['ts3hostname']
+        Port.value = int(request.POST['Port'])
+        QueryLoginUsername.value = request.POST['QueryLoginUsername']
+        QueryLoginPasswort.value = request.POST['QueryLoginPasswort']
+        QueryPort.value = int(request.POST['QueryPort'])
+        ts3hostname.save()
+        Port.save()
+        QueryLoginUsername.save()
+        QueryLoginPasswort.save()
+        QueryPort.save()
+        return HttpResponse()
+    return TemplateResponse(
+        request, 'teamspeak_settings.html',
+        {'ts3hostname': ts3hostname.value,
+         'Port': Port.value,
+         'QueryLoginUsername': QueryLoginUsername.value,
+         'QueryLoginPasswort': QueryLoginPasswort.value,
+         'QueryPort': QueryPort.value}
+    )
