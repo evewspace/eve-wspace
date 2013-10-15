@@ -25,10 +25,10 @@ from core.utils import get_config
 def show_online(request):
     serversettings = TeamspeakServer.objects.get(id=1)
 
-    server = PyTS3.ServerQuery(serversettings['host'], serversettings['queryport'])
+    server = PyTS3.ServerQuery(serversettings.host, serversettings.queryport)
     server.connect()
-    server.command('login', {'client_login_name': serversettings['queryuser'], 'client_login_password': serversettings['querypass']})
-    server.command('use', {'port': serversettings['voiceport']})
+    server.command('login', {'client_login_name': serversettings.queryuser, 'client_login_password': serversettings.querypass})
+    server.command('use', {'port': serversettings.voiceport})
     server.command('clientupdate', {'client_nickname': 'evewspace'})
 
     clientlist = server.command('clientlist -away')
@@ -40,11 +40,11 @@ def general_settings(request):
     Returns and processes the general settings section.
     """
     serversettings = TeamspeakServer.objects.get(id=1)
-    ts3hostname = serversettings['host']
-    Port = get_config("TS3_PORT", None)
-    QueryLoginUsername = get_config("TS3_QUERYUSER", None)
-    QueryLoginPasswort = get_config("TS3_QUERYPASS", None)
-    QueryPort = get_config("TS3_QUERYPORT", None)
+    ts3hostname = serversettings.host.
+    Port = serversettings.voiceport
+    QueryLoginUsername = serversettings.queryuser
+    QueryLoginPasswort = serversettings.querypass
+    QueryPort = serversettings.queryport
 
     if request.method == "POST":
         ts3hostname.value = request.POST['ts3hostname']

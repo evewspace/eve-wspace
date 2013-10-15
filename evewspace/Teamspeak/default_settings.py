@@ -16,6 +16,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.models import ConfigEntry
 from Teamspeak.models import TeamspeakServer
+from core.utils import get_config
+
 defaults = [
         ("TS3_HOSTNAME", "localhost"),
         ("TS3_PORT", "9987"),
