@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.models import ConfigEntry
-from Teamspeak.modles import TeamspeakServer
+from Teamspeak.models import TeamspeakServer
 defaults = [
         ("TS3_HOSTNAME", "localhost"),
         ("TS3_PORT", "9987"),
@@ -30,10 +30,9 @@ def load_defaults():
         config.value = setting[1]
         config.save()
 
-    ts = TeamspeakServer.objects.get(id=1)
-    serversettings = ts.entry_set.create(
-        host=get_config("TS3_HOSTNAME", None).value,
-        queryuser=get_config("TS3_QUERYUSER", None).value,
-        querypass=get_config("TS3_QUERYPASS", None).value,
-        queryport=get_config("TS3_QUERYPORT", None).value,
-        voiceport=get_config("TS3_PORT", None).value)
+    ts3 = TeamspeakServer.create(get_config("TS3_HOSTNAME", None).value,
+        get_config("TS3_QUERYUSER", None).value,
+        get_config("TS3_QUERYPASS", None).value,
+        get_config("TS3_QUERYPORT", None).value,
+        get_config("TS3_PORT", None).value)
+    ts3.save()
