@@ -17,7 +17,7 @@
 # Create your views here.
 
 from django.template.response import TemplateResponse
-from django.http import HttpResponse
+from django.shortcuts import redirect
 import PyTS3
 from Teamspeak.models import TeamspeakServer
 from core.utils import get_config
@@ -28,7 +28,7 @@ def show_online(request):
     server = PyTS3.ServerQuery(serversettings.host, serversettings.queryport)
     server.connect()
     server.command('login', {'client_login_name': serversettings.queryuser, 'client_login_password': serversettings.querypass})
-    server.command('use', {'port': serversettings.voiceport})
+    server.command('use', {'port': str(serversettings.voiceport)})
     server.command('clientupdate', {'client_nickname': 'evewspace'})
 
     clientlist = server.command('clientlist -away')
@@ -40,29 +40,21 @@ def general_settings(request):
     Returns and processes the general settings section.
     """
     serversettings = TeamspeakServer.objects.get(id=1)
-    ts3hostname = serversettings.host.
-    Port = serversettings.voiceport
-    QueryLoginUsername = serversettings.queryuser
-    QueryLoginPasswort = serversettings.querypass
-    QueryPort = serversettings.queryport
 
     if request.method == "POST":
-        ts3hostname.value = request.POST['ts3hostname']
-        Port.value = int(request.POST['Port'])
-        QueryLoginUsername.value = request.POST['QueryLoginUsername']
-        QueryLoginPasswort.value = request.POST['QueryLoginPasswort']
-        QueryPort.value = int(request.POST['QueryPort'])
-        ts3hostname.save()
-        Port.save()
-        QueryLoginUsername.save()
-        QueryLoginPasswort.save()
-        QueryPort.save()
-        return HttpResponse()
+        serversettings.host = request.POST['ts3hostname']
+        serversettings.voiceport = int(request.POST['Port'])
+        serversettings.queryuser = request.POST['QueryLoginUsername']
+        serversettings.querypass = request.POST['QueryLoginPasswort']
+        serversettings.queryport = int(request.POST['QueryPort'])
+        serversettings.save()
+        return redirect('/settings/')
+
     return TemplateResponse(
         request, 'teamspeak_settings.html',
-        {'ts3hostname': ts3hostname.value,
-         'Port': Port.value,
-         'QueryLoginUsername': QueryLoginUsername.value,
-         'QueryLoginPasswort': QueryLoginPasswort.value,
-         'QueryPort': QueryPort.value}
+        {'ts3hostname': serversettings.host,
+         'Port': serversettings.voiceport,
+         'QueryLoginUsername': serversettings.queryuser,
+         'QueryLoginPasswort': serversettings.querypass,
+         'QueryPort': serversettings.queryport}
     )
