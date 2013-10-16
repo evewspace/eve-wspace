@@ -18,23 +18,7 @@ from core.models import ConfigEntry
 from Teamspeak.models import TeamspeakServer
 from core.utils import get_config
 
-defaults = [
-        ("TS3_HOSTNAME", "localhost"),
-        ("TS3_PORT", "9987"),
-        ("TS3_QUERYUSER", "baduser"),
-        ("TS3_QUERYPASS", "badpass"),
-        ("TS3_QUERYPORT", "10011"),
-        ]
-
 def load_defaults():
-    for setting in defaults:
-        config = ConfigEntry.objects.get_or_create(name=setting[0], user=None)[0]
-        config.value = setting[1]
-        config.save()
 
-    ts3 = TeamspeakServer.create(get_config("TS3_HOSTNAME", None).value,
-        get_config("TS3_QUERYUSER", None).value,
-        get_config("TS3_QUERYPASS", None).value,
-        get_config("TS3_QUERYPORT", None).value,
-        get_config("TS3_PORT", None).value)
+    ts3 = TeamspeakServer.create("localhost","9987","baduser","badpass","10011")
     ts3.save()
