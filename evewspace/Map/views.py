@@ -482,7 +482,6 @@ def bulk_sig_import(request, map_id, ms_id):
             if k < 75:
                 sig_id = utils.convert_signature_id(row[COL_SIG])
                 sig = Signature.objects.get_or_create(sigid=sig_id,
-                        modified_by=request.user,
                         system=map_system.system)[0]
                 sig = _update_sig_from_tsv(sig, row)
                 sig.modified_by = request.user
@@ -664,12 +663,16 @@ def manual_add_system(request, map_id, ms_id):
     A GET request gets a blank add system form with the provided MapSystem
     as top system. The form is then POSTed to the add_system view.
     """
+    try:
+        current_system = System.objects.get(name=request.eve_systemname)
+    except Exception:
+        current_system = " "
     top_map_system = get_object_or_404(MapSystem, pk=ms_id)
     systems = System.objects.all()
     wormholes = WormholeType.objects.all()
     return render(request, 'add_system_box.html',
                   {'topMs': top_map_system, 'sysList': systems,
-                   'whList': wormholes})
+                   'whList': wormholes,'newsystem': current_system})
 
 
 # noinspection PyUnusedLocal
