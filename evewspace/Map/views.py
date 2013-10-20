@@ -33,6 +33,7 @@ from django.db.models import Q
 from Map.models import *
 from Map import utils, signals
 from core.utils import get_config
+from POS.models import POS
 
 # Decorator to check map permissions. Takes request and map_id
 # Permissions are 0 = None, 1 = View, 2 = Change
@@ -663,10 +664,10 @@ def manual_add_system(request, map_id, ms_id):
     A GET request gets a blank add system form with the provided MapSystem
     as top system. The form is then POSTed to the add_system view.
     """
-    try:
+    if request.is_igb_trusted:
         current_system = System.objects.get(name=request.eve_systemname)
-    except Exception:
-        current_system = " "
+    else:
+        current_system = ""
     top_map_system = get_object_or_404(MapSystem, pk=ms_id)
     systems = System.objects.all()
     wormholes = WormholeType.objects.all()
