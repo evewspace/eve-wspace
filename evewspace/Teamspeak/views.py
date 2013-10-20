@@ -18,10 +18,15 @@
 
 from django.template.response import TemplateResponse
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required, permission_required
 import PyTS3
 from Teamspeak.models import TeamspeakServer
 from core.utils import get_config
 
+# TODO: Change login_required to the appropriate
+# permission_required when the permission UI is done
+
+@login_required
 def show_online(request):
     serversettings = TeamspeakServer.objects.get(id=1)
 
@@ -34,7 +39,7 @@ def show_online(request):
     clientlist = server.command('clientlist -away')
     return TemplateResponse(request, 'ts_userlist.html',{'clientlist': clientlist})
 
-#@permission_required('Map.map_admin')
+@login_required
 def general_settings(request):
     """
     Returns and processes the general settings section.
