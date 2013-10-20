@@ -58,11 +58,12 @@
     {% load humanize %}
     <ul class="visited"><li>First Visit: {{system.first_visited|naturaltime}}</li><li> Last Visit: {{system.last_visited|naturaltime}}</li></ul>
     <div class="detailsLeft">
-    {% if system.occupied or poses %}
+    {% if system.occupied or system.poses.all %}
     <div class="occupiedDiv label label-important">
         <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p>
+        Towers:
         <ul>
-            {% for pos in poses %}
+            {% for pos in system.poses.all %}
             <li>P:{{pos.planet}} &nbspM: {{pos.moon}} - {{pos.towertype.name}} - {{pos.corporation.name}} - 
                 {% if pos.status == 0 %}
 	            <span class="label label-info">Status: UNANCHORED</span>
