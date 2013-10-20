@@ -33,6 +33,7 @@ from django.db.models import Q
 from Map.models import *
 from Map import utils, signals
 from core.utils import get_config
+from POS.models import POS
 
 # Decorator to check map permissions. Takes request and map_id
 # Permissions are 0 = None, 1 = View, 2 = Change
