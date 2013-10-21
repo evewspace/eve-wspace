@@ -239,8 +239,14 @@ def add_system(request, map_id):
         )
         time_status = int(request.POST.get('timeStatus'))
         mass_status = int(request.POST.get('massStatus'))
-        top_bubbled = "1" == request.POST.get('topBubbled')
-        bottom_bubbled = "1" == request.POST.get('bottomBubbled')
+        if request.POST.get('topBubbled', '0') != "0":
+            top_bubbled = True
+        else:
+            top_bubbled = False
+        if request.POST.get('bottomBubbled', '0') != "0":
+            bottom_bubbled = True
+        else:
+            bottom_bubbled = False
         # Add System
         bottom_ms = current_map.add_system(
             request.user, bottom_sys,
