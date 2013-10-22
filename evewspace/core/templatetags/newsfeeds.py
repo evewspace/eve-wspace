@@ -37,6 +37,8 @@ def feed_items(feed, retry=False):
     data = cache.get('feed_%s' % feed.pk)
     if data:
         try:
+            if data == 'error':
+                return {'error': True}
             for entry in data['entries']:
                 try:
                     dt = datetime.fromtimestamp(mktime(entry['published_parsed']))

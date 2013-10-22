@@ -151,7 +151,10 @@ def update_feeds():
     Caches and updates RSS feeds in NewsFeeds.
     """
     for feed in NewsFeed.objects.all():
-        data = feedparser.parse(feed.url)
+        try:
+            data = feedparser.parse(feed.url)
+        except Exception:
+            data = 'error'
         cache.set('feed_%s' % feed.pk, data, 7200)
         feed.name = data['feed']['title']
         try:
