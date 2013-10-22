@@ -447,7 +447,7 @@ def _update_sig_from_tsv(signature, row):
     else:
         sig_type = None
 
-    if info and sig_type:
+    if sig_type:
         updated = True
 
     if sig_type:
