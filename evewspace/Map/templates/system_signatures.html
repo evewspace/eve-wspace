@@ -2,7 +2,6 @@
 <table class="table table-condensed sysSigsTable" cellspacing="0">
     <tr>
     <th>Actions</th>
-    <th title="Updated Since Downtme">Upd.</th>
     <th>Sig ID</th>
     <th>Type</th>
     <th>Info</th>
@@ -10,7 +9,8 @@
     <th title="Capital Escalation Tracking">Escl.</th>
     </tr>
     {% for sig in system.system.signatures.all %}
-    <tr {% if sig.owned_by %}class="success"{% endif %}>
+    <tr {% if sig.owned_by %}class="success"{% elif not sig.updated %} class="sig-not-updated"{% endif %}
+        title="{% if not sig.updated %}Not updated since downtime!{% else %}Updated {{sig.modified_time|naturaltime}} by {{sig.modified_by}}.{% endif %}">
         <td>
             <i class="icon-pencil" title="Edit" onclick="GetEditSignatureBox({{system.pk}}, {{sig.pk}}, {{system.pk}});"></i> &nbsp;
             <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> &nbsp; 
@@ -20,13 +20,6 @@
             <i class="icon-star-empty" title="Not Owned (Click to Own)" onclick="OwnSignature({{system.pk}}, {{sig.pk}});"></i>
             {% endif %}
         </td>
-        <td>
-            {% if sig.updated %}
-            <i class="icon-ok-sign" title="Updated {{sig.modified_time|naturaltime}} by {{sig.modified_by}}."></i> &nbsp
-            {% else %}
-                <i class="icon-remove-sign" title="Signature Not Updated"></i> &nbsp
-            {% endif %}
-            </td>
             <td><span class="signatureID">{{sig.sigid}}</span> </td>
             <td><span class="signatureType" onclick="GetSiteSpawns({{system.pk}}, {{sig.pk}});" title="{{sig.sigtype.longname}}">{{sig.sigtype.shortname}}</span></td>
             <td><span class="signatureInfo">{{sig.info}}</span></td>

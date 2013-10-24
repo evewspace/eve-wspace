@@ -36,23 +36,31 @@ def feed_items(feed, retry=False):
     items = []
     data = cache.get('feed_%s' % feed.pk)
     if data:
-        for entry in data['entries']:
-            try:
-                dt = datetime.fromtimestamp(mktime(entry['published_parsed']))
-            except KeyError:
-                dt = None
-            try:
-                url = entry['link']
-            except KeyError:
-                url = "#"
-            item = {'title': entry['title'].replace('&amp;', '&').replace('&#039;', "'"),
-                    'summary': entry['summary'],
-                    'time': dt,
-                    'url': url}
-            items.append(item)
+        try:
+            if data == 'error':
+                return {'error': True}
+            for entry in data['entries']:
+                try:
+                    dt = datetime.fromtimestamp(mktime(entry['published_parsed']))
+                except KeyError:
+                    dt = None
+                try:
+                    url = entry['link']
+                except KeyError:
+                    url = "#"
+                item = {'title': entry['title'].replace('&amp;', '&').replace('&#039;', "'"),
+                        'summary': entry['summary'],
+                        'time': dt,
+                        'url': url}
+                items.append(item)
+        except Exception:
+            return {'error': True}
     if not items and retry == False:
-        update_feeds()
-        return feed_items(feed, True)
+        try:
+            update_feeds()
+            return feed_items(feed, True)
+        except Exception:
+            return {'error': True}
     elif  not items and retry == True:
         return {'error': True}
     return {'items': items}
