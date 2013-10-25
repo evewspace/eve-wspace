@@ -22,6 +22,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 import PyTS3
 from Teamspeak.models import TeamspeakServer
 from core.utils import get_config
+from django.http import HttpResponse
 
 # TODO: Change login_required to the appropriate
 # permission_required when the permission UI is done
@@ -29,15 +30,17 @@ from core.utils import get_config
 @login_required
 def show_online(request):
     serversettings = TeamspeakServer.objects.get(id=1)
+    try:
+        server = PyTS3.ServerQuery(serversettings.host, serversettings.queryport)
+        server.connect()
+        server.command('login', {'client_login_name': serversettings.queryuser, 'client_login_password': serversettings.querypass})
+        server.command('use', {'port': str(serversettings.voiceport)})
+        server.command('clientupdate', {'client_nickname': 'evewspace'})
+        clientlist = server.command('clientlist -away')
+        return TemplateResponse(request, 'ts_userlist.html',{'clientlist': clientlist})
+    except Exception as e:
+        return HttpResponse('%s' % (e), content_type="text/plain")
 
-    server = PyTS3.ServerQuery(serversettings.host, serversettings.queryport)
-    server.connect()
-    server.command('login', {'client_login_name': serversettings.queryuser, 'client_login_password': serversettings.querypass})
-    server.command('use', {'port': str(serversettings.voiceport)})
-    server.command('clientupdate', {'client_nickname': 'evewspace'})
-
-    clientlist = server.command('clientlist -away')
-    return TemplateResponse(request, 'ts_userlist.html',{'clientlist': clientlist})
 
 @login_required
 def general_settings(request):
