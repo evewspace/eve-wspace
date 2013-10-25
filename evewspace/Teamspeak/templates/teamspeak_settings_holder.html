@@ -15,29 +15,6 @@
 //    you should have received a copy of the gnu general public license
 //    along with this program.  if not, see <http://www.gnu.org/licenses/>.
 
-$(document).ready(function(){
-    GetTSSettings();
-});
-
-function GetTSSettings(){
-    $.ajax({
-       type: "GET",
-       url: "/teamspeak/settings/general/",
-       success: function(data){
-           $("#ts3generalsettings").html(data);
-       },
-       error: function(data){
-            alert("There was an error loading the general settings.");
-       }
-    });
-}
-
-function SaveTSSettings(){
-    $.ajax({
-        type: "POST",
-        data: $('#ts3GeneralSettingsForm').serialize(),
-        url: "/teamspeak/settings/general/",
-        //success: function(){GetGeneralSettings();},
-        //error: function(){alert("Invalid values, please make sure only integers are used.");}
-    });
-}
+<script type="text/javascript" src=/static/js/ts_settings.js></script>
+<div id="ts3generalsettings" class="accordion-body collapse">
+</div>
