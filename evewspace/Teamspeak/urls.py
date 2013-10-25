@@ -18,7 +18,6 @@ from django.conf.urls.defaults import patterns,include, url
 
 settingspatterns = patterns('Teamspeak.views',
         url(r'^general/$', 'general_settings'),
-        url(r'^holder/$', 'settings_holder'),
         )
 
 urlpatterns = patterns('Teamspeak.views',

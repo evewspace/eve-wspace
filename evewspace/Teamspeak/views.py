@@ -63,7 +63,3 @@ def general_settings(request):
          'QueryLoginPasswort': serversettings.querypass,
          'QueryPort': serversettings.queryport}
     )
-
-@login_required
-def settings_holder(request):
-    return TemplateResponse(request, 'teamspeak_settings_holder.html')
