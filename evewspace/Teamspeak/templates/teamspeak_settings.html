@@ -3,25 +3,32 @@
     <table>
         <tr>
             <td>Hostname of TS3 Server:</td>
-            <td><input type="text" class="input-mini" name="ts3hostname" value="{{ts3hostname}}"></td>
+            <td><input type="text" class="input" name="ts3hostname" value="{{ts3hostname}}"></td>
         </tr>
         <tr>
             <td>Port of the TS3 Server:</td>
-            <td><input type="text" class="input-mini" name="Port" value="{{Port}}"></td>
+            <td><input type="text" class="input" name="Port" value="{{Port}}"></td>
         </tr>
         <tr>
             <td>Query Login Username:</td>
-            <td> <input type="text" class="input-mini" name="QueryLoginUsername" value="{{QueryLoginUsername}}"></td>
+            <td> <input type="text" class="input" name="QueryLoginUsername" value="{{QueryLoginUsername}}"></td>
         </tr>
         <tr>
             <td>Query Login Password:</td>
-            <td> <input type="text" class="input-mini" name="QueryLoginPasswort" value="{{QueryLoginPasswort}}"></td>
+            <td> <input type="text" class="input" name="QueryLoginPasswort" value="{{QueryLoginPasswort}}"></td>
         </tr>
         <tr>
             <td>Query Port:</td>
-            <td> <input type="text" class="input-mini" name="QueryPort" value="{{QueryPort}}"></td>
+            <td> <input type="text" class="input" name="QueryPort" value="{{QueryPort}}"></td>
         </tr>
     </table>
     <br />
     <input type="submit" class="btn btn-primary" value="Save Changes">
 </form>
+<script type="text/javascript">
+    $('ts3pGeneralSettingsForm').submit(function(e){
+                e.preventDefault();
+                SaveTSSettings();
+                return false;
+            });
+</script>
