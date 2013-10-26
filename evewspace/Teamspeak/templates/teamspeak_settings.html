@@ -1,3 +1,9 @@
+{% if saved %}
+<div class="alert alert-success" style="max-width: 600px;">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>TS Settings Saved</strong>
+</div>
+{% endif %}
 <form id="ts3GeneralSettingsForm" action="/teamspeak/settings/general/" method="post">
     {% csrf_token %}
     <table>
@@ -15,7 +21,7 @@
         </tr>
         <tr>
             <td>Query Login Password:</td>
-            <td> <input type="text" class="input" name="QueryLoginPasswort" value="{{QueryLoginPasswort}}"></td>
+            <td> <input type="password" class="input" name="QueryLoginPasswort" value=""> (Blank to leave unchanged)</td>
         </tr>
         <tr>
             <td>Query Port:</td>
@@ -26,7 +32,7 @@
     <input type="submit" class="btn btn-primary" value="Save Changes">
 </form>
 <script type="text/javascript">
-    $('ts3pGeneralSettingsForm').submit(function(e){
+    $('#ts3GeneralSettingsForm').submit(function(e){
                 e.preventDefault();
                 SaveTSSettings();
                 return false;

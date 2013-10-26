@@ -37,7 +37,9 @@ function SaveTSSettings(){
         type: "POST",
         data: $('#ts3GeneralSettingsForm').serialize(),
         url: "/teamspeak/settings/general/",
-        //success: function(){GetGeneralSettings();},
-        //error: function(){alert("Invalid values, please make sure only integers are used.");}
+        success: function(data){
+            $("#ts3generalsettings").html(data);             
+        },
+        error: function(){alert("Invalid values, please make sure only integers are used.");}
     });
 }

@@ -48,15 +48,16 @@ def general_settings(request):
     Returns and processes the general settings section.
     """
     serversettings = TeamspeakServer.objects.get(id=1)
-
+    saved = False
     if request.method == "POST":
         serversettings.host = request.POST['ts3hostname']
         serversettings.voiceport = int(request.POST['Port'])
         serversettings.queryuser = request.POST['QueryLoginUsername']
-        serversettings.querypass = request.POST['QueryLoginPasswort']
+        if request.POST['QueryLoginPasswort'] != '':
+            serversettings.querypass = request.POST['QueryLoginPasswort']
         serversettings.queryport = int(request.POST['QueryPort'])
         serversettings.save()
-        return redirect('/settings/')
+        saved = True
 
     return TemplateResponse(
         request, 'teamspeak_settings.html',
@@ -64,5 +65,6 @@ def general_settings(request):
          'Port': serversettings.voiceport,
          'QueryLoginUsername': serversettings.queryuser,
          'QueryLoginPasswort': serversettings.querypass,
-         'QueryPort': serversettings.queryport}
+         'QueryPort': serversettings.queryport,
+         'saved': saved}
     )
