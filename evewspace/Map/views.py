@@ -1076,3 +1076,15 @@ def global_permissions(request):
 
     return TemplateResponse(request, 'global_perms.html',
                             {'groups': group_list})
+
+
+@require_map_permission(permission=2)
+def purge_signatures(request, map_id, ms_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    mapsys = get_object_or_404(MapSystem, pk=ms_id)
+    if request.method == "POST":
+        mapsys.system.signatures.all().delete()
+        return HttpResponse()
+    else:
+        return HttpResponse(status=400)

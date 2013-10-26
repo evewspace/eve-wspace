@@ -380,6 +380,21 @@ function EditSignature(msID, sigID){
 }
 
 
+function PurgeSignatures(msID){
+    address = "system/" + msID + "/signatures/purge/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        success: function(data){
+            LoadSignatures(msID, false);
+        },
+        error: function(err){
+            alert("Unable to purge signatures: \n\n" + err.responseText);
+        }
+    });
+}
+
+
 function OwnSignature(msID, sigID){
     address = "system/" + msID + "/signatures/" + sigID + "/own/";
     $.ajax({

@@ -119,6 +119,7 @@
                 <div style="margin-bottom: 10px; text-align: center;">
                     <h4>Signatures: {{system.name}}</h4>
                     <button class="btn" onclick="GetBulkImport({{mapsys.pk}});"><i class="icon-download"></i> Bulk Import</button>
+                    <button class="btn btn-danger" onclick="PurgeSignatures({{mapsys.pk}});">Purge Signatures</button>
                 </div>
                 <div id="sys{{mapsys.pk}}SigAddForm">
                 </div>
