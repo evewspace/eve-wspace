@@ -10,7 +10,7 @@
 
 {% block content %}
 <div class="registerBox">
-    <form method="post" action="{% url account.views.register %}">
+    <form method="post" action="{% url 'account.views.register' %}">
     {% csrf_token %}
     {{ form.as_ul }}
     <input class="btn btn-primary btn-large" type="submit" value="Register" />

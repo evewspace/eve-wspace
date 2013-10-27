@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
 
 key_patterns = patterns('API.views',
         url(r'^delete/$', 'delete_key'),

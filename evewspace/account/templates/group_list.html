@@ -23,6 +23,7 @@
         <button class="btn btn-mini btn-danger" id="groupNextLink">next</button>
     {% endif %}
     <script type="text/javascript">
+        {% if group_list.number != 1 %}
         $('#groupPreviousLink').click(function(){
                 $.ajax({
                     url: "/account/admin/group/list/{{group_list.previous_page_number}}/",
@@ -36,7 +37,9 @@
                         $('#groupTableHolder').html(data);
                     }
                     });
-               });
+                });
+        {% endif %}
+        {% if group_list.has_next %}
          $('#groupNextLink').click(function(){
                 $.ajax({
                     url: "/account/admin/group/list/{{group_list.next_page_number}}/",
@@ -51,5 +54,6 @@
                     }
                     });
                 });
+        {% endif %}
     </script>
 </div>

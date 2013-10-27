@@ -27,6 +27,7 @@
         <button class="btn btn-mini btn-danger" id="userNextLink">next</button>
     {% endif %}
     <script type="text/javascript">
+    {% if member_list.number != 1 %}
         $('#userPreviousLink').click(function(){
                 $.ajax({
                     url: "/account/admin/user/list/{{member_list.previous_page_number}}/",
@@ -40,8 +41,9 @@
                         $('#userTableHolder').html(data);
                     }
                     });
-               });
-         $('#userNextLink').click(function(){
+                });
+        {% endif %}
+        $('#userNextLink').click(function(){
                 $.ajax({
                     url: "/account/admin/user/list/{{member_list.next_page_number}}/",
                     {% if filter %}
