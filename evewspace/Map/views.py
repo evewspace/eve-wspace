@@ -412,9 +412,9 @@ def manual_location(request, map_id, ms_id):
             old_sys.remove_active_pilot(request.user.pk)
     map_sys = get_object_or_404(MapSystem, pk=ms_id)
     map_sys.system.add_active_pilot(request.user.username, request.user.pk,
-            'OGB Browser', 'Unknown', 'Unknown')
+            'OOG Browser', 'Unknown', 'Unknown')
     request.user.get_profile().update_location(map_sys.system.pk, request.user.pk,
-            'OGB Browser', 'Unknown', 'Unknown')
+            'OOG Browser', 'Unknown', 'Unknown')
     return HttpResponse()
 
 

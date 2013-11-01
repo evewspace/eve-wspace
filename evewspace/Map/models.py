@@ -153,15 +153,15 @@ class System(SystemData):
             cache.set(sys_cache_key, sys_location_dict, 15 * 60)
         return True
 
-    def _active_pilot_count(self):
+    def _active_pilot_list(self):
         sys_cache_key = 'sys_%s_locations' % self.pk
         sys_location_dict = cache.get(sys_cache_key)
         if sys_location_dict:
-            return len(sys_location_dict)
+            return sys_location_dict
         else:
-            return 0
+            return {}
 
-    pilot_count = property(_active_pilot_count)
+    pilot_list = property(_active_pilot_list)
 
 
 class KSystem(System):
