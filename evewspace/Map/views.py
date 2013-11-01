@@ -130,41 +130,44 @@ def _checkin_igb_trusted(request, current_map):
     containing the html for a system add dialog if we detect that a new system
     needs to be added
     """
-    current_system = System.objects.get(name=request.eve_systemname)
-    old_system = None
+    current_location = (request.eve_systemid, request.eve_charname,
+            request.eve_shipname, request.eve_shiptypename)
+    char_cache_key = 'char_%s_location' % request.eve_charid
+    old_location = cache.get(char_cache_key)
     result = None
-    threshold = datetime.now(pytz.utc) - timedelta(minutes=5)
-    recently_active = request.user.locations.filter(
-        timestamp__gt=threshold,
-        charactername=request.eve_charname
-    ).all()
+    print old_location
 
-    if recently_active.count():
-        old_system = request.user.locations.get(
-            charactername=request.eve_charname
-        ).system
-
+    if old_location != current_location:
+        if old_location:
+            old_system = get_object_or_404(System, pk=old_location[0])
+            old_system.remove_active_pilot(request.eve_charid)
+        current_system = get_object_or_404(System, pk=current_location[0])
+        current_system.add_active_pilot(request.user.username,
+                request.eve_charid, request.eve_charname, request.eve_shipname,
+                request.eve_shiptypename)
+        request.user.get_profile().update_location(current_system.pk,
+                request.eve_charid, request.eve_charname, request.eve_shipname,
+                request.eve_shiptypename)
+        cache.set(char_cache_key, current_location, 60 * 5)
     #Conditions for the system to be automagically added to the map.
-    if (
-        old_system in current_map
-        and current_system not in current_map
-        and not _is_moving_from_kspace_to_kspace(old_system, current_system)
-        and recently_active.count()
-    ):
-        context = {
-            'oldsystem': current_map.systems.filter(
-                system=old_system).all()[0],
-            'newsystem': current_system,
-            'wormholes': utils.get_possible_wh_types(old_system,
-                                                     current_system),
-        }
+        if (old_location and
+            old_system in current_map
+            and current_system not in current_map
+            and not _is_moving_from_kspace_to_kspace(old_system, current_system)
+        ):
+            context = {
+                'oldsystem': current_map.systems.filter(
+                    system=old_system).all()[0],
+                'newsystem': current_system,
+                'wormholes': utils.get_possible_wh_types(old_system,
+                                                         current_system),
+            }
 
-        result = render_to_string('igb_system_add_dialog.html', context,
-                                  context_instance=RequestContext(request))
+            result = render_to_string('igb_system_add_dialog.html', context,
+                                      context_instance=RequestContext(request))
+    else:
+        cache.set(char_cache_key, current_location, 60 * 5)
 
-    current_system.add_active_pilot(request.user, request.eve_charname,
-                                    request.eve_shipname,
-                                    request.eve_shiptypename)
     return result
 
 
@@ -202,9 +205,12 @@ def get_system_context(ms_id):
         interest = map_system.interesttime
         # Include any SiteTracker fleets that are active
     st_fleets = map_system.system.stfleets.filter(ended=None).all()
+    locations = cache.get('sys_%s_locations' % map_system.system.pk)
+    if not locations:
+        locations = {}
     return {'system': system, 'mapsys': map_system,
             'scanwarning': scan_warning, 'isinterest': interest,
-            'stfleets': st_fleets}
+            'stfleets': st_fleets, 'locations': locations}
 
 
 @login_required
@@ -389,13 +395,20 @@ def manual_location(request, map_id, ms_id):
     being active in that system.
 
     """
-    if request.is_ajax():
-        map_system = get_object_or_404(MapSystem, pk=ms_id)
-        map_system.system.add_active_pilot(request.user, "OOG Browser",
-                                           "Unknown", "Uknown")
-        return HttpResponse()
-    else:
+    if not request.is_ajax():
         raise PermissionDenied
+    user_locations = cache.get('user_%s_locations' % request.user.pk)
+    if user_locations:
+        old_location = user_locations.pop(request.user.pk, None)
+        if old_location:
+            old_sys = get_object_or_404(System, pk=old_location[0])
+            old_sys.remove_active_pilot(request.user.pk)
+    map_sys = get_object_or_404(MapSystem, pk=ms_id)
+    map_sys.system.add_active_pilot(request.user.username, request.user.pk,
+            'OGB Browser', 'Unknown', 'Unknown')
+    request.user.get_profile().update_location(map_sys.system.pk, request.user.pk,
+            'OGB Browser', 'Unknown', 'Unknown')
+    return HttpResponse()
 
 
 # noinspection PyUnusedLocal

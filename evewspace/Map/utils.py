@@ -61,7 +61,7 @@ class MapJSONGenerator(object):
     @staticmethod
     def get_cache_key(map_inst):
         return '%s_map' % map_inst.pk
-    
+
     def get_path_to_map_system(self, system):
         """
         Returns a list of MapSystems on the route between the map root and
@@ -85,8 +85,11 @@ class MapJSONGenerator(object):
         pvp_threshold = self.pvp_threshold
         npc_threshold = self.npc_threshold
         staticPrefix = "%s" % (settings.STATIC_URL + "images/")
-        if system.system.active_pilots.filter(user=self.user).exists():
-            return staticPrefix + "mylocation.png"
+        user_locations_dict = cache.get('user_%s_locations' % self.user.pk)
+        if user_locations_dict and type(user_locations_dict) == type(dict()):
+            for charid, location in user_locations_dict.items():
+                if location[0] == system.system.pk:
+                    return staticPrefix + "mylocation.png"
 
         if system.system.stfleets.filter(ended__isnull=True).exists():
             return staticPrefix + "farm.png"
@@ -128,7 +131,7 @@ class MapJSONGenerator(object):
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
                     'interestpath': path, 'ParentID': system.parentsystem.pk,
-                    'activePilots': system.system.active_pilots.count(),
+                    'activePilots': system.system.pilot_count,
                     'WhToParent': parentWH.bottom_type.name,
                     'WhFromParent': parentWH.top_type.name,
                     'WhMassStatus': parentWH.mass_status,
@@ -143,8 +146,8 @@ class MapJSONGenerator(object):
                     'LevelX': levelX,
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
+                    'activePilots': system.system.pilot_count,
                     'interestpath': path, 'ParentID': None,
-                    'activePilots': system.system.active_pilots.count(),
                     'WhToParent': "", 'WhFromParent': "",
                     'WhMassStatus': None, 'WhTimeStatus': None,
                     'WhToParentBubbled': None, 'WhFromParentBubbled': None,
