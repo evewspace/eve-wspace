@@ -29,6 +29,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, Permission
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
+from django.views.decorators.cache import cache_page
 
 from Map.models import *
 from Map import utils, signals
@@ -309,6 +310,7 @@ def system_menu(request, map_id, ms_id):
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=1)
+@cache_page(5)
 def system_tooltips(request, map_id):
     """
     Returns the system tooltips for map_id
@@ -324,6 +326,7 @@ def system_tooltips(request, map_id):
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=1)
+@cache_page(5)
 def wormhole_tooltips(request, map_id):
     """Takes a POST request from AJAX with a Wormhole ID and renders the
     wormhole tooltip for that ID to response.
@@ -602,6 +605,7 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
 # noinspection PyUnusedLocal
 @login_required()
 @require_map_permission(permission=1)
+@cache_page(1)
 def get_signature_list(request, map_id, ms_id):
     """
     Determines the proper escalationThreshold time and renders
