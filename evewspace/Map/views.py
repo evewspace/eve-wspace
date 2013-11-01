@@ -93,12 +93,16 @@ def map_checkin(request, map_id):
         dialog_html = _checkin_igb_trusted(request, current_map)
         if dialog_html is not None:
             json_values.update({'dialogHTML': dialog_html})
-
-    log_list = MapLog.objects.filter(timestamp__gt=load_time,
+    log_cache = cache.get('map_%s_log_string' % current_map.pk)
+    if not log_cache:
+        log_list = MapLog.objects.filter(timestamp__gt=load_time,
                                           visible=True,
                                           map=current_map)
 
-    log_string = render_to_string('log_div.html', {'logs': log_list})
+        log_string = render_to_string('log_div.html', {'logs': log_list})
+        cache.set('map_%s_log_string' % current_map.pk, log_string, 10)
+    else:
+        log_string = log_cache
     json_values.update({'logs': log_string})
 
     return HttpResponse(json.dumps(json_values), mimetype="application/json")
