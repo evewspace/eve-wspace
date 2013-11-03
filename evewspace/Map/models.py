@@ -503,7 +503,7 @@ class Signature(models.Model):
 
     def delete(self, *args, **kwargs):
         self.system.clear_sig_cache()
-        super(Signature, self).save(*args, **kwargs)
+        super(Signature, self).delete(*args, **kwargs)
 
 class MapPermission(models.Model):
     """
