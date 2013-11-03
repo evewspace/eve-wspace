@@ -36,6 +36,7 @@ var clearWhColor = "#00FF00"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
 var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
+var silentSystem = false; // Are systems added automatically wihthout a pop-up?
 
 $(document).ready(function(){
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
@@ -61,10 +62,14 @@ $(document).ready(function(){
 
 function processAjax(data){
     if (data.dialogHTML){
+        if (data.dialogHTML !== 'silent'){
                 $('#modalHolder').empty();
                 $('#modalHolder').html(data.dialogHTML);
                 $('#modalHolder').modal('show');
-            }
+        }else{
+            RefreshMap();
+        }
+    }
     if (data.logs){
         $('#logDiv').empty();
         $('#logDiv').html(data.logs);
@@ -78,7 +83,7 @@ function doMapAjaxCheckin() {
     $.ajax({
         type: "POST",
         url: currentpath,
-        data: {"loadtime": loadtime},
+        data: {"loadtime": loadtime, "silent": silentSystem},
         success: processAjax,
         error: function(error){
             alert('An error ocurred posting back to the server: \n\n' + error.responseText);
@@ -90,6 +95,30 @@ function doMapAjaxCheckin() {
 function HideSystemDetails(){
     clearTimeout(sigTimerID);
     $('#sysInfoDiv').empty();
+}
+
+
+function ToggleSilentAdd(){
+    if (silentSystem === false){
+        silentSystem = true;
+        $('#btnSilentAdd').text('Silent IGB Mapping: ON');
+    }else{
+        silentSystem = false;
+        $('#btnSilentAdd').text('Silent IGB Mapping: OFF');
+    }
+}
+
+
+function ToggleAutoRefresh(){
+    if (autoRefresh === true){
+        autoRefresh = false;
+        clearTimeout(refreshTimerID);
+        $('#btnRefreshToggle').text('Auto Refresh: OFF');
+    }else{
+        autoRefresh = true;
+        refreshTimerID = setInterval(RefreshMap, 15000);
+        $('#btnRefreshToggle').text('Auto Refresh: ON');
+    }
 }
 
 

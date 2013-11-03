@@ -163,8 +163,15 @@ def _checkin_igb_trusted(request, current_map):
                                                          current_system),
             }
 
-            result = render_to_string('igb_system_add_dialog.html', context,
+            if not request.POST.get('silent', False):
+                result = render_to_string('igb_system_add_dialog.html', context,
                                       context_instance=RequestContext(request))
+            else:
+                new_ms = current_map.add_system(request.user, current_system, '',
+                        context['oldsystem'])
+                k162_type = WormholeType.objects.get(name="K162")
+                new_ms.connect_to(context['oldsystem'], k162_type, k162_type)
+                result = 'silent'
     else:
         cache.set(char_cache_key, current_location, 60 * 5)
 
