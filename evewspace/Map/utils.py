@@ -165,16 +165,17 @@ class MapJSONGenerator(object):
             root = self.systems[None][0]
             syslist = [self.system_to_dict(root, 0),]
             self.recursive_system_data_generator(root, syslist, 1)
-            cached = json.dumps(syslist, sort_keys=True)
+            cached = syslist
             cache.set(cache_key, cached, 15)
 
-        user_img = "%s/images/mylocation.png" % (settings.STATIC_URL)
         user_locations_dict = cache.get('user_%s_locations' % self.user.pk)
-        user_locations = [i[1][0] for i in user_locations_dict.items()]
-        for system in cached:
-            if system['sysid'] in user_locations and system['imageURL'] == None:
-                system['imageURL'] = user_img
-        return cached
+        if user_locations_dict:
+            user_img = "%s/images/mylocation.png" % (settings.STATIC_URL)
+            user_locations = [i[1][0] for i in user_locations_dict.items()]
+            for system in cached:
+                if system['sysID'] in user_locations and system['imageURL'] == None:
+                    system['imageURL'] = user_img
+        return json.dumps(cached, sort_keys=True)
 
     def recursive_system_data_generator(self, start_sys, syslist, levelX):
         """
