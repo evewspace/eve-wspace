@@ -80,7 +80,7 @@ def map_checkin(request, map_id):
     current_map = get_object_or_404(Map, pk=map_id)
 
     # AJAX requests should post a JSON datetime called loadtime
-#     # back that we use to get recent logs.
+    # back that we use to get recent logs.
     if 'loadtime' not in request.POST:
         return HttpResponse(json.dumps({'error': "No loadtime"}),
                             mimetype="application/json")
@@ -309,23 +309,28 @@ def system_menu(request, map_id, ms_id):
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=1)
-@cache_page(5)
 def system_tooltips(request, map_id):
     """
     Returns the system tooltips for map_id
     """
     if not request.is_ajax():
         raise PermissionDenied
-    ms_list = MapSystem.objects.filter(map_id=map_id)\
-                    .select_related('parent_wormhole', 'system__region')\
-                    .iterator()
-    return render(request, 'system_tooltip.html', {'map_systems': ms_list})
-
+    cache_key = 'map_%s_sys_tooltip' % map_id
+    cached_tips = cache.get(cache_key)
+    if not cached_tips:
+        ms_list = MapSystem.objects.filter(map_id=map_id)\
+                        .select_related('parent_wormhole', 'system__region')\
+                        .iterator()
+        new_tips =  render_to_string('system_tooltip.html',
+                {'map_systems': ms_list}, RequestContext(request))
+        cache.set(cache_key, new_tips, 60)
+        return HttpResponse(new_tips)
+    else:
+        return HttpResponse(cached_tips)
 
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=1)
-@cache_page(5)
 def wormhole_tooltips(request, map_id):
     """Takes a POST request from AJAX with a Wormhole ID and renders the
     wormhole tooltip for that ID to response.
@@ -333,10 +338,18 @@ def wormhole_tooltips(request, map_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-    cur_map = get_object_or_404(Map, pk=map_id)
-    ms_list = MapSystem.objects.filter(map=cur_map).all()
-    whs = Wormhole.objects.filter(top__in=ms_list).all()
-    return render(request, 'wormhole_tooltip.html', {'wormholes': whs})
+    cache_key = 'map_%s_wh_tooltip' % map_id
+    cached_tips = cache.get(cache_key)
+    if not cached_tips:
+        cur_map = get_object_or_404(Map, pk=map_id)
+        ms_list = MapSystem.objects.filter(map=cur_map).all()
+        whs = Wormhole.objects.filter(top__in=ms_list).all()
+        new_tips = render_to_string('wormhole_tooltip.html',
+                {'wormholes': whs}, RequestContext(request))
+        cache.set(cache_key, new_tips, 60)
+        return HttpResponse(new_tips)
+    else:
+        return HttpResponse(cached_tips)
 
 
 # noinspection PyUnusedLocal
