@@ -423,6 +423,7 @@ def manual_location(request, map_id, ms_id):
             'OOG Browser', 'Unknown', 'Unknown')
     request.user.get_profile().update_location(map_sys.system.pk, request.user.pk,
             'OOG Browser', 'Unknown', 'Unknown')
+    map_sys.map.clear_caches()
     return HttpResponse()
 
 
@@ -448,6 +449,7 @@ def set_interest(request, map_id, ms_id):
             system.interesttime = None
             system.save()
             return HttpResponse()
+        system.map.clear_caches()
         return HttpResponse(status=418)
     else:
         raise PermissionDenied

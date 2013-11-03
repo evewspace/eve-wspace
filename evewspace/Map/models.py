@@ -163,6 +163,9 @@ class System(SystemData):
 
     pilot_list = property(_active_pilot_list)
 
+    def clear_sig_cache(self):
+        cache.delete('sys_%s_sig_list' % self.pk)
+
 
 class KSystem(System):
     sov = models.CharField(max_length = 100)
@@ -289,6 +292,14 @@ class Map(models.Model):
         self.add_log(user, "Created Snapshot: %s" % (name))
         return result
 
+    def clear_caches(self):
+        """
+        Clears the tooltip and json caches for the map.
+        """
+        cache.delete('map_%s_wh_tooltip' % self.pk)
+        cache.delete('map_%s_sys_tooltip' % self.pk)
+        cache.delete(MapJSONGenerator.get_cache_key(self))
+
 class MapSystem(models.Model):
     """
     Stores information regarding which systems are active in which maps
@@ -321,12 +332,11 @@ class MapSystem(models.Model):
 
     def save(self, *args, **kwargs):
         self.friendlyname = self.friendlyname.upper()
-        cache.delete('map_%s_sys_tooltip' % self.map_id)
-        cache.delete(MapJSONGenerator.get_cache_key(self.map))
+        self.map.clear_caches()
         super(MapSystem, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        cache.delete(MapJSONGenerator.get_cache_key(self.map))
+        self.map.clear_caches()
         super(MapSystem, self).delete(*args, **kwargs)
 
     def remove_system(self, user):
@@ -368,12 +378,15 @@ class Wormhole(models.Model):
     collapsed = models.NullBooleanField(null=True)
 
     def save(self, *args, **kwargs):
+        self.map.clear_caches()
         if self.time_status == 1 and not self.eol_time:
             self.eol_time = datetime.now(pytz.utc)
         elif self.time_status != 1:
             self.eol_time = None
-        cache.delete(MapJSONGenerator.get_cache_key(self.map))
-        cache.delete('map_%s_wh_tooltip' % self.map_id)
+        super(Wormhole, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.map.clear_caches()
         super(Wormhole, self).save(*args, **kwargs)
 
 class SignatureType(models.Model):
@@ -484,7 +497,12 @@ class Signature(models.Model):
         """
         Ensure that Sig IDs are proper.
         """
+        self.system.clear_sig_cache()
         self.sigid = utils.convert_signature_id(self.sigid)
+        super(Signature, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.system.clear_sig_cache()
         super(Signature, self).save(*args, **kwargs)
 
 class MapPermission(models.Model):
