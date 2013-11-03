@@ -289,6 +289,7 @@ class MapSystem(models.Model):
 
     def save(self, *args, **kwargs):
         self.friendlyname = self.friendlyname.upper()
+        cache.delete('map_%s_sys_tooltip' % self.map_id)
         cache.delete(MapJSONGenerator.get_cache_key(self.map))
         super(MapSystem, self).save(*args, **kwargs)
 
@@ -336,6 +337,7 @@ class Wormhole(models.Model):
         elif self.time_status != 1:
             self.eol_time = None
         cache.delete(MapJSONGenerator.get_cache_key(self.map))
+        cache.delete('map_%s_wh_tooltip' % self.map_id)
         super(Wormhole, self).save(*args, **kwargs)
 
 class SignatureType(models.Model):
