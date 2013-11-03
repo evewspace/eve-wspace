@@ -390,6 +390,8 @@ function PurgeSignatures(msID){
         type: "POST",
         success: function(data){
             LoadSignatures(msID, false);
+            $('#btnReallyPurgeSigs').hide();
+            $('#btnPurgeSigs').show();
         },
         error: function(err){
             alert("Unable to purge signatures: \n\n" + err.responseText);

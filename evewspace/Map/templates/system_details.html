@@ -119,7 +119,14 @@
                 <div style="margin-bottom: 10px; text-align: center;">
                     <h4>Signatures: {{system.name}}</h4>
                     <button class="btn" onclick="GetBulkImport({{mapsys.pk}});"><i class="icon-download"></i> Bulk Import</button>
-                    <button class="btn btn-danger" onclick="PurgeSignatures({{mapsys.pk}});">Purge Signatures</button>
+                    <button id="btnPurgeSigs" class="btn btn-danger">Purge Signatures</button>
+                    <button id="btnReallyPurgeSigs" class="btn btn-warning" style="display: none;"  onclick="PurgeSignatures({{mapsys.pk}});">Really Purge?</button>
+                    <script type="text/javascript">
+                        $('#btnPurgeSigs').click(function(){
+                                $('#btnReallyPurgeSigs').show();
+                                $('#btnPurgeSigs').hide();
+                                });
+                    </script>
                 </div>
                 <div id="sys{{mapsys.pk}}SigAddForm">
                 </div>
