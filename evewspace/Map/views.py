@@ -163,7 +163,7 @@ def _checkin_igb_trusted(request, current_map):
                                                          current_system),
             }
 
-            if not request.POST.get('silent', False):
+            if request.POST.get('silent', 'false') != 'true':
                 result = render_to_string('igb_system_add_dialog.html', context,
                                       context_instance=RequestContext(request))
             else:
@@ -268,7 +268,7 @@ def add_system(request, map_id):
         # Add Wormhole
         bottom_ms.connect_to(top_ms, top_type, bottom_type, top_bubbled,
                              bottom_bubbled, time_status, mass_status)
-
+        current_map.clear_caches()
         return HttpResponse()
     except ObjectDoesNotExist:
         return HttpResponse(status=400)
