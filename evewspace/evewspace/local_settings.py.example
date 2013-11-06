@@ -12,6 +12,12 @@ SECRET_KEY = 'alan_please_add_secret_key'
 
 STATIC_ROOT = "/home/maptool/static/"
 
+# Put the host name or IP address of all servers that can access the site
+# directly. If you use a reverse proxy, this should be the proxy server
+# address (most likely localhost). The default setting may be insecure.
+
+ALLOWED_HOSTS = ['*',]
+
 # Put your DB details here
 
 DATABASES = {

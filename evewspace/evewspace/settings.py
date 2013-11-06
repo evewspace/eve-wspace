@@ -11,7 +11,7 @@ import djcelery
 djcelery.setup_loader()
 
 BROKER_URL = 'amqp://guest:guest@localhost:5672/'
-
+ALLOWED_HOSTS = ['*',]
 from datetime import timedelta
 from celery.schedules import crontab
 CELERYBEAT_SCHEDULE = {
