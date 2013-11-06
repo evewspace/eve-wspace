@@ -49,7 +49,7 @@ class Request(models.Model):
     originuser = models.ForeignKey(User, related_name="cartrequests")
     totalcost = models.BigIntegerField()
     itemcount = models.IntegerField()
-    corprequest = models.BooleanField()
+    corprequest = models.BooleanField(default=False)
     daterequested = models.DateTimeField(auto_now_add=True)
     datefilled = models.DateTimeField(blank=True, null=True)
     fillcost = models.BigIntegerField(blank=True, null=True)

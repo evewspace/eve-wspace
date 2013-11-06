@@ -143,7 +143,7 @@ class SiteType(models.Model):
     shortname = models.CharField(max_length=8, unique=True)
     longname = models.CharField(max_length=80, unique=True)
     # Defunct site types are maintained in the databse for relational purposes but can no longer be credited
-    defunct = models.BooleanField()
+    defunct = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.longname
@@ -208,7 +208,7 @@ class UserSite(models.Model):
     """Represents a user's credit for a site."""
     site = models.ForeignKey(SiteRecord, related_name="members")
     user = models.ForeignKey(User, related_name="sites")
-    pending = models.BooleanField()
+    pending = models.BooleanField(default=False)
 
     def approve(self):
         """
