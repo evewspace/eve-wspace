@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Eve W-Space: New Map{% endblock %}
 {% block content %}
-<form action="{% url Map.views.create_map %}" method="post">
+<form action="{% url 'Map.views.create_map' %}" method="post">
     {% csrf_token %}
     {{form.non_field_errors}}
     <table>

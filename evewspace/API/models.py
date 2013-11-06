@@ -34,7 +34,7 @@ class APIKey(models.Model):
     """API Key object relates to User and contains key id, vcode, and validation information."""
     keyid = models.IntegerField(primary_key=True)
     vcode = models.CharField(max_length=100)
-    valid = models.BooleanField()
+    valid = models.BooleanField(default=False)
     lastvalidated = models.DateTimeField()
     access_mask = models.IntegerField()
     proxykey = models.CharField(max_length=100, null=True, blank=True)
@@ -291,7 +291,7 @@ class APICharacter(models.Model):
     lastshipname = models.CharField(max_length=100, blank=True, null=True)
     lastshiptype = models.CharField(max_length=100, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
-    visible = models.NullBooleanField()
+    visible = models.NullBooleanField(default=False)
 
     class Meta:
         permissions = (("view_limited_data", "View limited character API."),

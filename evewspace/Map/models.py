@@ -194,7 +194,7 @@ class Map(models.Model):
     name = models.CharField(max_length = 100, unique = True)
     root = models.ForeignKey(System, related_name="root")
     # Maps with explicitperms = True require an explicit permission entry to access.
-    explicitperms = models.BooleanField()
+    explicitperms = models.BooleanField(default=False)
 
     class Meta:
         permissions = (("map_unrestricted", "Do not require excplicit access to maps."),
@@ -399,8 +399,8 @@ class SignatureType(models.Model):
     # sleepersite and escalatable are used to track wormhole comabt sites.
     # sleepersite = true should give a "Rats cleared" option
     # escalatable = true should cause escalation tracking to kick in in C5/6
-    sleeprsite = models.BooleanField()
-    escalatable = models.BooleanField()
+    sleeprsite = models.BooleanField(default=False)
+    escalatable = models.BooleanField(default=False)
 
     def __unicode__(self):
         """Returns short name as unicode representation"""
@@ -413,7 +413,7 @@ class Signature(models.Model):
     modified_by = models.ForeignKey(User, related_name="signatures", null=True)
     sigtype = models.ForeignKey(SignatureType, related_name="sigs", null=True, blank=True)
     sigid = models.CharField(max_length = 10)
-    updated = models.BooleanField()
+    updated = models.BooleanField(default=False)
     info = models.CharField(max_length=65, null=True, blank=True)
     # ratscleared and lastescalated are used to track wormhole combat sites.
     # ratscleared is the DateTime that sleepers were cleared initially
@@ -526,7 +526,7 @@ class MapLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=255)
     # Visible logs are pushed to clients as they ocurr (e.g. system added to map)
-    visible = models.BooleanField()
+    visible = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "Map: %s  User: %s  Action: %s  Time: %s" % (self.map.name, self.user.username,

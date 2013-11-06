@@ -39,7 +39,7 @@ class Application(models.Model):
     disposition = models.IntegerField(choices=((0,'Duplicate'), (1,'Accepted'),
         (2,'Rejected'), (3, 'Deferred')))
     intelclear = models.DateTimeField()
-    standingsclear = models.BooleanField()
+    standingsclear = models.BooleanField(default=False)
 
     class Meta:
         permissions = (('can_recruit', 'Can view applications'),)

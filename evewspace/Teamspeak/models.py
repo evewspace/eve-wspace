@@ -27,9 +27,9 @@ class TeamspeakServer(models.Model):
     queryport = models.IntegerField()
     voiceport = models.IntegerField()
     # If enforcegroups = True, any TS users who do not have a GroupMap entry will have no groups
-    enforcegroups = models.BooleanField()
+    enforcegroups = models.BooleanField(default=False)
     # If enforceusers = True, any TS users without a Django user mapping will be removed
-    enforeceusers = models.BooleanField()
+    enforeceusers = models.BooleanField(default=False)
 
     @classmethod
     def create(cls,host,queryuser,querypass,queryport,voiceport):

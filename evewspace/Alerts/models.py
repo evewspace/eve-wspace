@@ -23,7 +23,7 @@ class SubscriptionGroup(models.Model):
     name = models.CharField(max_length=64, unique=True)
     desc = models.CharField(max_length=200)
     # A special alert group is one that cannot be individually joined or left.
-    special = models.BooleanField()
+    special = models.BooleanField(default=False)
     members = models.ManyToManyField(User, through='Subscription')
 
     class Meta:
@@ -67,5 +67,5 @@ class SubscriptionGroupPermission(models.Model):
     """Mapping table that relates Groups to their permissions for SubscriptionGroups."""
     user_group = models.ForeignKey(Group, related_name="alert_groups")
     sub_group = models.ForeignKey(SubscriptionGroup, related_name="group_permissions")
-    can_broadcast = models.BooleanField()
-    can_join = models.BooleanField()
+    can_broadcast = models.BooleanField(default=False)
+    can_join = models.BooleanField(default=False)
