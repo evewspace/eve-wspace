@@ -12,7 +12,7 @@
         <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}bootstrap/css/slate.css" />
         {% if is_igb and not is_igb_trusted %}
         <script type="text/javascript">
-            CCPEVE.requestTrust('{{SITE_URL}}');
+            CCPEVE.requestTrust(window.location.protocol + '//' + window.location.host);
         </script>
         {% endif %}
 		{% block scripts %}{%endblock%}
