@@ -22,7 +22,10 @@ register=template.Library()
 @register.inclusion_tag('reddit_list.html')
 def reddit_list():
     if cache.get('reddit'):
-        return {'reddit_data': cache.get('reddit')['data']['children']}
+        try:
+            return {'reddit_data': cache.get('reddit')['data']['children']}
+        except Exception:
+            return {'error': True}
     else:
         return {'error': True}
 
