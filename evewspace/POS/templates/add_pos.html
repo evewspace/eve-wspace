@@ -1,12 +1,12 @@
 <div title="Add Starbase" id="addPOSDialog" class="addPOSDialog">
     <div class="modal-header">
         <h4>Add POS: {{system.name}}</h4>
-    </div>
-    <div class="modal-body">
       <ul class="nav nav-pills">
         <li class="active"><a id="auto" href="#" data-toggle="tab">Auto</a></li>
         <li><a href="#" data-toggle="tab" id="manual">Manual</a></li>
       </ul>
+    </div>
+    <div class="modal-body">
       <form id="addPOSForm" action="/pos/{{system.pk}}/add" method="POST">
         {% csrf_token %}
         <input id="auto-field" name="auto" value="1" type="hidden">
