@@ -30,6 +30,8 @@
             M: <input name="rfminutes" class="input-mini" type="text">
         </div>
         <br />Fitting: <br />
+        <p id="auto-help">Paste a 360° dscan (irrelevant range) with Active Overview Settings unticked, from ongrid with the POS</p>
+        <p id="manual-help">Paste a dscan showing POS modules from just this POS<p>
         <textarea cols=40 rows=10 name="fitting"></textarea><br />
         <div class="manual-fields">
           Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1"> <br />
@@ -57,13 +59,14 @@
                 $('#modalHolder').modal('hide');
                 });
     $('#auto').click(function(e){
-        $('.manual-fields').hide();
+        $('.manual-fields, #manual-help').hide();
+        $('#auto-help').show();
         $('#auto-field').val('1');
     });
     $('#manual').click(function(e){
-        $('.manual-fields').show();
+        $('.manual-fields, #manual-help').show();
+        $('#auto-help').hide();
         $('#auto-field').val('0');
     });
     </script>
-    <style>.manual-fields{display: none;}</style>
-</div>
+    <style>.manual-fields, #manual-help {display: none;}</style>
