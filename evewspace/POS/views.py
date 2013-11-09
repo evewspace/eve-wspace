@@ -146,7 +146,7 @@ def add_pos(request, sysID):
                 corp = core_tasks.update_corporation(corpID, True)
             except AttributeError:
                 # The corp doesn't exist
-                raise Http404
+                return HttpResponse('Corp does not exist')
         else:
             # Have the async worker update the corp just so that it is up to date
             core_tasks.update_corporation.delay(corp.id)
@@ -168,7 +168,7 @@ def add_pos(request, sysID):
                             moon_name = cols[0]
             if moon_distance == 150000000:
                 #No moon found
-                raise Http404
+                return HttpResponse('No moon found in d-scan')
 
             print(moon_name)
             #parse POS location
@@ -191,7 +191,10 @@ def add_pos(request, sysID):
             pos=POS(system=system, planet=planet,
                 moon=moon, status=int(request.POST['status']),
                 corporation=corp)
-            pos.fit_from_iterable(fittings)
+            try:
+                pos.fit_from_iterable(fittings)
+            except BaseException:
+                return HttpResponse('No POS found in d-scan')
 
         else:
             tower = get_object_or_404(Type, name=request.POST['tower'])
@@ -199,6 +202,8 @@ def add_pos(request, sysID):
                 moon=int(request.POST['moon']), towertype=tower,
                 posname=request.POST['name'], fitting=request.POST['fitting'],
                 status=int(request.POST['status']), corporation=corp)
+            if request.POST.get('dscan', None) == "1":
+                pos.fit_from_dscan(request.POST['fitting'].encode('utf-8'))
             
         if pos.status == 3:
             if request.POST['rfdays'] == '':
@@ -219,8 +224,6 @@ def add_pos(request, sysID):
             pos.rftime = datetime.now(pytz.utc) + delta
         pos.save()
 
-        if request.POST.get('dscan', None) == "1":
-            pos.fit_from_dscan(request.POST['fitting'].encode('utf-8'))
-        return HttpResponse('[]')
+        return HttpResponse('\n')
     else:
         return TemplateResponse(request, 'add_pos.html', {'system': system})

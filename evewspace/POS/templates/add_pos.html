@@ -7,6 +7,7 @@
       </ul>
     </div>
     <div class="modal-body">
+      <p id="message"></p>
       <form id="addPOSForm" action="/pos/{{system.pk}}/add" method="POST">
         {% csrf_token %}
         <input id="auto-field" name="auto" value="1" type="hidden">
@@ -51,12 +52,9 @@
     $('#addPOSForm').submit(function(e){
                 e.preventDefault();
                 AddPOS({{system.pk}});
-                $('#modalHolder').modal('hide');
-                return false;
                 });
     $('#btnAddPOS').click(function(e){
                 AddPOS({{system.pk}});
-                $('#modalHolder').modal('hide');
                 });
     $('#auto').click(function(e){
         $('.manual-fields, #manual-help').hide();
