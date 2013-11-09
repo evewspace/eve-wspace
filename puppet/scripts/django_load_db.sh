@@ -1,8 +1,8 @@
 #!/bin/bash
 
-curl -O http://www.fuzzwork.co.uk/dump/mysql55-odyssey-1.0-89097.tbz2
-tar xvjf /vagrant/puppet/scripts/mysql55-odyssey-1.0-89097.tbz2
-mysql -u root -D djangotest < /vagrant/puppet/scripts/odyssey-1.0-89097/mysql55-odyssey-1.0-89097.dmp
+curl -O https://www.fuzzwork.co.uk/dump/mysql56-odyssey-1.1-91288.tar.bz2
+tar -xjvf /vagrant/puppet/scripts/mysql56-odyssey-1.1-91288.tar.bz2
+mysql -u root -D djangotest < /vagrant/puppet/scripts/odyssey-1.1-91288/mysql56-odyssey-1.1-91288.sql
 rm -rf /vagrant/puppet/scripts/odyssey-1.0-89097
 /vagrant/evewspace/manage.py syncdb --noinput
 /vagrant/evewspace/manage.py migrate
