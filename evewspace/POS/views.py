@@ -25,6 +25,7 @@ from django.shortcuts import render, get_object_or_404
 from datetime import datetime, timedelta, time
 import pytz
 import eveapi
+import re
 from API import cache_handler as handler
 from core import tasks as core_tasks
 
@@ -135,24 +136,70 @@ def add_pos(request, sysID):
         raise PermissionDenied
     system = get_object_or_404(System, pk=sysID)
     if request.method == 'POST':
-        tower = get_object_or_404(Type, name=request.POST['tower'])
         try:
             corp = Corporation.objects.get(name=request.POST['corp'])
-        except:
+        except Corporation.DoesNotExist:
             # Corp isn't in our DB, get its ID and add it
+            api = eveapi.EVEAPIConnection(cacheHandler=handler)
+            corpID = api.eve.CharacterID(names=request.POST['corp']).characters[0].characterID
             try:
-                api = eveapi.EVEAPIConnection(cacheHandler=handler)
-                corpID = api.eve.CharacterID(names=request.POST['corp']).characters[0].characterID
                 corp = core_tasks.update_corporation(corpID, True)
-            except:
+            except AttributeError:
                 # The corp doesn't exist
                 raise Http404
-        pos=POS(system=system, planet=int(request.POST['planet']),
+        else:
+            # Have the async worker update the corp just so that it is up to date
+            core_tasks.update_corporation.delay(corp.id)
+
+        if request.POST['auto'] == '1':
+            fittings = []
+            moon_distance = 150000000
+            for i in request.POST['fitting'].splitlines():
+                cols = i.split('\t')
+                #ignore offgrid stuff
+                if cols[2] != '-':
+                    fittings.append(cols)
+                    if cols[1] == 'Moon' and cols[2].endswith('km'):
+                        #found a moon close by
+                        distance = int(cols[2][:-3].replace(',',''))
+                        if distance < moon_distance:
+                            #closest moon so far
+                            moon_distance = distance
+                            moon_name = cols[0]
+            if moon_distance == 150000000:
+                #No moon found
+                raise Http404
+
+            print(moon_name)
+            #parse POS location
+            regex = '^%s ([IVX]+) - Moon ([1-9]+)$' % (system.name)
+            result = re.match(regex, moon_name).groups()
+            NUMERALS = {'X': 10, 'V': 5, 'I': 1}
+            planet = 0
+            for i in range(len(result[0])):
+                value = NUMERALS[result[0][i]]
+                try:
+                    next_value = NUMERALS[result[0][i+1]]
+                except IndexError:
+                    next_value = 0
+                if value < next_value:
+                    planet -= value
+                else:
+                    planet += value
+            moon = int(result[1])
+
+            pos=POS(system=system, planet=planet,
+                moon=moon, status=int(request.POST['status']),
+                corporation=corp)
+            pos.fit_from_iterable(fittings)
+
+        else:
+            tower = get_object_or_404(Type, name=request.POST['tower'])
+            pos=POS(system=system, planet=int(request.POST['planet']),
                 moon=int(request.POST['moon']), towertype=tower,
                 posname=request.POST['name'], fitting=request.POST['fitting'],
                 status=int(request.POST['status']), corporation=corp)
-        # Have the async worker update the corp just so that it is up to date
-        core_tasks.update_corporation.delay(corp.id)
+            
         if pos.status == 3:
             if request.POST['rfdays'] == '':
                 rf_days = 0
