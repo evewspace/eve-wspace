@@ -318,7 +318,12 @@ function AddPOS(sysID){
         url: address,
         data: $('#addPOSForm').serialize(),
         success: function(data){
-            GetPOSList(sysID);
+            if (data != '\n') {
+                $('#message').text(data);
+            } else {
+                GetPOSList(sysID);
+                $('#modalHolder').modal('hide');
+            }
         }
     });
 }
