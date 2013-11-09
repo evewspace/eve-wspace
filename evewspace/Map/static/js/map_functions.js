@@ -84,10 +84,7 @@ function doMapAjaxCheckin() {
         type: "POST",
         url: currentpath,
         data: {"loadtime": loadtime, "silent": silentSystem},
-        success: processAjax,
-        error: function(error){
-            alert('An error ocurred posting back to the server: \n\n' + error.responseText);
-        }
+        success: processAjax
         });
 }
 
