@@ -3,29 +3,39 @@
         <h4>Add POS: {{system.name}}</h4>
     </div>
     <div class="modal-body">
-    <form id="addPOSForm" action="/pos/{{system.pk}}/add" method="POST">
-        {% csrf_token %}
-        Full Corp Name: <input id="corpBox" class="corpAuto" name="corp" type="text" > <br />
-        <span class="label label-warning" id="digiterror">Please enter digits only for planet and moon. </span><br /><br />
-        Planet: <input name="planet" class="input-mini" type="text"> 
-        Moon: <input name="moon" class="input-mini" type="text"> <br />
-        Tower Name: <input name="name" type="text"> <br />
-        Tower Type: <input id="towertype" class="towerAuto" name="tower" type="text"> <br />
-        Status: <br /><input type="radio" onclick="Test(this);" name="status" value="0">&nbsp Unanchored 
-        <br /><input type="radio" name="status" onclick="Test(this);" value="1">&nbsp Anchored
-        <br /><input type="radio" name="status" onclick="Test(this);" value="2">&nbsp Onlining
-        <br /><input type="radio" name="status" onclick="Test(this);" value="3"> &nbsp Reinforced
-        <br /><input type="radio" name="status" value="4" onclick="Test(this);" checked="checked"> &nbsp Online
-        <br />
-        <div id="rftime" class="rftimerdiv" style="display: none">
-            RF Timer:<br /> D: <input name="rfdays" class="input-mini" type="text">
-            H: <input name="rfhours" class="input-mini" type="text">
-            M: <input name="rfminutes" class="input-mini" type="text">
-        </div>
-        <br />Fitting: <br />
-        <textarea cols=40 rows=10 name="fitting"></textarea><br />
-        Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1"> <br />
-    </form>
+    <ul class="nav nav-pills">
+      <li class="active">Auto</li>
+      <li>Manual</li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="auto-add">
+      </div>
+      <div class="tab-pane" id="manual-add">
+        <form id="addPOSForm" action="/pos/{{system.pk}}/add" method="POST">
+          {% csrf_token %}
+          Full Corp Name: <input id="corpBox" class="corpAuto" name="corp" type="text" > <br />
+          <span class="label label-warning" id="digiterror">Please enter digits only for planet and moon. </span><br /><br />
+          Planet: <input name="planet" class="input-mini" type="text"> 
+          Moon: <input name="moon" class="input-mini" type="text"> <br />
+          Tower Name: <input name="name" type="text"> <br />
+          Tower Type: <input id="towertype" class="towerAuto" name="tower" type="text"> <br />
+          Status: <br /><input type="radio" onclick="Test(this);" name="status" value="0">&nbsp Unanchored 
+          <br /><input type="radio" name="status" onclick="Test(this);" value="1">&nbsp Anchored
+          <br /><input type="radio" name="status" onclick="Test(this);" value="2">&nbsp Onlining
+          <br /><input type="radio" name="status" onclick="Test(this);" value="3"> &nbsp Reinforced
+          <br /><input type="radio" name="status" value="4" onclick="Test(this);" checked="checked"> &nbsp Online
+          <br />
+          <div id="rftime" class="rftimerdiv" style="display: none">
+              RF Timer:<br /> D: <input name="rfdays" class="input-mini" type="text">
+              H: <input name="rfhours" class="input-mini" type="text">
+              M: <input name="rfminutes" class="input-mini" type="text">
+          </div>
+          <br />Fitting: <br />
+          <textarea cols=40 rows=10 name="fitting"></textarea><br />
+          Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1"> <br />
+        </form>
+    </div>
+  </div>
 </div>
     <div class="modal-footer">
         <a href="#" class="btn" onclick="$('#modalHolder').modal('hide');">Cancel</a>
