@@ -43,7 +43,7 @@
                     });
                 });
         {% endif %}
-    {% if member_list.number < member_list.paginator.num_pages %}
+    {% if member_list.number != 1 and member_list.number < member_list.paginator.num_pages %}
         $('#userNextLink').click(function(){
                 $.ajax({
                     url: "/account/admin/user/list/{{member_list.next_page_number}}/",
