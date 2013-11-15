@@ -317,6 +317,8 @@ your environment) in */etc/apache2/sites-available/evewspace*:::
     <VirtualHost *:80>
             ServerName map.foo.bar
             DocumentRoot /home/maptool/static
+            ProxyPass /static !
+            ProxyPassReverse /static !
             Alias /static /home/maptool/static
             <Directory /home/maptool/static>
                     Order allow,deny
