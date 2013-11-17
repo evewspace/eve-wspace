@@ -313,17 +313,24 @@ function GetSiteSpawns(msID, sigID){
 function AddPOS(sysID){
     //This function adds a system using the information in a form named #sysAddForm
     address = "/pos/" + sysID + "/add/";
+    $('#pos_message').hide();
+    $('#btnAddPOS').html('Saving...');
+    $('#btnAddPOS').addClass('disabled');
     $.ajax({
         type: "POST",
         url: address,
         data: $('#addPOSForm').serialize(),
         success: function(data){
-            if (data != '\n') {
-                $('#message').text(data);
-            } else {
-                GetPOSList(sysID);
-                $('#modalHolder').modal('hide');
-            }
+            GetPOSList(sysID);
+            $('#modalHolder').modal('hide');
+            $('#btnAddPOS').html('Add POS');
+            $('#btnAddPOS').removeClass('disabled');
+        },
+        error: function(error){
+           $('#pos_error').html(error.responseText);
+           $('#pos_message').show();
+           $('#btnAddPOS').html('Add POS');
+           $('#btnAddPOS').removeClass('disabled');
         }
     });
 }
@@ -331,12 +338,12 @@ function AddPOS(sysID){
 
 function DeletePOS(posID, sysID){
     address = "/pos/" + sysID + "/" + posID + "/remove/";
-    $.ajax({
+   $.ajax({
         type: "POST",
         url: address,
         success: function(){
             GetPOSList(sysID);
-        }
+       },
     });
 }
 
@@ -356,16 +363,27 @@ function GetEditPOSDialog(posID, sysID){
 
 
 function EditPOS(posID, sysID){
-    //This function adds a system using the information in a form named #sysAddForm
     address = "/pos/" + sysID + "/" + posID + "/edit/";
-    $.ajax({
+    $('#pos_message').hide();
+    $('#btnEditPOS').html('Saving...');
+    $('#btnEditPOS').addClass('disabled');
+   $.ajax({
         type: "POST",
         url: address,
         data: $('#editPOSForm').serialize(),
         success: function(data){
             GetPOSList(sysID);
-        }
-    });
+            $('#modalHolder').modal('hide');
+            $('#btnEditPOS').html('Save POS');
+            $('#btnEditPOS').removeClass('disabled');
+       },
+       error: function(error){
+           $('#pos_error').html(error.responseText);
+           $('#pos_message').show();
+           $('#btnEditPOS').html('Save POS');
+           $('#btnEditPOS').removeClass('disabled');
+      }
+   });
 }
 
 

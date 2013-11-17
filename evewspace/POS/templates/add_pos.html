@@ -1,13 +1,23 @@
 <div title="Add Starbase" id="addPOSDialog" class="addPOSDialog">
     <div class="modal-header">
-        <h4>Add POS: {{system.name}}</h4>
-      <ul class="nav nav-pills" style="margin-bottom:0">
-        <li class="active"><a id="auto" href="#" data-toggle="tab">Auto</a></li>
-        <li><a href="#" data-toggle="tab" id="manual">Manual</a></li>
-      </ul>
+        <div class="row">
+            <div class="span6">
+                <h4>Add POS: {{system.name}}</h4>
+            </div>
+            <div class="span3 offset2">
+                <a href="#" class="btn" onclick="$('#modalHolder').modal('hide');">Cancel</a>
+                <a href="#" class="btn btn-info" id="btnAddPOS">Add POS</a>
+            </div>
+        </div>
+         <ul class="nav nav-pills" style="margin-bottom:0">
+            <li class="active"><a id="auto" href="#" data-toggle="tab">Auto</a></li>
+            <li><a href="#" data-toggle="tab" id="manual">Manual</a></li>
+          </ul>
     </div>
     <div class="modal-body">
-      <p id="message"></p>
+        <div class="alert alert-error" id="pos_message" style="display: none;">
+            <p id="pos_error"></p>
+        </div>
       <form id="addPOSForm" action="/pos/{{system.pk}}/add" method="POST">
         {% csrf_token %}
         <input id="auto-field" name="auto" value="1" type="hidden">
@@ -41,8 +51,6 @@
   </div>
 </div>
     <div class="modal-footer">
-        <a href="#" class="btn" onclick="$('#modalHolder').modal('hide');">Cancel</a>
-        <a href="#" class="btn btn-primary" id="btnAddPOS">Add POS</a>
     </div>
     <script type="text/javascript">
     function Test(rad){

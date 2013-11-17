@@ -1,9 +1,20 @@
 <div title="Edit Starbase" id="editPOSDialog" class="addPOSDialog">
     <div class="modal-header">
-        <h4>Edit POS</h4>
+        <div class="row">
+            <div class="span6">
+                <h4>Edit POS</h4>
+            </div>
+            <div class="span3 offset2">
+                <a href="#" class="btn" onclick="$('#modalHolder').modal('hide');">Cancel</a>
+                <a href="#" class="btn btn-primary" id="btnEditPOS">Save POS</a>
+           </div>
+        </div>
     </div>
     <div class="modal-body">
-    <form id="editPOSForm" action="/pos/{{system.pk}}/{{pos.id}}/edit/" method="POST">
+         <div class="alert alert-error" id="pos_message" style="display: none;">
+            <p id="pos_error"></p>
+         </div>
+   <form id="editPOSForm" action="/pos/{{system.pk}}/{{pos.id}}/edit/" method="POST">
         {% csrf_token %}
         Full Corp Name: <input id="corpBox" class="corpAuto" value="{{pos.corporation.name}}" name="corp" type="text" > <br />
         <span class="label label-warning" id="digiterror">Please enter digits only for planet and moon. </span><br /><br />
@@ -29,8 +40,6 @@
     </form>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn" onclick="$('#modalHolder').modal('hide');">Cancel</a>
-        <a href="#" class="btn btn-primary" id="btnEditPOS">Save POS</a>
     </div>
     <script type="text/javascript">
     function Test(rad){
