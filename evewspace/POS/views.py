@@ -175,7 +175,7 @@ def add_pos(request, sysID):
                 return HttpResponse('No moon found in d-scan!', status=404)
 
             #parse POS location
-            regex = '^%s ([IVX]+) - Moon ([1-9]+)$' % (system.name)
+            regex = '^%s ([IVX]+) - Moon ([0-9]+)$' % (system.name)
             re_result = re.match(regex, moon_name)
             if not re_result:
                 return HttpResponse(
