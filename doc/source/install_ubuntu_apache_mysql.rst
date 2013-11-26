@@ -310,6 +310,7 @@ NOTE: Apache 2.4 removes underscores in headers and is not compatible with IGB f
 Before configuring the Apache VirtualHost, ensure that mod_proxy is enabled:::
 
     $ sudo a2enmod proxy
+    $ sudo a2enmod proxy_http
 
 To make Apache serve Eve W-Space on a subdomain (e.g. *http://map.foo.bar*), 
 you can set up a VirtualHost by placing the following text (adapted for
