@@ -139,7 +139,9 @@ class POS(models.Model):
         if towers == 1 and self.towertype_id is None and self.posname is None:
             self.towertype = towertype
             self.posname = posname
-        if towers <= 1:
+        if towers == 0 and self.towertype_id is None:
+            raise AttributeError('No POS in the D-Scan!')
+        elif towers <= 1:
             self.save()
         else:
             raise AttributeError('Too many towers detected in the D-Scan!')
