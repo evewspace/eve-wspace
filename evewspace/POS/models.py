@@ -106,7 +106,10 @@ class POS(models.Model):
         self.guns = 0
         self.ewar = 0
         for row in fit:
-            itemType = Type.objects.get(name=row[1])
+            try:
+                itemType = Type.objects.get(name=row[1])
+            except Type.DoesNotExist: #odd bug where invalid items get into dscan
+                continue
             if itemType.marketgroup:
                 groupTree = []
                 parent = itemType.marketgroup
