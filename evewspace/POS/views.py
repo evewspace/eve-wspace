@@ -202,8 +202,8 @@ def add_pos(request, sysID):
                 corporation=corp)
             try:
                 pos.fit_from_iterable(fittings)
-            except BaseException:
-                return HttpResponse('No POS found in d-scan!', status=404)
+            except AttributeError as e:
+                return HttpResponse(e, status=404)
 
         else:
             tower = get_object_or_404(Type, name=request.POST['tower'])

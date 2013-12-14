@@ -327,7 +327,7 @@ function AddPOS(sysID){
             $('#btnAddPOS').removeClass('disabled');
         },
         error: function(error){
-           $('#pos_error').html(error.responseText);
+           $('#pos_message').html(error.responseText);
            $('#pos_message').show();
            $('#btnAddPOS').html('Add POS');
            $('#btnAddPOS').removeClass('disabled');
