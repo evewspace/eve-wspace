@@ -56,6 +56,7 @@ To do this from the Django shell:::
     >>>adm_group.profile.save()
 
 To do it from the UI:::
+
     > Log in as an administrator
     > Go to Settings and click the Groups tab
     > Click on the Admins group to bring up the edit dialog
@@ -82,6 +83,7 @@ same shell as the last section.)::
     >>>group.profile.save()
     
 From the UI:::
+
     > Log in as an administrator
     > Go to the Settings page and click the Groups tab
     > Click the 'Add Group' button
