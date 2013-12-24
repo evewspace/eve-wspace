@@ -45,6 +45,7 @@ def require_map_permission(permission=2):
     def _dec(view_func):
         def _view(request, map_id, *args, **kwargs):
             current_map = get_object_or_404(Map, pk=map_id)
+            print "Permission: %s\t Required: %s" % (current_map.get_permission(request.user), permission)
             if current_map.get_permission(request.user) < permission:
                 raise PermissionDenied
             else:
@@ -1044,9 +1045,34 @@ def map_settings(request, map_id):
     """
     Returns and processes the settings section for a map.
     """
+    saved = False
     subject = get_object_or_404(Map, pk=map_id)
+    if request.method == 'POST':
+        name = request.POST.get('name', None)
+        explicit_perms = request.POST.get('explicitperms', False)
+        if not name:
+            return HttpResponse('The map name cannot be blank', status=400)
+        subject.name = name
+        subject.explicitperms = explicit_perms
+        for group in Group.objects.all():
+            MapPermission.objects.filter(group=group, map=subject).delete()
+            setting = request.POST.get('map-%s-group-%s-permission' % (
+                subject.pk, group.pk), 0)
+            if setting != 0:
+                MapPermission(group=group, map=subject, access=setting).save()
+        subject.save()
+        saved = True
+    groups = []
+    for group in Group.objects.all():
+        if MapPermission.objects.filter(map=subject, group=group).exists():
+            perm = MapPermission.objects.get(map=subject, group=group).access
+        else:
+            perm = 0
+        groups.append((group,perm))
+
     return TemplateResponse(request, 'map_settings_single.html',
-                            {'map': subject})
+            {'map': subject, 'groups': groups, 'saved': saved})
+
 
 
 @permission_required('Map.map_admin')

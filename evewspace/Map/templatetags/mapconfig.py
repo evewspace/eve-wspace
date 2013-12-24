@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django import template
-from Map.models import Map, Destination, SignatureType, SiteSpawn
+from Map.models import Map, Destination, SignatureType, SiteSpawn, MapPermission
 from django.contrib.auth.models import Group
 
 register = template.Library()
@@ -35,4 +35,11 @@ def map_settings(subject):
     """
     Returns the config block for a sngle map's general settings.
     """
-    return {'map': subject}
+    groups = []
+    for group in Group.objects.all():
+        if MapPermission.objects.filter(map=subject, group=group).exists():
+            perm = MapPermission.objects.get(map=subject, group=group).access
+        else:
+            perm = 0
+        groups.append((group,perm))
+    return {'map': subject, 'groups': groups}
