@@ -162,3 +162,17 @@ function SaveMapSettings(map_id){
         }
     });
 }
+
+
+function DeleteMap(map_id){
+    $.ajax({
+        url: '/map/' + map_id + '/delete/',
+        type: 'POST',
+        success: function(){
+            $('#map' + map_id + 'Settings').html('<h1>Deleted</h1>');
+        },
+        error: function(error){
+            alert('The map could not be deleted: \n\n' + error.responseText);
+        }
+    });
+}
