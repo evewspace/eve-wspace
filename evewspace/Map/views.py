@@ -189,9 +189,12 @@ def _is_moving_from_kspace_to_kspace(old_system, current_system):
     return old_system.is_kspace() and current_system.is_kspace()
 
 
-def get_system_context(ms_id):
+def get_system_context(ms_id, user):
     map_system = get_object_or_404(MapSystem, pk=ms_id)
-
+    if map_system.map.get_permission(user) == 2:
+        can_edit = True
+    else:
+        can_edit = False
     #If map_system represents a k-space system get the relevant KSystem object
     if map_system.system.is_kspace():
         system = map_system.system.ksystem
@@ -218,7 +221,8 @@ def get_system_context(ms_id):
         locations = {}
     return {'system': system, 'mapsys': map_system,
             'scanwarning': scan_warning, 'isinterest': interest,
-            'stfleets': st_fleets, 'locations': locations}
+            'stfleets': st_fleets, 'locations': locations,
+            'can_edit': can_edit}
 
 
 @login_required
@@ -298,7 +302,8 @@ def system_details(request, map_id, ms_id):
     if not request.is_ajax():
         raise PermissionDenied
 
-    return render(request, 'system_details.html', get_system_context(ms_id))
+    return render(request, 'system_details.html',
+            get_system_context(ms_id, request.user))
 
 
 # noinspection PyUnusedLocal
@@ -311,7 +316,8 @@ def system_menu(request, map_id, ms_id):
     if not request.is_ajax():
         raise PermissionDenied
 
-    return render(request, 'system_menu.html', get_system_context(ms_id))
+    return render(request, 'system_menu.html',
+            get_system_context(ms_id, request.user))
 
 
 # noinspection PyUnusedLocal
@@ -562,7 +568,7 @@ def toggle_sig_owner(request, map_id, ms_id, sig_id=None):
 
 # noinspection PyUnusedLocal
 @login_required
-@require_map_permission(permission=2)
+@require_map_permission(permission=1)
 def edit_signature(request, map_id, ms_id, sig_id=None):
     """
     GET gets a pre-filled edit signature form.
@@ -572,6 +578,9 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
     if not request.is_ajax():
         raise PermissionDenied
     map_system = get_object_or_404(MapSystem, pk=ms_id)
+    # If the user can't edit signatures, return a blank response
+    if map_system.map.get_permission(request.user) != 2:
+        return HttpResponse()
     action = None
     if sig_id != None:
         signature = get_object_or_404(Signature, pk=sig_id)
