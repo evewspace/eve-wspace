@@ -147,3 +147,18 @@ function RemoveDestination(destID){
         success: function(){GetDestinationSettings();}
     });
 }
+
+
+function SaveMapSettings(map_id){
+    $.ajax({
+        url: '/map/' + map_id + '/settings/',
+        type: 'POST',
+        data: $('#map' + map_id + 'SettingsForm').serialize(),
+        success: function(data){
+            $("#map" + map_id + "Div").html(data);
+        },
+        error: function(error){
+            alert('The map settings could not be saved: \n\n' + error.responseText);
+        }
+    });
+}
