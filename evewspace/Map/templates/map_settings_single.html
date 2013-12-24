@@ -51,7 +51,20 @@
         </div>
         <div class="control-group" style="margin-left: 200px;">
             <button class="btn btn-success" type="submit">Save</button>
-            <button class="btn btn-danger">Delete Map</button>
+            <button id="map{{map.pk}}DeleteButton" class="btn btn-danger">Delete Map</button>
+            <button id="map{{map.pk}}FinalDelete" style="display: none;" class="btn-warning">Really Delete</button>
+            <script type='text/javascript'>
+                $('#map{{map.pk}}FinalDelete').click(function(e){
+                        e.preventDefault();
+                        DeleteMap({{map.pk}});
+                        });
+                $('#map{{map.pk}}DeleteButton').click(function(e){
+                        e.preventDefault();
+                        $('#map{{map.pk}}DeleteButton').hide();
+                        $('#map{{map.pk}}FinalDelete').show();
+                        return false;
+                        });
+            </script>
         </div>
     </div>
 </form>
