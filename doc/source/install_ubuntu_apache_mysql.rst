@@ -270,7 +270,7 @@ celeryd:::
     [program:celeryd]
     command=python manage.py celery worker -B --loglevel=info
     directory=/home/maptool/eve-wspace/evewspace
-    environment=PATH=/home/maptool/eve-wspace/bin
+    environment=PATH="/home/maptool/eve-wspace/bin"
     user=maptool
     autostart=true
     autorestart=true
@@ -281,7 +281,7 @@ celeryd:::
     [program:gunicorn]
     command=/home/maptool/eve-wspace/bin/gunicorn_django --workers=4 -b 0.0.0.0:8000 settings.py
     directory=/home/maptool/eve-wspace/evewspace/evewspace
-    environment=PATH=/home/maptool/eve-wspace/bin
+    environment=PATH="/home/maptool/eve-wspace/bin"
     user=maptool
     autostart=true
     autorestart=true
@@ -310,6 +310,7 @@ NOTE: Apache 2.4 removes underscores in headers and is not compatible with IGB f
 Before configuring the Apache VirtualHost, ensure that mod_proxy is enabled:::
 
     $ sudo a2enmod proxy
+    $ sudo a2enmod proxy_http
 
 To make Apache serve Eve W-Space on a subdomain (e.g. *http://map.foo.bar*), 
 you can set up a VirtualHost by placing the following text (adapted for
