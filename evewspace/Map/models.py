@@ -262,7 +262,7 @@ class Map(models.Model):
         #Done this way there should only be one db hit which gets all relevant
         #permissions
         for perm in self.grouppermissions.filter(group__in=groups):
-            highestperm = max(highestperm, perm)
+            highestperm = max(highestperm, perm.access)
 
         return highestperm
 
