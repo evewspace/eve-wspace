@@ -45,7 +45,6 @@ def require_map_permission(permission=2):
     def _dec(view_func):
         def _view(request, map_id, *args, **kwargs):
             current_map = get_object_or_404(Map, pk=map_id)
-            print "Permission: %s\t Required: %s" % (current_map.get_permission(request.user), permission)
             if current_map.get_permission(request.user) < permission:
                 raise PermissionDenied
             else:
@@ -131,6 +130,7 @@ def _checkin_igb_trusted(request, current_map):
     containing the html for a system add dialog if we detect that a new system
     needs to be added
     """
+    can_edit = current_map.get_permission(request.user) == 2
     current_location = (request.eve_systemid, request.eve_charname,
             request.eve_shipname, request.eve_shiptypename)
     char_cache_key = 'char_%s_location' % request.eve_charid
@@ -151,7 +151,8 @@ def _checkin_igb_trusted(request, current_map):
                 request.eve_shiptypename)
         cache.set(char_cache_key, current_location, 60 * 5)
     #Conditions for the system to be automagically added to the map.
-        if (old_location and
+        if (can_edit and
+            old_location and
             old_system in current_map
             and current_system not in current_map
             and not _is_moving_from_kspace_to_kspace(old_system, current_system)
