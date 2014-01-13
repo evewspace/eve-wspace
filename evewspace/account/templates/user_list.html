@@ -20,14 +20,30 @@
 </table>
 <div class="pagination">
     {% if member_list.number != 1 %}
+    <button class="btn btn-mini btn-danger" id="userFirstLink">first</button>
     <button class="btn btn-mini btn-danger" id="userPreviousLink">previous</button>
     {% endif %}
     <span>Page {{member_list.number}} of {{member_list.paginator.num_pages}}</span>
     {% if member_list.has_next %}
         <button class="btn btn-mini btn-danger" id="userNextLink">next</button>
+        <button class="btn btn-mini btn-danger" id="userLastLink">last</button>
     {% endif %}
     <script type="text/javascript">
     {% if member_list.number != 1 %}
+        $('#userFirstLink').click(function(){
+                $.ajax({
+                    url: "/account/admin/user/list/1/",
+                    {% if filter %}
+                    type: "POST",
+                    data: $('#usernameFilterForm').serialize(),
+                    {% else %}
+                    type: "GET",
+                    {% endif %}
+                    success: function(data){
+                        $('#userTableHolder').html(data);
+                    }
+                    });
+                });
         $('#userPreviousLink').click(function(){
                 $.ajax({
                     url: "/account/admin/user/list/{{member_list.previous_page_number}}/",
@@ -47,6 +63,20 @@
         $('#userNextLink').click(function(){
                 $.ajax({
                     url: "/account/admin/user/list/{{member_list.next_page_number}}/",
+                    {% if filter %}
+                    type: "POST",
+                    data: $('#usernameFilterForm').serialize(),
+                    {% else %}
+                    type: "GET",
+                    {% endif %}
+                    success: function(data){
+                        $('#userTableHolder').html(data);
+                    }
+                    });
+                });
+        $('#userLastLink').click(function(){
+                $.ajax({
+                    url: "/account/admin/user/list/{{member_list.paginator.num_pages}}/",
                     {% if filter %}
                     type: "POST",
                     data: $('#usernameFilterForm').serialize(),
