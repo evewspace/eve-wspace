@@ -136,7 +136,7 @@ def _checkin_igb_trusted(request, current_map):
     char_cache_key = 'char_%s_location' % request.eve_charid
     old_location = cache.get(char_cache_key)
     result = None
-    print old_location
+    current_system = get_object_or_404(System, pk=current_location[0])
 
     if old_location != current_location:
         if old_location:
@@ -174,7 +174,6 @@ def _checkin_igb_trusted(request, current_map):
         cache.set(char_cache_key, current_location, 60 * 5)
         # Use add_active_pilot to refresh the user's record in the global
         # location cache
-        current_system = get_object_or_404(System, pk=current_location[0])
         current_system.add_active_pilot(request.user.username,
                 request.eve_charid, request.eve_charname, request.eve_shipname,
                 request.eve_shiptypename)
