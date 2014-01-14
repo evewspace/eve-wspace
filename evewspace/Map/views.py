@@ -142,10 +142,6 @@ def _checkin_igb_trusted(request, current_map):
         if old_location:
             old_system = get_object_or_404(System, pk=old_location[0])
             old_system.remove_active_pilot(request.eve_charid)
-        current_system = get_object_or_404(System, pk=current_location[0])
-        current_system.add_active_pilot(request.user.username,
-                request.eve_charid, request.eve_charname, request.eve_shipname,
-                request.eve_shiptypename)
         request.user.get_profile().update_location(current_system.pk,
                 request.eve_charid, request.eve_charname, request.eve_shipname,
                 request.eve_shiptypename)
@@ -176,6 +172,12 @@ def _checkin_igb_trusted(request, current_map):
                 result = 'silent'
     else:
         cache.set(char_cache_key, current_location, 60 * 5)
+        # Use add_active_pilot to refresh the user's record in the global
+        # location cache
+        current_system = get_object_or_404(System, pk=current_location[0])
+        current_system.add_active_pilot(request.user.username,
+                request.eve_charid, request.eve_charname, request.eve_shipname,
+                request.eve_shiptypename)
 
     return result
 
