@@ -165,7 +165,7 @@ def add_pos(request, sysID):
                     fittings.append(cols)
                     if cols[1] == 'Moon' and cols[2].endswith('km'):
                         #found a moon close by
-                        distance = int(cols[2][:-3].replace(',',''))
+                        distance = int(cols[2][:-3].replace(',','').replace('.',''))
                         if distance < moon_distance:
                             #closest moon so far
                             moon_distance = distance
