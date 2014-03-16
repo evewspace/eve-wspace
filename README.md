@@ -24,12 +24,12 @@ How do I use it?
 ----------------
 Generally, Eve W-Space requires:
 
-* Django 1.4+
-* Python 2.7+
+* Django 1.6+
+* Python 2.6-2.7
 * Celery
 * RabbitMQ (preferred)
 * memcached (preferred)
-* mySQL (preferred, should work with Postgres as well)
+* An RDBMS (MariaDB, MySQL, and PostgreSQL tested)
 
 Other required python modules are listed in requirements.txt.
 
