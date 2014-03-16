@@ -928,6 +928,10 @@ function DrawSystem(system) {
         var rootSys = paper.ellipse(sysX, sysY, 40, 30);
         rootSys.msID = system.msID;
         rootSys.sysID = system.sysID;
+        // Dont even get me started...
+        if (system.backgroundImageURL) {
+            paper.image(system.backgroundImageURL, rootSys.attr("cx") - 28, rootSys.attr("cy") - 28, 55, 55);
+        }
         rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
