@@ -78,8 +78,8 @@ class System(SystemData):
             (6, "C6"), (7, "High Sec"), (8, "Low Sec"), (9, "Null Sec"))
     sysclass = models.IntegerField(choices = sysclass_choices)
     importance_choices = ((0, "Regular"),
-                     (1, "Hostile homesystem"),
-                     (2, "Important system"))
+                     (1, "Dangerous System"),
+                     (2, "Important System"))
     importance = models.IntegerField(choices = importance_choices, default = 0)
     occupied = models.TextField(blank = True)
 
