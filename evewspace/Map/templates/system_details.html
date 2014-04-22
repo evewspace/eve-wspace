@@ -60,7 +60,7 @@
     <div class="detailsLeft">
     {% if system.occupied or system.poses.all %}
     <div class="occupiedDiv label label-important">
-        <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|safe}}</p>
+        <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|linebreaks}}</p>
         Towers:
         <ul>
             {% for pos in system.poses.all %}
@@ -88,7 +88,7 @@
     </div>
     {% endif %}
     {% if system.info %}
-    <p class="infoText label label-info"><span class="infoTitle">Info:</span> <br /> {{system.info|safe}} </p><br />
+    <p class="infoText label label-info"><span class="infoTitle">Info:</span> <br /> {{system.info|linebreaksbr}} </p><br />
     {% endif %}
     {% if system.info or system.occupied %}
     <p class="sysInfoUpdated label label-success">Info Updated: {{system.updated|naturaltime}}</p><br />

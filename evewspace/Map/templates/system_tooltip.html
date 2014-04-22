@@ -43,10 +43,10 @@
      <br /> 
      <p class="statusText label label-success">SIG: {{mapsys.system.signatures.count}} POS: {{mapsys.system.poses.count}} Pilots: {{mapsys.system.pilot_list|length}}</p><br />
     {% if mapsys.system.occupied %}
-    <div class="occupiedTooltip label label-important"> Occupied: <br /> {{mapsys.system.occupied|safe}}</div>
+    <div class="occupiedTooltip label label-important"> Occupied: <br /> {{mapsys.system.occupied|linebreaksbr}}</div>
     {% endif %}
     {% if mapsys.system.info %}
-    <div class="infoTooltip label label-info"> Info: <br /> {{mapsys.system.info|safe}} </div>
+    <div class="infoTooltip label label-info"> Info: <br /> {{mapsys.system.info|linebreaksbr}} </div>
     {% endif %}
 </div>
 {% if mapsys.system.pilot_list %}
