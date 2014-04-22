@@ -43,6 +43,9 @@ $(document).ready(function(){
     if (autoRefresh === true){
         refreshTimerID = setInterval(RefreshMap, 15000);
     }
+    if (silentSystem === true){
+        $('#btnSilentAdd').text('Silent IGB Mapping: ON');
+    }
 });
 
 $(document).ready(function(){
