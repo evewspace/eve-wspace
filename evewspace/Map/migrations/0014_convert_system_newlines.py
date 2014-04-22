@@ -20,7 +20,6 @@ class Migration(DataMigration):
                 system.occupied = system.occupied.replace('<br />', '\n')
                 save = True
             if save:
-                print system.name
                 system.save()
     def backwards(self, orm):
         "Write your backwards methods here."
@@ -33,7 +32,6 @@ class Migration(DataMigration):
                 system.occupied = system.occupied.replace('\n', '<br />')
                 save = True
             if save:
-                print system.name
                 system.save()
 
     models = {
