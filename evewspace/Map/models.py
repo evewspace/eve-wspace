@@ -110,9 +110,6 @@ class System(SystemData):
             return self.ksystem
 
     def save(self, *args, **kwargs):
-        # Make sure any new lines in info or occupied are replaced with <br />
-        self.info = self.info.replace("\n", "<br />")
-        self.occupied = self.occupied.replace("\n", "<br />")
         self.updated = datetime.now(pytz.utc)
         if self.lastscanned < datetime.now(pytz.utc) - timedelta(days=3):
             self.lastscanned = datetime.now(pytz.utc)

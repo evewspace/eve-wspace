@@ -64,8 +64,6 @@ class POS(models.Model):
     def save(self, *args, **kwargs):
         if not self.posname:
             self.posname = self.towertype.name
-        # Ensure that any newline characters in fitting are changed to <br>
-        self.fitting = self.fitting.replace("\n", "<br />")
         # Mark tower as having been updated
         from datetime import datetime
         import pytz
