@@ -18,10 +18,10 @@ from core.models import Corporation
 from core.tasks import update_corporation
 from core.utils import get_config
 import cache_handler as handler
-
+from django.conf import settings
 from django.db import models
 from django.db.models import Q
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from django.utils.html import strip_tags
 from datetime import datetime
 import eveapi
@@ -29,6 +29,7 @@ import eveapi
 import pytz
 # Create your models here.
 
+User = settings.AUTH_USER_MODEL
 
 class APIKey(models.Model):
     """API Key object relates to User and contains key id, vcode, and validation information."""

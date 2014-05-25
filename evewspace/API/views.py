@@ -21,10 +21,12 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from API.models import CorpAPIKey, MemberAPIKey, APIKey, APIShipLog, APICharacter
 import API.cache_handler as handler
+
+User = get_user_model()
 
 def api_key_dialog(request):
     if not request.is_ajax():

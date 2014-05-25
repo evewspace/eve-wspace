@@ -14,8 +14,11 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from account.models import *
+
+User = get_user_model()
 
 def get_groups_for_code(regcode):
     """Returns a list of groups for a given registration code."""

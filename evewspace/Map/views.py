@@ -120,6 +120,7 @@ def map_refresh(request, map_id):
         utils.MapJSONGenerator(current_map,
                                request.user).get_systems_json()
     ]
+    print result[0]
     return HttpResponse(json.dumps(result))
 
 
@@ -142,7 +143,7 @@ def _checkin_igb_trusted(request, current_map):
         if old_location:
             old_system = get_object_or_404(System, pk=old_location[0])
             old_system.remove_active_pilot(request.eve_charid)
-        request.user.get_profile().update_location(current_system.pk,
+        request.user.update_location(current_system.pk,
                 request.eve_charid, request.eve_charname, request.eve_shipname,
                 request.eve_shiptypename)
         cache.set(char_cache_key, current_location, 60 * 5)
@@ -437,7 +438,7 @@ def manual_location(request, map_id, ms_id):
     map_sys = get_object_or_404(MapSystem, pk=ms_id)
     map_sys.system.add_active_pilot(request.user.username, request.user.pk,
             'OOG Browser', 'Unknown', 'Unknown')
-    request.user.get_profile().update_location(map_sys.system.pk, request.user.pk,
+    request.user.update_location(map_sys.system.pk, request.user.pk,
             'OOG Browser', 'Unknown', 'Unknown')
     map_sys.map.clear_caches()
     return HttpResponse()
@@ -765,7 +766,7 @@ def edit_system(request, map_id, ms_id):
                                % (map_system.system.name,
                                   map_system.friendlyname))
         return HttpResponse()
-    raise PermissionDenied 
+    raise PermissionDenied
 
 
 # noinspection PyUnusedLocal
