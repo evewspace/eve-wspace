@@ -20,7 +20,9 @@ from django.conf.urls import patterns, include, url
 from search import registry as search_registry
 from Alerts import method_registry
 from core import admin_page_registry, nav_registry
-
+# Uncomment to enable django admin
+#from django.contrib import admin
+#admin.autodiscover()
 method_registry.autodiscover()
 search_registry.autodiscover()
 admin_page_registry.autodiscover()
@@ -28,13 +30,11 @@ nav_registry.autodiscover()
 
 # Actual URL definitions
 urlpatterns = patterns('',
-        # Examples:
-        # url(r'^$', 'eve-space.views.home', name='home'),
-        # url(r'^WormholeSpace2/', include('eve-space.foo.urls')),
-
         # Uncomment the admin/doc line below to enable admin documentation:
         # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
         url(r'^$', 'core.views.home_view', name='index'),
+        # Uncommend to enable django admin
+        #url(r'^admin/', include(admin.site.urls)),
         url(r'^settings/$', 'core.views.config_view', name='settings'),
         url(r'^account/', include('account.urls')),
         url(r'^map/', include('Map.urls')),

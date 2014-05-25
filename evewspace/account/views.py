@@ -17,8 +17,8 @@
 from account.models import RegistrationForm
 from account.utils import *
 from account.forms import EditProfileForm
-
-from django.contrib.auth.models import User, Group
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import permission_required
 from django.template.response import TemplateResponse
 from django.template.loader import render_to_string
@@ -30,6 +30,8 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.forms.util import ErrorList
 # Create your views here.
+
+User = get_user_model()
 
 def register(request):
     if request.method == "POST":

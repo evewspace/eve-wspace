@@ -1,7 +1,8 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
+MULTI_TENANT = True
+AUTH_USER_MODEL = 'account.EWSUser'
 ADMINS = (
         # ('Your Name', 'your_email@example.com'),
 )
@@ -183,6 +184,7 @@ INSTALLED_APPS = (
         'django.contrib.staticfiles',
         'django.contrib.humanize',
         # Uncomment the next line to enable the admin:
+        #'django.contrib.admin',
         'core',
         'Map',
         'POS',
@@ -204,7 +206,6 @@ INSTALLED_APPS = (
 #Require a registration code to register
 ACCOUNT_REQUIRE_REG_CODE=True
 
-AUTH_PROFILE_MODULE = 'account.UserProfile'
 import django.conf.global_settings as DEFAULT_SETTINGS
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + ('core.context_processors.site', 'eveigb.context_processors.igb',)
 # ejabberd auth gateway log settings

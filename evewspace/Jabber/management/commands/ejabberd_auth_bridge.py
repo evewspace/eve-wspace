@@ -22,9 +22,11 @@ import sys
 import datetime
 import time
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User, check_password, Permission
-
+from django.contrib.auth.models import check_password, Permission
+from django.contrib.auth import get_user_model
 from core.utils import get_config
+
+User = get_user_model()
 
 class Command(BaseCommand):
     """

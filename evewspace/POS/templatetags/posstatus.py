@@ -16,7 +16,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django import template
 from POS.models import CorpPOS
-from django.contrib.auth.models import User
 from POS.utils import add_status_info
 register=template.Library()
 

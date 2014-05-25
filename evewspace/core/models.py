@@ -15,8 +15,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 # Core models contains models used across multiple apps
+
+User = settings.AUTH_USER_MODEL
 
 class NewsFeed(models.Model):
     """

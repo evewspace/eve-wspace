@@ -15,7 +15,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from Map.models import Map
 from django.template.response import TemplateResponse

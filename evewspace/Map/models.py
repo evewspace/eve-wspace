@@ -15,7 +15,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
-from django.contrib.auth.models import User, Group
+from django.conf import settings
+from django.contrib.auth.models import Group
 from core.models import SystemData
 from django import forms
 from django.forms import ModelForm
@@ -26,6 +27,8 @@ from Map import utils
 from Map.utils import MapJSONGenerator
 from django.core.cache import cache
 # Create your models here.
+
+User = settings.AUTH_USER_MODEL
 
 class WormholeType(models.Model):
     """Stores the permanent information on wormhole types.

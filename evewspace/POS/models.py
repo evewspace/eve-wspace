@@ -20,9 +20,10 @@ from API.models import CorpAPIKey
 from core.models import Corporation, Alliance
 from Map.models import System
 import csv
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 import pytz
 
+User = get_user_model()
 
 class POS(models.Model):
     """Represents a POS somewhere in space."""

@@ -17,15 +17,19 @@
 # Create your views here.
 from models import Fleet, UserLog, SiteType, SiteRecord, UserSite
 from Map.models import System
-from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, get_list_or_404
+from django.conf import settings
 from datetime import datetime
 import pytz
 import csv
+
+
+User = get_user_model()
 
 def require_boss():
     def _dec(view_func):

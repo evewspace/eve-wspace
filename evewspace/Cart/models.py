@@ -15,10 +15,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from core.models import Type
 
 # Create your models here.
+
+User = settings.AUTH_USER_MODEL
 
 class ShoppingCart(models.Model):
     """Represents an active shopping cart."""

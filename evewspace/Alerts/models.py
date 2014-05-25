@@ -15,8 +15,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.conf import settings
 # Create your models here.
+
+User = settings.AUTH_USER_MODEL
 
 class SubscriptionGroup(models.Model):
     """Contians the definition for alert broadcast groups."""
