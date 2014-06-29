@@ -2,7 +2,7 @@
     <h3>Create Group</h3>
 </div>
 <div class="modal-body">
-    <form class="form" id="createGroupForm" action="/account/admin/group/new/" method="POST">
+    <form class="form-horizontal" id="createGroupForm" action="/account/admin/group/new/" method="POST">
         <div class="control-group">
             <label class="control-label" for="groupnameInput">Group Name:</label>
             <div class="controls">
@@ -15,8 +15,6 @@
                 <input type="text" name="regcode" id="regcodeInput">
             </div>
         </div>
-        <button type="submit" class="btn btn-info">Create</button>
-        <button class="btn" onclick="$('#modalHolder').modal('hide'); return false;">Close</button>
     </form>
     <script type="text/javascript">
         $('#createGroupForm').submit(function(e){
@@ -25,4 +23,8 @@
                 return false;
                 });
     </script>
+</div>
+<div class='modal-footer'>
+    <button class="btn btn-info" onclick="CreateGroup();">Create</button>
+    <button class="btn" onclick="$('#modalHolder').modal('hide'); return false;">Close</button>
 </div>
