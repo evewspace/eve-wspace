@@ -517,9 +517,6 @@ def _translate_client_string(client_text):
 
 
 def _update_sig_from_tsv(signature, row):
-    f = open('test_file', 'a')
-    f.write('%s\n' % row)
-    f.flush()
     COL_SIG = 0
     COL_SIG_TYPE = 3
     COL_SIG_GROUP = 2
@@ -530,25 +527,18 @@ def _update_sig_from_tsv(signature, row):
     updated = False
     sig_type = None
     debug_text = row[COL_SIG_SCAN_GROUP]
-    f.write('%s\n' % debug_text)
-    f.flush()
     scan_group = _translate_client_string(row[COL_SIG_SCAN_GROUP])
-    f.write('%s\n' % scan_group)
-    f.flush()
     if (scan_group == "Cosmic Signature"
         or scan_group == "Cosmic Anomaly"
        ):
         try:
             sig_type_name = _translate_client_string(row[COL_SIG_GROUP])
-            f.write('%s\n' % sig_type_name)
-            f.flush()
             sig_type = SignatureType.objects.get(
                     longname=sig_type_name)
         except:
             sig_type = None
     else:
         sig_type = None
-    f.close()
 
     if sig_type:
         updated = True
