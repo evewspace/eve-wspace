@@ -14,7 +14,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.models import Corporation
+from core.models import Corporation, Tenant, Character
 from core.tasks import update_corporation
 from core.utils import get_config
 import cache_handler as handler
@@ -33,7 +33,8 @@ User = settings.AUTH_USER_MODEL
 
 class APIKey(models.Model):
     """API Key object relates to User and contains key id, vcode, and validation information."""
-    keyid = models.IntegerField(primary_key=True)
+    tenant = models.ForeignKey(Tenant, related_name='api_keys')
+    keyid = models.IntegerField()
     vcode = models.CharField(max_length=100)
     valid = models.BooleanField(default=False)
     lastvalidated = models.DateTimeField()
@@ -49,6 +50,7 @@ class APIKey(models.Model):
                          ("soft_key_fail", "Nag if no valid API key."),
                          ("hard_key_fail",
                              "Revoke access if no valid API Key."))
+        unique_together = ('tenant', 'keyid')
 
     def __unicode__(self):
         """Return key ID as unicode representation."""

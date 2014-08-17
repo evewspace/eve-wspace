@@ -2,9 +2,9 @@
 {% include 'system_menu.html' %}
 <ul class="nav nav-pills" id="sysInfoTab">
     <li class="active"><a href="#sysDetails" data-toggle="tab">Details</a></li>
-    <li><a href="#sigsPanel" data-toggle="tab">Signatures ({{mapsys.system.signatures.count}})</a></li>
-    <li><a href="#activePlayerPanel" data-toggle="tab">Pilots ({{locations|length}})</a></li>
-    <li><a href="#systemPosPanel" data-toggle="tab">Starbases ({{mapsys.system.poses.count}})</a></li>
+    <li><a href="#sigsPanel" data-toggle="tab">Signatures ({{mapsys.signature_list.count}})</a></li>
+    <li><a href="#activePlayerPanel" data-toggle="tab">Pilots ({{mapsys.pilot_list|length}})</a></li>
+    <li><a href="#systemPosPanel" data-toggle="tab">Starbases ({{mapsys.pos_list.count}})</a></li>
 </ul>
 <div id="sysTabHolder" class="tab-content well">
 <div id="sysDetails" class="tab-pane active">
@@ -56,14 +56,14 @@
 </div>
     <div class="row span6">
     {% load humanize %}
-    <ul class="visited"><li>First Visit: {{system.first_visited|naturaltime}}</li><li> Last Visit: {{system.last_visited|naturaltime}}</li></ul>
+    <ul class="visited"><li>First Visit: {{tenant_data.first_visited|naturaltime}}</li><li> Last Visit: {{tenant_data.last_visited|naturaltime}}</li></ul>
     <div class="detailsLeft">
-    {% if system.occupied or system.poses.all %}
+    {% if tenant_data.occupied or mapsys.pos_list.all %}
     <div class="occupiedDiv label label-important">
-        <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|linebreaks}}</p>
+        <span class="occupiedTitle">Occupied:</span> <br /> {{tenant_data.occupied|linebreaks}}</p>
         Towers:
         <ul>
-            {% for pos in system.poses.all %}
+            {% for pos in mapsys.pos_list.all %}
             <li>P:{{pos.planet}} &nbsp;M: {{pos.moon}} - {{pos.towertype.name}} - {{pos.corporation.name}} - 
                 {% if pos.status == 0 %}
 	            <span class="label label-info">Status: UNANCHORED</span>
@@ -87,11 +87,11 @@
         </ul>
     </div>
     {% endif %}
-    {% if system.info %}
-    <p class="infoText label label-info"><span class="infoTitle">Info:</span> <br /> {{system.info|linebreaksbr}} </p><br />
+    {% if tenant_data.info %}
+    <p class="infoText label label-info"><span class="infoTitle">Info:</span> <br /> {{tenant_data.info|linebreaksbr}} </p><br />
     {% endif %}
-    {% if system.info or system.occupied %}
-    <p class="sysInfoUpdated label label-success">Info Updated: {{system.updated|naturaltime}}</p><br />
+    {% if tenant_data.info or tenant_data.occupied %}
+    <p class="sysInfoUpdated label label-success">Info Updated: {{tenant_data.updated|naturaltime}}</p><br />
     {% endif %}
 </div>
 <div class="sysDetailsFooter row">

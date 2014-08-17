@@ -63,7 +63,8 @@ def get_pos_list(request, sysID):
     if not request.is_ajax():
         raise PermissionDenied
     system = get_object_or_404(System, pk=sysID)
-    poses = POS.objects.filter(system=system).all()
+    tenant = request.current_tenant
+    poses = POS.objects.filter(tenant=tenant, system=system).all()
     return TemplateResponse(request, 'poslist.html', {'system': system,
         'poses': poses})
 
@@ -77,6 +78,9 @@ def edit_pos(request, sysID, posID):
         raise PermissionDenied
     system = get_object_or_404(System, pk=sysID)
     pos = get_object_or_404(POS, pk=posID)
+    tenant = request.current_tenant
+    if pos.tenant != tenant:
+        raise PermissionDenied
     if request.method == 'POST':
         tower = get_object_or_404(Type, name=request.POST['tower'])
         try:
@@ -135,6 +139,7 @@ def add_pos(request, sysID):
     if not request.is_ajax():
         raise PermissionDenied
     system = get_object_or_404(System, pk=sysID)
+    tenant = request.current_tenant
     if request.method == 'POST':
         try:
             corp_name = request.POST.get('corp', None)
@@ -197,7 +202,7 @@ def add_pos(request, sysID):
                     planet += value
             moon = int(result[1])
 
-            pos=POS(system=system, planet=planet,
+            pos=POS(tenant=tenant, system=system, planet=planet,
                 moon=moon, status=int(request.POST['status']),
                 corporation=corp)
             try:
@@ -207,7 +212,8 @@ def add_pos(request, sysID):
 
         else:
             tower = get_object_or_404(Type, name=request.POST['tower'])
-            pos=POS(system=system, planet=int(request.POST['planet']),
+            pos=POS(tenant=tenant, system=system,
+                    planet=int(request.POST['planet']),
                 moon=int(request.POST['moon']), towertype=tower,
                 posname=request.POST['name'], fitting=request.POST['fitting'],
                 status=int(request.POST['status']), corporation=corp)

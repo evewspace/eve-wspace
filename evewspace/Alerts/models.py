@@ -17,23 +17,26 @@
 from django.db import models
 from django.contrib.auth.models import Group
 from django.conf import settings
+from core.models import Tenant
 # Create your models here.
 
 User = settings.AUTH_USER_MODEL
 
 class SubscriptionGroup(models.Model):
     """Contians the definition for alert broadcast groups."""
-    name = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=64)
     desc = models.CharField(max_length=200)
     # A special alert group is one that cannot be individually joined or left.
     special = models.BooleanField(default=False)
     members = models.ManyToManyField(User, through='Subscription')
+    tenant = models.ForeignKey(Tenant, related_name='alert_groups')
 
     class Meta:
         permissions = (("can_alert", "Use the alerts system."),
                          ("alert_admin", "Modify alert groups and rosters."),
                          ("can_ping_special", "Ping alert groups tagged special."),
                     )
+        unique_together = ('name', 'tenant')
 
     def __unicode__(self):
         return self.name

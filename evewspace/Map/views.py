@@ -45,7 +45,8 @@ def require_map_permission(permission=2):
     def _dec(view_func):
         def _view(request, map_id, *args, **kwargs):
             current_map = get_object_or_404(Map, pk=map_id)
-            if current_map.get_permission(request.user) < permission:
+            if current_map.get_permission(request.user,
+                    request.current_tenant) < permission:
                 raise PermissionDenied
             else:
                 return view_func(request, map_id, *args, **kwargs)
@@ -131,7 +132,8 @@ def _checkin_igb_trusted(request, current_map):
     containing the html for a system add dialog if we detect that a new system
     needs to be added
     """
-    can_edit = current_map.get_permission(request.user) == 2
+    can_edit = current_map.get_permission(request.user,
+            request.current_tenant) == 2
     current_location = (request.eve_systemid, request.eve_charname,
             request.eve_shipname, request.eve_shiptypename)
     char_cache_key = 'char_%s_location' % request.eve_charid
@@ -142,7 +144,8 @@ def _checkin_igb_trusted(request, current_map):
     if old_location != current_location:
         if old_location:
             old_system = get_object_or_404(System, pk=old_location[0])
-            old_system.remove_active_pilot(request.eve_charid)
+            old_system.remove_active_pilot(current_map.tenant,
+                    request.eve_charid)
         request.user.update_location(current_system.pk,
                 request.eve_charid, request.eve_charname, request.eve_shipname,
                 request.eve_shiptypename)
@@ -175,7 +178,8 @@ def _checkin_igb_trusted(request, current_map):
         cache.set(char_cache_key, current_location, 60 * 5)
         # Use add_active_pilot to refresh the user's record in the global
         # location cache
-        current_system.add_active_pilot(request.user.username,
+        current_system.add_active_pilot(current_map.tenant,
+                request.user.username,
                 request.eve_charid, request.eve_charname, request.eve_shipname,
                 request.eve_shiptypename)
 
@@ -192,9 +196,9 @@ def _is_moving_from_kspace_to_kspace(old_system, current_system):
     return old_system.is_kspace() and current_system.is_kspace()
 
 
-def get_system_context(ms_id, user):
+def get_system_context(request, ms_id, user):
     map_system = get_object_or_404(MapSystem, pk=ms_id)
-    if map_system.map.get_permission(user) == 2:
+    if map_system.map.get_permission(user, request.current_tenant) == 2:
         can_edit = True
     else:
         can_edit = False
@@ -203,6 +207,9 @@ def get_system_context(ms_id, user):
         system = map_system.system.ksystem
     else:
         system = map_system.system.wsystem
+    current_tenant = request.current_tenant
+
+    tenant_data = map_system.tenant_data
 
     scan_threshold = datetime.now(pytz.utc) - timedelta(
         hours=int(get_config("MAP_SCAN_WARNING", None).value)
@@ -211,21 +218,22 @@ def get_system_context(ms_id, user):
     interest_threshold = (datetime.now(pytz.utc)
                           - timedelta(minutes=interest_offset))
 
-    scan_warning = system.lastscanned < scan_threshold
+    scan_warning = tenant_data.lastscanned < scan_threshold
     if interest_offset > 0:
         interest = (map_system.interesttime and
                     map_system.interesttime > interest_threshold)
     else:
         interest = map_system.interesttime
         # Include any SiteTracker fleets that are active
-    st_fleets = map_system.system.stfleets.filter(ended=None).all()
-    locations = cache.get('sys_%s_locations' % map_system.system.pk)
+    st_fleets = map_system.system.stfleets.filter(tenant=current_tenant,
+            ended=None).all()
+    locations = cache.get('ten_%s_sys_%s_locations' % (map_system.map.tenant.pk, map_system.system.pk))
     if not locations:
         locations = {}
     return {'system': system, 'mapsys': map_system,
             'scanwarning': scan_warning, 'isinterest': interest,
             'stfleets': st_fleets, 'locations': locations,
-            'can_edit': can_edit}
+            'can_edit': can_edit, 'tenant_data': tenant_data}
 
 
 @login_required
@@ -306,7 +314,7 @@ def system_details(request, map_id, ms_id):
         raise PermissionDenied
 
     return render(request, 'system_details.html',
-            get_system_context(ms_id, request.user))
+            get_system_context(request, ms_id, request.user))
 
 
 # noinspection PyUnusedLocal
@@ -320,7 +328,7 @@ def system_menu(request, map_id, ms_id):
         raise PermissionDenied
 
     return render(request, 'system_menu.html',
-            get_system_context(ms_id, request.user))
+            get_system_context(request, ms_id, request.user))
 
 
 # noinspection PyUnusedLocal
@@ -434,9 +442,10 @@ def manual_location(request, map_id, ms_id):
         old_location = user_locations.pop(request.user.pk, None)
         if old_location:
             old_sys = get_object_or_404(System, pk=old_location[0])
-            old_sys.remove_active_pilot(request.user.pk)
+            old_sys.remove_active_pilot(map_sys.map.tenant, request.user.pk)
     map_sys = get_object_or_404(MapSystem, pk=ms_id)
-    map_sys.system.add_active_pilot(request.user.username, request.user.pk,
+    map_sys.system.add_active_pilot(map_sys.map.tenant, request.user.username,
+            request.user.pk,
             'OOG Browser', 'Unknown', 'Unknown')
     request.user.update_location(map_sys.system.pk, request.user.pk,
             'OOG Browser', 'Unknown', 'Unknown')
@@ -541,6 +550,7 @@ def bulk_sig_import(request, map_id, ms_id):
                         system=map_system.system)[0]
                 sig = _update_sig_from_tsv(sig, row)
                 sig.modified_by = request.user
+                sig.tenant = map_system.map.tenant
                 sig.save()
                 signals.signature_update.send_robust(sig, user=request.user,
                                                  map=map_system.map,
@@ -582,7 +592,8 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
         raise PermissionDenied
     map_system = get_object_or_404(MapSystem, pk=ms_id)
     # If the user can't edit signatures, return a blank response
-    if map_system.map.get_permission(request.user) != 2:
+    if map_system.map.get_permission(request.user,
+            request.current_tenant) != 2:
         return HttpResponse()
     action = None
     if sig_id != None:
@@ -596,7 +607,8 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
             ingame_id = utils.convert_signature_id(form.cleaned_data['sigid'])
             if sig_id == None:
                 signature, created = Signature.objects.get_or_create(
-                            system=map_system.system, sigid=ingame_id)
+                            system=map_system.system, sigid=ingame_id,
+                            tenant=map_system.map.tenant)
 
             signature.sigid = ingame_id
             signature.updated = True
@@ -607,6 +619,7 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
                 sigtype = None
             signature.sigtype = sigtype
             signature.modified_by = request.user
+            signature.tenant = map_system.map.tenant
             signature.save()
             map_system.system.lastscanned = datetime.now(pytz.utc)
             map_system.system.save()
@@ -639,7 +652,6 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
 # noinspection PyUnusedLocal
 @login_required()
 @require_map_permission(permission=1)
-@cache_page(1)
 def get_signature_list(request, map_id, ms_id):
     """
     Determines the proper escalationThreshold time and renders
@@ -748,19 +760,21 @@ def edit_system(request, map_id, ms_id):
     if not request.is_ajax():
         raise PermissionDenied
     map_system = get_object_or_404(MapSystem, pk=ms_id)
+    tenant_data = map_system.tenant_data
     if request.method == 'GET':
-        occupied = map_system.system.occupied.replace("<br />", "\n")
-        info = map_system.system.info.replace("<br />", "\n")
+        occupied = tenant_data.occupied.replace("<br />", "\n")
+        info = tenant_data.info.replace("<br />", "\n")
         return TemplateResponse(request, 'edit_system.html',
                                 {'mapsys': map_system,
-                                'occupied': occupied, 'info': info}
+                                'occupied': occupied, 'info': info,
+                                'tenant_data': tenant_data}
                                 )
     if request.method == 'POST':
         map_system.friendlyname = request.POST.get('friendlyName', '')
-        map_system.system.info = request.POST.get('info', '')
-        map_system.system.occupied = request.POST.get('occupied', '')
-        map_system.system.importance = request.POST.get('importance', '0')
-        map_system.system.save()
+        tenant_data.info = request.POST.get('info', '')
+        tenant_data.occupied = request.POST.get('occupied', '')
+        tenant_data.importance = request.POST.get('importance', '0')
+        tenant_data.save()
         map_system.save()
         map_system.map.add_log(request.user, "Edited System: %s (%s)"
                                % (map_system.system.name,
@@ -817,15 +831,17 @@ def create_map(request):
     This function creates a map and then redirects to the new map.
     """
     if request.method == 'POST':
-        form = MapForm(request.POST)
-        if form.is_valid():
-            new_map = form.save()
-            new_map.add_log(request.user, "Created the %s map." % new_map.name)
-            new_map.add_system(request.user, new_map.root, "Root", None)
-            return HttpResponseRedirect(reverse('Map.views.get_map',
+        root_sys = get_object_or_404(System, name=request.POST.get('root'))
+        tenant = request.current_tenant
+        new_map = Map(root=root_sys, tenant=tenant)
+        new_map.name = request.POST.get('name')
+        if request.POST.get('explicit_perms', None):
+            new_map.explicitperms = True
+        new_map.save()
+        new_map.add_log(request.user, "Created the %s map." % new_map.name)
+        new_map.add_system(request.user, new_map.root, "Root", None)
+        return HttpResponseRedirect(reverse('Map.views.get_map',
                                                 kwargs={'map_id': new_map.pk}))
-        else:
-            return TemplateResponse(request, 'new_map.html', {'form': form})
     else:
         form = MapForm
         return TemplateResponse(request, 'new_map.html', {'form': form, })
@@ -1156,7 +1172,7 @@ def purge_signatures(request, map_id, ms_id):
         raise PermissionDenied
     mapsys = get_object_or_404(MapSystem, pk=ms_id)
     if request.method == "POST":
-        mapsys.system.signatures.all().delete()
+        mapsys.signature_list.delete()
         return HttpResponse()
     else:
         return HttpResponse(status=400)

@@ -18,6 +18,7 @@ from django.db import models
 from django.conf import settings
 from Map.models import Map, System, MapSystem
 from core.utils import get_config
+from core.models import Tenant
 from datetime import datetime
 import pytz
 
@@ -27,6 +28,7 @@ User = settings.AUTH_USER_MODEL
 
 class Fleet(models.Model):
     """Represents a SiteTracker fleet."""
+    tenant = models.ForeignKey(Tenant, related_name="stfleets")
     system = models.ForeignKey(System, related_name="stfleets")
     initial_boss = models.ForeignKey(User, related_name="bossfleets")
     current_boss = models.ForeignKey(User, related_name="currently_bossing")
@@ -80,7 +82,8 @@ class Fleet(models.Model):
                 weighted_points = raw_points * weight_factor)
         site.save()
         for user in self.members.filter(leavetime=None).all():
-            site.members.add(UserSite(site=site, user=user.user, pending=False))
+            site.members.add(UserSite(tenant=self.tenant, site=site,
+                user=user.user, pending=False))
         return site
 
 
@@ -210,6 +213,7 @@ class UserSite(models.Model):
     """Represents a user's credit for a site."""
     site = models.ForeignKey(SiteRecord, related_name="members")
     user = models.ForeignKey(User, related_name="sites")
+    tenant = models.ForeignKey(Tenant, related_name='site_records')
     pending = models.BooleanField(default=False)
 
     def approve(self):

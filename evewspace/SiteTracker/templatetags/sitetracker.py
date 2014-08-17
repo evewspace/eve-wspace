@@ -20,18 +20,19 @@ from SiteTracker.models import Fleet, SiteType, UserSite
 
 register = template.Library()
 
-def get_st_context(user):
+def get_st_context(user, tenant):
     """
     Returns a dict of myfleets, availfleets, and fleetcount.
     """
-    myfleets = user.sitetrackerlogs.filter(leavetime=None).all()
+    myfleets = user.sitetrackerlogs.filter(fleet__tenant=tenant,
+            leavetime=None).all()
     availfleets = []
-    for fleet in Fleet.objects.filter(ended=None):
+    for fleet in Fleet.objects.filter(tenant=tenant, ended=None):
         if fleet.members.filter(user=user, leavetime=None).count() ==  0:
             availfleets.append(fleet)
-    fleetcount = Fleet.objects.filter(ended=None).count()
+    fleetcount = Fleet.objects.filter(tenant=tenant, ended=None).count()
     return {'myfleets': myfleets, 'availfleets': availfleets,
-            'fleetcount': fleetcount, 'user': user}
+            'fleetcount': fleetcount, 'user': user, 'current_tenant': tenant}
 
 
 @register.inclusion_tag("st_status_bar.html", takes_context=True)
@@ -39,16 +40,16 @@ def st_status_bar(context, refresh=False):
     """
     Displays the SiteTracker status bar.
     """
-    dict_values = get_st_context(context['user'])
+    dict_values = get_st_context(context['user'], context['current_tenant'])
     dict_values.update({'refresh': refresh})
     return dict_values
 
-@register.inclusion_tag("st_status.html")
-def st_status(user):
+@register.inclusion_tag("st_status.html", takes_context=True)
+def st_status(context, user):
     """
     Displays the status text.
     """
-    return get_st_context(user)
+    return get_st_context(user, context['current_tenant'])
 
 @register.inclusion_tag("st_boss_member.html")
 def st_boss_member(member):
@@ -57,12 +58,12 @@ def st_boss_member(member):
     """
     return {'member': member}
 
-@register.inclusion_tag("st_my_fleets.html")
-def st_my_fleets(user):
+@register.inclusion_tag("st_my_fleets.html", takes_context=True)
+def st_my_fleets(context, user):
     """
     List of fleets which user is a member.
     """
-    return get_st_context(user)
+    return get_st_context(user, context['current_tenant'])
 
 @register.inclusion_tag("st_fleet_details.html")
 def st_fleet_details(fleet, user):
@@ -77,16 +78,17 @@ def st_member_site_list(fleet, user):
     List of sites for a user in a fleet.
     """
     pending_sites = []
-    for log in UserSite.objects.filter(user=user, pending=True).all():
+    for log in UserSite.objects.filter(tenant=tenant, user=user,
+            pending=True).all():
         pending_sites.append(log.site)
     return {'fleet': fleet, 'pending_sites': pending_sites, 'user': user}
 
-@register.inclusion_tag("st_avail_fleets.html")
-def st_avail_fleets(user):
+@register.inclusion_tag("st_avail_fleets.html", takes_context=True)
+def st_avail_fleets(context, user):
     """
     List of available fleets.
     """
-    return get_st_context(user)
+    return get_st_context(user, context['current_tenant'])
 
 @register.inclusion_tag("st_fleet_details_boss.html")
 def st_fleet_details_boss(fleet, user):

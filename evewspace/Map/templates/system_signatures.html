@@ -8,7 +8,7 @@
     <th title="Activated / Rats">Act.</th>
     <th title="Capital Escalation Tracking">Escl.</th>
     </tr>
-    {% for sig in system.system.signatures.all %}
+    {% for sig in system.signature_list.all %}
     <tr {% if sig.owned_by %}class="success"{% elif not sig.updated %} class="sig-not-updated"{% endif %}
         title="{% if not sig.updated %}Not updated since downtime!{% else %}Updated {{sig.modified_time|naturaltime}} by {{sig.modified_by}}.{% endif %}">
         <td>

@@ -64,7 +64,9 @@ def create_fleet(request):
         raise PermissionDenied
     sysid = request.POST.get('sysID', None)
     system = get_object_or_404(System, pk=sysid)
-    fleet = Fleet(initial_boss=request.user, current_boss=request.user,
+    tenant = request.current_tenant
+    fleet = Fleet(tenant=tenant, initial_boss=request.user,
+            current_boss=request.user,
             system=system)
     fleet.save()
     UserLog(fleet=fleet, user=request.user).save()
@@ -208,10 +210,12 @@ def claim_site(request, fleetID, siteID, memberID):
             raise PermissionDenied
     else:
         if fleet.current_boss == request.user:
-            site.members.add(UserSite(site=site, user=member, pending=False))
+            site.members.add(UserSite(tenant=fleet.tenant, site=site,
+                user=member, pending=False))
             return HttpResponse()
         elif member == request.user:
-            site.members.add(UserSite(site=site, user=member, pending=True))
+            site.members.add(UserSite(tenant=fleet.tenant, site=site,
+                user=member, pending=True))
             return HttpResponse()
 
     raise PermissionDenied
@@ -244,7 +248,9 @@ def refresh_fleets(request):
     """
     if not request.is_ajax():
         raise PermissionDenied
-    myfleets = request.user.sitetrackerlogs.filter(leavetime=None)
+    tenant = request.current_tenant
+    myfleets = request.user.sitetrackerlogs.filter(fleet__tenant=tenant,
+            leavetime=None)
     return TemplateResponse(request, "st_fleet_refresh.html", {'myfleets': myfleets})
 
 

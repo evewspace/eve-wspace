@@ -17,7 +17,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group
-from core.models import SystemData
+from core.models import SystemData, Tenant
 from django import forms
 from django.forms import ModelForm
 from datetime import datetime, timedelta
@@ -80,21 +80,19 @@ class System(SystemData):
     sysclass_choices = ((1, "C1"), (2, "C2"), (3, "C3"), (4, "C4"), (5, "C5"),
             (6, "C6"), (7, "High Sec"), (8, "Low Sec"), (9, "Null Sec"))
     sysclass = models.IntegerField(choices = sysclass_choices)
+    npckills = models.IntegerField(null=True, blank=True)
+    podkills = models.IntegerField(null=True, blank=True)
+    shipkills = models.IntegerField(null=True, blank=True)
+    first_visited = models.DateTimeField(null=True, blank=True)
+    last_visited = models.DateTimeField(null=True, blank=True)
     importance_choices = ((0, "Regular"),
                      (1, "Dangerous System"),
                      (2, "Important System"))
     importance = models.IntegerField(choices = importance_choices, default = 0)
     occupied = models.TextField(blank = True)
-
-    occupied = models.TextField(blank = True)
     info = models.TextField(blank = True)
     lastscanned = models.DateTimeField()
-    npckills = models.IntegerField(null=True, blank=True)
-    podkills = models.IntegerField(null=True, blank=True)
-    shipkills = models.IntegerField(null=True, blank=True)
     updated = models.DateTimeField(null=True, blank=True)
-    first_visited = models.DateTimeField(null=True, blank=True)
-    last_visited = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         """Returns name of System as unicode representation"""
@@ -112,21 +110,9 @@ class System(SystemData):
         else:
             return self.ksystem
 
-    def save(self, *args, **kwargs):
-        self.updated = datetime.now(pytz.utc)
-        if self.lastscanned < datetime.now(pytz.utc) - timedelta(days=3):
-            self.lastscanned = datetime.now(pytz.utc)
-        if not self.first_visited:
-            self.first_visited = datetime.now(pytz.utc)
-            self.last_visited = datetime.now(pytz.utc)
-        if self.last_visited < datetime.now(pytz.utc) - timedelta(days=2):
-            self.last_visited = datetime.now(pytz.utc)
-
-        super(System, self).save(*args, **kwargs)
-
-    def add_active_pilot(self, username, charid, charname,
+    def add_active_pilot(self, tenant, username, charid, charname,
             shipname, shiptype):
-        sys_cache_key = 'sys_%s_locations' % self.pk
+        sys_cache_key = 'ten_%s_sys_%s_locations' % (tenant.pk, self.pk)
         current_time = time.time()
         time_threshold = current_time - (15 * 60)
         sys_location_dict = cache.get(sys_cache_key)
@@ -145,10 +131,10 @@ class System(SystemData):
         cache.set(sys_cache_key, sys_location_dict, 15 * 60)
         return location
 
-    def remove_active_pilot(self, charid):
+    def remove_active_pilot(self, tenant, charid):
         current_time = time.time()
         time_threshold = current_time - (15 * 60)
-        sys_cache_key = 'sys_%s_locations' % self.pk
+        sys_cache_key = 'ten_%s_sys_%s_locations' % (tenant.pk, self.pk)
         sys_location_dict = cache.get(sys_cache_key)
         if sys_location_dict:
             sys_location_dict.pop(charid, None)
@@ -159,18 +145,56 @@ class System(SystemData):
             cache.set(sys_cache_key, sys_location_dict, 15 * 60)
         return True
 
-    def _active_pilot_list(self):
-        sys_cache_key = 'sys_%s_locations' % self.pk
+    def pilot_list(self, tenant):
+        sys_cache_key = 'ten_%s_sys_%s_locations' % (tenant.pk, self.pk)
         sys_location_dict = cache.get(sys_cache_key)
         if sys_location_dict:
             return sys_location_dict
         else:
             return {}
 
-    pilot_list = property(_active_pilot_list)
+    def get_tenant_data(self, tenant):
+        if self.tenant_data.filter(tenant=tenant).exists():
+            return self.tenant_data.get(tenant=tenant)
+        else:
+            tenant_data = TenantSystemData(tenant=tenant, system=self)
+            tenant_data.save()
+            return tenant_data
 
-    def clear_sig_cache(self):
-        cache.delete('sys_%s_sig_list' % self.pk)
+
+class TenantSystemData(models.Model):
+    """
+    Returns SystemData extended with Tenant-specific information.
+    """
+    system = models.ForeignKey(System, related_name='tenant_data')
+    tenant = models.ForeignKey(Tenant, related_name='system_intel')
+    first_visited = models.DateTimeField(null=True, blank=True)
+    last_visited = models.DateTimeField(null=True, blank=True)
+    importance_choices = ((0, "Regular"),
+                     (1, "Dangerous System"),
+                     (2, "Important System"))
+    importance = models.IntegerField(choices = importance_choices, default = 0)
+    occupied = models.TextField(blank = True)
+    info = models.TextField(blank = True)
+    lastscanned = models.DateTimeField()
+    updated = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ('system', 'tenant')
+
+    def save(self, *args, **kwargs):
+        self.updated = datetime.now(pytz.utc)
+        if not self.lastscanned:
+            self.lastscanned = datetime.now(pytz.utc)
+        if self.lastscanned < datetime.now(pytz.utc) - timedelta(days=3):
+            self.lastscanned = datetime.now(pytz.utc)
+        if not self.first_visited:
+            self.first_visited = datetime.now(pytz.utc)
+            self.last_visited = datetime.now(pytz.utc)
+        if self.last_visited < datetime.now(pytz.utc) - timedelta(days=2):
+            self.last_visited = datetime.now(pytz.utc)
+
+        super(TenantSystemData, self).save(*args, **kwargs)
 
 
 class KSystem(System):
@@ -197,6 +221,7 @@ class WSystem(System):
 
 class Map(models.Model):
     """Stores the maps available in the map tool. root relates to System model."""
+    tenant = models.ForeignKey(Tenant, related_name='maps')
     name = models.CharField(max_length = 100, unique = True)
     root = models.ForeignKey(System, related_name="root")
     # Maps with explicitperms = True require an explicit permission entry to access.
@@ -242,7 +267,7 @@ class Map(models.Model):
                      visible=visible)
         log.save()
 
-    def get_permission(self, user):
+    def get_permission(self, user, current_tenant=None):
         """
         Returns the highest permision that user has on the map.
         0 = No Access
@@ -251,6 +276,12 @@ class Map(models.Model):
         """
         #Anonymous users always return 0
         if user.is_anonymous():
+            return 0
+        # Return 0 if we're the wrong tenant
+        if current_tenant:
+            if current_tenant != self.tenant:
+                return 0
+        elif self.tenant_id != 1:
             return 0
         #Special case: If user is a map admin, always return 2
         if user.has_perm('Map.map_admin'):
@@ -317,6 +348,29 @@ class MapSystem(models.Model):
     interesttime = models.DateTimeField(null=True, blank=True)
     parentsystem = models.ForeignKey('self', related_name="childsystems",
             null=True, blank=True)
+
+    @property
+    def tenant_data(self):
+        try:
+            return self.system.get_tenant_data(self.map.tenant)
+        except TenantSystemData.DoesNotExist:
+            tenant_data = TenantSystemData(tenant=self.map.tenant,
+                    system=self.system)
+            tenant_data.save()
+            return tenant_data
+
+    @property
+    def pos_list(self):
+        return self.system.poses.filter(tenant=self.map.tenant)
+
+    @property
+    def signature_list(self):
+        return self.system.signatures.filter(tenant=self.map.tenant)
+
+    @property
+    def pilot_list(self):
+        return self.system.pilot_list(self.map.tenant)
+
     def __unicode__(self):
         return "system %s in map %s" % (self.system.name, self.map.name)
 
@@ -415,6 +469,7 @@ class SignatureType(models.Model):
 
 class Signature(models.Model):
     """Stores the signatures active in all systems. Relates to System model."""
+    tenant = models.ForeignKey(Tenant, related_name='signatures')
     system = models.ForeignKey(System, related_name="signatures")
     modified_by = models.ForeignKey(User, related_name="signatures", null=True)
     sigtype = models.ForeignKey(SignatureType, related_name="sigs", null=True, blank=True)
@@ -436,7 +491,7 @@ class Signature(models.Model):
 
     class Meta:
         ordering = ['sigid']
-        unique_together = ('system', 'sigid')
+        unique_together = ('tenant', 'system', 'sigid')
 
     def __unicode__(self):
         """Returns sig ID as unicode representation"""
@@ -503,12 +558,10 @@ class Signature(models.Model):
         """
         Ensure that Sig IDs are proper.
         """
-        self.system.clear_sig_cache()
         self.sigid = utils.convert_signature_id(self.sigid)
         super(Signature, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        self.system.clear_sig_cache()
         super(Signature, self).delete(*args, **kwargs)
 
 class MapPermission(models.Model):

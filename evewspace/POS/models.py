@@ -17,7 +17,7 @@
 from django.db import models
 from core.models import Type, Location
 from API.models import CorpAPIKey
-from core.models import Corporation, Alliance
+from core.models import Corporation, Alliance, Tenant
 from Map.models import System
 import csv
 from django.contrib.auth import get_user_model
@@ -27,6 +27,7 @@ User = get_user_model()
 
 class POS(models.Model):
     """Represents a POS somewhere in space."""
+    tenant = models.ForeignKey(Tenant, related_name='pos_intel')
     system = models.ForeignKey(System, related_name="poses")
     planet = models.IntegerField()
     moon   = models.IntegerField()

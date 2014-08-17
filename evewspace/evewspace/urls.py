@@ -33,6 +33,8 @@ urlpatterns = patterns('',
         # Uncomment the admin/doc line below to enable admin documentation:
         # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
         url(r'^$', 'core.views.home_view', name='index'),
+        url(r'^switch_instance/(?P<tenant_id>\d+)/$',
+            'core.views.switch_tenant', name='switch_tenant'),
         # Uncommend to enable django admin
         #url(r'^admin/', include(admin.site.urls)),
         url(r'^settings/$', 'core.views.config_view', name='settings'),

@@ -20,6 +20,39 @@ from django.conf import settings
 
 User = settings.AUTH_USER_MODEL
 
+class SecurityRole(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True)
+    app = models.CharField(max_length=255)
+
+
+class Tenant(models.Model):
+    name = models.CharField(max_length=255)
+    admin_notes = models.TextField(null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True)
+
+    def resync_roles(self):
+        pass
+
+
+class TenantRole(models.Model):
+    tenant = models.ForeignKey(Tenant, related_name='roles')
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True)
+    users = models.ManyToManyField(User, related_name='tenant_roles')
+    permissions = models.ManyToManyField(SecurityRole,
+            related_name='tenant_roles')
+
+class TenantACL(models.Model):
+    tenant = models.ForeignKey(Tenant, related_name='acl_entries')
+    char_id = models.BigIntegerField(null=True)
+    corp_id = models.BigIntegerField(null=True)
+    alliance_id = models.BigIntegerField(null=True)
+    user = models.ForeignKey(User, null=True)
+    role = models.ForeignKey(TenantRole, related_name='acl_entries')
+
+
 class NewsFeed(models.Model):
     """
     Contains information about an RSS feed. If user is None, the feed is
@@ -32,6 +65,7 @@ class NewsFeed(models.Model):
 
     class Meta:
         ordering = ['name']
+
 
 class Alliance(models.Model):
     """Represents an alliance, data pulled from api"""
@@ -54,6 +88,14 @@ class Corporation(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class Character(models.Model):
+    """Represents and Eve Character."""
+    id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=255)
+    corporation = models.ForeignKey(Corporation, null=True)
+    user = models.ForeignKey(User, null=True)
 
 
 class ConfigEntry(models.Model):

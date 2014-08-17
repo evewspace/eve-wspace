@@ -14,16 +14,10 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from django import template
-from Map.models import *
-register = template.Library()
+from django.core.management.base import NoArgsCommand, CommandError
+from django.core.cache import cache
 
-@register.inclusion_tag('map_list.html', takes_context=True)
-def mapnavlist(context, user):
-    """Return list of maps that should appear in the user's nav bar."""
-    #Make a list, yay!
-    maplist = []
-    for map in Map.objects.all():
-        if map.get_permission(user, context['current_tenant']) > 0:
-            maplist.append(map)
-    return {'maps': maplist}
+class Command(NoArgsCommand):
+    def handle_noargs(self, **options):
+        cache.clear()
+        self.stdout.write('Cache cleared.\n')

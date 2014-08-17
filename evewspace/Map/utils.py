@@ -37,6 +37,7 @@ class MapJSONGenerator(object):
         self.map = map
         self.user = user
         self.levelY = 0
+        self.tenant = map.tenant
         self.pvp_threshold = int(get_config("MAP_PVP_THRESHOLD", user).value)
         self.npc_threshold = int(get_config("MAP_NPC_THRESHOLD", user).value)
         self.interest_time = int(get_config("MAP_INTEREST_TIME", user).value)
@@ -86,7 +87,8 @@ class MapJSONGenerator(object):
         npc_threshold = self.npc_threshold
         staticPrefix = "%s" % (settings.STATIC_URL + "images/")
 
-        if system.system.stfleets.filter(ended__isnull=True).exists():
+        if system.system.stfleets.filter(tenant=self.tenant,
+                ended__isnull=True).exists():
             return staticPrefix + "farm.png"
 
         if system.system.shipkills + system.system.podkills > pvp_threshold:
@@ -126,7 +128,7 @@ class MapJSONGenerator(object):
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
                     'interestpath': path, 'ParentID': system.parentsystem.pk,
-                    'activePilots': len(system.system.pilot_list),
+                    'activePilots': len(system.system.pilot_list(self.tenant)),
                     'WhToParent': parentWH.bottom_type.name,
                     'WhFromParent': parentWH.top_type.name,
                     'WhMassStatus': parentWH.mass_status,
@@ -142,7 +144,7 @@ class MapJSONGenerator(object):
                     'LevelX': levelX,
                     'LevelY': self.levelY, 'SysClass': system.system.sysclass,
                     'Friendly': system.friendlyname, 'interest': interest,
-                    'activePilots': len(system.system.pilot_list),
+                    'activePilots': len(system.system.pilot_list(self.tenant)),
                     'interestpath': path, 'ParentID': None,
                     'WhToParent': "", 'WhFromParent': "",
                     'WhMassStatus': None, 'WhTimeStatus': None,
@@ -160,13 +162,13 @@ class MapJSONGenerator(object):
         """
         staticPrefix = "%s" % (settings.STATIC_URL + "images/")
 
-        if system.system.importance == 0:
+        if system.tenant_data.importance == 0:
             return None
-        if system.system.importance == 1:
+        if system.tenant_data.importance == 1:
             return staticPrefix + "skull.png"
-        if system.system.importance == 2:
+        if system.tenant_data.importance == 2:
             return staticPrefix + "mark.png"
-        raise ValueError                                       
+        raise ValueError
 
 
     def get_systems_json(self):

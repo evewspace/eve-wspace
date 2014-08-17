@@ -14,9 +14,13 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
 from Map.models import Map
+from core.models import Tenant
 from django.template.response import TemplateResponse
 
 # Create your views here.
@@ -27,6 +31,17 @@ def home_view(request):
     directs them to that map or displays a home page template."""
 
     return TemplateResponse(request, 'home.html')
+
+
+@login_required()
+def switch_tenant(request, tenant_id):
+    old_tenant = request.current_tenant
+    new_tenant = get_object_or_404(Tenant, pk=tenant_id)
+    if new_tenant not in request.user.tenants:
+        raise PermissionDenied
+
+    request.session['current_tenant'] = new_tenant.pk
+    return HttpResponseRedirect(reverse('index'))
 
 
 @login_required

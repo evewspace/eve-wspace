@@ -2,6 +2,8 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 MULTI_TENANT = True
+DEFAULT_TENANT_ENABLED = True
+ALLOW_TENANT_CREATION = True
 AUTH_USER_MODEL = 'account.EWSUser'
 ADMINS = (
         # ('Your Name', 'your_email@example.com'),
@@ -164,6 +166,8 @@ MIDDLEWARE_CLASSES = (
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
+        'account.middleware.StrictAuthentication',
+        'core.middleware.MultitenantMiddleware',
         'eveigb.middleware.IGBMiddleware',
 )
 
@@ -207,7 +211,11 @@ INSTALLED_APPS = (
 ACCOUNT_REQUIRE_REG_CODE=True
 
 import django.conf.global_settings as DEFAULT_SETTINGS
-TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + ('core.context_processors.site', 'eveigb.context_processors.igb',)
+TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + (
+        'core.context_processors.site',
+        'core.context_processors.multitenant',
+        'eveigb.context_processors.igb',
+        )
 # ejabberd auth gateway log settings
 
 import logging

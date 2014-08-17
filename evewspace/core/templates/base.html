@@ -23,9 +23,32 @@
 	<!-- Header block is rendered before the nav bar. Contentheader is rendered after -->
 		<!-- Divs have both class and id so that base CSS can use classes and child templates can override this with id selectors -->
 		<div id="baseHeadDiv" class="header">
-			{%block header%}{%endblock%}
+            {%block header%}{%endblock%}
 		</div>
-
+            {%block tenant_bar %}
+            {% if multitenant_enabled %}
+                {% if tenant_list|length > 1 or allow_creation %}
+            <div id="baseTenantDiv" class="tenant-bar navbar" style="margin-bottom: 10px;">
+                <div class="navbar-inner">
+                    <ul class='nav'>
+                        <a class="brand" href="#">Instance:</a>
+                    <li class="dropdown"><a class='dropdown-toggle' data-toggle='dropdown' href="#">{{current_tenant.name}}</a>
+                    <ul class='dropdown-menu'>
+                    {% for tenant in tenant_list %}
+                    <li><a tabindex='-1' href='{% url 'switch_tenant' tenant.pk %}'>{{tenant.name}}</a></li>
+                    {% endfor %}
+                    {% if allow_creation %}
+                    <li class="divider"></li>
+                    <li><a tabindex="-1" href="#">Create New Instance</a></li>
+                    {% endif %}
+                    </li>
+                </ul>
+                </ul>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endblock %}
         <div id="baseNavDiv" class="navbar">
             <div class="navbar-inner">
                 <ul class="nav">

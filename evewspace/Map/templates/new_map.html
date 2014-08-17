@@ -1,29 +1,29 @@
 {% extends "base.html" %}
 {% block title %}Eve W-Space: New Map{% endblock %}
 {% block content %}
-<form action="{% url 'Map.views.create_map' %}" method="post">
+<form class='form-horizontal'action="{% url 'Map.views.create_map' %}" method="post">
     {% csrf_token %}
-    {{form.non_field_errors}}
-    <table>
-        {{form.name_errors}}
-        <tr>
-            <td><label for="id_name">Map Name:</label></td>
-            <td><input type="text" id="id_name" name="name" /></td>
-        </tr>
-        {{form.root_errors}}
-        <tr>
-            <td><label for="id_root">Root System:</label></td>
-            <td><input type="text" id="id_root" name="root" class="systemAuto" /></td>
-        </tr>
-        {{form.explicitperms_errors}}
-        {% if perms.Map.map_admin %}
-        <tr>
-            <td><label for="id_explicitperms">Require Explicit Permissions:</label> </td>
-            <td><input type="checkbox" id="id_explicitperms" name="explicitperms" /></td>
-        </tr>
-        {% endif %}
-    </table>
-    <input class="btn btn-primary" type="submit" value="Submit" />
+    <div class="control-group">
+        <label class='control-label' for='mapName'>Map Name:</label>
+        <div class='controls'>
+            <input type='text' name='name' id='mapName'>
+        </div>
+    </div>
+     <div class="control-group">
+        <label class='control-label' for='mapRoot'>Root System:</label>
+        <div class='controls'>
+            <input class="systemAuto" type='text' name='root' id='mapRoot'>
+        </div>
+    </div>
+     <div class="control-group">
+        <label class='control-label' for='explicitPerms'>Require Explicit Permissions?</label>
+        <div class='controls'>
+            <input type='checkbox' id='explicitPerms' name='explicit_perms'>
+        </div>
+    </div>
+    <div style="margin-left: 200px;">
+        <input class="btn btn-primary" type="submit" value="Submit" />
+    </div>
 </form>
 {% endblock %}
 

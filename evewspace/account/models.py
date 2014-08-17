@@ -26,6 +26,7 @@ from django.utils import timezone
 from django.utils.http import urlquote
 from django.core.mail import send_mail
 from django.utils.translation import ugettext_lazy as _
+from core.models import Tenant
 import pytz
 import datetime
 import time
@@ -56,7 +57,7 @@ class EWSUserManager(BaseUserManager):
         return self._create_user(username, email, password, False, False,
                                  **extra_fields)
 
-    def create_superuser(self, username, email, password, **extra_fields):
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
         return self._create_user(username, email, password, True, True,
                                  **extra_fields)
 
@@ -80,7 +81,7 @@ class EWSUser(AbstractBaseUser, PermissionsMixin):
         help_text=_('Designates whether this user should be treated as '
                     'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    defaultmap = models.ForeignKey(Map, related_name = "defaultusers", blank=True, null=True)
+    defaultmap = models.ForeignKey(Map, related_name="defaultusers", blank=True, null=True)
     objects = EWSUserManager()
 
     USERNAME_FIELD = 'username'
@@ -131,6 +132,25 @@ class EWSUser(AbstractBaseUser, PermissionsMixin):
 
         cache.set(user_cache_key, user_locations_dict, 60 * 15)
         return user_locations_dict
+
+    def tenant_permissions(self, tenant):
+        roles = []
+        for role in self.tenant_roles.filter(tenant=tenant).all():
+            for permission in role.permissions.all():
+                roles.append(permission)
+        return roles
+
+    @property
+    def tenants(self):
+        tenants = []
+        if settings.DEFAULT_TENANT_ENABLED:
+            default_tenant = Tenant.objects.get(pk=1)
+            if not default_tenant in tenants:
+                tenants.append(default_tenant)
+        for role in self.tenant_roles.all():
+            if role.tenant not in tenants:
+                tenants.append(role.tenant)
+        return tenants
 
 
 class GroupProfile(models.Model):

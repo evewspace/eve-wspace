@@ -37,26 +37,26 @@
     {% endif %}
     {% load humanize %}
     <span class="sysLastScanned label {% if scanwarning  %} label-important {% endif %}">
-        Last Scanned: {{mapsys.system.lastscanned|naturaltime}}
+        Last Scanned: {{mapsys.tenant_data.lastscanned|naturaltime}}
     </span><br /> 
      <span class="statsText label label-inverse"> NPC: {{mapsys.system.npckills}} Ship: {{mapsys.system.shipkills}} Pod: {{mapsys.system.podkills}}{% if mapsys.system.sysclass > 6 %} Jumps: {{mapsys.system.get_spec.jumps}} {% endif %}</span> 
      <br /> 
-     <p class="statusText label label-success">SIG: {{mapsys.system.signatures.count}} POS: {{mapsys.system.poses.count}} Pilots: {{mapsys.system.pilot_list|length}}</p><br />
-    {% if mapsys.system.occupied %}
-    <div class="occupiedTooltip label label-important"> Occupied: <br /> {{mapsys.system.occupied|linebreaksbr}}</div>
+     <p class="statusText label label-success">SIG: {{mapsys.signature_list.count}} POS: {{mapsys.pos_list.count}} Pilots: {{mapsys.pilot_list|length}}</p><br />
+    {% if mapsys.tenant_data.occupied %}
+    <div class="occupiedTooltip label label-important"> Occupied: <br /> {{mapsys.tenant_data.occupied|linebreaksbr}}</div>
     {% endif %}
-    {% if mapsys.system.info %}
-    <div class="infoTooltip label label-info"> Info: <br /> {{mapsys.system.info|linebreaksbr}} </div>
+    {% if mapsys.tenant_data.info %}
+    <div class="infoTooltip label label-info"> Info: <br /> {{mapsys.tenant_data.info|linebreaksbr}} </div>
     {% endif %}
 </div>
-{% if mapsys.system.pilot_list %}
+{% if mapsys.pilot_list %}
     <div class="span3">
             <table>
                 <tr>
                     <th>Pilot</th>
                     <th>Ship Type</th>
                 </tr>
-            {% for charid, p in mapsys.system.pilot_list.items %}
+            {% for charid, p in mapsys.pilot_list.items %}
                 {% if p.1 != "OOG Browser" %}
                 <tr>
                     <td>{{p.1}}</td>
