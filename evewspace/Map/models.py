@@ -348,14 +348,11 @@ class MapSystem(models.Model):
 
     def remove_system(self, user):
         """
-        Removes the supplied system and all of its children. If there are
-        no other instances of the system on other maps, also clears its sigs.
+        Removes the supplied system and all of its children.
         """
         # Raise ValueError if we're trying to delete the root
         if not self.parentsystem:
             raise ValueError("Cannot remove the root system.")
-        if self.system.maps.count() == 1:
-            self.system.signatures.all().delete()
         self.parent_wormhole.delete()
         for system in self.childsystems.all():
             system.remove_system(user)
