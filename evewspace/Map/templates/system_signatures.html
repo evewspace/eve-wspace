@@ -10,7 +10,7 @@
     </tr>
     {% for sig in system.system.signatures.all %}
     <tr {% if sig.owned_by %}class="success"{% elif not sig.updated %} class="sig-not-updated"{% endif %}
-        title="{% if not sig.updated %}Not updated since downtime!{% else %}Updated {{sig.modified_time|naturaltime}} by {{sig.modified_by}}.{% endif %}">
+        title="{% if not sig.updated %}Not yet scanned!{% else %}Scanned {{sig.modified_time|naturaltime}} by {{sig.modified_by}}.{% endif %}">
         <td>
             <i class="icon-pencil" title="Edit" onclick="GetEditSignatureBox({{system.pk}}, {{sig.pk}}, {{system.pk}});"></i> &nbsp;
             <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> &nbsp; 

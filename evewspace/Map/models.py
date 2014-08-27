@@ -493,7 +493,6 @@ class Signature(models.Model):
         """Increments the downtime count and does downtime cleanup
         of updated and activated."""
         self.activated = None
-        self.updated = False
         self.lastescalated = None
         if self.downtimes:
             self.downtimes += 1
