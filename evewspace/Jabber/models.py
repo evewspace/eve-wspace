@@ -37,4 +37,5 @@ class SlackChannel(models.Model):
     
     def __unicode__(self):
         return "Channel: %s Group: %s" % (self.channel, self.group.name)
+
     
