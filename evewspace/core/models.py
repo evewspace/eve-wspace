@@ -62,6 +62,7 @@ class NewsFeed(models.Model):
     description = models.CharField(max_length=255, null=True, blank=True)
     url = models.CharField(max_length=255)
     user = models.ForeignKey(User, related_name='feeds', null=True)
+    tenant = models.ForeignKey(Tenant, related_name='feeds', null=True)
 
     class Meta:
         ordering = ['name']

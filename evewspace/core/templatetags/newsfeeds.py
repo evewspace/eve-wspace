@@ -27,7 +27,14 @@ register=template.Library()
 def feeds(context):
     feeds = []
     for feed in NewsFeed.objects.all():
-        if feed.user == context['user'] or feed.user == None:
+        # Global feeds
+        if not feed.user and not feed.tenant:
+            feeds.append(feed)
+        # User Feeds
+        if feed.user == context['user']:
+            feeds.append(feed)
+        # Tenant-global Feeds
+        if not feed.user and feed.tenant == context['current_tenant']:
             feeds.append(feed)
     return {'feeds': feeds}
 
