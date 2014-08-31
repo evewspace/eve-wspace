@@ -23,7 +23,11 @@ def mapnavlist(context, user):
     """Return list of maps that should appear in the user's nav bar."""
     #Make a list, yay!
     maplist = []
-    for map in Map.objects.all():
-        if map.get_permission(user, context['current_tenant']) > 0:
-            maplist.append(map)
+    try:
+        for map in Map.objects.all():
+            if map.get_permission(user, context['current_tenant']) > 0:
+                maplist.append(map)
+    except KeyError:
+        # current_tenant isn't set for some reason. Deny all maps.
+        maplist = []
     return {'maps': maplist}
