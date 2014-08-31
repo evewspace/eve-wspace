@@ -92,18 +92,10 @@ def fill_jumps_cache():
 def check_server_status():
     """
     Checks the server status, if it detects the server is down, set updated=False
-    on all signatures.
+    on all signatures. This is deprecated as of Hyperion and is maintained
+    to prevent older configuration files from breaking on upgrade.
     """
-    api = eveapi.EVEAPIConnection(cacheHandler=handler)
-    try:
-        statusapi = api.server.ServerStatus()
-    except:
-        # API is down, assume the server is down as well
-        Signature.objects.all().update(updated=False)
-        return
-    if statusapi.serverOpen == u'True':
-        return
-    Signature.objects.all().update(updated=False)
+    return None
 
 @task()
 def downtime_site_update():

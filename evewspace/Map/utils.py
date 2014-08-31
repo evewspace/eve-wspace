@@ -22,6 +22,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.db.models import Q
 from math import pow, sqrt
 import datetime
 import json
@@ -133,6 +134,8 @@ class MapJSONGenerator(object):
                     'WhFromParent': parentWH.top_type.name,
                     'WhMassStatus': parentWH.mass_status,
                     'WhTimeStatus': parentWH.time_status,
+                    'WhTotalMass': parentWH.max_mass,
+                    'WhJumpMass': parentWH.jump_mass,
                     'WhToParentBubbled': parentWH.bottom_bubbled,
                     'WhFromParentBubbled': parentWH.top_bubbled,
                     'iconImageURL': self.get_system_icon(system),
@@ -147,6 +150,7 @@ class MapJSONGenerator(object):
                     'activePilots': len(system.system.pilot_list(self.tenant)),
                     'interestpath': path, 'ParentID': None,
                     'WhToParent': "", 'WhFromParent': "",
+                    'WhTotalMass': None, 'WhJumpMass': None,
                     'WhMassStatus': None, 'WhTimeStatus': None,
                     'WhToParentBubbled': None, 'WhFromParentBubbled': None,
                     'iconImageURL': self.get_system_icon(system),
@@ -250,12 +254,13 @@ def get_wormhole_type(system1, system2):
     if source == "5" or source == "6":
         if WormholeType.objects.filter(source="Z",
                 destination=destination).count() != 0:
-            sourcewh = WormholeType.objects.filter(source="Z",
-                    destination=destination).all()
+            sourcewh = WormholeType.objects.filter(
+                    Q(source="Z") | Q(source='W')).filter(
+                            destination=destination).all()
 
     if sourcewh == None:
-        sourcewh = WormholeType.objects.filter(source=source,
-                destination=destination).all()
+        sourcewh = WormholeType.objects.filter(Q(source=source) | Q(source='W')
+                ).filter(destination=destination).all()
     return sourcewh
 
 

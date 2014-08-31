@@ -142,6 +142,42 @@ def group_admin(request):
 
 
 @permission_required('account.account_admin')
+def new_user(request):
+    if request.method == 'POST':
+        error_list = []
+        username = request.POST.get('username', None)
+        password1 = request.POST.get('password1', None)
+        password2 = request.POST.get('password2', None)
+        email = request.POST.get('email', None)
+        if not username:
+            error_list.append('Username cannot be blank!')
+        if password1 != password2:
+            error_list.append('Passwords do not match!')
+        if not password1:
+            error_list.append('Password cannot be blank!')
+        if error_list:
+            return HttpResponse(render_to_string('create_user_error.html',
+                {'errors': error_list}), status=400)
+        user = User(username=username, email=email)
+        user.save()
+        user.set_password(password1)
+        user.is_active = True
+        user.save()
+        if user.email:
+            message = EmailMessage(
+                    subject="Password Reset",
+                    body=render_to_string(
+                        'password_admin_reset_email.txt',
+                        {'admin': request.user, 'member': user,
+                            'password': password1,
+                            'notify': True}),
+                    to=[user.email,])
+            message.send(fail_silently=False)
+        return HttpResponse()
+
+    return TemplateResponse(request, 'create_user.html')
+
+@permission_required('account.account_admin')
 def user_edit(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     return TemplateResponse(request, 'user_edit_dialog.html',

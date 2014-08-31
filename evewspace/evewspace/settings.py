@@ -254,4 +254,3 @@ except NameError:
         from local_settings import *
     except ImportError:
         pass
-

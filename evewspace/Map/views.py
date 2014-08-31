@@ -121,7 +121,6 @@ def map_refresh(request, map_id):
         utils.MapJSONGenerator(current_map,
                                request.user).get_systems_json()
     ]
-    print result[0]
     return HttpResponse(json.dumps(result))
 
 
@@ -481,6 +480,50 @@ def set_interest(request, map_id, ms_id):
         raise PermissionDenied
 
 
+def _translate_client_string(client_text):
+    TRANSLATE_DICT = {
+            'Cosmic Signature': 'Cosmic Signature',
+            'Cosmic Anomaly': 'Cosmic Anomaly',
+            'Ore Site': 'Ore Site',
+            'Gas Site': 'Gas Site',
+            'Data Site': 'Data Site',
+            'Relic Site': 'Relic Site',
+            'Wormhole': 'Wormhole',
+            'Combat Site': 'Combat Site',
+            # Russian
+            '\xd0\x98\xd1\x81\xd1\x82\xd0\xbe\xd1\x87\xd0\xbd\xd0\xb8\xd0\xba\xd0\xb8 \xd1\x81\xd0\xb8\xd0\xb3\xd0\xbd\xd0\xb0\xd0\xbb\xd0\xbe\xd0\xb2': 'Cosmic Signature',
+            '\xd0\x9a\xd0\xbe\xd1\x81\xd0\xbc\xd0\xb8\xd1\x87\xd0\xb5\xd1\x81\xd0\xba\xd0\xb0\xd1\x8f \xd0\xb0\xd0\xbd\xd0\xbe\xd0\xbc\xd0\xb0\xd0\xbb\xd0\xb8\xd1\x8f': 'Cosmic Anomaly',
+            '\xd0\xa0\xd0\xa3\xd0\x94\xd0\x90: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd0\xb4\xd0\xbe\xd0\xb1\xd1\x8b\xd1\x87\xd0\xb8 \xd1\x80\xd1\x83\xd0\xb4\xd1\x8b': 'Ore Site',
+            '\xd0\x93\xd0\x90\xd0\x97: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd0\xb4\xd0\xbe\xd0\xb1\xd1\x8b\xd1\x87\xd0\xb8 \xd0\xb3\xd0\xb0\xd0\xb7\xd0\xb0': 'Gas Site',
+            '\xd0\x94\xd0\x90\xd0\x9d\xd0\x9d\xd0\xab\xd0\x95: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd1\x81\xd0\xb1\xd0\xbe\xd1\x80\xd0\xb0 \xd0\xb4\xd0\xb0\xd0\xbd\xd0\xbd\xd1\x8b\xd1\x85': 'Data Site',
+            '\xd0\x90\xd0\xa0\xd0\xa2\xd0\x95\xd0\xa4\xd0\x90\xd0\x9a\xd0\xa2\xd0\xab: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd0\xbf\xd0\xbe\xd0\xb8\xd1\x81\xd0\xba\xd0\xb0 \xd0\xb0\xd1\x80\xd1\x82\xd0\xb5\xd1\x84\xd0\xb0\xd0\xba\xd1\x82\xd0\xbe\xd0\xb2': 'Relic Site',
+            '\xd0\xa7\xd0\xb5\xd1\x80\xd0\xb2\xd0\xbe\xd1\x82\xd0\xbe\xd1\x87\xd0\xb8\xd0\xbd\xd0\xb0': 'Wormhole',
+            '\xd0\x9e\xd0\x9f\xd0\x90\xd0\xa1\xd0\x9d\xd0\x9e: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd0\xbf\xd0\xbe\xd0\xb2\xd1\x8b\xd1\x88\xd0\xb5\xd0\xbd\xd0\xbd\xd0\xbe\xd0\xb9 \xd0\xbe\xd0\xbf\xd0\xb0\xd1\x81\xd0\xbd\xd0\xbe\xd1\x81\xd1\x82\xd0\xb8': 'Combat Site',
+            # German
+            u'Kosmische Signatur': 'Cosmic Signature',
+            u'Kosmische Anomalie': 'Cosmic Anomaly',
+            u'Mineraliengebiet': 'Ore Site',
+            u'Gasgebiet': 'Gas Site',
+            u'Datengebiet': 'Data Site',
+            u'Reliktgebiet': 'Relic Site',
+            u'Wurmloch': 'Wormhole',
+            u'Kampfgebiet': 'Combat Site',
+            # Japanese
+            '\xe5\xae\x87\xe5\xae\x99\xe3\x81\xae\xe3\x82\xb7\xe3\x82\xb0\xe3\x83\x8d\xe3\x83\x81\xe3\x83\xa3': 'Cosmic Signature',
+            '\xe5\xae\x87\xe5\xae\x99\xe3\x81\xae\xe7\x89\xb9\xe7\x95\xb0\xe7\x82\xb9': 'Cosmic Anomaly',
+            '\xe9\x89\xb1\xe7\x9f\xb3\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Ore Site',
+            '\xe3\x82\xac\xe3\x82\xb9\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Gas Site',
+            '\xe3\x83\x87\xe3\x83\xbc\xe3\x82\xbf\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Data Site',
+            '\xe9\x81\xba\xe7\x89\xa9\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Relic Site',
+            '\xe3\x83\xaf\xe3\x83\xbc\xe3\x83\xa0\xe3\x83\x9b\xe3\x83\xbc\xe3\x83\xab': 'Wormhole',
+            '\xe6\x88\xa6\xe9\x97\x98\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Combat Site'
+            }
+    try:
+        text = TRANSLATE_DICT[client_text]
+        return text
+    except KeyError:
+        return None
+
 
 def _update_sig_from_tsv(signature, row):
     COL_SIG = 0
@@ -492,12 +535,15 @@ def _update_sig_from_tsv(signature, row):
     info = row[COL_SIG_TYPE]
     updated = False
     sig_type = None
-    if (row[COL_SIG_SCAN_GROUP] == "Cosmic Signature"
-        or row[COL_SIG_SCAN_GROUP] == "Cosmic Anomaly"
+    debug_text = row[COL_SIG_SCAN_GROUP]
+    scan_group = _translate_client_string(row[COL_SIG_SCAN_GROUP])
+    if (scan_group == "Cosmic Signature"
+        or scan_group == "Cosmic Anomaly"
        ):
         try:
+            sig_type_name = _translate_client_string(row[COL_SIG_GROUP])
             sig_type = SignatureType.objects.get(
-                    longname=row[COL_SIG_GROUP])
+                    longname=sig_type_name)
         except:
             sig_type = None
     else:
@@ -533,7 +579,7 @@ def bulk_sig_import(request, map_id, ms_id):
     k = 0
     if request.method == 'POST':
         reader = csv.reader(request.POST.get('paste', '').decode(
-                'utf-8').splitlines(), delimiter="\t")
+            ).splitlines(), delimiter="\t")
         COL_SIG = 0
         COL_STRENGTH = 4
         for row in reader:

@@ -44,6 +44,7 @@ class WormholeType(models.Model):
     # H : High Sec Only (e.g. freighter capable K > C5 in high)
     # NH : Low or Nullsec (e.g. cap capable K > C5)
     # K : Any K-space (e.g. X702 to a C3)
+    # W: Any W-space (i.e. Hyperion frig holes)
     # N: Nullsec
     # L: Lowsec
     # Z: Class 5 or 6 (5/6 > K holes)
@@ -401,14 +402,11 @@ class MapSystem(models.Model):
 
     def remove_system(self, user):
         """
-        Removes the supplied system and all of its children. If there are
-        no other instances of the system on other maps, also clears its sigs.
+        Removes the supplied system and all of its children.
         """
         # Raise ValueError if we're trying to delete the root
         if not self.parentsystem:
             raise ValueError("Cannot remove the root system.")
-        if self.system.maps.count() == 1:
-            self.system.signatures.all().delete()
         self.parent_wormhole.delete()
         for system in self.childsystems.all():
             system.remove_system(user)
@@ -436,6 +434,22 @@ class Wormhole(models.Model):
     updated = models.DateTimeField(auto_now=True)
     eol_time = models.DateTimeField(null=True)
     collapsed = models.NullBooleanField(null=True)
+
+    @property
+    def max_mass(self):
+        if self.top_type.maxmass:
+            return self.top_type.maxmass
+        if self.bottom_type.maxmass:
+            return self.bottom_type.maxmass
+        return 0
+
+    @property
+    def jump_mass(self):
+        if self.top_type.jumpmass:
+            return self.top_type.jumpmass
+        if self.bottom_type.jumpmass:
+            return self.bottom_type.jumpmass
+        return 0
 
     def save(self, *args, **kwargs):
         self.map.clear_caches()
@@ -531,7 +545,6 @@ class Signature(models.Model):
         """Increments the downtime count and does downtime cleanup
         of updated and activated."""
         self.activated = None
-        self.updated = False
         self.lastescalated = None
         if self.downtimes:
             self.downtimes += 1

@@ -198,4 +198,3 @@ class RegistrationForm(EWSUserCreationForm):
     email = forms.EmailField(required=False, label="E-Mail Address (Optional)")
     password2 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password:")
     regcode = forms.CharField(max_length=64, label="Registration Code")
-

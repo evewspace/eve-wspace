@@ -24,6 +24,9 @@ class AlertMethodBase(object):
         send_alert(to_users, message, from_user, sub_group)
             -Send alert to given to_users. Should handle an unregistered user
              gracefully.
+        per_user_method()
+            -Return True if this method requires per-user signup (i.e. Jabber)
+             Return False if no per-user registration is required (i.e. Slack)
         register_user(user, sub_group)
             -Register the provided user and subscription group as being handled
              by this method.
@@ -45,6 +48,12 @@ class AlertMethodBase(object):
             message = "%s \n \n FROM: %s  TO: %s" % (message,
                     from_user.username, sub_group.name)
         raise NotImplementedError(message)
+
+    def per_user_method(self):
+        """
+        Does this alert method require per-user registration?
+        """
+        return True
 
     def register_user(self, user, sub_group):
         """

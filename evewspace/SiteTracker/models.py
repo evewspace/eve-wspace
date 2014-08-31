@@ -281,8 +281,3 @@ class PayoutEntry(models.Model):
     user = models.ForeignKey(User, related_name="payouts")
     claim = models.ForeignKey(Claim, related_name="payout")
     iskshare = models.BigIntegerField()
-
-
-
-
-

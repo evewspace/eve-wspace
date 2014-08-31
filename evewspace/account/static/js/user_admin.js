@@ -19,6 +19,15 @@ $(document).ready(function(){
     GetUserList(1);
 });
 
+function GenerateRandomString() {
+    var result = "";
+    var allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i=0; i < 12; i++){
+    result += allowedChars.charAt(Math.floor(Math.random() * allowedChars.length));
+   }
+    return result;
+}
+
 function GetUserList(page_number) {
     $.ajax({
         url: "/account/admin/user/list/" + page_number + "/",
@@ -40,14 +49,10 @@ function GetEditUserDialog(user_id) {
 }
 
 function SetRandomPassword() {
-    var result = "";
-    var allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!$#";
-   for (var i=0; i < 12; i++){
-    result += allowedChars.charAt(Math.floor(Math.random() * allowedChars.length));
-   }
-   $('#newPassword').val(result);
-   $('#passwordConfirm').val(result);
-   $('#randomPasswordSpan').html("Password: " + result).show();
+    var result = GenerateRandomString();
+    $('#newPassword').val(result);
+    $('#passwordConfirm').val(result);
+    $('#randomPasswordSpan').html("Password: " + result).show();
 }
 
 function SaveUser(user_id) {
@@ -89,6 +94,35 @@ function SaveUserGroups(user_id) {
         },
         error: function(error){
             alert('Unable to get the group list:' + error.responseText);
+        }
+    });
+}
+
+function GetCreateUserDialog(){
+    $.ajax({
+        url: '/account/admin/user/new/',
+        type: 'GET',
+        success: function(data){
+            $('#modalHolder').html(data).modal('show');
+        },
+        error: function(error){
+            alert('Could not get the create user dialog:\n\n' + error.responseText);
+        }
+    });
+}
+
+function CreateUser(){
+    $('#createUserError').hide();
+    $.ajax({
+        url: '/account/admin/user/new/',
+        type: 'POST',
+        data: $('#createUserForm').serialize(),
+        success: function(data){
+            $('#modalHolder').modal('hide');
+            GetUserList(1);
+        },
+        error: function(error){
+            $('#createUserError').html(error.responseText).show();
         }
     });
 }
