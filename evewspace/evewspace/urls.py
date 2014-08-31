@@ -35,6 +35,7 @@ urlpatterns = patterns('',
         url(r'^$', 'core.views.home_view', name='index'),
         url(r'^switch_instance/(?P<tenant_id>\d+)/$',
             'core.views.switch_tenant', name='switch_tenant'),
+        url(r'^new_tenant/$', 'core.views.create_tenant'),
         # Uncommend to enable django admin
         #url(r'^admin/', include(admin.site.urls)),
         url(r'^settings/$', 'core.views.config_view', name='settings'),

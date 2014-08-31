@@ -21,6 +21,8 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from Map.models import Map
 from core.models import Tenant
+from core.utils import get_config
+from django.conf import settings
 from django.template.response import TemplateResponse
 
 # Create your views here.
@@ -50,3 +52,20 @@ def config_view(request):
     Gets the configuration page.
     """
     return TemplateResponse(request, 'settings.html')
+
+@login_required
+def create_tenant(request):
+    if not settings.ALLOW_TENANT_CREATION:
+        if not request.user.has_perm('core.tenant_admin'):
+            raise PermissionDenied
+
+    if request.method == 'POST':
+        tenant_name = request.POST.get('name', None)
+        if not tenant_name:
+            return HttpResponse('Tenant name must be provided!', status=400)
+        new_tenant = Tenant(name=tenant_name)
+        new_tenant.save()
+        new_tenant.create_default_admin(request.user)
+        return HttpResponseRedirect(reverse('switch_tenant',
+            kwargs={'tenant_id': new_tenant.pk}))
+    return TemplateResponse(request, 'new_tenant.html')

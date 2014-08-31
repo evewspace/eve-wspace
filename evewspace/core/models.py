@@ -32,8 +32,20 @@ class Tenant(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
 
+    def create_default_admin(self, user):
+        """
+        Creates the initial 'Admin' role and adds user to it.
+        """
+        role = TenantRole(tenant=self, name='Admin',
+                description='Full control over the instance.')
+        role.save()
+        role.users.add(user)
+
     def resync_roles(self):
         pass
+
+    class Meta:
+        permissions = [('tenant_admin', 'Can edit tenants.'),]
 
 
 class TenantRole(models.Model):

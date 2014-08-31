@@ -39,7 +39,7 @@
                     {% endfor %}
                     {% if allow_creation %}
                     <li class="divider"></li>
-                    <li><a tabindex="-1" href="#">Create New Instance</a></li>
+                    <li><a tabindex="-1" href="{% url 'core.views.create_tenant' %}">Create New Instance</a></li>
                     {% endif %}
                     </li>
                 </ul>

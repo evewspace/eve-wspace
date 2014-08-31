@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Create Instance:</h3>
+<form class='form' action='/new_tenant/' method='POST'>
+    {% csrf_token %}
+    <label for='#tenant-name'>Instance Name:</label>
+    <input id='tenant-name' name='name' type='text'>
+    <br />
+    <input type='submit' class='btn btn-info' value='Create Instance'>
+</form>
+{% endblock %}
