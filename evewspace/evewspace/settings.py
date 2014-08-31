@@ -190,6 +190,7 @@ INSTALLED_APPS = (
         'Teamspeak',
         'Cart',
         'API',
+        'Slack',
         'account',
         'eveigb',
         'search',

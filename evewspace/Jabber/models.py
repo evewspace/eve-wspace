@@ -26,4 +26,3 @@ class JabberAccount(models.Model):
 
     def __unicode__(self):
         return "User: %s  JID: %s" % (self.user.username, self.jid)
-
