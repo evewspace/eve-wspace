@@ -57,17 +57,22 @@ def edit_subscriptions(request):
     # subscribed methods as info
     current_subs = {}
     available_groups = []
+    # Only pass methods requiring per-user registration
+    user_methods = []
+    for alert_method in method_registry:
+        if method_registry[alert_method]().per_user_method():
+            user_methods.append(alert_method)
     for sub_group in SubscriptionGroup.objects.all():
         if sub_group.get_user_perms(request.user)[1]:
            available_groups.append(sub_group)
            method_list = []
-           for alert_method in method_registry:
+           for alert_method in user_methods:
                if method_registry[alert_method]().is_registered(request.user, sub_group):
                    method_list.append(alert_method)
            current_subs[sub_group.name] = method_list
     if request.method == "POST":
         for group in available_groups:
-            for alert_method in method_registry:
+            for alert_method in user_methods:
                 method_registry[alert_method]().unregister(request.user, group)
                 if request.POST.get("%s_%s" % (group.pk, alert_method), False):
                     method_registry[alert_method]().register(request.user, group)
@@ -76,5 +81,6 @@ def edit_subscriptions(request):
         return TemplateResponse(request, "edit_subscriptions.html",
                 {'current_subs': current_subs,
                     'all_methods': method_registry,
-                    'available_groups': available_groups})
+                    'available_groups': available_groups,
+                    'user_methods': user_methods})
 

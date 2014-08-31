@@ -24,8 +24,6 @@ defaults = [
         ("JABBER_LOCAL_SPACE_CHAR", "_"),
         ("JABBER_LOCAL_DOMAIN", "localhost"),
         ("JABBER_LOCAL_ENABLED", "0"),
-        ("SLACK_TOKEN", ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(24))),
-        ("SLACK_SUBDOMAIN", "SLACK"),
         ]
 
 def load_defaults():
