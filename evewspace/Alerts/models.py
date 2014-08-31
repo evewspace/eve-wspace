@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #    Eve W-Space
 #    Copyright (C) 2013  Andrew Austin and other contributors
 #
