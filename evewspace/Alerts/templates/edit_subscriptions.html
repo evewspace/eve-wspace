@@ -9,14 +9,14 @@
             <table class="table">
                 <tr>
                     <th>Group</th>
-                    {% for method in all_methods %}
+                    {% for method in user_methods %}
                     <th>{{method}}</th>
                     {% endfor %}
                 </tr>
                 {% for group in available_groups %}
                 <tr>
                     <td>{{group.name}}</td>
-                    {% for method in all_methods %}
+                    {% for method in user_methods %}
                     <td><input name="{{group.pk}}_{{method}}" type="checkbox" {% if method in current_subs|keyvalue:group.name %} checked="checked" {% endif %} /></td>
                     {% endfor %}
                 </tr>
