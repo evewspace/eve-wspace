@@ -927,8 +927,9 @@ def destination_list(request, map_id, ms_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-    destinations = Destination.objects.filter(Q(user=None) |
-                                              Q(user=request.user))
+    destinations = Destination.objects.filter(Q(tenant=request.current_tenant)
+                                            | Q(user=request.user)
+                                            | Q(tenant=None, user=None))
     map_system = get_object_or_404(MapSystem, pk=ms_id)
     try:
         system = KSystem.objects.get(pk=map_system.system.pk)

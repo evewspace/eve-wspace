@@ -616,9 +616,10 @@ class Snapshot(models.Model):
 
 
 class Destination(models.Model):
-    """Represents a corp-wide destination whose range should be shown in the map."""
+    """Represents a destination whose range should be shown in the map."""
     system = models.ForeignKey(KSystem, related_name='destinations')
     user = models.ForeignKey(User, related_name='destinations', null=True)
+    tenant = models.ForeignKey(Tenant, related_name='destinations', null=True)
 
 class SiteSpawn(models.Model):
     """Contains the site spawn list for a site as HTML."""
