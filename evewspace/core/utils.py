@@ -16,12 +16,21 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.models import ConfigEntry
 
-def get_config(name, user):
+def get_config(name, user=None, tenant=None):
     """
     Gets the correct config value for the given key name.
-    Value with the given user has priority over any default value.
+    Priority: 1: User + Tenant, 2: User, 3: Tenant, 4: Global
     """
     try:
-        return ConfigEntry.objects.get(name=name, user=user)
+        return ConfigEntry.objects.get(name=name, user=user, tenant=tenant)
     except ConfigEntry.DoesNotExist:
-        return ConfigEntry.objects.get(name=name, user=None)
+        pass
+    try:
+        return ConfigEntry.objects.get(name=name, user=user, tenant=None)
+    except ConfigEntry.DoesNotExist:
+        pass
+    try:
+        return ConfigEntry.objects.get(name=name, user=None, tenant=tenant)
+    except ConfigEntry.DoesNotExist:
+        pass
+    return ConfigEntry.objects.get(name=name, user=None, tenant=None)

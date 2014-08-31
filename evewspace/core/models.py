@@ -102,7 +102,8 @@ class ConfigEntry(models.Model):
     """A configuration setting that may be changed at runtime."""
     name = models.CharField(max_length=32, unique=True)
     value = models.CharField(max_length=255, null=True, blank=True)
-    user = models.ForeignKey(User, related_name='settings', null=True, blank=True)
+    user = models.ForeignKey(User, related_name='settings', null=True)
+    tenant = models.ForeignKey(Tenant, related_name='settings', null=True)
 
 
 class MarketGroup(models.Model):
