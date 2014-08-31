@@ -223,7 +223,7 @@ class WSystem(System):
 class Map(models.Model):
     """Stores the maps available in the map tool. root relates to System model."""
     tenant = models.ForeignKey(Tenant, related_name='maps')
-    name = models.CharField(max_length = 100, unique = True)
+    name = models.CharField(max_length = 100)
     root = models.ForeignKey(System, related_name="root")
     # Maps with explicitperms = True require an explicit permission entry to access.
     explicitperms = models.BooleanField(default=False)
@@ -231,6 +231,7 @@ class Map(models.Model):
     class Meta:
         permissions = (("map_unrestricted", "Do not require excplicit access to maps."),
                 ("map_admin", "Access map configuration."),)
+        unique_together = ('tenant', 'name')
 
     def __unicode__(self):
         """Returns name of Map as unicode representation."""
