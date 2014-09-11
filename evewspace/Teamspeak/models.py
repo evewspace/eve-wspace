@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 
 # Create your models here.
 
@@ -27,9 +27,19 @@ class TeamspeakServer(models.Model):
     queryport = models.IntegerField()
     voiceport = models.IntegerField()
     # If enforcegroups = True, any TS users who do not have a GroupMap entry will have no groups
-    enforcegroups = models.BooleanField()
+    enforcegroups = models.BooleanField(default=False)
     # If enforceusers = True, any TS users without a Django user mapping will be removed
-    enforeceusers = models.BooleanField()
+    enforeceusers = models.BooleanField(default=False)
+
+    @classmethod
+    def create(cls,host,queryuser,querypass,queryport,voiceport):
+        ts3= cls(host=host,queryuser=queryuser,querypass=querypass,queryport=queryport,voiceport=voiceport)
+        return ts3
+
+    class Meta:
+        permissions = (('ts_admin', 'Can administer Teamspeak settings'),
+                       ('ts_see_online', 'Can see online TS users'),
+                       )
 
 class GroupMap(models.Model):
     """Maps Django user groups to Teamspeak groups."""

@@ -20,7 +20,11 @@
 {
 	text-align: center;
 }
-
+.feedbackPanel
+{
+    margin-left: 0px;
+    text-align: center;
+}
 .logInBox
 {
 	color: #C8C8C8;

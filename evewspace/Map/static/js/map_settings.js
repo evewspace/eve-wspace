@@ -147,3 +147,32 @@ function RemoveDestination(destID){
         success: function(){GetDestinationSettings();}
     });
 }
+
+
+function SaveMapSettings(map_id){
+    $.ajax({
+        url: '/map/' + map_id + '/settings/',
+        type: 'POST',
+        data: $('#map' + map_id + 'SettingsForm').serialize(),
+        success: function(data){
+            $("#map" + map_id + "Div").html(data);
+        },
+        error: function(error){
+            alert('The map settings could not be saved: \n\n' + error.responseText);
+        }
+    });
+}
+
+
+function DeleteMap(map_id){
+    $.ajax({
+        url: '/map/' + map_id + '/delete/',
+        type: 'POST',
+        success: function(){
+            $('#map' + map_id + 'Settings').html('<h1>Deleted</h1>');
+        },
+        error: function(error){
+            alert('The map could not be deleted: \n\n' + error.responseText);
+        }
+    });
+}

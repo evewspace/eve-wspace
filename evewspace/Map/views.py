@@ -29,10 +29,12 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, Permission
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
+from django.views.decorators.cache import cache_page
 
 from Map.models import *
 from Map import utils, signals
 from core.utils import get_config
+from POS.models import POS
 
 # Decorator to check map permissions. Takes request and map_id
 # Permissions are 0 = None, 1 = View, 2 = Change
@@ -66,7 +68,6 @@ def get_map(request, map_id):
     context = {
         'map': current_map,
         'access': current_map.get_permission(request.user),
-        'systemsJSON': current_map.as_json(request.user)
     }
     return TemplateResponse(request, 'map.html', context)
 
@@ -92,18 +93,9 @@ def map_checkin(request, map_id):
         dialog_html = _checkin_igb_trusted(request, current_map)
         if dialog_html is not None:
             json_values.update({'dialogHTML': dialog_html})
-
-    new_log_query = MapLog.objects.filter(timestamp__gt=load_time,
+    log_list = MapLog.objects.filter(timestamp__gt=load_time,
                                           visible=True,
                                           map=current_map)
-    log_list = []
-
-    for log in new_log_query:
-        #TODO (marbin): Move this to a template.
-        log_list.append(
-            "<strong>User:</strong> %s <strong>Action:</strong> %s"
-            % (log.user.username, log.action)
-        )
 
     log_string = render_to_string('log_div.html', {'logs': log_list})
     json_values.update({'logs': log_string})
@@ -138,41 +130,54 @@ def _checkin_igb_trusted(request, current_map):
     containing the html for a system add dialog if we detect that a new system
     needs to be added
     """
-    current_system = System.objects.get(name=request.eve_systemname)
-    old_system = None
+    can_edit = current_map.get_permission(request.user) == 2
+    current_location = (request.eve_systemid, request.eve_charname,
+            request.eve_shipname, request.eve_shiptypename)
+    char_cache_key = 'char_%s_location' % request.eve_charid
+    old_location = cache.get(char_cache_key)
     result = None
-    threshold = datetime.now(pytz.utc) - timedelta(minutes=5)
-    recently_active = request.user.locations.filter(
-        timestamp__gt=threshold,
-        charactername=request.eve_charname
-    ).all()
+    current_system = get_object_or_404(System, pk=current_location[0])
 
-    if recently_active.count():
-        old_system = request.user.locations.get(
-            charactername=request.eve_charname
-        ).system
-
+    if old_location != current_location:
+        if old_location:
+            old_system = get_object_or_404(System, pk=old_location[0])
+            old_system.remove_active_pilot(request.eve_charid)
+        request.user.update_location(current_system.pk,
+                request.eve_charid, request.eve_charname, request.eve_shipname,
+                request.eve_shiptypename)
+        cache.set(char_cache_key, current_location, 60 * 5)
     #Conditions for the system to be automagically added to the map.
-    if (
-        old_system in current_map
-        and current_system not in current_map
-        and not _is_moving_from_kspace_to_kspace(old_system, current_system)
-        and recently_active.count()
-    ):
-        context = {
-            'oldsystem': current_map.systems.filter(
-                system=old_system).all()[0],
-            'newsystem': current_system,
-            'wormholes': utils.get_possible_wh_types(old_system,
-                                                     current_system),
-        }
+        if (can_edit and
+            old_location and
+            old_system in current_map
+            and current_system not in current_map
+            and not _is_moving_from_kspace_to_kspace(old_system, current_system)
+        ):
+            context = {
+                'oldsystem': current_map.systems.filter(
+                    system=old_system).all()[0],
+                'newsystem': current_system,
+                'wormholes': utils.get_possible_wh_types(old_system,
+                                                         current_system),
+            }
 
-        result = render_to_string('igb_system_add_dialog.html', context,
-                                  context_instance=RequestContext(request))
+            if request.POST.get('silent', 'false') != 'true':
+                result = render_to_string('igb_system_add_dialog.html', context,
+                                      context_instance=RequestContext(request))
+            else:
+                new_ms = current_map.add_system(request.user, current_system, '',
+                        context['oldsystem'])
+                k162_type = WormholeType.objects.get(name="K162")
+                new_ms.connect_to(context['oldsystem'], k162_type, k162_type)
+                result = 'silent'
+    else:
+        cache.set(char_cache_key, current_location, 60 * 5)
+        # Use add_active_pilot to refresh the user's record in the global
+        # location cache
+        current_system.add_active_pilot(request.user.username,
+                request.eve_charid, request.eve_charname, request.eve_shipname,
+                request.eve_shiptypename)
 
-    current_system.add_active_pilot(request.user, request.eve_charname,
-                                    request.eve_shipname,
-                                    request.eve_shiptypename)
     return result
 
 
@@ -186,9 +191,12 @@ def _is_moving_from_kspace_to_kspace(old_system, current_system):
     return old_system.is_kspace() and current_system.is_kspace()
 
 
-def get_system_context(ms_id):
+def get_system_context(ms_id, user):
     map_system = get_object_or_404(MapSystem, pk=ms_id)
-
+    if map_system.map.get_permission(user) == 2:
+        can_edit = True
+    else:
+        can_edit = False
     #If map_system represents a k-space system get the relevant KSystem object
     if map_system.system.is_kspace():
         system = map_system.system.ksystem
@@ -210,9 +218,13 @@ def get_system_context(ms_id):
         interest = map_system.interesttime
         # Include any SiteTracker fleets that are active
     st_fleets = map_system.system.stfleets.filter(ended=None).all()
+    locations = cache.get('sys_%s_locations' % map_system.system.pk)
+    if not locations:
+        locations = {}
     return {'system': system, 'mapsys': map_system,
             'scanwarning': scan_warning, 'isinterest': interest,
-            'stfleets': st_fleets}
+            'stfleets': st_fleets, 'locations': locations,
+            'can_edit': can_edit}
 
 
 @login_required
@@ -247,8 +259,14 @@ def add_system(request, map_id):
         )
         time_status = int(request.POST.get('timeStatus'))
         mass_status = int(request.POST.get('massStatus'))
-        top_bubbled = "1" == request.POST.get('topBubbled')
-        bottom_bubbled = "1" == request.POST.get('bottomBubbled')
+        if request.POST.get('topBubbled', '0') != "0":
+            top_bubbled = True
+        else:
+            top_bubbled = False
+        if request.POST.get('bottomBubbled', '0') != "0":
+            bottom_bubbled = True
+        else:
+            bottom_bubbled = False
         # Add System
         bottom_ms = current_map.add_system(
             request.user, bottom_sys,
@@ -257,7 +275,7 @@ def add_system(request, map_id):
         # Add Wormhole
         bottom_ms.connect_to(top_ms, top_type, bottom_type, top_bubbled,
                              bottom_bubbled, time_status, mass_status)
-
+        current_map.clear_caches()
         return HttpResponse()
     except ObjectDoesNotExist:
         return HttpResponse(status=400)
@@ -286,7 +304,8 @@ def system_details(request, map_id, ms_id):
     if not request.is_ajax():
         raise PermissionDenied
 
-    return render(request, 'system_details.html', get_system_context(ms_id))
+    return render(request, 'system_details.html',
+            get_system_context(ms_id, request.user))
 
 
 # noinspection PyUnusedLocal
@@ -299,7 +318,8 @@ def system_menu(request, map_id, ms_id):
     if not request.is_ajax():
         raise PermissionDenied
 
-    return render(request, 'system_menu.html', get_system_context(ms_id))
+    return render(request, 'system_menu.html',
+            get_system_context(ms_id, request.user))
 
 
 # noinspection PyUnusedLocal
@@ -311,11 +331,18 @@ def system_tooltips(request, map_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-    ms_list = MapSystem.objects.filter(map_id=map_id)\
-                    .select_related('parent_wormhole', 'system__region')\
-                    .iterator()
-    return render(request, 'system_tooltip.html', {'map_systems': ms_list})
-
+    cache_key = 'map_%s_sys_tooltip' % map_id
+    cached_tips = cache.get(cache_key)
+    if not cached_tips:
+        ms_list = MapSystem.objects.filter(map_id=map_id)\
+                        .select_related('parent_wormhole', 'system__region')\
+                        .iterator()
+        new_tips =  render_to_string('system_tooltip.html',
+                {'map_systems': ms_list}, RequestContext(request))
+        cache.set(cache_key, new_tips, 60)
+        return HttpResponse(new_tips)
+    else:
+        return HttpResponse(cached_tips)
 
 # noinspection PyUnusedLocal
 @login_required
@@ -327,10 +354,18 @@ def wormhole_tooltips(request, map_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-    cur_map = get_object_or_404(Map, pk=map_id)
-    ms_list = MapSystem.objects.filter(map=cur_map).all()
-    whs = Wormhole.objects.filter(top__in=ms_list).all()
-    return render(request, 'wormhole_tooltip.html', {'wormholes': whs})
+    cache_key = 'map_%s_wh_tooltip' % map_id
+    cached_tips = cache.get(cache_key)
+    if not cached_tips:
+        cur_map = get_object_or_404(Map, pk=map_id)
+        ms_list = MapSystem.objects.filter(map=cur_map).all()
+        whs = Wormhole.objects.filter(top__in=ms_list).all()
+        new_tips = render_to_string('wormhole_tooltip.html',
+                {'wormholes': whs}, RequestContext(request))
+        cache.set(cache_key, new_tips, 60)
+        return HttpResponse(new_tips)
+    else:
+        return HttpResponse(cached_tips)
 
 
 # noinspection PyUnusedLocal
@@ -391,13 +426,21 @@ def manual_location(request, map_id, ms_id):
     being active in that system.
 
     """
-    if request.is_ajax():
-        map_system = get_object_or_404(MapSystem, pk=ms_id)
-        map_system.system.add_active_pilot(request.user, "OOG Browser",
-                                           "Unknown", "Uknown")
-        return HttpResponse()
-    else:
+    if not request.is_ajax():
         raise PermissionDenied
+    user_locations = cache.get('user_%s_locations' % request.user.pk)
+    if user_locations:
+        old_location = user_locations.pop(request.user.pk, None)
+        if old_location:
+            old_sys = get_object_or_404(System, pk=old_location[0])
+            old_sys.remove_active_pilot(request.user.pk)
+    map_sys = get_object_or_404(MapSystem, pk=ms_id)
+    map_sys.system.add_active_pilot(request.user.username, request.user.pk,
+            'OOG Browser', 'Unknown', 'Unknown')
+    request.user.update_location(map_sys.system.pk, request.user.pk,
+            'OOG Browser', 'Unknown', 'Unknown')
+    map_sys.map.clear_caches()
+    return HttpResponse()
 
 
 # noinspection PyUnusedLocal
@@ -422,10 +465,55 @@ def set_interest(request, map_id, ms_id):
             system.interesttime = None
             system.save()
             return HttpResponse()
+        system.map.clear_caches()
         return HttpResponse(status=418)
     else:
         raise PermissionDenied
 
+
+def _translate_client_string(client_text):
+    TRANSLATE_DICT = {
+            'Cosmic Signature': 'Cosmic Signature',
+            'Cosmic Anomaly': 'Cosmic Anomaly',
+            'Ore Site': 'Ore Site',
+            'Gas Site': 'Gas Site',
+            'Data Site': 'Data Site',
+            'Relic Site': 'Relic Site',
+            'Wormhole': 'Wormhole',
+            'Combat Site': 'Combat Site',
+            # Russian
+            '\xd0\x98\xd1\x81\xd1\x82\xd0\xbe\xd1\x87\xd0\xbd\xd0\xb8\xd0\xba\xd0\xb8 \xd1\x81\xd0\xb8\xd0\xb3\xd0\xbd\xd0\xb0\xd0\xbb\xd0\xbe\xd0\xb2': 'Cosmic Signature',
+            '\xd0\x9a\xd0\xbe\xd1\x81\xd0\xbc\xd0\xb8\xd1\x87\xd0\xb5\xd1\x81\xd0\xba\xd0\xb0\xd1\x8f \xd0\xb0\xd0\xbd\xd0\xbe\xd0\xbc\xd0\xb0\xd0\xbb\xd0\xb8\xd1\x8f': 'Cosmic Anomaly',
+            '\xd0\xa0\xd0\xa3\xd0\x94\xd0\x90: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd0\xb4\xd0\xbe\xd0\xb1\xd1\x8b\xd1\x87\xd0\xb8 \xd1\x80\xd1\x83\xd0\xb4\xd1\x8b': 'Ore Site',
+            '\xd0\x93\xd0\x90\xd0\x97: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd0\xb4\xd0\xbe\xd0\xb1\xd1\x8b\xd1\x87\xd0\xb8 \xd0\xb3\xd0\xb0\xd0\xb7\xd0\xb0': 'Gas Site',
+            '\xd0\x94\xd0\x90\xd0\x9d\xd0\x9d\xd0\xab\xd0\x95: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd1\x81\xd0\xb1\xd0\xbe\xd1\x80\xd0\xb0 \xd0\xb4\xd0\xb0\xd0\xbd\xd0\xbd\xd1\x8b\xd1\x85': 'Data Site',
+            '\xd0\x90\xd0\xa0\xd0\xa2\xd0\x95\xd0\xa4\xd0\x90\xd0\x9a\xd0\xa2\xd0\xab: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd0\xbf\xd0\xbe\xd0\xb8\xd1\x81\xd0\xba\xd0\xb0 \xd0\xb0\xd1\x80\xd1\x82\xd0\xb5\xd1\x84\xd0\xb0\xd0\xba\xd1\x82\xd0\xbe\xd0\xb2': 'Relic Site',
+            '\xd0\xa7\xd0\xb5\xd1\x80\xd0\xb2\xd0\xbe\xd1\x82\xd0\xbe\xd1\x87\xd0\xb8\xd0\xbd\xd0\xb0': 'Wormhole',
+            '\xd0\x9e\xd0\x9f\xd0\x90\xd0\xa1\xd0\x9d\xd0\x9e: \xd1\x80\xd0\xb0\xd0\xb9\xd0\xbe\xd0\xbd \xd0\xbf\xd0\xbe\xd0\xb2\xd1\x8b\xd1\x88\xd0\xb5\xd0\xbd\xd0\xbd\xd0\xbe\xd0\xb9 \xd0\xbe\xd0\xbf\xd0\xb0\xd1\x81\xd0\xbd\xd0\xbe\xd1\x81\xd1\x82\xd0\xb8': 'Combat Site',
+            # German
+            u'Kosmische Signatur': 'Cosmic Signature',
+            u'Kosmische Anomalie': 'Cosmic Anomaly',
+            u'Mineraliengebiet': 'Ore Site',
+            u'Gasgebiet': 'Gas Site',
+            u'Datengebiet': 'Data Site',
+            u'Reliktgebiet': 'Relic Site',
+            u'Wurmloch': 'Wormhole',
+            u'Kampfgebiet': 'Combat Site',
+            # Japanese
+            '\xe5\xae\x87\xe5\xae\x99\xe3\x81\xae\xe3\x82\xb7\xe3\x82\xb0\xe3\x83\x8d\xe3\x83\x81\xe3\x83\xa3': 'Cosmic Signature',
+            '\xe5\xae\x87\xe5\xae\x99\xe3\x81\xae\xe7\x89\xb9\xe7\x95\xb0\xe7\x82\xb9': 'Cosmic Anomaly',
+            '\xe9\x89\xb1\xe7\x9f\xb3\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Ore Site',
+            '\xe3\x82\xac\xe3\x82\xb9\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Gas Site',
+            '\xe3\x83\x87\xe3\x83\xbc\xe3\x82\xbf\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Data Site',
+            '\xe9\x81\xba\xe7\x89\xa9\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Relic Site',
+            '\xe3\x83\xaf\xe3\x83\xbc\xe3\x83\xa0\xe3\x83\x9b\xe3\x83\xbc\xe3\x83\xab': 'Wormhole',
+            '\xe6\x88\xa6\xe9\x97\x98\xe3\x82\xb5\xe3\x82\xa4\xe3\x83\x88': 'Combat Site'
+            }
+    try:
+        text = TRANSLATE_DICT[client_text]
+        return text
+    except KeyError:
+        return None
 
 
 def _update_sig_from_tsv(signature, row):
@@ -438,18 +526,21 @@ def _update_sig_from_tsv(signature, row):
     info = row[COL_SIG_TYPE]
     updated = False
     sig_type = None
-    if (row[COL_SIG_SCAN_GROUP] == "Cosmic Signature"
-        or row[COL_SIG_SCAN_GROUP] == "Cosmic Anomaly"
+    debug_text = row[COL_SIG_SCAN_GROUP]
+    scan_group = _translate_client_string(row[COL_SIG_SCAN_GROUP])
+    if (scan_group == "Cosmic Signature"
+        or scan_group == "Cosmic Anomaly"
        ):
         try:
+            sig_type_name = _translate_client_string(row[COL_SIG_GROUP])
             sig_type = SignatureType.objects.get(
-                    longname=row[COL_SIG_GROUP])
+                    longname=sig_type_name)
         except:
             sig_type = None
     else:
         sig_type = None
 
-    if info and sig_type:
+    if sig_type:
         updated = True
 
     if sig_type:
@@ -457,6 +548,8 @@ def _update_sig_from_tsv(signature, row):
     signature.updated = updated or signature.updated
     if info:
         signature.info = info
+    if signature.info == None:
+        signature.info = ''
 
     return signature
 
@@ -477,7 +570,7 @@ def bulk_sig_import(request, map_id, ms_id):
     k = 0
     if request.method == 'POST':
         reader = csv.reader(request.POST.get('paste', '').decode(
-                'utf-8').splitlines(), delimiter="\t")
+            ).splitlines(), delimiter="\t")
         COL_SIG = 0
         COL_STRENGTH = 4
         for row in reader:
@@ -493,6 +586,7 @@ def bulk_sig_import(request, map_id, ms_id):
                 sig = Signature.objects.get_or_create(sigid=sig_id,
                         system=map_system.system)[0]
                 sig = _update_sig_from_tsv(sig, row)
+                sig.modified_by = request.user
                 sig.save()
                 signals.signature_update.send_robust(sig, user=request.user,
                                                  map=map_system.map,
@@ -511,9 +605,19 @@ def bulk_sig_import(request, map_id, ms_id):
                                 {'mapsys': map_system})
 
 
-# noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=2)
+def toggle_sig_owner(request, map_id, ms_id, sig_id=None):
+    if not request.is_ajax():
+        raise PermissionDenied
+    sig = get_object_or_404(Signature, pk=sig_id)
+    sig.toggle_ownership(request.user)
+    return HttpResponse()
+
+
+# noinspection PyUnusedLocal
+@login_required
+@require_map_permission(permission=1)
 def edit_signature(request, map_id, ms_id, sig_id=None):
     """
     GET gets a pre-filled edit signature form.
@@ -523,11 +627,15 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
     if not request.is_ajax():
         raise PermissionDenied
     map_system = get_object_or_404(MapSystem, pk=ms_id)
+    # If the user can't edit signatures, return a blank response
+    if map_system.map.get_permission(request.user) != 2:
+        return HttpResponse()
     action = None
     if sig_id != None:
         signature = get_object_or_404(Signature, pk=sig_id)
         created = False
-
+        if not signature.owned_by:
+            signature.toggle_ownership(request.user)
     if request.method == 'POST':
         form = SignatureForm(request.POST)
         if form.is_valid():
@@ -544,6 +652,7 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
             else:
                 sigtype = None
             signature.sigtype = sigtype
+            signature.modified_by = request.user
             signature.save()
             map_system.system.lastscanned = datetime.now(pytz.utc)
             map_system.system.save()
@@ -551,6 +660,8 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
                 action = 'Created'
             else:
                 action = 'Updated'
+            if signature.owned_by:
+                signature.toggle_ownership(request.user)
             map_system.map.add_log(request.user,
                                    "%s signature %s in %s (%s)" %
                                    (action, signature.sigid, map_system.system.name,
@@ -574,6 +685,7 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
 # noinspection PyUnusedLocal
 @login_required()
 @require_map_permission(permission=1)
+@cache_page(1)
 def get_signature_list(request, map_id, ms_id):
     """
     Determines the proper escalationThreshold time and renders
@@ -657,12 +769,16 @@ def manual_add_system(request, map_id, ms_id):
     A GET request gets a blank add system form with the provided MapSystem
     as top system. The form is then POSTed to the add_system view.
     """
+    if request.is_igb_trusted:
+        current_system = System.objects.get(name=request.eve_systemname)
+    else:
+        current_system = ""
     top_map_system = get_object_or_404(MapSystem, pk=ms_id)
     systems = System.objects.all()
     wormholes = WormholeType.objects.all()
     return render(request, 'add_system_box.html',
                   {'topMs': top_map_system, 'sysList': systems,
-                   'whList': wormholes})
+                   'whList': wormholes,'newsystem': current_system})
 
 
 # noinspection PyUnusedLocal
@@ -687,14 +803,10 @@ def edit_system(request, map_id, ms_id):
                                 )
     if request.method == 'POST':
         map_system.friendlyname = request.POST.get('friendlyName', '')
-        if (
-                (map_system.system.info != request.POST.get('info', '')) or
-                (map_system.system.occupied !=
-                 request.POST.get('occupied', ''))
-        ):
-            map_system.system.info = request.POST.get('info', '')
-            map_system.system.occupied = request.POST.get('occupied', '')
-            map_system.system.save()
+        map_system.system.info = request.POST.get('info', '')
+        map_system.system.occupied = request.POST.get('occupied', '')
+        map_system.system.importance = request.POST.get('importance', '0')
+        map_system.system.save()
         map_system.save()
         map_system.map.add_log(request.user, "Edited System: %s (%s)"
                                % (map_system.system.name,
@@ -987,9 +1099,34 @@ def map_settings(request, map_id):
     """
     Returns and processes the settings section for a map.
     """
+    saved = False
     subject = get_object_or_404(Map, pk=map_id)
+    if request.method == 'POST':
+        name = request.POST.get('name', None)
+        explicit_perms = request.POST.get('explicitperms', False)
+        if not name:
+            return HttpResponse('The map name cannot be blank', status=400)
+        subject.name = name
+        subject.explicitperms = explicit_perms
+        for group in Group.objects.all():
+            MapPermission.objects.filter(group=group, map=subject).delete()
+            setting = request.POST.get('map-%s-group-%s-permission' % (
+                subject.pk, group.pk), 0)
+            if setting != 0:
+                MapPermission(group=group, map=subject, access=setting).save()
+        subject.save()
+        saved = True
+    groups = []
+    for group in Group.objects.all():
+        if MapPermission.objects.filter(map=subject, group=group).exists():
+            perm = MapPermission.objects.get(map=subject, group=group).access
+        else:
+            perm = 0
+        groups.append((group,perm))
+
     return TemplateResponse(request, 'map_settings_single.html',
-                            {'map': subject})
+            {'map': subject, 'groups': groups, 'saved': saved})
+
 
 
 @permission_required('Map.map_admin')
@@ -1057,3 +1194,15 @@ def global_permissions(request):
 
     return TemplateResponse(request, 'global_perms.html',
                             {'groups': group_list})
+
+
+@require_map_permission(permission=2)
+def purge_signatures(request, map_id, ms_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    mapsys = get_object_or_404(MapSystem, pk=ms_id)
+    if request.method == "POST":
+        mapsys.system.signatures.all().delete()
+        return HttpResponse()
+    else:
+        return HttpResponse(status=400)

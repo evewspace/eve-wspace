@@ -12,6 +12,7 @@
 {% block content %}
 <div class="tab-content">
     <div id="profile" class="tab-pane active">
+        {% load account_tags %}
         {% profile_sections %}
     </div>
     {% admin_panels %}

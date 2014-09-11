@@ -1,8 +1,10 @@
-from django.contrib.auth.models import User
+from django.conf import settings
 from Alerts.models import SubscriptionGroup
 from django.db import models
 
 # Create your models here.
+
+User = settings.AUTH_USER_MODEL
 
 class JabberSubscription(models.Model):
     """
@@ -24,4 +26,3 @@ class JabberAccount(models.Model):
 
     def __unicode__(self):
         return "User: %s  JID: %s" % (self.user.username, self.jid)
-

@@ -1,0 +1,30 @@
+{% if render %}
+<div class="feedbackPanel">
+<div class="feedbackButtonPanel btn-group">
+    <button class="btn btn-inverse" id="bugReportButton">Report Bug</button>
+    <button class="btn btn-inverse" id="feedbackReportButton">Feedback</button>
+</div>
+</div>
+<script type="text/javascript" src="https://jira.evewspace.com/s/en_USozet0f-1988229788/6099/3/1.4.0-m3/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=609d6507"></script>
+<script type="text/javascript" src="https://jira.evewspace.com/s/en_USozet0f-1988229788/6099/3/1.4.0-m3/_/download/batch/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector/com.atlassian.jira.collector.plugin.jira-issue-collector-plugin:issuecollector.js?collectorId=813a855b"></script>
+<script type="text/javascript">
+    window.ATL_JQ_PAGE_PROPS = $.extend(window.ATL_JQ_PAGE_PROPS, {
+                '609d6507': {
+                    triggerFunction: function(showCollectorDialog) {
+                        jQuery("#bugReportButton").click(function(e) {
+                                e.preventDefault();
+                                showCollectorDialog();
+                                });
+                        }
+                },
+                '813a855b': { 
+                    triggerFunction: function(showCollectorDialog) {
+                        jQuery("#feedbackReportButton").click(function(e) {
+                                e.preventDefault();
+                                showCollectorDialog();
+                                });
+                        }
+                }
+            });
+</script>
+{% endif %}

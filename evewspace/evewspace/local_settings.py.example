@@ -10,7 +10,13 @@ SECRET_KEY = 'alan_please_add_secret_key'
 # Set this to the directory you are service static files out of so that
 # manage.py collectstatic can put them in the right place
 
-STATIC_ROOT = "/home/evewspace/static/"
+STATIC_ROOT = "/home/maptool/static/"
+
+# Put the host name or IP address of all servers that can access the site
+# directly. If you use a reverse proxy, this should be the proxy server
+# address (most likely localhost). The default setting may be insecure.
+
+ALLOWED_HOSTS = ['*',]
 
 # Put your DB details here
 
@@ -67,13 +73,8 @@ CELERYBEAT_SCHEDULE = {
                 'schedule': crontab(minute=30, hour=10, day_of_week="tue"),
                 'args': ()
             },
-        'server_status':{
-                'task': 'Map.tasks.check_server_status',
-                'schedule': timedelta(minutes=3),
-                'args': ()
-            },
         'stale_locations':{
-                'task': 'Map.tasks.clear_stale_locations',
+                'task': 'Map.tasks.clear_stale_records',
                 'schedule': timedelta(minutes=5),
                 'args': ()
             },

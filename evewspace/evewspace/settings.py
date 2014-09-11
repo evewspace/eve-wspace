@@ -1,7 +1,8 @@
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
+MULTI_TENANT = True
+AUTH_USER_MODEL = 'account.EWSUser'
 ADMINS = (
         # ('Your Name', 'your_email@example.com'),
 )
@@ -11,7 +12,7 @@ import djcelery
 djcelery.setup_loader()
 
 BROKER_URL = 'amqp://guest:guest@localhost:5672/'
-
+ALLOWED_HOSTS = ['*',]
 from datetime import timedelta
 from celery.schedules import crontab
 CELERYBEAT_SCHEDULE = {
@@ -40,13 +41,8 @@ CELERYBEAT_SCHEDULE = {
                 'schedule': crontab(minute=30, hour=10, day_of_week="tue"),
                 'args': ()
             },
-        'server_status':{
-                'task': 'Map.tasks.check_server_status',
-                'schedule': timedelta(minutes=3),
-                'args': ()
-            },
         'stale_locations':{
-                'task': 'Map.tasks.clear_stale_locations',
+                'task': 'Map.tasks.clear_stale_records',
                 'schedule': timedelta(minutes=5),
                 'args': ()
             },
@@ -183,6 +179,7 @@ INSTALLED_APPS = (
         'django.contrib.staticfiles',
         'django.contrib.humanize',
         # Uncomment the next line to enable the admin:
+        #'django.contrib.admin',
         'core',
         'Map',
         'POS',
@@ -193,6 +190,7 @@ INSTALLED_APPS = (
         'Teamspeak',
         'Cart',
         'API',
+        'Slack',
         'account',
         'eveigb',
         'search',
@@ -204,7 +202,6 @@ INSTALLED_APPS = (
 #Require a registration code to register
 ACCOUNT_REQUIRE_REG_CODE=True
 
-AUTH_PROFILE_MODULE = 'account.UserProfile'
 import django.conf.global_settings as DEFAULT_SETTINGS
 TEMPLATE_CONTEXT_PROCESSORS = DEFAULT_SETTINGS.TEMPLATE_CONTEXT_PROCESSORS + ('core.context_processors.site', 'eveigb.context_processors.igb',)
 # ejabberd auth gateway log settings

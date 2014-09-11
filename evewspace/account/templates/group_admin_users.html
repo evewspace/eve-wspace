@@ -1,0 +1,19 @@
+{% load account_tags %}
+<div class="GroupUsersContainer">
+    <span class="label label-success">Removal not yet implemented.</span>
+    <br /><br />
+    <table class="table table-hover">
+        <tr>
+            <th>User</th>
+            <th>Active</th>
+            <th>Remove</th>
+        </tr>
+        {% for member in group.user_set.all %}
+        <tr>
+            <td>{{member.username}}</td>
+            <td>{% if member.is_active %}Yes{% else %}No{% endif %}</td>
+            <td><button class="btn btn-small btn-danger" disabled="disabled" onclick="RemoveGroupUser({{group.pk}}, {{member.pk}});">Remove</button></td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>

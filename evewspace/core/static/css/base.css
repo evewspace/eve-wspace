@@ -32,10 +32,18 @@ BODY
 	padding: 20px;
 	height: 1%;
 }
-
+.feedbackPanel
+{
+    margin-left: 400px;
+}
 .copyrightNotice
 {
     font-size: 8pt;
+}
+body .modal
+{
+    width: 580px;
+    margin-left: -270px;
 }
 .stStatusHeader
 {

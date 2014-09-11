@@ -14,7 +14,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from django.conf.urls.defaults import patterns, include, url
+from django.conf.urls import patterns, include, url
 
 sigpatterns = patterns('Map.views',
         url(r'^activate/$', 'activate_signature'),
@@ -22,7 +22,8 @@ sigpatterns = patterns('Map.views',
         url(r'^clear/$', 'mark_signature_cleared'),
         url(r'^remove/$', 'delete_signature'),
         url(r'^edit/$', 'edit_signature'),
-        url(r'^spawns/$', 'site_spawns')
+        url(r'^spawns/$', 'site_spawns'),
+        url(r'^own/$', 'toggle_sig_owner'),
         )
 
 syspatterns = patterns('Map.views',
@@ -37,6 +38,7 @@ syspatterns = patterns('Map.views',
         url(r'^addchild/$', 'manual_add_system'),
         url(r'^signatures/$', 'get_signature_list'),
         url(r'^signatures/new/$', 'edit_signature'),
+        url(r'^signatures/purge/$', 'purge_signatures'),
         url(r'^signatures/bulkadd/$', 'bulk_sig_import'),
         url(r'^signatures/(?P<sig_id>\d+)/', include(sigpatterns)),
         url(r'^collapse/$', 'collapse_system'),
@@ -51,7 +53,6 @@ mappatterns = patterns('Map.views',
         url(r'^$', 'get_map'),
         url(r'^update/$', 'map_checkin'),
         url(r'^refresh/$', 'map_refresh'),
-        url(r'^edit/$', 'edit_map'),
         url(r'^delete/$', 'delete_map'),
         url(r'^system/new/$', 'add_system'),
         url(r'^system/tooltips/$', 'system_tooltips'),

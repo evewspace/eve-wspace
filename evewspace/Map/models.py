@@ -15,14 +15,20 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
-from django.contrib.auth.models import User, Group
+from django.conf import settings
+from django.contrib.auth.models import Group
 from core.models import SystemData
 from django import forms
 from django.forms import ModelForm
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 import pytz
+import time
 from Map import utils
+from Map.utils import MapJSONGenerator
+from django.core.cache import cache
 # Create your models here.
+
+User = settings.AUTH_USER_MODEL
 
 class WormholeType(models.Model):
     """Stores the permanent information on wormhole types.
@@ -38,6 +44,7 @@ class WormholeType(models.Model):
     # H : High Sec Only (e.g. freighter capable K > C5 in high)
     # NH : Low or Nullsec (e.g. cap capable K > C5)
     # K : Any K-space (e.g. X702 to a C3)
+    # W: Any W-space (i.e. Hyperion frig holes)
     # N: Nullsec
     # L: Lowsec
     # Z: Class 5 or 6 (5/6 > K holes)
@@ -74,6 +81,12 @@ class System(SystemData):
     sysclass_choices = ((1, "C1"), (2, "C2"), (3, "C3"), (4, "C4"), (5, "C5"),
             (6, "C6"), (7, "High Sec"), (8, "Low Sec"), (9, "Null Sec"))
     sysclass = models.IntegerField(choices = sysclass_choices)
+    importance_choices = ((0, "Regular"),
+                     (1, "Dangerous System"),
+                     (2, "Important System"))
+    importance = models.IntegerField(choices = importance_choices, default = 0)
+    occupied = models.TextField(blank = True)
+
     occupied = models.TextField(blank = True)
     info = models.TextField(blank = True)
     lastscanned = models.DateTimeField()
@@ -101,9 +114,6 @@ class System(SystemData):
             return self.ksystem
 
     def save(self, *args, **kwargs):
-        # Make sure any new lines in info or occupied are replaced with <br />
-        self.info = self.info.replace("\n", "<br />")
-        self.occupied = self.occupied.replace("\n", "<br />")
         self.updated = datetime.now(pytz.utc)
         if self.lastscanned < datetime.now(pytz.utc) - timedelta(days=3):
             self.lastscanned = datetime.now(pytz.utc)
@@ -115,20 +125,54 @@ class System(SystemData):
 
         super(System, self).save(*args, **kwargs)
 
-    def add_active_pilot(self, user, charname, shipname, shiptype):
-        from Map.models import ActivePilot
-        from datetime import datetime, timedelta
-        import pytz
-        # Do nothing if there is a recent matching record
-        threshold = datetime.now(pytz.utc) - timedelta(minutes=30)
-        if ActivePilot.objects.filter(timestamp__gt=threshold, user=user,
-                charactername=charname, shipname=shipname,
-                shiptype=shiptype, system=self).count() == 0:
-            # Flush other records for this character and user
-            ActivePilot.objects.filter(charactername=charname, user=user).delete()
-            # Add new record
-            record = ActivePilot(system=self, user=user, charactername=charname,
-                    shipname=shipname, shiptype=shiptype).save()
+    def add_active_pilot(self, username, charid, charname,
+            shipname, shiptype):
+        sys_cache_key = 'sys_%s_locations' % self.pk
+        current_time = time.time()
+        time_threshold = current_time - (15 * 60)
+        sys_location_dict = cache.get(sys_cache_key)
+        location = (username, charname, shipname, shiptype, current_time)
+        if sys_location_dict:
+            sys_location_dict.pop(charid, None)
+            sys_location_dict[charid] = location
+        else:
+            sys_location_dict = {charid: location}
+
+        # Prune dict to prevent carrying over stale entries
+        for charid, location in sys_location_dict.items():
+            if location[4] < time_threshold:
+                sys_location_dict.pop(charid, None)
+
+        cache.set(sys_cache_key, sys_location_dict, 15 * 60)
+        return location
+
+    def remove_active_pilot(self, charid):
+        current_time = time.time()
+        time_threshold = current_time - (15 * 60)
+        sys_cache_key = 'sys_%s_locations' % self.pk
+        sys_location_dict = cache.get(sys_cache_key)
+        if sys_location_dict:
+            sys_location_dict.pop(charid, None)
+            # Prune dict to prevent carrying over stale entries
+            for charid, location in sys_location_dict.items():
+                if location[4] < time_threshold:
+                    sys_location_dict.pop(charid, None)
+            cache.set(sys_cache_key, sys_location_dict, 15 * 60)
+        return True
+
+    def _active_pilot_list(self):
+        sys_cache_key = 'sys_%s_locations' % self.pk
+        sys_location_dict = cache.get(sys_cache_key)
+        if sys_location_dict:
+            return sys_location_dict
+        else:
+            return {}
+
+    pilot_list = property(_active_pilot_list)
+
+    def clear_sig_cache(self):
+        cache.delete('sys_%s_sig_list' % self.pk)
+
 
 class KSystem(System):
     sov = models.CharField(max_length = 100)
@@ -157,7 +201,7 @@ class Map(models.Model):
     name = models.CharField(max_length = 100, unique = True)
     root = models.ForeignKey(System, related_name="root")
     # Maps with explicitperms = True require an explicit permission entry to access.
-    explicitperms = models.BooleanField()
+    explicitperms = models.BooleanField(default=False)
 
     class Meta:
         permissions = (("map_unrestricted", "Do not require excplicit access to maps."),
@@ -225,7 +269,7 @@ class Map(models.Model):
         #Done this way there should only be one db hit which gets all relevant
         #permissions
         for perm in self.grouppermissions.filter(group__in=groups):
-            highestperm = max(highestperm, perm)
+            highestperm = max(highestperm, perm.access)
 
         return highestperm
 
@@ -254,6 +298,14 @@ class Map(models.Model):
         result.save()
         self.add_log(user, "Created Snapshot: %s" % (name))
         return result
+
+    def clear_caches(self):
+        """
+        Clears the tooltip and json caches for the map.
+        """
+        cache.delete('map_%s_wh_tooltip' % self.pk)
+        cache.delete('map_%s_sys_tooltip' % self.pk)
+        cache.delete(MapJSONGenerator.get_cache_key(self))
 
 class MapSystem(models.Model):
     """
@@ -287,18 +339,20 @@ class MapSystem(models.Model):
 
     def save(self, *args, **kwargs):
         self.friendlyname = self.friendlyname.upper()
+        self.map.clear_caches()
         super(MapSystem, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.map.clear_caches()
+        super(MapSystem, self).delete(*args, **kwargs)
 
     def remove_system(self, user):
         """
-        Removes the supplied system and all of its children. If there are
-        no other instances of the system on other maps, also clears its sigs.
+        Removes the supplied system and all of its children.
         """
         # Raise ValueError if we're trying to delete the root
         if not self.parentsystem:
             raise ValueError("Cannot remove the root system.")
-        if self.system.maps.count() == 1:
-            self.system.signatures.all().delete()
         self.parent_wormhole.delete()
         for system in self.childsystems.all():
             system.remove_system(user)
@@ -327,11 +381,32 @@ class Wormhole(models.Model):
     eol_time = models.DateTimeField(null=True)
     collapsed = models.NullBooleanField(null=True)
 
+    @property
+    def max_mass(self):
+        if self.top_type.maxmass:
+            return self.top_type.maxmass
+        if self.bottom_type.maxmass:
+            return self.bottom_type.maxmass
+        return 0
+
+    @property
+    def jump_mass(self):
+        if self.top_type.jumpmass:
+            return self.top_type.jumpmass
+        if self.bottom_type.jumpmass:
+            return self.bottom_type.jumpmass
+        return 0
+
     def save(self, *args, **kwargs):
+        self.map.clear_caches()
         if self.time_status == 1 and not self.eol_time:
             self.eol_time = datetime.now(pytz.utc)
         elif self.time_status != 1:
             self.eol_time = None
+        super(Wormhole, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.map.clear_caches()
         super(Wormhole, self).save(*args, **kwargs)
 
 class SignatureType(models.Model):
@@ -344,8 +419,8 @@ class SignatureType(models.Model):
     # sleepersite and escalatable are used to track wormhole comabt sites.
     # sleepersite = true should give a "Rats cleared" option
     # escalatable = true should cause escalation tracking to kick in in C5/6
-    sleeprsite = models.BooleanField()
-    escalatable = models.BooleanField()
+    sleeprsite = models.BooleanField(default=False)
+    escalatable = models.BooleanField(default=False)
 
     def __unicode__(self):
         """Returns short name as unicode representation"""
@@ -355,9 +430,10 @@ class SignatureType(models.Model):
 class Signature(models.Model):
     """Stores the signatures active in all systems. Relates to System model."""
     system = models.ForeignKey(System, related_name="signatures")
+    modified_by = models.ForeignKey(User, related_name="signatures", null=True)
     sigtype = models.ForeignKey(SignatureType, related_name="sigs", null=True, blank=True)
     sigid = models.CharField(max_length = 10)
-    updated = models.BooleanField()
+    updated = models.BooleanField(default=False)
     info = models.CharField(max_length=65, null=True, blank=True)
     # ratscleared and lastescalated are used to track wormhole combat sites.
     # ratscleared is the DateTime that sleepers were cleared initially
@@ -368,9 +444,13 @@ class Signature(models.Model):
     downtimes = models.IntegerField(null=True, blank=True)
     ratscleared = models.DateTimeField(null=True, blank=True)
     lastescalated = models.DateTimeField(null=True, blank=True)
+    modified_time = models.DateTimeField(auto_now=True, null=True)
+    owned_by = models.ForeignKey(User, related_name="sigs_owned", null=True)
+    owned_time = models.DateTimeField(null=True)
 
     class Meta:
         ordering = ['sigid']
+        unique_together = ('system', 'sigid')
 
     def __unicode__(self):
         """Returns sig ID as unicode representation"""
@@ -410,7 +490,6 @@ class Signature(models.Model):
         """Increments the downtime count and does downtime cleanup
         of updated and activated."""
         self.activated = None
-        self.updated = False
         self.lastescalated = None
         if self.downtimes:
             self.downtimes += 1
@@ -423,12 +502,27 @@ class Signature(models.Model):
         self.updated = True
         self.save()
 
+    def toggle_ownership(self, user):
+        """Toggles ownership."""
+        if self.owned_by:
+            self.owned_by = None
+            self.owned_time = None
+        else:
+            self.owned_by = user
+            self.owned_time = datetime.now(pytz.utc)
+        self.save()
+
     def save(self, *args, **kwargs):
         """
         Ensure that Sig IDs are proper.
         """
+        self.system.clear_sig_cache()
         self.sigid = utils.convert_signature_id(self.sigid)
         super(Signature, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.system.clear_sig_cache()
+        super(Signature, self).delete(*args, **kwargs)
 
 class MapPermission(models.Model):
     """
@@ -451,7 +545,7 @@ class MapLog(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=255)
     # Visible logs are pushed to clients as they ocurr (e.g. system added to map)
-    visible = models.BooleanField()
+    visible = models.BooleanField(default=False)
 
     def __unicode__(self):
         return "Map: %s  User: %s  Action: %s  Time: %s" % (self.map.name, self.user.username,
@@ -466,16 +560,6 @@ class Snapshot(models.Model):
     user = models.ForeignKey(User, related_name='snapshots')
     json = models.TextField()
     description = models.CharField(max_length=255)
-
-
-class ActivePilot(models.Model):
-    """Represents the location of a tracked character."""
-    user = models.ForeignKey(User, related_name='locations')
-    charactername = models.CharField(max_length=72)
-    shipname = models.CharField(max_length=32)
-    shiptype = models.CharField(max_length=32)
-    system = models.ForeignKey(System, related_name='active_pilots')
-    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class Destination(models.Model):

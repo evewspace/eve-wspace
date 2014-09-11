@@ -14,22 +14,35 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from django.core.management.base import NoArgsCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.utils.importlib import import_module
 from django.utils.module_loading import module_has_submodule
 from core.models import ConfigEntry
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     """
     Load default settings from each application's default_settings.py file.
     """
-    def handle_noargs(self, **options):
-        for app in settings.INSTALLED_APPS:
-            mod = import_module(app)
-            if module_has_submodule(mod, "default_settings"):
+    def handle(self, *args, **options):
+        if not args:
+            for app in settings.INSTALLED_APPS:
+                mod = import_module(app)
+                if module_has_submodule(mod, "default_settings"):
+                    try:
+                        def_mod = import_module("%s.default_settings" % app)
+                        def_mod.load_defaults()
+                    except:
+                        raise
+        else:
+            for app in args:
                 try:
-                    def_mod = import_module("%s.default_settings" % app)
-                    def_mod.load_defaults()
-                except:
-                    raise
+                    mod = import_module(app)
+                except ImportError:
+                    raise CommandError('App %s could not be imported.' % app)
+                if module_has_submodule(mod, "default_settings"):
+                    try:
+                        def_mod = import_module("%s.default_settings" % app)
+                        def_mod.load_defaults()
+                    except:
+                        raise

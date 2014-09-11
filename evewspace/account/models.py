@@ -16,50 +16,129 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
 from django import forms
-from django.contrib.auth.models import User, Group
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager, Group
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.core.cache import cache
+from django.conf import settings
 from Map.models import Map, System
 from django.db.models.signals import post_save
+from django.utils import timezone
+from django.utils.http import urlquote
+from django.core.mail import send_mail
+from django.utils.translation import ugettext_lazy as _
 import pytz
 import datetime
+import time
 # Create your models here.
 
-class PlayTime(models.Model):
-    """PlayTime represents a choice of play times for use in several forms."""
-    fromtime = models.TimeField()
-    totime = models.TimeField()
+User = settings.AUTH_USER_MODEL
 
+class EWSUserManager(BaseUserManager):
 
-class UserProfile(models.Model):
-    """UserProfile defines custom fields tied to each User record in the Django auth DB."""
-    user = models.ForeignKey(User, unique=True)
-    jabberid = models.EmailField(blank=True, null=True)
+    def _create_user(self, username, email, password,
+                     is_staff, is_superuser, **extra_fields):
+        """
+        Creates and saves a User with the given username, email and password.
+        """
+        now = timezone.now()
+        if not username:
+            raise ValueError('The given username must be set')
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email,
+                          is_staff=is_staff, is_active=True,
+                          is_superuser=is_superuser, last_login=now,
+                          date_joined=now, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, username, email=None, password=None, **extra_fields):
+        return self._create_user(username, email, password, False, False,
+                                 **extra_fields)
+
+    def create_superuser(self, username, email, password, **extra_fields):
+        return self._create_user(username, email, password, True, True,
+                                 **extra_fields)
+
+class EWSUser(AbstractBaseUser, PermissionsMixin):
+    """
+    An abstract base class implementing a fully featured User model with
+    admin-compliant permissions.
+
+    Username, password and email are required. Other fields are optional.
+    """
+    username = models.CharField(_('username'), max_length=30, unique=True,
+        help_text=_('Required. 30 characters or fewer. Letters, numbers and '
+                    '@/./+/-/_ characters'))
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=30, blank=True)
+    email = models.EmailField(_('email address'), blank=True)
+    is_staff = models.BooleanField(_('staff status'), default=False,
+        help_text=_('Designates whether the user can log into this admin '
+                    'site.'))
+    is_active = models.BooleanField(_('active'), default=True,
+        help_text=_('Designates whether this user should be treated as '
+                    'active. Unselect this instead of deleting accounts.'))
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     defaultmap = models.ForeignKey(Map, related_name = "defaultusers", blank=True, null=True)
-    playtimes = models.ManyToManyField(PlayTime)
-    currentsystem = models.ForeignKey(System, related_name="activepilots", blank=True, null=True)
-    lastactive = models.DateTimeField()
+    objects = EWSUserManager()
 
-    def update_location(self, system):
+    USERNAME_FIELD = 'username'
+
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+        permissions = (('account_admin', 'Administer users and groups'),)
+
+    def get_absolute_url(self):
+        return "/users/%s/" % urlquote(self.username)
+
+    def get_full_name(self):
         """
-        updates the current location and last active timestamp for this user
+        Returns the first_name plus the last_name, with a space in between.
         """
-        self.currentsystem = system
-        self.lastactive = datetime.datetime.now(pytz.utc)
-        self.save()
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        "Returns the short name for the user."
+        return self.first_name
+
+    def email_user(self, subject, message, from_email=None):
+        """
+        Sends an email to this User.
+        """
+        send_mail(subject, message, from_email, [self.email])
+
+    def update_location(self, sys_id, charid, charname, shipname, shiptype):
+        """
+        Updates the cached locations dict for this user.
+        """
+        current_time = time.time()
+        user_cache_key = 'user_%s_locations' % self.pk
+        user_locations_dict = cache.get(user_cache_key)
+        time_threshold = current_time - (60 * 15)
+        location_tuple = (sys_id, charname, shipname, shiptype, current_time)
+        if user_locations_dict:
+            user_locations_dict.pop(charid, None)
+            user_locations_dict[charid] = location_tuple
+        else:
+            user_locations_dict = {charid: location_tuple}
+        # Prune dict to ensure we're not carrying over stale entries
+        for charid, location in user_locations_dict.items():
+            if location[4] < time_threshold:
+                user_locations_dict.pop(charid, None)
+
+        cache.set(user_cache_key, user_locations_dict, 60 * 15)
+        return user_locations_dict
 
 
 class GroupProfile(models.Model):
     """GroupProfile defines custom fields tied to each Group record."""
-    group = models.ForeignKey(Group, related_name='profile', unique=True)
+    group = models.OneToOneField(Group, related_name='profile')
     description = models.CharField(max_length=200, blank=True, null=True)
     regcode = models.CharField(max_length=64, blank=True, null=True)
-
-def create_user_profile(sender, instance, created, **kwargs):
-    """Handle user creation event and create a new profile to match the new user"""
-    if created:
-        UserProfile.objects.create(user=instance, lastactive=datetime.datetime.utcnow().replace(tzinfo=pytz.UTC))
-
-post_save.connect(create_user_profile, sender=User)
+    visible = models.BooleanField(default=True)
 
 
 def create_group_profile(sender, instance, created, **kwargs):
@@ -70,7 +149,30 @@ def create_group_profile(sender, instance, created, **kwargs):
 post_save.connect(create_group_profile, sender=Group)
 
 
-class RegistrationForm(UserCreationForm):
+class EWSUserCreationForm(UserCreationForm):
+    username = forms.CharField(max_length=30, label=_("Username"))
+    class Meta:
+        model = EWSUser
+        fields = ('username',)
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        try:
+            EWSUser.objects.get(username=username)
+        except EWSUser.DoesNotExist:
+            return username
+        raise forms.ValidationError(
+                self.error_messages['duplicate_username'],
+                code='duplicate_username',
+                )
+
+
+class EWSUserChangeForm(UserChangeForm):
+    class Meta:
+        model = EWSUser
+
+
+class RegistrationForm(EWSUserCreationForm):
     """Extends the django registration form to add fields."""
     username = forms.CharField(max_length=30, label="Username")
     email = forms.EmailField(required=False, label="E-Mail Address (Optional)")

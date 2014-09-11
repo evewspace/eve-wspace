@@ -20,9 +20,10 @@ from API.models import CorpAPIKey
 from core.models import Corporation, Alliance
 from Map.models import System
 import csv
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 import pytz
 
+User = get_user_model()
 
 class POS(models.Model):
     """Represents a POS somewhere in space."""
@@ -64,8 +65,6 @@ class POS(models.Model):
     def save(self, *args, **kwargs):
         if not self.posname:
             self.posname = self.towertype.name
-        # Ensure that any newline characters in fitting are changed to <br>
-        self.fitting = self.fitting.replace("\n", "<br />")
         # Mark tower as having been updated
         from datetime import datetime
         import pytz
@@ -87,7 +86,12 @@ class POS(models.Model):
         """
         Fills in a POS's fitting from a copy / paste of d-scan results.
         """
-        import csv
+        return self.fit_from_iterable(csv.reader(dscan.splitlines(), delimiter="\t"))
+
+    def fit_from_iterable(self, fit):
+        """
+        Fills in a POS's fitting from an iterable (normally parsed d-scan)
+        """
         from core.models import Type
         itemDict={}
         # marketGroupIDs to consider guns, ewar, hardeners, and smas
@@ -100,8 +104,11 @@ class POS(models.Model):
         self.hardener = 0
         self.guns = 0
         self.ewar = 0
-        for row in csv.reader(dscan.splitlines(), delimiter="\t"):
-            itemType = Type.objects.get(name=row[1])
+        for row in fit:
+            try:
+                itemType = Type.objects.get(name=row[1])
+            except Type.DoesNotExist: #odd bug where invalid items get into dscan
+                continue
             if itemType.marketgroup:
                 groupTree = []
                 parent = itemType.marketgroup
@@ -118,6 +125,8 @@ class POS(models.Model):
                     self.hardener += 1
                 if itemType.marketgroup.id == 478:
                     towers += 1
+                    towertype = itemType
+                    posname = row[0]
                 if itemDict.has_key(itemType.name):
                     itemDict[itemType.name] += 1
                 elif 1285 in groupTree and 478 not in groupTree:
@@ -126,7 +135,12 @@ class POS(models.Model):
         self.fitting = "Imported from D-Scan:\n"
         for itemtype in itemDict:
             self.fitting += "\n%s : %s" % (itemtype, itemDict[itemtype])
-        if towers <= 1:
+        if towers == 1 and self.towertype_id is None and self.posname is None:
+            self.towertype = towertype
+            self.posname = posname
+        if towers == 0 and self.towertype_id is None:
+            raise AttributeError('No POS in the D-Scan!')
+        elif towers <= 1:
             self.save()
         else:
             raise AttributeError('Too many towers detected in the D-Scan!')

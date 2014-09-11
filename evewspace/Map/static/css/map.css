@@ -1,6 +1,15 @@
-.mapDiv
+#baseHeadDiv
 {
-    margin-top:10px;
+    display: none;
+}
+#baseNavDiv
+{
+    margin-bottom: 5px;
+}
+.sig-not-updated
+{
+    opacity: 0.5;
+    filter: alpha(opacity = 50);
 }
 .systemPanelHeader
 {
@@ -100,6 +109,7 @@
 .signatureListDiv
 {
     text-align: left;
+    white-space: nowrap;
 }
 .sysSigsList
 {
@@ -115,7 +125,7 @@
 }
 .posSummary
 {
-    margin-left: 60px;
+    margin-left: 70px;
     margin-top: -10px;
 }
 .sigAddFormDiv
@@ -144,6 +154,10 @@
 h5
 {
     text-align: center;
+}
+#stPlaceholderDiv
+{
+    margin-bottom: 5px;
 }
 .stFleetHeader
 {

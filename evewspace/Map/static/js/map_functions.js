@@ -32,15 +32,20 @@ var highlightActivePilots = true; // Draw a notification ring around systems wit
 var goodColor = "#00FF00"; // Color of good status connections
 var badColor = "#FF0000"; // Color of first shrink connections
 var bubbledColor = "#FF0000"; // Color of first shrink connections
-var clearWhColor = "#00FF00"; // Color of good status connections
+var clearWhColor = "#BBFFBB"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
+var frigWhColor = "#00FFFF"; // Color of Hyperion Frigate Hole
 var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
+var silentSystem = false; // Are systems added automatically wihthout a pop-up?
 
 $(document).ready(function(){
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
     if (autoRefresh === true){
         refreshTimerID = setInterval(RefreshMap, 15000);
+    }
+    if (silentSystem === true){
+        $('#btnSilentAdd').text('Silent IGB Mapping: ON');
     }
 });
 
@@ -61,10 +66,14 @@ $(document).ready(function(){
 
 function processAjax(data){
     if (data.dialogHTML){
+        if (data.dialogHTML !== 'silent'){
                 $('#modalHolder').empty();
                 $('#modalHolder').html(data.dialogHTML);
                 $('#modalHolder').modal('show');
-            }
+        }else{
+            RefreshMap();
+        }
+    }
     if (data.logs){
         $('#logDiv').empty();
         $('#logDiv').html(data.logs);
@@ -78,7 +87,7 @@ function doMapAjaxCheckin() {
     $.ajax({
         type: "POST",
         url: currentpath,
-        data: {"loadtime": loadtime},
+        data: {"loadtime": loadtime, "silent": silentSystem},
         success: processAjax
         });
 }
@@ -87,6 +96,30 @@ function doMapAjaxCheckin() {
 function HideSystemDetails(){
     clearTimeout(sigTimerID);
     $('#sysInfoDiv').empty();
+}
+
+
+function ToggleSilentAdd(){
+    if (silentSystem === false){
+        silentSystem = true;
+        $('#btnSilentAdd').text('Silent IGB Mapping: ON');
+    }else{
+        silentSystem = false;
+        $('#btnSilentAdd').text('Silent IGB Mapping: OFF');
+    }
+}
+
+
+function ToggleAutoRefresh(){
+    if (autoRefresh === true){
+        autoRefresh = false;
+        clearTimeout(refreshTimerID);
+        $('#btnRefreshToggle').text('Auto Refresh: OFF');
+    }else{
+        autoRefresh = true;
+        refreshTimerID = setInterval(RefreshMap, 15000);
+        $('#btnRefreshToggle').text('Auto Refresh: ON');
+    }
 }
 
 
@@ -284,12 +317,24 @@ function GetSiteSpawns(msID, sigID){
 function AddPOS(sysID){
     //This function adds a system using the information in a form named #sysAddForm
     address = "/pos/" + sysID + "/add/";
+    $('#pos_message').hide();
+    $('#btnAddPOS').html('Saving...');
+    $('#btnAddPOS').addClass('disabled');
     $.ajax({
         type: "POST",
         url: address,
         data: $('#addPOSForm').serialize(),
         success: function(data){
             GetPOSList(sysID);
+            $('#modalHolder').modal('hide');
+            $('#btnAddPOS').html('Add POS');
+            $('#btnAddPOS').removeClass('disabled');
+        },
+        error: function(error){
+           $('#pos_message').html(error.responseText);
+           $('#pos_message').show();
+           $('#btnAddPOS').html('Add POS');
+           $('#btnAddPOS').removeClass('disabled');
         }
     });
 }
@@ -297,12 +342,12 @@ function AddPOS(sysID){
 
 function DeletePOS(posID, sysID){
     address = "/pos/" + sysID + "/" + posID + "/remove/";
-    $.ajax({
+   $.ajax({
         type: "POST",
         url: address,
         success: function(){
             GetPOSList(sysID);
-        }
+       },
     });
 }
 
@@ -322,16 +367,27 @@ function GetEditPOSDialog(posID, sysID){
 
 
 function EditPOS(posID, sysID){
-    //This function adds a system using the information in a form named #sysAddForm
     address = "/pos/" + sysID + "/" + posID + "/edit/";
-    $.ajax({
+    $('#pos_message').hide();
+    $('#btnEditPOS').html('Saving...');
+    $('#btnEditPOS').addClass('disabled');
+   $.ajax({
         type: "POST",
         url: address,
         data: $('#editPOSForm').serialize(),
         success: function(data){
             GetPOSList(sysID);
-        }
-    });
+            $('#modalHolder').modal('hide');
+            $('#btnEditPOS').html('Save POS');
+            $('#btnEditPOS').removeClass('disabled');
+       },
+       error: function(error){
+           $('#pos_error').html(error.responseText);
+           $('#pos_message').show();
+           $('#btnEditPOS').html('Save POS');
+           $('#btnEditPOS').removeClass('disabled');
+      }
+   });
 }
 
 
@@ -380,6 +436,35 @@ function EditSignature(msID, sigID){
 }
 
 
+function PurgeSignatures(msID){
+    address = "system/" + msID + "/signatures/purge/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        success: function(data){
+            LoadSignatures(msID, false);
+            $('#btnReallyPurgeSigs').hide();
+            $('#btnPurgeSigs').show();
+        },
+        error: function(err){
+            alert("Unable to purge signatures: \n\n" + err.responseText);
+        }
+    });
+}
+
+
+function OwnSignature(msID, sigID){
+    address = "system/" + msID + "/signatures/" + sigID + "/own/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        success: function(data){
+            LoadSignatures(msID, false);
+        }
+    });
+}
+
+
 function GetEditSignatureBox(msID, sigID){
     address = "system/" + msID + "/signatures/" + sigID + "/edit/";
     $.ajax({
@@ -388,6 +473,7 @@ function GetEditSignatureBox(msID, sigID){
         success: function(data){
             $('#sys' + msID + "SigAddFOrm").empty();
             $('#sys' + msID + "SigAddForm").html(data);
+            LoadSignatures(msID, false);
         }
     });
 }
@@ -806,10 +892,20 @@ function DrawSystem(system) {
         childSys.WhFromParentBubbled = system.WhFromParentBubbled;
         childSys.WhToParentBubbled = system.WhToParentBubbled;
         childSys.click(onSysClick);
+
+        // Dont even get me started...
+        if (system.backgroundImageURL) {
+            paper.image(system.backgroundImageURL, childSys.attr("cx") - 28, childSys.attr("cy") - 28, 55, 55);
+        }
+
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
         sysText.sysID = system.sysID;
         sysText.click(onSysClick);
+         if (is_igb === true){
+            childSys.dblclick(onSysDblClick);
+            sysText.dblclick(onSysDblClick);
+        }
         ColorSystem(system, childSys, sysText);
         childSys.collapsed = system.collapsed;
         objSystems.push(childSys);
@@ -836,11 +932,19 @@ function DrawSystem(system) {
         var rootSys = paper.ellipse(sysX, sysY, 40, 30);
         rootSys.msID = system.msID;
         rootSys.sysID = system.sysID;
+        // Dont even get me started...
+        if (system.backgroundImageURL) {
+            paper.image(system.backgroundImageURL, rootSys.attr("cx") - 28, rootSys.attr("cy") - 28, 55, 55);
+        }
         rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
         sysText.msID = system.msID;
         sysText.sysID = system.sysID;
         sysText.click(onSysClick);
+        if (is_igb === true){
+            rootSys.dblclick(onSysDblClick);
+            sysText.dblclick(onSysDblClick);
+        }
         ColorSystem(system, rootSys, sysText);
 
         objSystems.push(rootSys);
@@ -881,6 +985,11 @@ function GetConnectionColor(system){
     }
     if (warningFlag == true){
         return warningColor;
+    }
+    // If jump mass is not 0 (K162 / Gate), but less than 10M,
+    // we have a Hyperion frigate-sized hole
+    if ( 0 < system.WhJumpMass && system.WhJumpMass < 10000000) {
+        return frigWhColor;
     }
     return goodColor;
 }
@@ -986,8 +1095,8 @@ function ColorSystem(system, ellipseSystem, textSysName) {
         }
     iconX = ellipseSystem.attr("cx")+40;
     iconY = ellipseSystem.attr("cy")-35;
-    if (system.imageURL){
-        paper.image(system.imageURL, iconX, iconY, 25, 25);
+    if (system.iconImageURL) {
+        paper.image(system.iconImageURL, iconX, iconY, 25, 25);
     }
     ellipseSystem.attr({ fill: sysColor, stroke: sysStroke, "stroke-width": sysStrokeWidth, cursor: "pointer", "stroke-dasharray": sysStrokeDashArray });
     textSysName.attr({ fill: textColor, "font-size": textFontSize, cursor: "pointer" });
@@ -1228,6 +1337,10 @@ function onSysClick(e) {
     DisplaySystemDetails(this.msID, this.sysID);
     var div = document.getElementById("sys"+this.msID+"Tip");
     div.style.display = 'none';
+}
+
+function onSysDblClick(e) {
+    CCPEVE.showInfo(5, this.sysID);
 }
 
 function OnWhOver(e) {

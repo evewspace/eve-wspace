@@ -12,9 +12,10 @@
         <span class="planetno"><strong>{{pos.planet}}</strong></span>
 		<span class="moonlabel">Moon: </span>
         <span class="moonno"><strong>{{pos.moon}}<strong></span>&nbsp
-        <span class="postype"><strong>{{pos.towertype.name}}</strong></span>&nbsp &nbsp
+        <span class="posname"><strong>{{pos.posname}}</strong></span>&nbsp &nbsp
         <br />
         <div class="posSummary">
+            <span class="postype"><strong>{{pos.towertype.name}}</strong></span><br />
             {% if pos.status == 0 %}
                 <span class="label label-info">Status: UNANCHORED</span>
             {% endif %}
@@ -52,7 +53,7 @@
         </div>
 	</div>
     <div id="pos{{pos.pk}}Details" class="poslist_main collapse">
-        <div class"poslist_info">
+        <div class="poslist_info">
             <h5>Owner: </h5>
             <img src="http://image.eveonline.com/Corporation/{{pos.corporation.id}}_32.png" ></img> &nbsp
             {% if pos.corporation.alliance %}
@@ -60,16 +61,16 @@
             {% endif %}
             <br />
             <span class="poslist_corplabel">Corp: </span>
-			<a href="http://www.zkillboard.com/corporation/{{pos.corporation.id}}/" target="_blank" class="killboard_link">{{pos.corporation.name}}</a>
+			<a href="http://zkillboard.com/corporation/{{pos.corporation.id}}/" target="_blank" class="killboard_link">{{pos.corporation.name}}</a>
             <span class="poslist_ticker">[{{pos.corporation.ticker}}]</span><br />
             {% if pos.corporation.alliance %}
             <span class="poslist_alliancelable">Alliance: </span>
-            <a href="http://www.zkillboard.com/alliance/{{pos.corporation.alliance.id}}/" target="_blank" class="killboard_link">{{pos.corporation.alliance.name}}</a>
+            <a href="http://zkillboard.com/alliance/{{pos.corporation.alliance.id}}/" target="_blank" class="killboard_link">{{pos.corporation.alliance.name}}</a>
             <span class="poslist_ticker">[{{pos.corporation.alliance.shortname}}]</span><br />
             {% endif %}
             <span class="poslist_posname">Name: {{pos.posname}}</span> <br />
             <h5>Full Fitting: </h5>
-            <span class="poslist_fitting">{{pos.fitting|safe}}</span> <br />
+            <span class="poslist_fitting">{{pos.fitting|linebreaksbr}}</span> <br />
 		</div>
 	</div>
 </li>

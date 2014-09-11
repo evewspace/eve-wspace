@@ -1,0 +1,40 @@
+{% if saved %}
+<div class="alert alert-success" style="max-width: 600px;">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>TS Settings Saved</strong>
+</div>
+{% endif %}
+<form id="ts3GeneralSettingsForm" action="/teamspeak/settings/general/" method="post">
+    {% csrf_token %}
+    <table>
+        <tr>
+            <td>Hostname of TS3 Server:</td>
+            <td><input type="text" class="input" name="ts3hostname" value="{{ts3hostname}}"></td>
+        </tr>
+        <tr>
+            <td>Port of the TS3 Server:</td>
+            <td><input type="text" class="input" name="Port" value="{{Port}}"></td>
+        </tr>
+        <tr>
+            <td>Query Login Username:</td>
+            <td> <input type="text" class="input" name="QueryLoginUsername" value="{{QueryLoginUsername}}"></td>
+        </tr>
+        <tr>
+            <td>Query Login Password:</td>
+            <td> <input type="password" class="input" name="QueryLoginPasswort" value=""> (Blank to leave unchanged)</td>
+        </tr>
+        <tr>
+            <td>Query Port:</td>
+            <td> <input type="text" class="input" name="QueryPort" value="{{QueryPort}}"></td>
+        </tr>
+    </table>
+    <br />
+    <input type="submit" class="btn btn-primary" value="Save Changes">
+</form>
+<script type="text/javascript">
+    $('#ts3GeneralSettingsForm').submit(function(e){
+                e.preventDefault();
+                SaveTSSettings();
+                return false;
+            });
+</script>

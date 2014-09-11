@@ -52,9 +52,16 @@ To do this from the Django shell:::
 
     >>>from django.contrib.auth.models import Group
     >>>adm_group = Group.objects.get(name="Admins")
-    >>>adm_prof = adm_group.profile.get()
-    >>>adm_prof.regcode = 'my_super_sekrit_regcode'
-    >>>adm_prof.save()
+    >>>adm_group.profile.regcode = 'my_super_sekrit_regcode'
+    >>>adm_group.profile.save()
+
+To do it from the UI:::
+
+    > Log in as an administrator
+    > Go to Settings and click the Groups tab
+    > Click on the Admins group to bring up the edit dialog
+    > Either enter a registration code or hit the Randomize button to generate one
+    > Click Save
 
 Now the registration code for the *Admins* group is whatever you put in place 
 of *my_super_sekrit_regcode*. An account created with this registration code 
@@ -72,31 +79,16 @@ same shell as the last section.)::
     >>>from django.contrib.auth.models import Group
     >>>group = Group(name="Awesome Users")
     >>>group.save()
-    >>>grp_prof = group.profile.get()
-    >>>grp_prof.regcode = 'probably_less_sekrit_regcode'
-    >>>grp_prof.save()
+    >>>group.profile.regcode = 'sekrit_code'
+    >>>group.profile.save()
+    
+From the UI:::
 
+    > Log in as an administrator
+    > Go to the Settings page and click the Groups tab
+    > Click the 'Add Group' button
+    > Fill in the pop-up form and submit
 
-Now any user registering with the registration code 
-*probably_less_sekrit_regcode* will be in the *Awesome Users* group. 
 
 You can give this group basic map permissions from the Map Admin panel under
 the "Global Permissions" section.
-
-Set the Domain Name (for IGB Trust)
------------------------------------
-
-Several map features rely on Eve W-Space being run in a trusted IGB session
-(although the IGB isn't required for core functions). For Eve W-Space to
-automatically request IGB trust, you need to tell it what domain it will
-be run as (that domain will be requested as the trusted URL).
-
-To set this from the Django shell (make sure to use http:// or https:// 
-or the IGB will complain)::
-
-    >>>from django.contrib.sites.models import Site
-    >>>Site.objects.update(domain="https://alpha.evewspace.com")
-    1L
-
-You should replace *https://alpha.evewspace.com* with whatever domain
-users will use to access your instance.

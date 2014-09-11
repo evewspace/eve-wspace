@@ -15,8 +15,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 # Create your models here.
+
+User = get_user_model()
 
 class Interest(models.Model):
     """Represents an option for the 'What are you interests? question'"""
@@ -39,7 +41,7 @@ class Application(models.Model):
     disposition = models.IntegerField(choices=((0,'Duplicate'), (1,'Accepted'),
         (2,'Rejected'), (3, 'Deferred')))
     intelclear = models.DateTimeField()
-    standingsclear = models.BooleanField()
+    standingsclear = models.BooleanField(default=False)
 
     class Meta:
         permissions = (('can_recruit', 'Can view applications'),)

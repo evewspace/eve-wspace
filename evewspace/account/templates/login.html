@@ -14,7 +14,7 @@
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 <div class="logInBox">
-<form method="post" action="{% url django.contrib.auth.views.login %}">
+<form method="post" action="{% url 'django.contrib.auth.views.login' %}">
 {% csrf_token %}
 <table>
 <tr>
@@ -26,12 +26,12 @@
 	        <td>{{ form.password }}</td>
 		</tr>
 	<tr>
-		<td colspan="2"><a href="{% url password_reset %}">Forgot Password?</a></td>
+		<td colspan="2"><a href="{% url 'password_reset' %}">Forgot Password?</a></td>
 	</tr>
 		</table>
 <br />
     <input class="btn btn-primary btn-large" type="submit" value="Log In" />
-    <a class="btn btn-info" href="{% url register %}">Register</a>
+    <a class="btn btn-info" href="{% url 'register' %}">Register</a>
     <input type="hidden" name="next" value="{{ next }}" />
 </form>
 </div>

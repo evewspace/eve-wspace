@@ -15,11 +15,11 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from celery import task
-from Map.models import System, KSystem, Signature, ActivePilot
+from Map.models import System, KSystem, Signature
 from core.models import Faction, SystemJump
 from core.models import Alliance
 import eveapi
-from API import utils as handler
+from API import cache_handler as handler
 from django.core.cache import cache
 from datetime import datetime, timedelta
 import pytz
@@ -92,18 +92,10 @@ def fill_jumps_cache():
 def check_server_status():
     """
     Checks the server status, if it detects the server is down, set updated=False
-    on all signatures.
+    on all signatures. This is deprecated as of Hyperion and is maintained
+    to prevent older configuration files from breaking on upgrade.
     """
-    api = eveapi.EVEAPIConnection(cacheHandler=handler)
-    try:
-        statusapi = api.server.ServerStatus()
-    except:
-        # API is down, assume the server is down as well
-        Signature.objects.all().update(updated=False)
-        return
-    if statusapi.serverOpen == u'True':
-        return
-    Signature.objects.all().update(updated=False)
+    return None
 
 @task()
 def downtime_site_update():
@@ -117,11 +109,10 @@ def downtime_site_update():
             sig.increment_downtime()
 
 @task()
-def clear_stale_locations():
+def clear_stale_records():
     """
     This task will clear any user location records older than 15 minutes.
     """
     limit = datetime.now(pytz.utc) - timedelta(minutes=15)
-    for record in ActivePilot.objects.all():
-        if record.timestamp < limit:
-            record.delete()
+    Signature.objects.filter(owned_time__isnull=False,
+            owned_time__lt=limit).update(owned_time=None, owned_by=None)

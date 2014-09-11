@@ -1,5 +1,6 @@
 <div class="accordion" id="map_accordion">
     {% load static %}
+    {% load mapconfig %}
     <script type="text/javascript" src="{% get_static_prefix %}js/map_settings.js"></script>
     <div class="accordion-group">
         <div class="accordion-heading">
@@ -83,6 +84,7 @@
         <div id="map{{m.pk}}Settings" class="accordion-body collapse">
             <div class="accordion-inner">
                 <div id="map{{m.pk}}Div">
+                    {% map_settings m %}
                 </div>
             </div>
         </div>

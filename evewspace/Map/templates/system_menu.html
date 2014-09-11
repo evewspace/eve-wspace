@@ -12,15 +12,19 @@
         </ul>
     </div>
     {% endif %}
-    {% if mapsys.parent_wormhole.collapsed and mapsys.parent_wormhole %}
-    <a class="btn btn-small" onclick="ResurrectSystem({{mapsys.pk}});">Resurrect System</a>
-    {% elif mapsys.parent_wormhole %}
-    <a class="btn btn-small" onclick="CollapseSystem({{mapsys.pk}});">Collapse System</a>
+    {% if can_edit %}
+        {% if mapsys.parent_wormhole.collapsed and mapsys.parent_wormhole %}
+        <a class="btn btn-small" onclick="ResurrectSystem({{mapsys.pk}});">Resurrect System</a>
+        {% elif mapsys.parent_wormhole %}
+        <a class="btn btn-small" onclick="CollapseSystem({{mapsys.pk}});">Collapse System</a>
+        {% endif %}
     {% endif %}
     {% if not is_igb %}
-    <a class="btn btn-small"" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
+    <a class="btn btn-small" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
     {% endif %}
+    {% if can_edit %}
     <a class="btn btn-small" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
+    {% endif %}
     {% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
     <a class="btn btn-small" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>
     {% endif %}
@@ -32,14 +36,19 @@
         <ul id="intelDropdown" class="dropdown-menu" role="menu">
         <li><a href="http://www.wormnav.com/index.php?locus={{system.name}}" target="_blank">Wormnav</a></li>
         <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
-        <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
-        <li><a href="http://www.zkillboard.com/system/{{system.pk}}" target="_blank">zKillboard</a></li>
         {% if system.sysclass < 7 %}
-        <li><a href="http://www.wormhol.es/{{system.name}}" target="_blank">Wormhol.es</a></li>
+        <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
+        {% else %}
+        <li><a href="http://evemaps.dotlan.net/map/{{system.region.name.split|join:"_"}}/{{system.name.split|join:"_"}}" target="_blank">Dotlan</a></li>
+        {% endif %}
+        <li><a href="http://zkillboard.com/system/{{system.pk}}" target="_blank">zKillboard</a></li>
+        {% if system.sysclass < 7 %}
+        <li><a href="http://wh.pasta.gg/{{system.name}}" target="_blank">Wormhol.es</a></li>
         {% endif %}
 
     </ul>
 </div>
+    {% if can_edit %}
             {% if isinterest %}
             <a class="btn btn-small" onclick="RemoveInterest({{mapsys.pk}});" >Remove Interest </a>
             {% else %}
@@ -56,5 +65,6 @@
                 <li><a class="dropdown-toggle" data-toggle="dropdown")>Just Kidding!</a></li>
             </ul>
         </div>
+    {% endif %}
     </div>
 </div>

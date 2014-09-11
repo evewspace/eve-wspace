@@ -1,0 +1,76 @@
+
+<form id="map{{map.pk}}SettingsForm" class="form form-horizontal">
+    {% if saved %}
+    <div class="alert alert-success" style="margin-left: 200px; width: 250px">
+        <h5>Map Settings Saved</h5>
+    </div>
+    {% endif %}
+   <div class="control-group">
+        <label class="control-label" for="map{{map.pk}}Name">Name:</label>
+        <div class="controls">
+            <input type="text" name="name" id="map{{map.pk}}Name" value="{{map.name}}" />
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <label class="checkbox">
+                    <input type="checkbox" {% if map.explicitperms %}checked="checked"{% endif %} name="explicitperms"> Explicit Permissions Only
+                </label>
+            </div>
+        </div>
+        <div class="control-group" style="margin-left: 200px; width: 400px;">
+            <h5>Explicit Permission Table</h5>
+            <h6 class="text-info">Unless Explicit Permissions Only is set, users with the Unrestricted global permission will have Change access.</h6>
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Group</th>
+                        <th>None</th>
+                        <th>Read</th>
+                        <th>Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for group,access in groups %}
+                    <tr>
+                        <td>{{group.name}}</td>
+                        <td>
+                            <input type="radio" name="map-{{map.pk}}-group-{{group.pk}}-permission" value="0" {% if access == 0 %}checked="checked"{% endif %}>
+                        </td>
+                        <td>
+                            <input type="radio" name="map-{{map.pk}}-group-{{group.pk}}-permission" value="1" {% if access == 1 %}checked="checked"{% endif %}>
+                        </td>
+                        <td>
+                            <input type="radio" name="map-{{map.pk}}-group-{{group.pk}}-permission" value="2" {% if access == 2 %}checked="checked"{% endif %} >
+                        </td>
+                    </tr>
+                    <script type="text/javascript">
+                    </script>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="control-group" style="margin-left: 200px;">
+            <button class="btn btn-success" type="submit">Save</button>
+            <button id="map{{map.pk}}DeleteButton" class="btn btn-danger">Delete Map</button>
+            <button id="map{{map.pk}}FinalDelete" style="display: none;" class="btn-warning">Really Delete</button>
+            <script type='text/javascript'>
+                $('#map{{map.pk}}FinalDelete').click(function(e){
+                        e.preventDefault();
+                        DeleteMap({{map.pk}});
+                        });
+                $('#map{{map.pk}}DeleteButton').click(function(e){
+                        e.preventDefault();
+                        $('#map{{map.pk}}DeleteButton').hide();
+                        $('#map{{map.pk}}FinalDelete').show();
+                        return false;
+                        });
+            </script>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    $('#map{{map.pk}}SettingsForm').submit(function(e){
+                e.preventDefault();
+                SaveMapSettings({{map.pk}});
+            });
+</script>

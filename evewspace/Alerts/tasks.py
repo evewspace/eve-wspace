@@ -17,7 +17,9 @@
 from celery import task
 from Alerts.models import SubscriptionGroup
 from Alerts import method_registry
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 @task
 def send_alert(from_user, sub_group, message, subject):

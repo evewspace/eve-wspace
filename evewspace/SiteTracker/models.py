@@ -15,13 +15,15 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from Map.models import Map, System, MapSystem
 from core.utils import get_config
 from datetime import datetime
 import pytz
 
 # Create your models here.
+
+User = settings.AUTH_USER_MODEL
 
 class Fleet(models.Model):
     """Represents a SiteTracker fleet."""
@@ -143,7 +145,7 @@ class SiteType(models.Model):
     shortname = models.CharField(max_length=8, unique=True)
     longname = models.CharField(max_length=80, unique=True)
     # Defunct site types are maintained in the databse for relational purposes but can no longer be credited
-    defunct = models.BooleanField()
+    defunct = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.longname
@@ -208,7 +210,7 @@ class UserSite(models.Model):
     """Represents a user's credit for a site."""
     site = models.ForeignKey(SiteRecord, related_name="members")
     user = models.ForeignKey(User, related_name="sites")
-    pending = models.BooleanField()
+    pending = models.BooleanField(default=False)
 
     def approve(self):
         """

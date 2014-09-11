@@ -12,7 +12,7 @@
         <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}bootstrap/css/slate.css" />
         {% if is_igb and not is_igb_trusted %}
         <script type="text/javascript">
-            CCPEVE.requestTrust('{{SITE_URL}}');
+            CCPEVE.requestTrust(window.location.protocol + '//' + window.location.host);
         </script>
         {% endif %}
 		{% block scripts %}{%endblock%}
@@ -29,7 +29,7 @@
         <div id="baseNavDiv" class="navbar">
             <div class="navbar-inner">
                 <ul class="nav">
-                    <a class="brand" href="{% url core.views.home_view %}">Eve W-Space</a>
+                    <a class="brand" href="{% url 'core.views.home_view' %}">Eve W-Space</a>
                     {% load coretags %}
                     {% nav_entries %}
                     {% comment %}    
@@ -64,7 +64,7 @@
             </div>
             {%block content %}{%endblock%}
 		</div>
-
+        {% feedback_panel %}
 		<div id="baseFooterDiv" class="footer">
             {%block footer %}{%endblock%}
             <div class="copyrightNotice">
