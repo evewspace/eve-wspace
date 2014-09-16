@@ -57,6 +57,11 @@ package {'rabbitmq-server':
 	require => Exec['apt-get update']
     }
 
+package {'python-mysqldb':
+	ensure => present,
+	require => Exec['apt-get update']
+	}
+
 service {'rabbitmq-server':
     ensure => 'running',
     hasrestart => 'true',
