@@ -28,6 +28,8 @@ You can install all required packages with the following. You will be prompted f
       nginx bzip2 memcached libmysqlclient-dev mysql-server libxml2-dev \
       libxslt-dev rabbitmq-server supervisor
 
+Note: if you want to use PostgreSQL, replace libmysqlclient-dev and mysql-server with libpq-dev and postgresql.
+
 You will also be needing to edit text, so make sure to install your favorite text editor if *nano* or *vi* (not *vim*) aren't your cup of tea:
 
 Next, you will need to upgrade *distribute* and install *virtualenv*:::
@@ -98,7 +100,9 @@ You will notice that your shell changes to include *(eve-wspace)* when the virtu
 
 Now you can install the required Python packages:::
 
-    (eve-wspace)$ pip install -r /home/maptool/eve-wspace/requirements.txt
+    (eve-wspace)$ pip install -r /home/maptool/eve-wspace/requirements-mysql.txt
+
+Use requirements-postgresql.txt if you are using PostgreSQL.
 
 Configuring local_settings.py
 -----------------------------
@@ -231,7 +235,7 @@ You need to tell supervisor about the tools you want it to run, to do that, you 
     $ sudo nano /etc/supervisor/conf.d/gunicorn.conf
 
     [program:gunicorn]
-    command=/home/maptool/eve-wspace/bin/gunicorn_django --workers=4 -b 0.0.0.0:8000 settings.py
+    command=/home/maptool/eve-wspace/bin/gunicorn_django --workers=4 -b 127.0.0.1:8000 settings.py
     directory=/home/maptool/eve-wspace/evewspace/evewspace
     environment=PATH="/home/maptool/eve-wspace/bin"
     user=maptool
@@ -277,7 +281,7 @@ Now that Eve W-Space itself is running, you need to get people to it. That's whe
             proxy_set_header X-Scheme $scheme;
             proxy_connect_timeout 10;
             proxy_read_timeout 30;
-            proxy_pass http://localhost:8000;
+            proxy_pass http://127.0.0.1:8000;
         }
     }
 
@@ -285,6 +289,9 @@ Now that Eve W-Space itself is running, you need to get people to it. That's whe
     $ sudo rm /etc/nginx/sites-enabled/default
     $ sudo ln -s /etc/nginx/sites-available/evewspace /etc/nginx/sites-enabled/evewspace
     $ sudo service nginx reload
+
+
+Note: if you have multiple virtual domains on your nginx server, put "underscores_in_headers on;" in nginx.conf instead.
 
 Congratulations! Your Eve W-Space instance should now be available at whatever 
 your ip or host name was from the Nginx config. Please see the :doc:`getting_started` page for your next steps. Keep in mind that your instance 
