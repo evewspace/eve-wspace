@@ -286,6 +286,9 @@ Now that Eve W-Space itself is running, you need to get people to it. That's whe
     $ sudo ln -s /etc/nginx/sites-available/evewspace /etc/nginx/sites-enabled/evewspace
     $ sudo service nginx reload
 
+
+Note: if you have multiple virtual domains on your nginx server, put "underscores_in_headers on;" in nginx.conf instead.
+
 Congratulations! Your Eve W-Space instance should now be available at whatever 
 your ip or host name was from the Nginx config. Please see the :doc:`getting_started` page for your next steps. Keep in mind that your instance 
 will have a default administrator registration code until you change it, so do that ASAP.
