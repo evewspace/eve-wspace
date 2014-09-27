@@ -231,7 +231,7 @@ You need to tell supervisor about the tools you want it to run, to do that, you 
     $ sudo nano /etc/supervisor/conf.d/gunicorn.conf
 
     [program:gunicorn]
-    command=/home/maptool/eve-wspace/bin/gunicorn_django --workers=4 -b 0.0.0.0:8000 settings.py
+    command=/home/maptool/eve-wspace/bin/gunicorn_django --workers=4 -b 127.0.0.1:8000 settings.py
     directory=/home/maptool/eve-wspace/evewspace/evewspace
     environment=PATH="/home/maptool/eve-wspace/bin"
     user=maptool
@@ -277,7 +277,7 @@ Now that Eve W-Space itself is running, you need to get people to it. That's whe
             proxy_set_header X-Scheme $scheme;
             proxy_connect_timeout 10;
             proxy_read_timeout 30;
-            proxy_pass http://localhost:8000;
+            proxy_pass http://127.0.0.1:8000;
         }
     }
 
