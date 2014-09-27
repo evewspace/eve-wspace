@@ -28,6 +28,8 @@ You can install all required packages with the following. You will be prompted f
       nginx bzip2 memcached libmysqlclient-dev mysql-server libxml2-dev \
       libxslt-dev rabbitmq-server supervisor
 
+Note: if you want to use PostgreSQL, replace libmysqlclient-dev and mysql-server with libpq-dev and postgresql.
+
 You will also be needing to edit text, so make sure to install your favorite text editor if *nano* or *vi* (not *vim*) aren't your cup of tea:
 
 Next, you will need to upgrade *distribute* and install *virtualenv*:::
@@ -98,7 +100,9 @@ You will notice that your shell changes to include *(eve-wspace)* when the virtu
 
 Now you can install the required Python packages:::
 
-    (eve-wspace)$ pip install -r /home/maptool/eve-wspace/requirements.txt
+    (eve-wspace)$ pip install -r /home/maptool/eve-wspace/requirements-mysql.txt
+
+Use requirements-postgresql.txt if you are using PostgreSQL.
 
 Configuring local_settings.py
 -----------------------------
