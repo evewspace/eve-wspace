@@ -360,6 +360,38 @@ class MapSystem(models.Model):
             self.friendlyname), True)
         self.delete()
 
+    def get_all_children(self):
+        child_list = []
+        for system in self.childsystems.all():
+            for sys in system.get_all_children():
+                child_list.append(sys)
+        child_list.append(self)
+        return child_list
+
+    def promote_system(self, user):
+        """
+        Makes this system the root system and deletes all other chains.
+        """
+        if not self.parentsystem:
+            # This is already the root system
+            return True
+        # Cut all ties
+        self.parent_wormhole.delete()
+        self.parentsystem = None
+        self.save()
+        # Generate a list of systems to delete
+        child_list = self.get_all_children()
+        for sys in self.map.systems.all():
+            if not sys in child_list:
+                try:
+                    sys.parent_wormhole.delete()
+                except Exception:
+                    # Nasty hack because of race condition for deleting hole
+                    pass
+                sys.delete()
+        self.map.add_log(user, "Truncated to: %s (%s)" % (self.system.name,
+            self.friendlyname), True)
+
 
 class Wormhole(models.Model):
     """

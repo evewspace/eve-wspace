@@ -715,6 +715,21 @@ function DeleteSystem(msID){
 }
 
 
+function PromoteSystem(msID){
+    address = "system/" + msID + "/promote/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        success: function(){
+            if (msID == focusMS){
+                HideSystemDetails();            
+            }
+            setTimeout(function(){RefreshMap();}, 500);
+        }
+    });
+}
+
+
 function StartDrawing() {
     if ((typeof (systemsJSON) != "undefined") && (systemsJSON != null)) {
         var stellarSystemsLength = systemsJSON.length;
