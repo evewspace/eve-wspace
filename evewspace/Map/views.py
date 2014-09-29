@@ -300,6 +300,17 @@ def remove_system(request, map_id, ms_id):
     return HttpResponse()
 
 
+@login_required
+@require_map_permission(permission=2)
+def promote_system(request, map_id, ms_id):
+    """
+    Promotes the MapSystem to map root and truncates other chains.
+    """
+    system = get_object_or_404(MapSystem, pk=ms_id)
+    system.promote_system(request.user)
+    return HttpResponse()
+
+
 # noinspection PyUnusedLocal
 @login_required
 @require_map_permission(permission=1)
