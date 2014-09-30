@@ -20,3 +20,4 @@ networkx==1.8.1
 PyTS3==0.3
 requests==2.4.0
 MySQL-python==1.2.5
+PyYAML==3.11

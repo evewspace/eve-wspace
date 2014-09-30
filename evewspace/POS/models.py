@@ -53,6 +53,15 @@ class POS(models.Model):
     class Meta:
         ordering = ['system__name', 'planet', 'moon']
 
+    def as_dict(self):
+        data = {
+                'planet': self.planet, 'moon': self.moon,
+                'tower': self.towertype.name, 'owner': self.corporation.name,
+                'fitting': self.fitting, 'status': self.get_status_display(),
+                'rftime': self.rftime, 'warpin': self.warpin_notice
+                }
+        return data
+
     def clean(self):
         from django.core.exceptions import ValidationError
         if self.rftime and self.status != 3:

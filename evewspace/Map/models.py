@@ -23,6 +23,7 @@ from django.forms import ModelForm
 from datetime import datetime, timedelta
 import pytz
 import time
+import yaml
 from Map import utils
 from Map.utils import MapJSONGenerator
 from django.core.cache import cache
@@ -289,6 +290,18 @@ class Map(models.Model):
         """
         return utils.MapJSONGenerator(self, user).get_systems_json()
 
+    def as_yaml(self):
+        """
+        Returns the yaml representation of the map for import/export.
+        """
+        data = {
+                'map_name': self.name,
+                'export_time': datetime.now(pytz.utc),
+                'systems': [x.as_dict() for x in self.systems.filter(
+                    parentsystem=None).all()]
+                }
+        return yaml.dump(data)
+
     def snapshot(self, user, name, description):
         """
         Makes and returns a snapshot of the map.
@@ -392,6 +405,34 @@ class MapSystem(models.Model):
         self.map.add_log(user, "Truncated to: %s (%s)" % (self.system.name,
             self.friendlyname), True)
 
+    def as_dict(self):
+        """
+        Returns a dict representation of the system.
+        """
+        try:
+            parent_wh_dict = {
+                    'id': self.parent_wormhole.wh_type.name,
+                    'updated': self.parent_wormhole.updated,
+                    'top_bubbled': self.parent_wormhole.top_bubbled,
+                    'bottom_bubbled': self.parent_wormhole.bottom_bubbled,
+                    'mass_status': self.parent_wormhole.get_mass_status_display(),
+                    'time_status': self.parent_wormhole.get_time_status_display(),
+                    'collapsed': self.parent_wormhole.collapsed
+                    }
+        except Wormhole.DoesNotExist:
+            parent_wh_dict = None
+
+        data = {
+                'tag': self.friendlyname,
+                'system': self.system.name,
+                'signatures':[sig.as_dict() for sig in self.system.signatures.all()],
+                'starbases': [pos.as_dict() for pos in self.system.poses.all()],
+                'parent_wh': parent_wh_dict,
+                'children': [x.as_dict() for x in self.childsystems.all()]
+                }
+        return data
+
+
 
 class Wormhole(models.Model):
     """
@@ -412,6 +453,15 @@ class Wormhole(models.Model):
     updated = models.DateTimeField(auto_now=True)
     eol_time = models.DateTimeField(null=True)
     collapsed = models.NullBooleanField(null=True)
+
+    @property
+    def wh_type(self):
+        if self.top_type.maxmass:
+            return self.top_type
+        if self.bottom_type.maxmass:
+            return self.botton_type
+        # Default to first side of hole
+        return self.top_type
 
     @property
     def max_mass(self):
@@ -487,6 +537,14 @@ class Signature(models.Model):
     def __unicode__(self):
         """Returns sig ID as unicode representation"""
         return self.sigid
+
+    def as_dict(self):
+        data = {
+                'id': self.sigid,
+                'type': self.sigtype.shortname,
+                'info': self.info
+                }
+        return data
 
     def activate(self):
         """Toggles the site activation."""
