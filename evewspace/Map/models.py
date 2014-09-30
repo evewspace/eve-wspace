@@ -300,7 +300,7 @@ class Map(models.Model):
                 'systems': [x.as_dict() for x in self.systems.filter(
                     parentsystem=None).all()]
                 }
-        return yaml.dump(data)
+        return yaml.safe_dump(data, encoding='utf-8', allow_unicode=True)
 
     def snapshot(self, user, name, description):
         """
