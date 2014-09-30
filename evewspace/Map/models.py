@@ -459,7 +459,7 @@ class Wormhole(models.Model):
         if self.top_type.maxmass:
             return self.top_type
         if self.bottom_type.maxmass:
-            return self.botton_type
+            return self.bottom_type
         # Default to first side of hole
         return self.top_type
 
