@@ -57,7 +57,7 @@ class POS(models.Model):
         data = {
                 'planet': self.planet, 'moon': self.moon,
                 'tower': self.towertype.name, 'owner': self.corporation.name,
-                'fitting': self.fitting, 'status': self.get_status_display(),
+                'status': self.get_status_display(),
                 'rftime': self.rftime, 'warpin': self.warpin_notice
                 }
         return data
