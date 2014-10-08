@@ -137,6 +137,8 @@ def _checkin_igb_trusted(request, current_map):
     old_location = cache.get(char_cache_key)
     result = None
     current_system = get_object_or_404(System, pk=current_location[0])
+    silent_map = request.POST.get('silent', 'false') == 'true'
+    kspace_map = request.POST.get('kspace', 'false') == 'true'
 
     if old_location != current_location:
         if old_location:
@@ -151,7 +153,8 @@ def _checkin_igb_trusted(request, current_map):
             old_location and
             old_system in current_map
             and current_system not in current_map
-            and not _is_moving_from_kspace_to_kspace(old_system, current_system)
+            and not _is_moving_from_kspace_to_kspace(old_system,
+                current_system, kspace_map)
         ):
             context = {
                 'oldsystem': current_map.systems.filter(
@@ -181,14 +184,18 @@ def _checkin_igb_trusted(request, current_map):
     return result
 
 
-def _is_moving_from_kspace_to_kspace(old_system, current_system):
+def _is_moving_from_kspace_to_kspace(old_system, current_system, kspace_map):
     """
     returns whether we are moving through kspace
     :param old_system:
     :param current_system:
     :return:
     """
-    return old_system.is_kspace() and current_system.is_kspace()
+    if not kspace_map:
+        return old_system.is_kspace() and current_system.is_kspace()
+    else:
+        # K-space mapping enabled, pass the check
+        return False
 
 
 def get_system_context(ms_id, user):
@@ -290,6 +297,17 @@ def remove_system(request, map_id, ms_id):
     """
     system = get_object_or_404(MapSystem, pk=ms_id)
     system.remove_system(request.user)
+    return HttpResponse()
+
+
+@login_required
+@require_map_permission(permission=2)
+def promote_system(request, map_id, ms_id):
+    """
+    Promotes the MapSystem to map root and truncates other chains.
+    """
+    system = get_object_or_404(MapSystem, pk=ms_id)
+    system.promote_system(request.user)
     return HttpResponse()
 
 
