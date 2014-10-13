@@ -79,7 +79,7 @@ class System(SystemData):
 
     """
     sysclass_choices = ((1, "C1"), (2, "C2"), (3, "C3"), (4, "C4"), (5, "C5"),
-            (6, "C6"), (7, "High Sec"), (8, "Low Sec"), (9, "Null Sec"))
+            (6, "C6"), (7, "High Sec"), (8, "Low Sec"), (9, "Null Sec"), (10, "Blank"))
     sysclass = models.IntegerField(choices = sysclass_choices)
     importance_choices = ((0, "Regular"),
                      (1, "Dangerous System"),
