@@ -54,12 +54,6 @@ class Command(NoArgsCommand):
                     newdata.npckills = 0
                     newdata.shipkills = 0
                     newdata.save()
-                newdata = WSystem(static1=None, static2=None, sysclass=10, lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
-                            info='', occupied='')
-                newdata.name= "Blank"
-                newdata.save()
-                
-                
             except LocationWormholeClass.DoesNotExist:
                 pass
             except DoesNotExist:
