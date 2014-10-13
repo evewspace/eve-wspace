@@ -57,6 +57,7 @@ class Command(NoArgsCommand):
                 newdata = WSystem(static1=None, static2=None, sysclass=10, lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
                             info='', occupied='')
                 newdata.name= "Blank"
+                newdata.save()
                 
                 
             except LocationWormholeClass.DoesNotExist:
