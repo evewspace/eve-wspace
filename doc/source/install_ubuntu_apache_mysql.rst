@@ -36,6 +36,8 @@ but it is recommended that you set a secure password and remember it for later.:
     apache2 bzip2 memcached libmysqlclient-dev mysql-server libxml2-dev libxslt-dev \
     rabbitmq-server supervisor libapache2-mod-wsgi
 
+Note: if you want to use PostgreSQL, replace libmysqlclient-dev and mysql-server with libpq-dev and postgresql.
+
 You will also be needing to edit text, so make sure to install your favorite text 
 editor if *nano* or *vi* (not *vim*) aren't your cup of tea:
 
@@ -117,7 +119,9 @@ virtual environment is active.
 
 Now you can install the required Python packages:::
 
-    (eve-wspace)$ pip install -r /home/maptool/eve-wspace/requirements.txt
+    (eve-wspace)$ pip install -r /home/maptool/eve-wspace/requirements-mysql.txt
+
+Use requirements-postgresql.txt if you are using PostgreSQL.
 
 Configuring local_settings.py
 -----------------------------
