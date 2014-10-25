@@ -63,7 +63,7 @@ class POS(models.Model):
         for pos in import_list:
             planet = pos['planet']
             moon = pos['moon']
-            warpin = pos['moon']
+            warpin = pos['warpin']
             status = pos['status']
             rftime = pos['rftime']
             name = pos['name']
@@ -77,7 +77,7 @@ class POS(models.Model):
                         names=pos['owner']).characters[0].characterID
                 owner = tasks.update_corporation(corpID, True)
             if POS.objects.filter(system=system, planet=planet,
-                    moon=moon, owner=owner).exists():
+                    moon=moon, corporation=owner).exists():
                 # Update first existing record
                 starbase = POS.objects.filter(system=system, planet=planet,
                         moon=moon, corporation=owner).all()[0]
