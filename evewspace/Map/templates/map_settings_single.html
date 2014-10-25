@@ -17,6 +17,13 @@
                 </label>
             </div>
         </div>
+        <div class="control-group">
+            <div class="controls">
+                <label class="checkbox">
+                    <input type="checkbox" {% if map.truncate_allowed %}checked="checked"{% endif %} name="truncate_allowed"> Truncate Function Enabled
+                </label>
+            </div>
+        </div>
         <div class="control-group" style="margin-left: 200px; width: 400px;">
             <h5>Explicit Permission Table</h5>
             <h6 class="text-info">Unless Explicit Permissions Only is set, users with the Unrestricted global permission will have Change access.</h6>

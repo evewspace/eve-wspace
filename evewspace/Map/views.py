@@ -306,10 +306,13 @@ def promote_system(request, map_id, ms_id):
     """
     Promotes the MapSystem to map root and truncates other chains.
     """
-    system = get_object_or_404(MapSystem, pk=ms_id)
-    system.promote_system(request.user)
-    return HttpResponse()
-
+    map_obj = get_object_or_404(Map, pk=map_id)
+    if map_obj.truncate_allowed:
+        system = get_object_or_404(MapSystem, pk=ms_id)
+        system.promote_system(request.user)
+        return HttpResponse()
+    else:
+        raise PermissionDenied
 
 # noinspection PyUnusedLocal
 @login_required
@@ -1122,8 +1125,10 @@ def map_settings(request, map_id):
     if request.method == 'POST':
         name = request.POST.get('name', None)
         explicit_perms = request.POST.get('explicitperms', False)
+        truncate_allowed = request.POST.get('truncate_allowed', False)
         if not name:
             return HttpResponse('The map name cannot be blank', status=400)
+        subject.truncate_allowed = truncate_allowed
         subject.name = name
         subject.explicitperms = explicit_perms
         for group in Group.objects.all():

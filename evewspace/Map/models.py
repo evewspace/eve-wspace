@@ -203,6 +203,7 @@ class Map(models.Model):
     root = models.ForeignKey(System, related_name="root")
     # Maps with explicitperms = True require an explicit permission entry to access.
     explicitperms = models.BooleanField(default=False)
+    truncate_allowed = models.BooleanField(default=True)
 
     class Meta:
         permissions = (("map_unrestricted", "Do not require excplicit access to maps."),
@@ -741,7 +742,6 @@ class InlineModelChoiceField(forms.ModelChoiceField):
 class MapForm(ModelForm):
     root = InlineModelChoiceField(queryset=System.objects.all(),
             widget=forms.TextInput(attrs={'class': 'systemAuto'}))
-
     class Meta:
         model = Map
 
