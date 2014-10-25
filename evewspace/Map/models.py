@@ -249,6 +249,21 @@ class Map(models.Model):
         new_map.save()
         root_mapsys = new_map.add_system(user=user, system=root_sys,
                 friendlyname=root_system['tag'])
+        for sig in root_system['signatures']:
+            sig_id = sig['id']
+            info = sig['info']
+            if sig['type']:
+                sig_type = SignatureType.objects.get(shortname=sig['type'])
+            else:
+                sig_type = None
+            if sig_type:
+                updated = True
+            Signature(sigid=sig_id, sigtype=sig_type,
+                    system=root_mapsys.system, info=info, updated=updated).save()
+        from POS.models import POS
+        POS.update_from_import_list(root_mapsys.system,
+                root_system['starbases'])
+        root_mapsys.add_children_from_list(root_system['children'])
         return new_map
 
     def add_log(self, user, action, visible=False):
