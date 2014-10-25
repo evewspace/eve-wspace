@@ -19,9 +19,11 @@ from core.models import Type, Location
 from API.models import CorpAPIKey
 from core.models import Corporation, Alliance
 from Map.models import System
-import csv
+from API import cache_handler as handler
 from django.contrib.auth import get_user_model
 import pytz
+import csv
+import eveapi
 
 User = get_user_model()
 
@@ -53,11 +55,51 @@ class POS(models.Model):
     class Meta:
         ordering = ['system__name', 'planet', 'moon']
 
+    @classmethod
+    def update_from_import_list(self, system, import_list):
+        """
+        Imports starbases from YAML importer.
+        """
+        for pos in import_list:
+            planet = pos['planet']
+            moon = pos['moon']
+            warpin = pos['moon']
+            status = pos['status']
+            rftime = pos['rftime']
+            name = pos['name']
+            tower = Type.objects.get(name=pos['tower'])
+            try:
+                owner = Corporation.objects.get(name=pos['owner'])
+            except Corporation.DoesNotExist:
+                from core import tasks
+                api = eveapi.EVEAPIConnection(cacheHandler=handler)
+                corpID = api.eve.CharacterID(
+                        names=pos['owner']).characters[0].characterID
+                owner = tasks.update_corporation(corpID, True)
+            if POS.objects.filter(system=system, planet=planet,
+                    moon=moon, owner=owner).exists():
+                # Update first existing record
+                starbase = POS.objects.filter(system=system, planet=planet,
+                        moon=moon, corporation=owner).all()[0]
+                starbase.status = status
+                starbase.name = name
+                starbase.towertype = tower
+                if status == 3:
+                    starbase.rftime = rftime
+                starbase.warpin_notice = warpin
+            else:
+                new_pos = POS(system=system, planet=planet, moon=moon,
+                        corporation=owner, towertype=tower,
+                        warpin_notice=warpin, status=status)
+                if status == 3:
+                    new_pos.rftime = rftime
+                new_pos.save()
+
     def as_dict(self):
         data = {
                 'planet': self.planet, 'moon': self.moon,
                 'tower': self.towertype.name, 'owner': self.corporation.name,
-                'status': self.get_status_display(),
+                'status': self.status, 'name': self.posname,
                 'rftime': self.rftime, 'warpin': self.warpin_notice
                 }
         return data
