@@ -15,6 +15,10 @@
             <td><label for="id_root">Root System:</label></td>
             <td><input type="text" id="id_root" name="root" class="systemAuto" /></td>
         </tr>
+        <tr>
+            <td><label for="id_truncate_allowed">Truncate Function Enabled:</label></td>
+            <td><input type='checkbox' id='id_truncate_allowed' name='truncate_allowed' checked='checked' /></td>
+        </tr>
         {{form.explicitperms_errors}}
         {% if perms.Map.map_admin %}
         <tr>
