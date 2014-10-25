@@ -612,7 +612,7 @@ class Signature(models.Model):
     def as_dict(self):
         data = {
                 'id': self.sigid,
-                'type': self.sigtype.shortname,
+                'type': self.sigtype.shortname if self.sigtype else None,
                 'info': self.info
                 }
         return data
