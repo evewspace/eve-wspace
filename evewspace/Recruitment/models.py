@@ -15,10 +15,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.conf import settings
 # Create your models here.
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 class Interest(models.Model):
     """Represents an option for the 'What are you interests? question'"""

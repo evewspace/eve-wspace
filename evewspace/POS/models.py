@@ -20,12 +20,12 @@ from API.models import CorpAPIKey
 from core.models import Corporation, Alliance
 from Map.models import System
 from API import cache_handler as handler
-from django.contrib.auth import get_user_model
+from django.conf import settings
 import pytz
 import csv
 import eveapi
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 class POS(models.Model):
     """Represents a POS somewhere in space."""
