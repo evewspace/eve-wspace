@@ -897,8 +897,39 @@ def create_map(request):
         form = MapForm
         return TemplateResponse(request, 'new_map.html', {'form': form, })
 
-def _sort_destinations(destinations):
+@permission_required('Map.add_map')
+def import_map(request):
+    """
+    Import a map from a YAML export.
+    """
+    if request.method == 'POST':
+        yaml_string = request.POST.get('yaml_string', None)
+        if not yaml_string:
+            return TemplateResponse(request, 'import_map.html',
+                    {'error': 'Import text cannot be blank!'})
+        try:
+            new_map = Map.yaml_import(request.user, yaml_string)
+        except Exception as ex:
+            return TemplateResponse(request, 'import_map.html',
+                    {'error': 'The map failed to import: %s' % repr(ex)})
+        return HttpResponseRedirect(reverse('Map.views.get_map',
+            kwargs={'map_id': new_map.pk}))
+    else:
+        return TemplateResponse(request, 'import_map.html')
 
+@login_required
+@require_map_permission(permission=1)
+def export_map(request, map_id):
+    """
+    Exports a map as YAML.
+    """
+    map_obj = get_object_or_404(Map, pk=map_id)
+    map_obj.add_log(user=request.user, action='Exported the map to YAML.',
+            visible=True)
+    return TemplateResponse(request, 'export_map_dialog.html',
+            {'yaml_string': map_obj.as_yaml()})
+
+def _sort_destinations(destinations):
     """
     Takes a list of destination tuples and returns the same list, sorted in order of the jumps.
     """
