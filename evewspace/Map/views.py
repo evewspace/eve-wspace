@@ -137,6 +137,8 @@ def _checkin_igb_trusted(request, current_map):
     old_location = cache.get(char_cache_key)
     result = None
     current_system = get_object_or_404(System, pk=current_location[0])
+    silent_map = request.POST.get('silent', 'false') == 'true'
+    kspace_map = request.POST.get('kspace', 'false') == 'true'
 
     if old_location != current_location:
         if old_location:
@@ -151,7 +153,8 @@ def _checkin_igb_trusted(request, current_map):
             old_location and
             old_system in current_map
             and current_system not in current_map
-            and not _is_moving_from_kspace_to_kspace(old_system, current_system)
+            and not _is_moving_from_kspace_to_kspace(old_system,
+                current_system, kspace_map)
         ):
             context = {
                 'oldsystem': current_map.systems.filter(
@@ -181,14 +184,18 @@ def _checkin_igb_trusted(request, current_map):
     return result
 
 
-def _is_moving_from_kspace_to_kspace(old_system, current_system):
+def _is_moving_from_kspace_to_kspace(old_system, current_system, kspace_map):
     """
     returns whether we are moving through kspace
     :param old_system:
     :param current_system:
     :return:
     """
-    return old_system.is_kspace() and current_system.is_kspace()
+    if not kspace_map:
+        return old_system.is_kspace() and current_system.is_kspace()
+    else:
+        # K-space mapping enabled, pass the check
+        return False
 
 
 def get_system_context(ms_id, user):
@@ -292,6 +299,20 @@ def remove_system(request, map_id, ms_id):
     system.remove_system(request.user)
     return HttpResponse()
 
+
+@login_required
+@require_map_permission(permission=2)
+def promote_system(request, map_id, ms_id):
+    """
+    Promotes the MapSystem to map root and truncates other chains.
+    """
+    map_obj = get_object_or_404(Map, pk=map_id)
+    if map_obj.truncate_allowed:
+        system = get_object_or_404(MapSystem, pk=ms_id)
+        system.promote_system(request.user)
+        return HttpResponse()
+    else:
+        raise PermissionDenied
 
 # noinspection PyUnusedLocal
 @login_required
@@ -876,8 +897,39 @@ def create_map(request):
         form = MapForm
         return TemplateResponse(request, 'new_map.html', {'form': form, })
 
-def _sort_destinations(destinations):
+@permission_required('Map.add_map')
+def import_map(request):
+    """
+    Import a map from a YAML export.
+    """
+    if request.method == 'POST':
+        yaml_string = request.POST.get('yaml_string', None)
+        if not yaml_string:
+            return TemplateResponse(request, 'import_map.html',
+                    {'error': 'Import text cannot be blank!'})
+        try:
+            new_map = Map.yaml_import(request.user, yaml_string)
+        except Exception as ex:
+            return TemplateResponse(request, 'import_map.html',
+                    {'error': 'The map failed to import: %s' % repr(ex)})
+        return HttpResponseRedirect(reverse('Map.views.get_map',
+            kwargs={'map_id': new_map.pk}))
+    else:
+        return TemplateResponse(request, 'import_map.html')
 
+@login_required
+@require_map_permission(permission=1)
+def export_map(request, map_id):
+    """
+    Exports a map as YAML.
+    """
+    map_obj = get_object_or_404(Map, pk=map_id)
+    map_obj.add_log(user=request.user, action='Exported the map to YAML.',
+            visible=True)
+    return TemplateResponse(request, 'export_map_dialog.html',
+            {'yaml_string': map_obj.as_yaml()})
+
+def _sort_destinations(destinations):
     """
     Takes a list of destination tuples and returns the same list, sorted in order of the jumps.
     """
@@ -1104,8 +1156,10 @@ def map_settings(request, map_id):
     if request.method == 'POST':
         name = request.POST.get('name', None)
         explicit_perms = request.POST.get('explicitperms', False)
+        truncate_allowed = request.POST.get('truncate_allowed', False)
         if not name:
             return HttpResponse('The map name cannot be blank', status=400)
+        subject.truncate_allowed = truncate_allowed
         subject.name = name
         subject.explicitperms = explicit_perms
         for group in Group.objects.all():

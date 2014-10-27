@@ -34,7 +34,7 @@
             <span class="caret"></span>
         </a>
         <ul id="intelDropdown" class="dropdown-menu" role="menu">
-        <li><a href="http://www.wormnav.com/index.php?locus={{system.name}}" target="_blank">Wormnav</a></li>
+        <li><a href="https://eveeye.com/?system={{system.name}}" target="_blank">EveEye</a></li>
         <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
         {% if system.sysclass < 7 %}
         <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
@@ -65,6 +65,17 @@
                 <li><a class="dropdown-toggle" data-toggle="dropdown")>Just Kidding!</a></li>
             </ul>
         </div>
-    {% endif %}
+        {% if mapsys.map.truncate_allowed %}
+         <div id="truncateButton" class="btn-group dropdown">
+            <a class="btn btn-small btn-danger dropdown-toggle" data-toggle="dropdown">
+                Truncate Chain
+            </a>
+            <ul id="truncateDropdown" class="dropdown-menu" role="menu">
+                <li><a onclick="PromoteSystem({{mapsys.pk}});")>I'm sure!</a></li>
+                <li><a class="dropdown-toggle" data-toggle="dropdown")>Just Kidding!</a></li>
+            </ul>
+        </div>
+        {% endif %}
+   {% endif %}
     </div>
 </div>

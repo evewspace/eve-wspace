@@ -38,6 +38,7 @@ var frigWhColor = "#00FFFF"; // Color of Hyperion Frigate Hole
 var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
 var silentSystem = false; // Are systems added automatically wihthout a pop-up?
+var kspaceIGBMapping = false; // Do we map K<>K connections from the IGB?
 
 $(document).ready(function(){
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
@@ -46,6 +47,11 @@ $(document).ready(function(){
     }
     if (silentSystem === true){
         $('#btnSilentAdd').text('Silent IGB Mapping: ON');
+    }
+    if (kspaceIGBMapping === true){
+        $('#btnKspaceIGB').text('Map K-Space Connections: ON');
+    }else{
+        $('#btnKspaceIGB').text('Map K-Space Connections: OFF');
     }
 });
 
@@ -87,7 +93,7 @@ function doMapAjaxCheckin() {
     $.ajax({
         type: "POST",
         url: currentpath,
-        data: {"loadtime": loadtime, "silent": silentSystem},
+        data: {"loadtime": loadtime, "silent": silentSystem, 'kspace': kspaceIGBMapping},
         success: processAjax
         });
 }
@@ -106,6 +112,17 @@ function ToggleSilentAdd(){
     }else{
         silentSystem = false;
         $('#btnSilentAdd').text('Silent IGB Mapping: OFF');
+    }
+}
+
+
+function ToggleKspaceMapping(){
+    if (kspaceIGBMapping === false){
+        kspaceIGBMapping = true;
+        $('#btnKspaceIGB').text('Map K-Space Connections: ON');
+    }else{
+        kspaceIGBMapping = false;
+        $('#btnKspaceIGB').text('Map K-Space Connections: OFF');
     }
 }
 
@@ -181,6 +198,21 @@ function DisplaySystemMenu(msID){
         url: address,
         success: function(data) { 
             $('#sysMenu').html(data);
+        }
+    });
+}
+
+
+function GetExportMap(mapID){
+    address = "export/";
+    $.ajax({
+        url: address,
+        type: "GET",
+        success: function(data) {
+            $('#modalHolder').html(data).modal('show');
+        },
+        error: function(error) {
+            alert('Could not get the export dialog:\n\n' + error.responseText);
         }
     });
 }
@@ -685,6 +717,21 @@ function EditSystem(msID, sysID){
 
 function DeleteSystem(msID){
     address = "system/" + msID + "/remove/";
+    $.ajax({
+        type: "POST",
+        url: address,
+        success: function(){
+            if (msID == focusMS){
+                HideSystemDetails();            
+            }
+            setTimeout(function(){RefreshMap();}, 500);
+        }
+    });
+}
+
+
+function PromoteSystem(msID){
+    address = "system/" + msID + "/promote/";
     $.ajax({
         type: "POST",
         url: address,

@@ -1,0 +1,16 @@
+<div class='modal-header'>
+    <h4>Export Map</h4>
+</div>
+<div class='modal-body'>
+    <div class='well'>
+        <textarea rows='15' style='width: 80%;' id='yaml-output'>{{yaml_string|safe}}</textarea>
+    </div>
+    <script type='text/javascript'>
+        $('#yaml-output').focus(function(e){
+            this.select();
+        });
+    </script>
+</div>
+<div class='modal-footer'>
+    <button class='btn btn-default' onclick="$('#modalHolder').modal('hide');">Close</button>
+</div>
