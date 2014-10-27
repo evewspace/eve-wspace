@@ -924,7 +924,8 @@ def export_map(request, map_id):
     Exports a map as YAML.
     """
     map_obj = get_object_or_404(Map, pk=map_id)
-    map_obj.add_log(user=request.user, action='Exported the map to YAML.')
+    map_obj.add_log(user=request.user, action='Exported the map to YAML.',
+            visible=True)
     return TemplateResponse(request, 'export_map_dialog.html',
             {'yaml_string': map_obj.as_yaml()})
 
