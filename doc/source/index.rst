@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Eve W-Space 0.2!
+Welcome to Eve W-Space!
 ===========================
 
 NOTE: Eve W-Space is currently in alpha. Most features outside of Mapping 
