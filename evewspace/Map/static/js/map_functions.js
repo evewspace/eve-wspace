@@ -203,6 +203,21 @@ function DisplaySystemMenu(msID){
 }
 
 
+function GetExportMap(mapID){
+    address = "export/";
+    $.ajax({
+        url: address,
+        type: "GET",
+        success: function(data) {
+            $('#modalHolder').html(data).modal('show');
+        },
+        error: function(error) {
+            alert('Could not get the export dialog:\n\n' + error.responseText);
+        }
+    });
+}
+
+
 function MarkScanned(msID, fromPanel, sysID){
     address = "system/" + msID + "/scanned/";
     $.ajax({

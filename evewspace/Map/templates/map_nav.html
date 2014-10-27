@@ -4,5 +4,6 @@
         {% if perms.Map.add_map %}
         <li class="divider"></li>
         <li><a href="{% url 'Map.views.create_map' %}">Add Map</a></li>
+        <li><a href="{%  url 'Map.views.import_map' %}">Import Map</a></li>
         {% endif %}
 	</ul></li>
