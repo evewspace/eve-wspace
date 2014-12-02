@@ -31,6 +31,7 @@ function GetProfileDestinationSettings(){
         }
     });
 }
+
 function AddProfileDestination(){
     $.ajax({
         type: "POST",
@@ -40,7 +41,6 @@ function AddProfileDestination(){
         error: function(){alert("There was an error adding the destination. Please make sure you have entered a valid K-Space system.");}
     });
 }
-
 
 function RemoveProfileDestination(destID){
     $.ajax({
