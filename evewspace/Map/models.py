@@ -102,6 +102,26 @@ class System(SystemData):
         """Returns name of System as unicode representation"""
         return self.name
 
+    @property
+    def class_string(self):
+        if self.sysclass < 7:
+            return 'C%s' % self.sysclass
+        if self.sysclass == 7:
+            return 'Highsec'
+        if self.sysclass == 8:
+            return 'Lowsec'
+        if self.sysclass == 9:
+            return 'Nullsec'
+        # Class 10/11 appear in two Jovian constellations. Reason unknown.
+        if self.sysclass == 10:
+            return 'Odd Jove Space'
+        if self.sysclass == 11:
+            return 'Odd Jove Space'
+        if self.sysclass == 12:
+            return 'Thera'
+        if self.sysclass == 13:
+            return 'Small Ship'
+
     def is_kspace(self):
         if self.sysclass in range(7,12):
             return True

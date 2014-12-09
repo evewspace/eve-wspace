@@ -5,7 +5,7 @@
        <h4 class="sysFriendlySpan">{{mapsys.friendlyname}}{% if mapsys.parent_wormhole.collapsed %} - COLLAPSED{% endif %}</h4>
         {% if mapsys.system.is_wspace %}
         <div> 
-            <strong>Class: {% if mapsys.system.sysclass < 7 %} {{mapsys.system.sysclass}} {% elif mapsys.system.sysclass == 13 %} Small Ship W-Space {% else %} Thera {% endif %}</strong>
+            <strong>Class: {{mapsys.system.class_string}} </strong>
         </div>
         <div>
             <strong>Effect: {{mapsys.system.get_spec.effect}}</strong>
