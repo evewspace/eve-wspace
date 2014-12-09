@@ -55,7 +55,7 @@ class Command(NoArgsCommand):
                     newdata.save()
             except LocationWormholeClass.DoesNotExist:
                 pass
-            except DoesNotExist:
+            except Exception:
                 self.stderr.write('Unable to process %s' % (system.name))
         self.stdout.write('First Pass Complete, beginning lowsec pass')
         for system in basedata:
