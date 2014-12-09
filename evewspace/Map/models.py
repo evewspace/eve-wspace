@@ -202,6 +202,7 @@ class WSystem(System):
     static1 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="primary_statics")
     static2 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="secondary_statics")
     effect = models.CharField(max_length=50, blank=True, null=True)
+    is_shattered = models.NullBooleanField(default=False)
 
 class Map(models.Model):
     """Stores the maps available in the map tool. root relates to System model."""
