@@ -1,19 +1,17 @@
-#    Eve W-Space
-#    Copyright (C) 2013  Andrew Austin and other contributors
+#   Eve W-Space
+#   Copyright 2014 Andrew Austin and contributors
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version. An additional term under section
-#    7 of the GPL is included in the LICENSE file.
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#       http://www.apache.org/licenses/LICENSE-2.0
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
 #from Map.models import *
 from collections import defaultdict
 from core.models import SystemJump, Type, Location
@@ -113,6 +111,10 @@ class MapJSONGenerator(object):
         if system in self._get_interest_path():
             path = True
         if system.system.is_wspace():
+            shattered = system.system.wsystem.is_shattered
+        else:
+            shattered = False
+        if system.system.is_wspace():
             effect = system.system.wsystem.effect
         else:
             effect = None
@@ -139,7 +141,8 @@ class MapJSONGenerator(object):
                     'iconImageURL': self.get_system_icon(system),
                     'whID': parentWH.pk, 'msID': system.pk,
                     'backgroundImageURL': self.get_system_background(system),
-                    'effect': effect, 'collapsed': collapsed}
+                    'effect': effect, 'collapsed': collapsed,
+                    'shattered': shattered}
         else:
             result = {'sysID': system.system.pk, 'Name': system.system.name,
                     'LevelX': levelX,
@@ -154,7 +157,8 @@ class MapJSONGenerator(object):
                     'iconImageURL': self.get_system_icon(system),
                     'whID': None, 'msID': system.pk,
                     'backgroundImageURL': self.get_system_background(system),
-                    'effect': effect, 'collapsed': False}
+                    'effect': effect, 'collapsed': False,
+                    'shattered': shattered}
         return result
 
     def get_system_background(self, system):
@@ -222,11 +226,11 @@ def get_wormhole_type(system1, system2):
     source = "K"
     destination = "K"
     # Set the source and destination for system1 > system2
-    if system1.sysclass < 7:
+    if system1.is_wspace:
         source = str(system1.sysclass)
     if system1.sysclass == 7:
         source = "H"
-    if system1.sysclass > 7:
+    if system1.sysclass in [8,9,10,11]:
         source = "NH"
 
     destination = system2.sysclass

@@ -1,21 +1,19 @@
-//    Eve W-Space
-//    Copyright (C) 2013  Andrew Austin and other contributors
+//   Eve W-Space
+//   Copyright 2014 Andrew Austin and contributors
 //
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version. An additional term under section
-//    7 of the GPL is included in the LICENSE file.
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
 //
-//   This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
-//  Portions Copyright (c) 2011 Georgi Kolev (arcanis@wiadvice.com). Licensed under the GPL (http://www.gnu.org/copyleft/gpl.html) license.
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+//  
+//  Portions Copyright (c) 2011 Georgi Kolev (arcanis@wiadvice.com). Licensed under the Apache 2.0 license.
 
 var loadtime = null;
 var paper = null;
@@ -33,7 +31,7 @@ var strokeWidth = 3; // The width in px of the line connecting wormholes
 var interestWidth = 3; // The width in px of the line connecting wormholes when interest is on
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map
 var sliceLastChars = false; // Friendly name should show last 8 chars if over 8, shows first 8 if false
-var highlightActivePilots = true; // Draw a notification ring around systems with active pilots
+var highlightActivePilots = true; // Draw a notification ring around systems with active pilots.
 var goodColor = "#00FF00"; // Color of good status connections
 var badColor = "#FF0000"; // Color of first shrink connections
 var bubbledColor = "#FF0000"; // Color of first shrink connections
@@ -890,6 +888,12 @@ function DrawSystem(system) {
         case 9:
             classString = "N";
             break;
+        case 12:
+            classString = "T";
+            break;
+        case 13:
+            classString = "SS";
+            break;
         default:
             classString = "C" + system.SysClass;
             break;
@@ -1057,33 +1061,37 @@ function ColorSystem(system, ellipseSystem, textSysName) {
         }
         sysStrokeDashArray = "- ";
     }
+
     // not selected
     switch (system.SysClass) {
+        // Null
         case 9:
             sysColor = "#CC0000";
             sysStroke = "#990000";
-            textColor = "#FFF";
+            textColor = "#fff";
             break;
+        // Low
         case 8:
             sysColor = "#93841E";
             sysStroke = "#60510A";
-            textColor = "#FFF";
+            textColor = "#fff";
             break;
+        // High
         case 7:
             sysColor = "#009F00";
             sysStroke = "#006B00";
-            textColor = "#FFF";
+            textColor = "#fff";
             break;
-        case 6:
+         case 6:
             sysColor = "#0022FF";
             sysStroke = "#0000FF";
             textColor = "#FFF";
             break;
-        case 5:
+         case 5:
             sysColor = "#0044FF";
             sysStroke = "#0000FF";
             textColor = "#FFF";
-            break;
+            break; 
         case 4:
             sysColor = "#0066FF";
             sysStroke = "#0022FF";
@@ -1094,15 +1102,27 @@ function ColorSystem(system, ellipseSystem, textSysName) {
             sysStroke = "#0044FF";
             textColor = "#FFF";
             break;
-        case 2:
+         case 2:
             sysColor = "#00AAFF";
             sysStroke = "#0066FF";
             textColor = "#FFF";
             break;
-        case 1:
+         case 1:
             sysColor = "#00CDFF";
             sysStroke = "#0088FF";
+            textColor = "#FFF"; 
+            break;
+         // Thera
+         case 12:
+            sysColor = "#800080";
+            sysStroke = "#7F3939";
             textColor = "#FFF";
+            break;
+         // Small Ship Hole
+         case 13:
+            sysColor = "#FFA500";
+            sysStroke = "#7f5200";
+            textColor = "#000";
             break;
         default:
             sysColor = "#F2F4FF";
@@ -1110,8 +1130,14 @@ function ColorSystem(system, ellipseSystem, textSysName) {
             textColor = "#0974EA";
             break;
     }
-    var iconX = ellipseSystem.attr("cx") + 40;
-    var iconY = ellipseSystem.attr("cy") - 35;
+    if (system.shattered) {
+        sysStroke = "#FFA500";
+        if (sysStrokeWidth < 3) {
+            sysStrokeWidth = 3;
+        }
+    }
+    var iconX = ellipseSystem.attr("cx")+40;
+    var iconY = ellipseSystem.attr("cy")-35;
     if (system.iconImageURL) {
         paper.image(system.iconImageURL, iconX, iconY, 25, 25);
     }
@@ -1135,7 +1161,9 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     }
 }
 
-// Currently unused, needs implementation.
+/* Currently unused, needs implementation.
+ * Colors wormhole systems by effect.
+ */
 function WormholeEffectColor(system, defaultcolor) {
     switch (system.effect) {
         case "Wolf-Rayet Star":

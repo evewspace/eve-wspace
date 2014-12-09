@@ -1,19 +1,17 @@
-#    Eve W-Space
-#    Copyright (C) 2013  Andrew Austin and other contributors
+#   Eve W-Space
+#   Copyright 2014 Andrew Austin and contributors
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version. An additional term under section
-#    7 of the GPL is included in the LICENSE file.
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#       http://www.apache.org/licenses/LICENSE-2.0
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
 from django.core.management.base import NoArgsCommand, CommandError
 from core.models import *
 from Map.models import *
@@ -27,10 +25,12 @@ class Command(NoArgsCommand):
         self.stdout.write('Beginning System Table Construction')
         basedata = SystemData.objects.all()
         for system in basedata:
-            #self.stdout.write('Processing system: %s' % (system.name))
+            # Prevent trying to add duplicate systems if run on an existing DB
+            if System.objects.filter(pk=system.pk).exists():
+                continue
             try:
                 sysclass = LocationWormholeClass.objects.get(location=system.region.id).sysclass
-                if sysclass > 6:
+                if sysclass in range(7,12):
                     newdata = KSystem(sov='', sysclass=sysclass,
                             lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
                             info='', occupied='')
@@ -43,7 +43,6 @@ class Command(NoArgsCommand):
                     newdata.shipkills = 0
                     newdata.save()
                 else:
-                    # TODO: Populate statics by constellation
                     newdata = WSystem(static1=None, static2=None, sysclass=sysclass,
                             lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
                             info='', occupied='')
@@ -56,7 +55,7 @@ class Command(NoArgsCommand):
                     newdata.save()
             except LocationWormholeClass.DoesNotExist:
                 pass
-            except DoesNotExist:
+            except Exception:
                 self.stderr.write('Unable to process %s' % (system.name))
         self.stdout.write('First Pass Complete, beginning lowsec pass')
         for system in basedata:

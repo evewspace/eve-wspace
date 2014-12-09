@@ -1,19 +1,17 @@
-//    eve w-space
-//    copyright (c) 2013  andrew austin and other contributors
+//   Eve W-Space
+//   Copyright 2014 Andrew Austin and contributors
 //
-//    this program is free software: you can redistribute it and/or modify
-//    it under the terms of the gnu general public license as published by
-//    the free software foundation, either version 3 of the license, or
-//    (at your option) any later version. an additional term under section
-//    7 of the gpl is included in the license file.
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
 //
-//    this program is distributed in the hope that it will be useful,
-//    but without any warranty; without even the implied warranty of
-//    merchantability or fitness for a particular purpose.  see the
-//    gnu general public license for more details.
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//    you should have received a copy of the gnu general public license
-//    along with this program.  if not, see <http://www.gnu.org/licenses/>.
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
 
 $(document).ready(function(){
     GetGroupList(1);
