@@ -27,10 +27,12 @@ class Command(NoArgsCommand):
         self.stdout.write('Beginning System Table Construction')
         basedata = SystemData.objects.all()
         for system in basedata:
-            #self.stdout.write('Processing system: %s' % (system.name))
+            # Prevent trying to add duplicate systems if run on an existing DB
+            if System.objects.filter(pk=system.pk).exists():
+                continue
             try:
                 sysclass = LocationWormholeClass.objects.get(location=system.region.id).sysclass
-                if sysclass > 6:
+                if sysclass in range(7,12):
                     newdata = KSystem(sov='', sysclass=sysclass,
                             lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
                             info='', occupied='')
@@ -43,7 +45,6 @@ class Command(NoArgsCommand):
                     newdata.shipkills = 0
                     newdata.save()
                 else:
-                    # TODO: Populate statics by constellation
                     newdata = WSystem(static1=None, static2=None, sysclass=sysclass,
                             lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
                             info='', occupied='')

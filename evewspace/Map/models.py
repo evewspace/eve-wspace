@@ -109,10 +109,10 @@ class System(SystemData):
         return self.sysclass < 7
 
     def get_spec(self):
-        if self.sysclass < 7:
-            return self.wsystem
-        else:
+        if self.sysclass in range(7,12):
             return self.ksystem
+        else:
+            return self.wsystem
 
     def save(self, *args, **kwargs):
         self.updated = datetime.now(pytz.utc)
