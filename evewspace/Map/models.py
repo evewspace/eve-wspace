@@ -103,10 +103,16 @@ class System(SystemData):
         return self.name
 
     def is_kspace(self):
-        return self.sysclass >= 7
+        if self.sysclass in range(7,12):
+            return True
 
     def is_wspace(self):
-        return self.sysclass < 7
+        if not self.sysclass in range(7,12):
+            return True
+
+    def is_rhea_space(self):
+        if self.sysclass == 13:
+            return True
 
     def get_spec(self):
         if self.sysclass in range(7,12):

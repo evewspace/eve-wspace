@@ -3,16 +3,21 @@
 <div class="mapSysInfo row">
    <div class="sysClassSpan span3">
        <h4 class="sysFriendlySpan">{{mapsys.friendlyname}}{% if mapsys.parent_wormhole.collapsed %} - COLLAPSED{% endif %}</h4>
-        {% if mapsys.system.sysclass < 7 %}
+        {% if mapsys.system.is_wspace %}
         <div> 
-            <strong>Class: {{mapsys.system.sysclass}}</strong>
+            <strong>Class: {% if mapsys.system.sysclass < 7 %} {{mapsys.system.sysclass}} {% elif mapsys.system.sysclass == 13 %} Small Ship W-Space {% else %} Thera {% endif %}</strong>
         </div>
         <div>
             <strong>Effect: {{mapsys.system.get_spec.effect}}</strong>
         </div>
         <div>
             <strong>Probable Statics: <br />
-                {{mapsys.system.get_spec.static1}} ({{mapsys.system.get_spec.static1.dest_string}}) &nbsp {% if mapsys.system.get_spec.static2 %}{{mapsys.system.get_spec.static2}} ({{mapsys.system.get_spec.static2.dest_string}}){% endif %}</strong>
+                {% if not mapsys.system.get_spec.static1 %}
+                Unknown
+                {% else %}
+                {{mapsys.system.get_spec.static1}} ({{mapsys.system.get_spec.static1.dest_string}}) &nbsp {% if mapsys.system.get_spec.static2 %}{{mapsys.system.get_spec.static2}} ({{mapsys.system.get_spec.static2.dest_string}}){% endif %}
+                {% endif %}
+            </strong>
         </div>
         {% endif %}
         <strong>
@@ -30,7 +35,7 @@
         <br />
         <strong>Sov: {{mapsys.system.get_spec.sov}}</strong>
     {% endif %}
-    {% if mapsys.system.sysclass > 6 %}
+    {% if mapsys.system.is_kspace %}
     <br />
     <strong>Region: {{mapsys.system.region}}</strong>
     <br />
@@ -38,9 +43,11 @@
     {% load humanize %}
     <span class="sysLastScanned label {% if scanwarning  %} label-important {% endif %}">
         Last Scanned: {{mapsys.system.lastscanned|naturaltime}}
-    </span><br /> 
-     <span class="statsText label label-inverse"> NPC: {{mapsys.system.npckills}} Ship: {{mapsys.system.shipkills}} Pod: {{mapsys.system.podkills}}{% if mapsys.system.sysclass > 6 %} Jumps: {{mapsys.system.get_spec.jumps}} {% endif %}</span> 
+    </span><br />
+    {% if mapsys.system.is_kspace %}
+     <span class="statsText label label-inverse"> NPC: {{mapsys.system.npckills}} Ship: {{mapsys.system.shipkills}} Pod: {{mapsys.system.podkills}} Jumps: {{mapsys.system.get_spec.jumps}}</span> 
      <br /> 
+     {% endif %}
      <p class="statusText label label-success">SIG: {{mapsys.system.signatures.count}} POS: {{mapsys.system.poses.count}} Pilots: {{mapsys.system.pilot_list|length}}</p><br />
     {% if mapsys.system.occupied %}
     <div class="occupiedTooltip label label-important"> Occupied: <br /> {{mapsys.system.occupied|linebreaksbr}}</div>
