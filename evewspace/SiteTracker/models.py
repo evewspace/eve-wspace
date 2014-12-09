@@ -158,7 +158,8 @@ class SiteWeight(models.Model):
     site_type = models.ForeignKey(SiteType, related_name='weights')
     sysclass = models.IntegerField(choices=[(1, "C1"), (2, "C2"), (3, "C3"),
         (4, "C4"), (5, "C5"), (6, "C6"), (7, "High Sec"), (8, "Low Sec"),
-        (9, "Null Sec")])
+        (9, "Null Sec"), (10, "Jove"), (11, "Jove"), (12, "Thera"),
+        (13, "Small Ship")])
     raw_points = models.IntegerField()
 
 

@@ -102,17 +102,43 @@ class System(SystemData):
         """Returns name of System as unicode representation"""
         return self.name
 
+    @property
+    def class_string(self):
+        if self.sysclass < 7:
+            return 'C%s' % self.sysclass
+        if self.sysclass == 7:
+            return 'Highsec'
+        if self.sysclass == 8:
+            return 'Lowsec'
+        if self.sysclass == 9:
+            return 'Nullsec'
+        # Class 10/11 appear in two Jovian constellations. Reason unknown.
+        if self.sysclass == 10:
+            return 'Odd Jove Space'
+        if self.sysclass == 11:
+            return 'Odd Jove Space'
+        if self.sysclass == 12:
+            return 'Thera'
+        if self.sysclass == 13:
+            return 'Small Ship'
+
     def is_kspace(self):
-        return self.sysclass >= 7
+        if self.sysclass in range(7,12):
+            return True
 
     def is_wspace(self):
-        return self.sysclass < 7
+        if not self.sysclass in range(7,12):
+            return True
+
+    def is_rhea_space(self):
+        if self.sysclass == 13:
+            return True
 
     def get_spec(self):
-        if self.sysclass < 7:
-            return self.wsystem
-        else:
+        if self.sysclass in range(7,12):
             return self.ksystem
+        else:
+            return self.wsystem
 
     def save(self, *args, **kwargs):
         self.updated = datetime.now(pytz.utc)
@@ -196,6 +222,7 @@ class WSystem(System):
     static1 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="primary_statics")
     static2 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="secondary_statics")
     effect = models.CharField(max_length=50, blank=True, null=True)
+    is_shattered = models.NullBooleanField(default=False)
 
 class Map(models.Model):
     """Stores the maps available in the map tool. root relates to System model."""

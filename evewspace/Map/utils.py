@@ -113,6 +113,10 @@ class MapJSONGenerator(object):
         if system in self._get_interest_path():
             path = True
         if system.system.is_wspace():
+            shattered = system.system.wsystem.is_shattered
+        else:
+            shattered = False
+        if system.system.is_wspace():
             effect = system.system.wsystem.effect
         else:
             effect = None
@@ -139,7 +143,8 @@ class MapJSONGenerator(object):
                     'iconImageURL': self.get_system_icon(system),
                     'whID': parentWH.pk, 'msID': system.pk,
                     'backgroundImageURL': self.get_system_background(system),
-                    'effect': effect, 'collapsed': collapsed}
+                    'effect': effect, 'collapsed': collapsed,
+                    'shattered': shattered}
         else:
             result = {'sysID': system.system.pk, 'Name': system.system.name,
                     'LevelX': levelX,
@@ -154,7 +159,8 @@ class MapJSONGenerator(object):
                     'iconImageURL': self.get_system_icon(system),
                     'whID': None, 'msID': system.pk,
                     'backgroundImageURL': self.get_system_background(system),
-                    'effect': effect, 'collapsed': False}
+                    'effect': effect, 'collapsed': False,
+                    'shattered': shattered}
         return result
 
     def get_system_background(self, system):
@@ -222,11 +228,11 @@ def get_wormhole_type(system1, system2):
     source = "K"
     destination = "K"
     # Set the source and destination for system1 > system2
-    if system1.sysclass < 7:
+    if system1.is_wspace:
         source = str(system1.sysclass)
     if system1.sysclass == 7:
         source = "H"
-    if system1.sysclass > 7:
+    if system1.sysclass in [8,9,10,11]:
         source = "NH"
 
     destination = system2.sysclass

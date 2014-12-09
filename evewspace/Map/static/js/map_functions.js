@@ -908,6 +908,12 @@ function DrawSystem(system) {
         case 9:
             classString = "N";
             break;
+        case 12:
+            classString = "T";
+            break;
+        case 13:
+            classString = "SS";
+            break;
         default:
             classString = "C"+system.SysClass;
             break;
@@ -1088,17 +1094,19 @@ function ColorSystem(system, ellipseSystem, textSysName) {
 
         // not selected
         switch (system.SysClass) {
-
+            // Null
             case 9:
                 sysColor = "#CC0000";
                 sysStroke = "#990000";
                 textColor = "#fff";
                 break;
+            // Low
             case 8:
                 sysColor = "#93841E";
                 sysStroke = "#60510A";
                 textColor = "#fff";
                 break;
+            // High
             case 7:
                 sysColor = "#009F00";
                 sysStroke = "#006B00";
@@ -1134,12 +1142,30 @@ function ColorSystem(system, ellipseSystem, textSysName) {
                 sysStroke = "#0088FF";
                 textColor = "#FFF"; 
                 break;
-           default:
+             // Thera
+             case 12:
+                sysColor = "#800080";
+                sysStroke = "#7F3939";
+                textColor = "#FFF";
+                break;
+             // Small Ship Hole
+             case 13:
+                sysColor = "#FFA500";
+                sysStroke = "#7f5200";
+                textColor = "#000";
+                break;
+            default:
                 sysColor = "#F2F4FF";
                 sysStroke = "#0657B9";
                 textColor = "#0974EA";
                 break;
         }
+    if (system.shattered) {
+        sysStroke = "#FFA500";
+        if (sysStrokeWidth < 3) {
+            sysStrokeWidth = 3;
+        }
+    }
     iconX = ellipseSystem.attr("cx")+40;
     iconY = ellipseSystem.attr("cy")-35;
     if (system.iconImageURL) {

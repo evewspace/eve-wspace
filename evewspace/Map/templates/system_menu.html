@@ -1,6 +1,6 @@
 <div id="sysMenu" class="sysMenuDiv">
 <div class="btn-group btn-group">
-    {% if is_igb and mapsys.system.sysclass > 6 %}
+    {% if is_igb and mapsys.system.is_kspace %}
     <div id="autopilotButton" class="btn-group dropdown">
         <a class="btn btn-small dropdown-toggle" data-toggle="dropdown">
             Autopilot
@@ -36,13 +36,13 @@
         <ul id="intelDropdown" class="dropdown-menu" role="menu">
         <li><a href="https://eveeye.com/?system={{system.name}}" target="_blank">EveEye</a></li>
         <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
-        {% if system.sysclass < 7 %}
+        {% if system.is_kspace < 7 %}
         <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
         {% else %}
         <li><a href="http://evemaps.dotlan.net/map/{{system.region.name.split|join:"_"}}/{{system.name.split|join:"_"}}" target="_blank">Dotlan</a></li>
         {% endif %}
         <li><a href="http://zkillboard.com/system/{{system.pk}}" target="_blank">zKillboard</a></li>
-        {% if system.sysclass < 7 %}
+        {% if system.is_wspace < 7 %}
         <li><a href="http://wh.pasta.gg/{{system.name}}" target="_blank">Wormhol.es</a></li>
         {% endif %}
 
