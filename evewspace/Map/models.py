@@ -132,10 +132,6 @@ class System(SystemData):
         if self.sysclass == 13:
             return True
 
-    def is_thera(self):
-        if self.sysclass == 12:
-            return True
-
     def get_spec(self):
         if self.sysclass in range(7,12):
             return self.ksystem
