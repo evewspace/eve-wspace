@@ -1,29 +1,29 @@
-#    Eve W-Space
-#    Copyright (C) 2013  Andrew Austin and other contributors
+#   Eve W-Space
+#   Copyright 2014 Andrew Austin and contributors
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version. An additional term under section
-#    7 of the GPL is included in the LICENSE file.
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#       http://www.apache.org/licenses/LICENSE-2.0
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
 from django.db import models
 from core.models import Type, Location
 from API.models import CorpAPIKey
 from core.models import Corporation, Alliance
 from Map.models import System
-import csv
-from django.contrib.auth import get_user_model
+from API import cache_handler as handler
+from django.conf import settings
 import pytz
+import csv
+import eveapi
 
-User = get_user_model()
+User = settings.AUTH_USER_MODEL
 
 class POS(models.Model):
     """Represents a POS somewhere in space."""
@@ -52,6 +52,55 @@ class POS(models.Model):
 
     class Meta:
         ordering = ['system__name', 'planet', 'moon']
+
+    @classmethod
+    def update_from_import_list(self, system, import_list):
+        """
+        Imports starbases from YAML importer.
+        """
+        for pos in import_list:
+            planet = pos['planet']
+            moon = pos['moon']
+            warpin = pos['warpin']
+            status = pos['status']
+            rftime = pos['rftime']
+            name = pos['name']
+            tower = Type.objects.get(name=pos['tower'])
+            try:
+                owner = Corporation.objects.get(name=pos['owner'])
+            except Corporation.DoesNotExist:
+                from core import tasks
+                api = eveapi.EVEAPIConnection(cacheHandler=handler)
+                corpID = api.eve.CharacterID(
+                        names=pos['owner']).characters[0].characterID
+                owner = tasks.update_corporation(corpID, True)
+            if POS.objects.filter(system=system, planet=planet,
+                    moon=moon, corporation=owner).exists():
+                # Update first existing record
+                starbase = POS.objects.filter(system=system, planet=planet,
+                        moon=moon, corporation=owner).all()[0]
+                starbase.status = status
+                starbase.name = name
+                starbase.towertype = tower
+                if status == 3:
+                    starbase.rftime = rftime
+                starbase.warpin_notice = warpin
+            else:
+                new_pos = POS(system=system, planet=planet, moon=moon,
+                        corporation=owner, towertype=tower,
+                        warpin_notice=warpin, status=status)
+                if status == 3:
+                    new_pos.rftime = rftime
+                new_pos.save()
+
+    def as_dict(self):
+        data = {
+                'planet': self.planet, 'moon': self.moon,
+                'tower': self.towertype.name, 'owner': self.corporation.name,
+                'status': self.status, 'name': self.posname,
+                'rftime': self.rftime, 'warpin': self.warpin_notice
+                }
+        return data
 
     def clean(self):
         from django.core.exceptions import ValidationError

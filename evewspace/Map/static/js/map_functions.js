@@ -1,21 +1,19 @@
-//    Eve W-Space
-//    Copyright (C) 2013  Andrew Austin and other contributors
+//   Eve W-Space
+//   Copyright 2014 Andrew Austin and contributors
 //
-//    This program is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU General Public License as published by
-//    the Free Software Foundation, either version 3 of the License, or
-//    (at your option) any later version. An additional term under section
-//    7 of the GPL is included in the LICENSE file.
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
 //
-//   This program is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU General Public License for more details.
+//       http://www.apache.org/licenses/LICENSE-2.0
 //
-//    You should have received a copy of the GNU General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
 //  
-//  Portions Copyright (c) 2011 Georgi Kolev (arcanis@wiadvice.com). Licensed under the GPL (http://www.gnu.org/copyleft/gpl.html) license.
+//  Portions Copyright (c) 2011 Georgi Kolev (arcanis@wiadvice.com). Licensed under the Apache 2.0 license.
 
 var loadtime = null;
 var paper = null;
@@ -198,6 +196,21 @@ function DisplaySystemMenu(msID){
         url: address,
         success: function(data) { 
             $('#sysMenu').html(data);
+        }
+    });
+}
+
+
+function GetExportMap(mapID){
+    address = "export/";
+    $.ajax({
+        url: address,
+        type: "GET",
+        success: function(data) {
+            $('#modalHolder').html(data).modal('show');
+        },
+        error: function(error) {
+            alert('Could not get the export dialog:\n\n' + error.responseText);
         }
     });
 }
@@ -893,6 +906,12 @@ function DrawSystem(system) {
         case 9:
             classString = "N";
             break;
+        case 12:
+            classString = "T";
+            break;
+        case 13:
+            classString = "SS";
+            break;
         default:
             classString = "C"+system.SysClass;
             break;
@@ -1073,17 +1092,19 @@ function ColorSystem(system, ellipseSystem, textSysName) {
 
         // not selected
         switch (system.SysClass) {
-
+            // Null
             case 9:
                 sysColor = "#CC0000";
                 sysStroke = "#990000";
                 textColor = "#fff";
                 break;
+            // Low
             case 8:
                 sysColor = "#93841E";
                 sysStroke = "#60510A";
                 textColor = "#fff";
                 break;
+            // High
             case 7:
                 sysColor = "#009F00";
                 sysStroke = "#006B00";
@@ -1119,12 +1140,30 @@ function ColorSystem(system, ellipseSystem, textSysName) {
                 sysStroke = "#0088FF";
                 textColor = "#FFF"; 
                 break;
-           default:
+             // Thera
+             case 12:
+                sysColor = "#800080";
+                sysStroke = "#7F3939";
+                textColor = "#FFF";
+                break;
+             // Small Ship Hole
+             case 13:
+                sysColor = "#FFA500";
+                sysStroke = "#7f5200";
+                textColor = "#000";
+                break;
+            default:
                 sysColor = "#F2F4FF";
                 sysStroke = "#0657B9";
                 textColor = "#0974EA";
                 break;
         }
+    if (system.shattered) {
+        sysStroke = "#FFA500";
+        if (sysStrokeWidth < 3) {
+            sysStrokeWidth = 3;
+        }
+    }
     iconX = ellipseSystem.attr("cx")+40;
     iconY = ellipseSystem.attr("cy")-35;
     if (system.iconImageURL) {

@@ -1,4 +1,4 @@
-Eve W-Space v0.3
+Eve W-Space
 ===========
 
 NOTE: Eve W-Space is currently in alpha. Most features outside of Mapping 

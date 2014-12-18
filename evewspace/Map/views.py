@@ -1,19 +1,17 @@
-#    Eve W-Space
-#    Copyright (C) 2013  Andrew Austin and other contributors
+#   Eve W-Space
+#   Copyright 2014 Andrew Austin and contributors
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version. An additional term under section
-#    7 of the GPL is included in the LICENSE file.
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#       http://www.apache.org/licenses/LICENSE-2.0
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
 from datetime import datetime, timedelta
 import json
 import csv
@@ -306,10 +304,13 @@ def promote_system(request, map_id, ms_id):
     """
     Promotes the MapSystem to map root and truncates other chains.
     """
-    system = get_object_or_404(MapSystem, pk=ms_id)
-    system.promote_system(request.user)
-    return HttpResponse()
-
+    map_obj = get_object_or_404(Map, pk=map_id)
+    if map_obj.truncate_allowed:
+        system = get_object_or_404(MapSystem, pk=ms_id)
+        system.promote_system(request.user)
+        return HttpResponse()
+    else:
+        raise PermissionDenied
 
 # noinspection PyUnusedLocal
 @login_required
@@ -894,8 +895,39 @@ def create_map(request):
         form = MapForm
         return TemplateResponse(request, 'new_map.html', {'form': form, })
 
-def _sort_destinations(destinations):
+@permission_required('Map.add_map')
+def import_map(request):
+    """
+    Import a map from a YAML export.
+    """
+    if request.method == 'POST':
+        yaml_string = request.POST.get('yaml_string', None)
+        if not yaml_string:
+            return TemplateResponse(request, 'import_map.html',
+                    {'error': 'Import text cannot be blank!'})
+        try:
+            new_map = Map.yaml_import(request.user, yaml_string)
+        except Exception as ex:
+            return TemplateResponse(request, 'import_map.html',
+                    {'error': 'The map failed to import: %s' % repr(ex)})
+        return HttpResponseRedirect(reverse('Map.views.get_map',
+            kwargs={'map_id': new_map.pk}))
+    else:
+        return TemplateResponse(request, 'import_map.html')
 
+@login_required
+@require_map_permission(permission=1)
+def export_map(request, map_id):
+    """
+    Exports a map as YAML.
+    """
+    map_obj = get_object_or_404(Map, pk=map_id)
+    map_obj.add_log(user=request.user, action='Exported the map to YAML.',
+            visible=True)
+    return TemplateResponse(request, 'export_map_dialog.html',
+            {'yaml_string': map_obj.as_yaml()})
+
+def _sort_destinations(destinations):
     """
     Takes a list of destination tuples and returns the same list, sorted in order of the jumps.
     """
@@ -1122,8 +1154,10 @@ def map_settings(request, map_id):
     if request.method == 'POST':
         name = request.POST.get('name', None)
         explicit_perms = request.POST.get('explicitperms', False)
+        truncate_allowed = request.POST.get('truncate_allowed', False)
         if not name:
             return HttpResponse('The map name cannot be blank', status=400)
+        subject.truncate_allowed = truncate_allowed
         subject.name = name
         subject.explicitperms = explicit_perms
         for group in Group.objects.all():

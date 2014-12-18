@@ -1,19 +1,17 @@
-#    Eve W-Space
-#    Copyright (C) 2013  Andrew Austin and other contributors
+#   Eve W-Space
+#   Copyright 2014 Andrew Austin and contributors
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version. An additional term under section
-#    7 of the GPL is included in the LICENSE file.
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
 #
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
+#       http://www.apache.org/licenses/LICENSE-2.0
 #
-#    You should have received a copy of the GNU General Public License
-#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -23,6 +21,7 @@ from django.forms import ModelForm
 from datetime import datetime, timedelta
 import pytz
 import time
+import yaml
 from Map import utils
 from Map.utils import MapJSONGenerator
 from django.core.cache import cache
@@ -101,17 +100,43 @@ class System(SystemData):
         """Returns name of System as unicode representation"""
         return self.name
 
+    @property
+    def class_string(self):
+        if self.sysclass < 7:
+            return 'C%s' % self.sysclass
+        if self.sysclass == 7:
+            return 'Highsec'
+        if self.sysclass == 8:
+            return 'Lowsec'
+        if self.sysclass == 9:
+            return 'Nullsec'
+        # Class 10/11 appear in two Jovian constellations. Reason unknown.
+        if self.sysclass == 10:
+            return 'Odd Jove Space'
+        if self.sysclass == 11:
+            return 'Odd Jove Space'
+        if self.sysclass == 12:
+            return 'Thera'
+        if self.sysclass == 13:
+            return 'Small Ship'
+
     def is_kspace(self):
-        return self.sysclass >= 7
+        if self.sysclass in range(7,12):
+            return True
 
     def is_wspace(self):
-        return self.sysclass < 7
+        if not self.sysclass in range(7,12):
+            return True
+
+    def is_rhea_space(self):
+        if self.sysclass == 13:
+            return True
 
     def get_spec(self):
-        if self.sysclass < 7:
-            return self.wsystem
-        else:
+        if self.sysclass in range(7,12):
             return self.ksystem
+        else:
+            return self.wsystem
 
     def save(self, *args, **kwargs):
         self.updated = datetime.now(pytz.utc)
@@ -195,6 +220,7 @@ class WSystem(System):
     static1 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="primary_statics")
     static2 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="secondary_statics")
     effect = models.CharField(max_length=50, blank=True, null=True)
+    is_shattered = models.NullBooleanField(default=False)
 
 class Map(models.Model):
     """Stores the maps available in the map tool. root relates to System model."""
@@ -202,6 +228,7 @@ class Map(models.Model):
     root = models.ForeignKey(System, related_name="root")
     # Maps with explicitperms = True require an explicit permission entry to access.
     explicitperms = models.BooleanField(default=False)
+    truncate_allowed = models.BooleanField(default=True)
 
     class Meta:
         permissions = (("map_unrestricted", "Do not require excplicit access to maps."),
@@ -233,6 +260,37 @@ class Map(models.Model):
         """
         for msys in self.systems.all():
             yield msys.system
+
+    @classmethod
+    def yaml_import(self, user, yaml_string):
+        """
+        Imports a YAML export string into a new Map.
+        """
+        yaml_dict = yaml.safe_load(yaml_string)
+        map_name = yaml_dict['map_name']
+        root_system = yaml_dict['systems'][0]
+        root_sys = System.objects.get(name=root_system['system'])
+        new_map = Map(name=map_name, root=root_sys)
+        new_map.save()
+        root_mapsys = new_map.add_system(user=user, system=root_sys,
+                friendlyname=root_system['tag'])
+        for sig in root_system['signatures']:
+            sig_id = sig['id']
+            info = sig['info']
+            if sig['type']:
+                sig_type = SignatureType.objects.get(shortname=sig['type'])
+            else:
+                sig_type = None
+            if sig_type:
+                updated = True
+            if not Signature.objects.filter(sigid=sig_id, system=root_mapsys.system).exists():
+                Signature(sigid=sig_id, sigtype=sig_type,
+                       system=root_mapsys.system, info=info, updated=updated).save()
+        from POS.models import POS
+        POS.update_from_import_list(root_mapsys.system,
+                root_system['starbases'])
+        root_mapsys.add_children_from_list(root_system['children'])
+        return new_map
 
     def add_log(self, user, action, visible=False):
         """
@@ -289,6 +347,18 @@ class Map(models.Model):
         """
         return utils.MapJSONGenerator(self, user).get_systems_json()
 
+    def as_yaml(self):
+        """
+        Returns the yaml representation of the map for import/export.
+        """
+        data = {
+                'map_name': self.name,
+                'export_time': datetime.now(pytz.utc),
+                'systems': [x.as_dict() for x in self.systems.filter(
+                    parentsystem=None).all()]
+                }
+        return yaml.safe_dump(data, encoding='utf-8', allow_unicode=True)
+
     def snapshot(self, user, name, description):
         """
         Makes and returns a snapshot of the map.
@@ -320,6 +390,50 @@ class MapSystem(models.Model):
             null=True, blank=True)
     def __unicode__(self):
         return "system %s in map %s" % (self.system.name, self.map.name)
+
+    def add_children_from_list(self, children=[]):
+        """
+        Adds child systems from list generated by the YAML importer.
+        """
+        print "Adding %s children to %s" % (len(children), self.system.name)
+        for child in children:
+            new_sys = System.objects.get(name=child['system'])
+            friendlyname = child['tag']
+            parentsystem = self
+            new_mapsys = MapSystem(map=self.map, system=new_sys,
+                    friendlyname=friendlyname, parentsystem=self)
+            new_mapsys.save()
+            parent_wh = child['parent_wh']
+            top_type = WormholeType.objects.get(name=parent_wh['near_type'])
+            bottom_type = WormholeType.objects.get(name=parent_wh['far_type'])
+            top_bubbled = parent_wh['top_bubbled']
+            bottom_bubbled = parent_wh['bottom_bubbled']
+            mass_status = parent_wh['mass_status']
+            time_status = parent_wh['time_status']
+
+            wh = new_mapsys.connect_to(system=self, topType=top_type,
+                    bottomType=bottom_type, topBubbled=top_bubbled,
+                    bottomBubbled=bottom_bubbled, timeStatus=time_status,
+                    massStatus=mass_status)
+            wh.save()
+
+            for sig in child['signatures']:
+                sig_id = sig['id']
+                info = sig['info']
+                if sig['type']:
+                    sig_type = SignatureType.objects.get(shortname=sig['type'])
+                else:
+                    sig_type = None
+                if sig_type:
+                    updated = True
+                else:
+                    updated = False
+                if not Signature.objects.filter(system=self.system, sigid=sig_id).exists():
+                    Signature(sigid=sig_id, sigtype=sig_type,
+                            system=self.system, info=info, updated=updated).save()
+            from POS.models import POS
+            POS.update_from_import_list(self.system, child['starbases'])
+            new_mapsys.add_children_from_list(child['children'])
 
     def connect_to(self, system,
                    topType, bottomType,
@@ -392,6 +506,35 @@ class MapSystem(models.Model):
         self.map.add_log(user, "Truncated to: %s (%s)" % (self.system.name,
             self.friendlyname), True)
 
+    def as_dict(self):
+        """
+        Returns a dict representation of the system.
+        """
+        try:
+            parent_wh_dict = {
+                    'near_type': self.parent_wormhole.top_type.name,
+                    'far_type': self.parent_wormhole.bottom_type.name,
+                    'updated': self.parent_wormhole.updated,
+                    'top_bubbled': self.parent_wormhole.top_bubbled,
+                    'bottom_bubbled': self.parent_wormhole.bottom_bubbled,
+                    'mass_status': self.parent_wormhole.mass_status,
+                    'time_status': self.parent_wormhole.time_status,
+                    'collapsed': self.parent_wormhole.collapsed
+                    }
+        except Wormhole.DoesNotExist:
+            parent_wh_dict = None
+
+        data = {
+                'tag': self.friendlyname,
+                'system': self.system.name,
+                'signatures':[sig.as_dict() for sig in self.system.signatures.all()],
+                'starbases': [pos.as_dict() for pos in self.system.poses.all()],
+                'parent_wh': parent_wh_dict,
+                'children': [x.as_dict() for x in self.childsystems.all()]
+                }
+        return data
+
+
 
 class Wormhole(models.Model):
     """
@@ -412,6 +555,15 @@ class Wormhole(models.Model):
     updated = models.DateTimeField(auto_now=True)
     eol_time = models.DateTimeField(null=True)
     collapsed = models.NullBooleanField(null=True)
+
+    @property
+    def wh_type(self):
+        if self.top_type.maxmass:
+            return self.top_type
+        if self.bottom_type.maxmass:
+            return self.bottom_type
+        # Default to first side of hole
+        return self.top_type
 
     @property
     def max_mass(self):
@@ -487,6 +639,14 @@ class Signature(models.Model):
     def __unicode__(self):
         """Returns sig ID as unicode representation"""
         return self.sigid
+
+    def as_dict(self):
+        data = {
+                'id': self.sigid,
+                'type': self.sigtype.shortname if self.sigtype else None,
+                'info': self.info
+                }
+        return data
 
     def activate(self):
         """Toggles the site activation."""
@@ -628,7 +788,6 @@ class InlineModelChoiceField(forms.ModelChoiceField):
 class MapForm(ModelForm):
     root = InlineModelChoiceField(queryset=System.objects.all(),
             widget=forms.TextInput(attrs={'class': 'systemAuto'}))
-
     class Meta:
         model = Map
 

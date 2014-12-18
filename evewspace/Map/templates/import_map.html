@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Import Map:</h3>
+
+<p class='text-info'>Paste in the exported map data below and click Import. Once the import is complete, you will be redirected to the new map.</p>
+
+<div class='well'>
+    <p id='importError' {% if not error %}style='display: none;' {% endif %} class='alert alert-error'>{{error}}</p>
+    <form id='mapImportForm' class='form' action='/map/import/' method='POST'>
+        {% csrf_token %}
+        <textarea name='yaml_string'rows='20' style='width: 50%' autofocus></textarea>
+        <br /><br />
+        <button id='btnImport' class='btn btn-default'>Import</button>
+    </form>
+</div>
+<script type='text/javascript'>
+    $('#mapImportForm').submit(function(e){
+            $('#btnImport').html('Working...');
+            $('#btnImport').attr('disabled', 'disabled');
+            });
+</script>
+{% endblock %}
