@@ -327,6 +327,7 @@ def remove_user(request, group_id, user_id):
     user = get_object_or_404(User, pk=user_id)
     if request.method == "POST":
         user.groups.remove(group)
+        return HttpResponse()
     else:
         return HttpResponse(status=400)
 
