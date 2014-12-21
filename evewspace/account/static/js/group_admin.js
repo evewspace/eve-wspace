@@ -132,3 +132,16 @@ function CreateGroup() {
         }
     });
 }
+
+function RemoveGroupUser(group_id, user_id) {
+    $.ajax({
+        url: "/account/admin/group/" + group_id + "/user/" + user_id + "/remove/",
+        type: "POST",
+        success: function(data){
+            
+        },
+        error: function(error){
+            alert("Could not delete the user: " + error.responseText);
+        }
+    });
+}
