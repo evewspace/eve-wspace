@@ -20,6 +20,7 @@ $(document).ready(function(){
     GetSigTypeSettings();
     GetSiteSpawnSettings();
 });
+
 function GetGeneralSettings(){
     $.ajax({
        type: "GET",
@@ -32,7 +33,6 @@ function GetGeneralSettings(){
        }
     });
 }
-
 
 function GetDestinationSettings(){
     $.ajax({
@@ -49,7 +49,6 @@ function GetDestinationSettings(){
     });
 }
 
-
 function GetPermissionSettings(){
     $.ajax({
         type: "GET",
@@ -62,7 +61,6 @@ function GetPermissionSettings(){
         }
     });
 }
-
 
 function GetSigTypeSettings(){
     $.ajax({
@@ -77,7 +75,6 @@ function GetSigTypeSettings(){
     });
 }
 
-
 function GetSiteSpawnSettings(){
     $.ajax({
         type: "GET",
@@ -90,7 +87,6 @@ function GetSiteSpawnSettings(){
         }
     });
 }
-
 
 function GetMapSettings(mapID){
     $.ajax({
@@ -105,7 +101,6 @@ function GetMapSettings(mapID){
     });
 }
 
-
 function SaveGlobalPermissions(){
     $.ajax({
         type: "POST",
@@ -114,7 +109,6 @@ function SaveGlobalPermissions(){
         success: function(){GetPermissionSettings();}
     });
 }
-
 
 function SaveGlobalSettings(){
     $.ajax({
@@ -126,7 +120,6 @@ function SaveGlobalSettings(){
     });
 }
 
-
 function AddDestination(){
     $.ajax({
         type: "POST",
@@ -137,7 +130,6 @@ function AddDestination(){
     });
 }
 
-
 function RemoveDestination(destID){
     $.ajax({
         type: "POST",
@@ -145,7 +137,6 @@ function RemoveDestination(destID){
         success: function(){GetDestinationSettings();}
     });
 }
-
 
 function SaveMapSettings(map_id){
     $.ajax({
@@ -160,7 +151,6 @@ function SaveMapSettings(map_id){
         }
     });
 }
-
 
 function DeleteMap(map_id){
     $.ajax({
