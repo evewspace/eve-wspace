@@ -92,3 +92,30 @@ From the UI:::
 
 You can give this group basic map permissions from the Map Admin panel under
 the "Global Permissions" section.
+
+Configure an E-Mail Server
+--------------------------
+
+If you want to send users password recovery e-mails or send admins error logs
+when they happen, you'll need to configure an SMTP server to use. In this
+example we'll be using Gmail. You can try and set up your own server but
+you should know what you're doing at that point, so this guide doesn't cover it.
+
+First create a Gmail account with your preferred credentials. We're using
+*bob@evewspace.com* as an example. Open up your local_settings.py file.
+Uncomment and configure the e-mail related settings as follows.
+
+    SERVER_EMAIL='*<administrator e-mail here>*'
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_HOST_USER = 'bob@evewspace.com'
+    EMAIL_HOST_PASSWORD = '*<your gmail password here>*'
+    EMAIL_USE_TLS = True
+
+Reset your services with the following command;
+
+    $ sudo supervisorctl restart all
+
+Try and reset your password from the admin interface to see if it's working.
+If there's a problem many providers will return meaningful error messages.
