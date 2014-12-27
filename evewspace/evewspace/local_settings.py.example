@@ -34,10 +34,10 @@ DATABASES = {
 # Set your E-mail options below if you need to override the defaults
 #SERVER_EMAIL='bob@J100820.wh'
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_HOST = 'localhost'
+#EMAIL_HOST = ''
 #EMAIL_PORT = 25
-#EMAIL_USER = ''
-#EMAIL_PASSWORD = ''
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
 #EMAIL_USE_TLS = False
 #
 #If you use the file e-mail backend, set this:
