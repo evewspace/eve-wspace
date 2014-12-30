@@ -986,5 +986,122 @@
         "lifetime": 16, 
         "maxmass": 1000000000
     }
+},
+{
+    "pk": 144, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "A009", 
+        "destination": 13, 
+        "source": "W", 
+        "jumpmass": 5000000, 
+        "target": "Small Ship", 
+        "lifetime": 16, 
+        "maxmass": 1000000000
+    }
+},
+{
+    "pk": 145, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "T458", 
+        "destination": 12, 
+        "source": 7, 
+        "jumpmass": 20000000, 
+        "target": "Thera", 
+        "lifetime": 16, 
+        "maxmass": 500000000
+    }
+},
+{
+    "pk": 146, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "M164", 
+        "destination": 12, 
+        "source": 8, 
+        "jumpmass": 300000000, 
+        "target": "Thera", 
+        "lifetime": 16, 
+        "maxmass": 2000000000
+    }
+},
+{
+    "pk": 147, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "L031", 
+        "destination": 12, 
+        "source": 9, 
+        "jumpmass": 1000000000, 
+        "target": "Thera", 
+        "lifetime": 16, 
+        "maxmass": 3000000000
+    }
+},
+{
+    "pk": 148, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "Q063", 
+        "destination": 7, 
+        "source": 12, 
+        "jumpmass": 20000000, 
+        "target": "Highsec", 
+        "lifetime": 16, 
+        "maxmass": 500000000
+    }
+},
+{
+    "pk": 149, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "V898", 
+        "destination": 8, 
+        "source": 12, 
+        "jumpmass": 300000000, 
+        "target": "Lowsec", 
+        "lifetime": 16, 
+        "maxmass": 2000000000
+    }
+},
+{
+    "pk": 150, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "E587", 
+        "destination": 9, 
+        "source": 12, 
+        "jumpmass": 1000000000, 
+        "target": "Nullsec", 
+        "lifetime": 16, 
+        "maxmass": 3000000000
+    }
+},
+{
+    "pk": 151, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "F135", 
+        "destination": 12, 
+        "source": "W", 
+        "jumpmass": 300000000, 
+        "target": "Thera", 
+        "lifetime": 16, 
+        "maxmass": 750000000
+    }
+},
+{
+    "pk": 152, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "F355", 
+        "destination": 12, 
+        "source": 1, 
+        "jumpmass": 20000000, 
+        "target": "Thera", 
+        "lifetime": 16, 
+        "maxmass": 100000000
+    }
 }
 ]
