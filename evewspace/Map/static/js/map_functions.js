@@ -1138,14 +1138,14 @@ function ColorSystem(system, ellipseSystem, textSysName) {
             break;
     }
 
-    if (system.msID === focusMS) {
-        textColor = "#f0ff00";
-    }
     if (system.shattered) {
         sysStroke = "#FFA500";
         if (sysStrokeWidth < 3) {
             sysStrokeWidth = 3;
         }
+    }
+    if (system.msID === focusMS) {
+        textColor = "#000";
     }
     var iconX = ellipseSystem.attr("cx")+40;
     var iconY = ellipseSystem.attr("cy")-35;
