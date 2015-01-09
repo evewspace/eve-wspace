@@ -803,10 +803,10 @@ function ConnectSystems(obj1, obj2, line, bg, interest, dasharray) {
         var lineObj;
         if (interest == true) {
             lineObj = paper.path(path).attr({
+                stroke: color,
                 fill: "none",
                 "stroke-dasharray": dasharray,
                 "stroke-width": interestWidth,
-                stroke: "#f0ff00"
             });
         } else {
             lineObj = paper.path(path).attr({
@@ -1060,6 +1060,7 @@ function ColorSystem(system, ellipseSystem, textSysName) {
         sysStrokeDashArray = "--";
     }
     if (system.msID === focusMS) {
+        sysStroke = "#f0ff00";
         if (system.interest) {
             sysStrokeWidth = 7;
         } else {
