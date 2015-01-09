@@ -1060,7 +1060,7 @@ function ColorSystem(system, ellipseSystem, textSysName) {
         sysStrokeDashArray = "--";
     }
     if (system.msID === focusMS) {
-        sysStroke = "#f0ff00";
+        textColor = "#f0ff00";
         if (system.interest) {
             sysStrokeWidth = 7;
         } else {
