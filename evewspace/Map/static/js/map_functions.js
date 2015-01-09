@@ -1137,6 +1137,10 @@ function ColorSystem(system, ellipseSystem, textSysName) {
             textColor = "#0974EA";
             break;
     }
+
+    if (system.msID === focusMS) {
+        textColor = "#f0ff00";
+    }
     if (system.shattered) {
         sysStroke = "#FFA500";
         if (sysStrokeWidth < 3) {
