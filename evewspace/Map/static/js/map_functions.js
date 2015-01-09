@@ -1091,32 +1091,32 @@ function ColorSystem(system, ellipseSystem, textSysName) {
             break;
          case 6:
             sysColor = "#0022FF";
-            sysStroke = "#0000FF";
+            sysStroke = WormholeEffectColor(system,"#0000FF");
             textColor = "#FFF";
             break;
          case 5:
             sysColor = "#0044FF";
-            sysStroke = "#0000FF";
+            sysStroke = WormholeEffectColor(system,"#0000FF");
             textColor = "#FFF";
             break; 
         case 4:
             sysColor = "#0066FF";
-            sysStroke = "#0022FF";
+            sysStroke = WormholeEffectColor(system,"#0022FF");
             textColor = "#FFF";
             break;
         case 3:
             sysColor = "#0088FF";
-            sysStroke = "#0044FF";
+            sysStroke = WormholeEffectColor(system,"#0044FF");
             textColor = "#FFF";
             break;
          case 2:
             sysColor = "#00AAFF";
-            sysStroke = "#0066FF";
+            sysStroke = WormholeEffectColor(system,"#0066FF");
             textColor = "#FFF";
             break;
          case 1:
             sysColor = "#00CDFF";
-            sysStroke = "#0088FF";
+            sysStroke = WormholeEffectColor(system,"#0088FF");
             textColor = "#FFF"; 
             break;
          // Thera
