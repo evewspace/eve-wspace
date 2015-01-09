@@ -38,9 +38,10 @@ var bubbledColor = "#FF0000"; // Color of first shrink connections
 var clearWhColor = "#BBFFBB"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
 var frigWhColor = "#00FFFF"; // Color of Hyperion Frigate Hole
+var eolColor = "#F0FF00"; //color for eol
 var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
-var silentSystem = false; // Are systems added automatically wihthout a pop-up?
+var silentSystem = true; // Are systems added automatically wihthout a pop-up?
 var kspaceIGBMapping = false; // Do we map K<>K connections from the IGB?
 
 $(document).ready(function () {
@@ -930,6 +931,7 @@ function DrawSystem(system) {
             paper.image(system.backgroundImageURL, childSys.attr("cx") - 28, childSys.attr("cy") - 28, 55, 55);
         }
         sysText = paper.text(sysX, sysY, sysName);
+        sysText.attr({"font-weight": 'bold'}); 
         sysText.msID = system.msID;
         sysText.sysID = system.sysID;
         sysText.click(onSysClick);
@@ -969,6 +971,7 @@ function DrawSystem(system) {
         }
         rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
+        sysText.attr({"font-weight": 'bold'}); 
         sysText.msID = system.msID;
         sysText.sysID = system.sysID;
         sysText.click(onSysClick);
@@ -1013,6 +1016,9 @@ function GetConnectionColor(system) {
     }
     if (warningFlag == true) {
         return warningColor;
+    }
+    if (system.WhTimeStatus == 1) {
+        return eolColor;
     }
     // If jump mass is not 0 (K162 / Gate), but less than 10M,
     // we have a Hyperion frigate-sized hole
