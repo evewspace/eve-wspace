@@ -917,7 +917,7 @@ function DrawSystem(system) {
         var childSys = paper.ellipse(sysX, sysY, 40, 28);
         if (system.activePilots > 0 && highlightActivePilots === true) {
             var notificationRing = paper.ellipse(sysX, sysY, 45, 33);
-            notificationRing.attr({'stroke-dasharray': '--', 'stroke-width': 2, 'stroke': '#ADFF2F'});
+            notificationRing.attr({'stroke-dasharray': '--', 'stroke-width': 4, 'stroke': '#ffffff'});
         }
         childSys.msID = system.msID;
         childSys.whID = system.whID;
