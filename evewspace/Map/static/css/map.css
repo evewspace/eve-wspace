@@ -41,6 +41,12 @@
 {
     list-style: none;
 }
+.systemStatsItem {
+    display: inline-block;
+    padding-right: 5px;
+    padding-left: 5px;
+    border-right: 1px #555 dotted;
+}
 .popover
 {
     width: 300px;
