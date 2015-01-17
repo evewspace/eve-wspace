@@ -160,7 +160,7 @@ function DisplaySystemDetails(msID, sysID) {
             GetDestinations(msID);
             $('#btnImport').off();
             $('#btnImport').click(function(e){
-                BulkImport({{mapsys.pk}});
+                BulkImport(msID);
             });
             focusMS = msID;
             StartDrawing();
