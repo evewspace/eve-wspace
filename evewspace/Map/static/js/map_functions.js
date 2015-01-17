@@ -38,6 +38,7 @@ var renderWormholeTags = true; // Determines whether wormhole types are shown on
 var sliceLastChars = false; // Friendly name should show last 8 chars if over 8, shows first 8 if false
 var highlightActivePilots = true; // Draw a notification ring around systems with active pilots.
 var goodColor = "#00FF00"; // Color of good status connections
+var goodColor_zen = "#666"; // Color of good status connections
 var badColor = "#FF0000"; // Color of first shrink connections
 var bubbledColor = "#FF0000"; // Color of first shrink connections
 var clearWhColor = "#BBFFBB"; // Color of good status connections
@@ -1110,7 +1111,11 @@ function GetConnectionColor(system) {
     if (0 < system.WhJumpMass && system.WhJumpMass < 10000000) {
         return frigWhColor;
     }
-    return goodColor;
+    if (zenMode) {
+        return goodColor_zen;
+    } else {
+        return goodColor;
+    }
 }
 
 function GetWormholeColor(system) {
