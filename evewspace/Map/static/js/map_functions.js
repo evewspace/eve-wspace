@@ -1039,7 +1039,7 @@ function DrawSystem(system) {
             rootSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        extraText = paper.text(sysX, sysY+12, extraText);
+        extraText = paper.text(sysX, sysY+48, extraText);
         extraText.msID = system.msID;
         extraText.sysID = system.sysID;
         extraText.click(onSysClick);
