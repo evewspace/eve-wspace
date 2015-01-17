@@ -50,6 +50,9 @@
         {% if system.sysclass = 9 %}
         Null Sec
         {% endif %}
+        {% if not mapsys.system.is_wspace %}
+        <button class='btn btn-mini btn-info' onclick="CCPEVE.setDestination({{mapsys.system.pk}});">Set destination</button>
+        {% endif %}
         {% if system.sov %}
         <br />
         Sov: {{system.sov}}
