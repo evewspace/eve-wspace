@@ -218,3 +218,15 @@ textarea
     display: block;
     margin-top: 20px;
 }
+.sigWH {
+    color: #63a5ff
+}
+.sigRELIC {
+    color: #ff63f2;
+}
+.sigDATA {
+    color: #9139f3;
+}
+.sigGAS {
+    color: #f3b839;
+}
