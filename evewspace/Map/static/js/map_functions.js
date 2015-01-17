@@ -1563,6 +1563,6 @@ function togglezen() {
         RefreshMap();
     } else {
         zenMode = 1;
-        scaleFactor = 0.8;
+        scale(0.8);
     }
 }
