@@ -62,7 +62,7 @@
 </div>
     <div class="row span6">
     {% load humanize %}
-    <ul class="visited"><li>First Visit: {{system.first_visited|naturaltime}}</li><li> Last Visit: {{system.last_visited|naturaltime}}</li></ul>
+    <div class="visited">First Visit: {{system.first_visited|naturaltime}} &bull; Last Visit: {{system.last_visited|naturaltime}}</div>
     <div class="detailsLeft">
     {% if system.occupied or system.poses.all %}
     <div class="occupiedDiv label label-important">
