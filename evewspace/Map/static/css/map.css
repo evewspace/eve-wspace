@@ -230,3 +230,13 @@ textarea
 .sigGAS {
     color: #f3b839;
 }
+#backtotop {
+    display: fixed;
+    left: 2;
+    top: 40%;
+    background: url(../images/back_to_top.png);
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+}
