@@ -153,7 +153,7 @@ function DisplaySystemDetails(msID, sysID) {
                 url: "system/" + msID + "/signatures/new/",
                 success: function (data) {
                     $('#sys' + msID + 'SigAddForm').empty().html(data);
-                    $('#id_sigid').focus();
+                    $('#sysInfoDiv').focus();
                 }
             });
             GetPOSList(sysID);
