@@ -311,7 +311,7 @@ function GetSystemTooltips() {
             //clicking the tooltip acts as clicking the system 
             //(IG browser can be sloppy)
             $('#systemTooltipHolder>div').click(function(){
-                var msID = this.id.substr(3,this.id.length -6);
+                var msID = parseInt(this.id.substr(3,this.id.length -6));
                 var sysID = GetSysID(msID);
                 DisplaySystemDetails(msID, sysID);
                 var div = $('#sys' + msID + "Tip").hide();
