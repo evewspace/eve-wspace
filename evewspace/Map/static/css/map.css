@@ -212,3 +212,9 @@ textarea
   top: 21px;
   content: '';
 }
+#sysDetails h4 {
+    border-top: 1px solid #ccc;
+    clear: both;
+    display: block;
+    margin-top: 20px;
+}
