@@ -44,6 +44,7 @@ var bubbledColor = "#FF0000"; // Color of first shrink connections
 var clearWhColor = "#BBFFBB"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
 var frigWhColor = "#FFFFFF"; // Color of Hyperion Frigate Hole
+var frigWhColor_zen = "#71cbff"; // Color of Hyperion Frigate Hole
 var eolColor = "#F0FF00"; //color for eol
 var sysColor_zen = "#222"; //color for eol
 var renderCollapsedConnections = false; // Are collapsed connections shown?
@@ -1110,7 +1111,11 @@ function GetConnectionColor(system) {
     // If jump mass is not 0 (K162 / Gate), but less than 10M,
     // we have a Hyperion frigate-sized hole
     if (0 < system.WhJumpMass && system.WhJumpMass < 10000000) {
-        return frigWhColor;
+        if (zenMode) {
+            return frigWhColor_zen;
+        } else {
+            return frigWhColor;
+        }
     }
     if (zenMode) {
         return goodColor_zen;
