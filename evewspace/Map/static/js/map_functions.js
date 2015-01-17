@@ -1109,7 +1109,7 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     var textColor = "#000";
     if (system.interest == true) {
         sysStrokeWidth = 7;
-        sysStrokeDashArray = "..";
+        sysStrokeDashArray = "--";
     }
     if (system.msID === focusMS) {
         textColor = "#f0ff00";
@@ -1205,7 +1205,7 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     if (system.msID === focusMS) {
         textColor = "#000";
         sysStroke = "#FFFC00";
-        sysStrokeDashArray = "..";
+        sysStrokeDashArray = "--"
     }
     var iconX = ellipseSystem.attr("cx")+40;
     var iconY = ellipseSystem.attr("cy")-35;
