@@ -1316,7 +1316,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
     var changePos = ChangeSysWormholePosition(systemTo, systemFrom);
 
     var textCenterX = (sysX1 + sysX2) / 2;
-    textCenterX = textCenterX + 10;
+    textCenterX = textCenterX + s(10);
     var textCenterY = (sysY1 + sysY2) / 2;
 
     var whFromSysX = textCenterX;
@@ -1380,7 +1380,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
             whToText = "< " + systemTo.WhToParent;
         }
 
-        whFromSys = paper.text(s(whFromSysX), whFromSysY, whFromText);
+        whFromSys = paper.text(whFromSysX, whFromSysY, whFromText);
         whFromSys.attr({fill: whFromColor, cursor: "pointer", "font-size": s(11), "font-weight": decoration});  //stroke: "#fff"
         whFromSys.click(function () {
             GetEditWormholeDialog(systemTo.whID);
