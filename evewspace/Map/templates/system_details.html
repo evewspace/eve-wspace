@@ -6,7 +6,7 @@
     <li><a href="#activePlayerPanel" data-toggle="tab">Pilots ({{locations|length}})</a></li>
     <li><a href="#systemPosPanel" data-toggle="tab">Starbases ({{mapsys.system.poses.count}})</a></li>
 </ul>
-<div id="sysTabHolder" class="tab-content well">
+<div id="sysTabHolder" class="well"> <!-- removed tab-content , no tabbing -->
 <div id="sysDetails" class="tab-pane active">
 <div id="sysPanelHeader" class="systemPanelHeader row">
     <h4>{% if can_edit %}<i title="Edit Info" class="icon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %}System Details: {{mapsys.system.name}} </h4>
