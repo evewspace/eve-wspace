@@ -963,17 +963,17 @@ function DrawSystem(system) {
     }
     var friendly = "";
     if (system.Friendly) {
-        if (system.Friendly.length > 8) {
-            if (sliceLastChars == true) {
-                system.Friendly = ".." + system.Friendly.slice(-8);
+        if (system.Friendly.length > 6) {
+            if ((sliceLastChars == true) || (zenMode)) {
+                system.Friendly = "." + system.Friendly.slice(-6);
             } else {
-                system.Friendly = system.Friendly.slice(0, 8) + "..";
+                system.Friendly = system.Friendly.slice(0, 6) + ".";
             }
         }
         friendly = system.Friendly + "\n";
     }
     var sysName = friendly + system.Name + " " + classString + effectString + "";
-    if (zenMode && (classString != "")) {
+    if (zenMode && ((classString == "H") || (classString == "N") || || (classString == "L") || (classString == "T"))) {
         sysName = friendly + classString;
     }
     var extraText = "";
@@ -1288,6 +1288,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
         textSysName.ellipseIndex = objSystems.length;
         textSysName.hover(onSysOver, onSysOut);
     }
+        scale(0.8);
 }
 
 /* Currently unused, needs implementation.
