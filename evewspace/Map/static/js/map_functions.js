@@ -1234,7 +1234,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
     var iconX = ellipseSystem.attr("cx")+s(40);
     var iconY = ellipseSystem.attr("cy")-s(35);
     if (system.iconImageURL) {
-        paper.image(system.iconImageURL, s(iconX), s(iconY), 25, 25);
+        paper.image(system.iconImageURL, iconX, iconY, 25, 25);
     }
     ellipseSystem.attr({
         fill: sysColor,
