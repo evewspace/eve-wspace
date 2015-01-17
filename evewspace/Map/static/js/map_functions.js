@@ -45,6 +45,7 @@ var clearWhColor = "#BBFFBB"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
 var frigWhColor = "#FFFFFF"; // Color of Hyperion Frigate Hole
 var eolColor = "#F0FF00"; //color for eol
+var sysColor_zen = "#999"; //color for eol
 var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
 var silentSystem = true; // Are systems added automatically wihthout a pop-up?
@@ -1244,7 +1245,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
     var labelFontSize = textFontSize;
     if (zenMode) {
         textColor = sysColor;
-        sysColor = "#000";
+        sysColor = sysColor_zen;
         labelFontSize = s(16);
     }
     if (system.msID === focusMS) {
