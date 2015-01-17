@@ -1292,7 +1292,6 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
         textSysName.ellipseIndex = objSystems.length;
         textSysName.hover(onSysOver, onSysOut);
     }
-        scale(0.8);
 }
 
 /* Currently unused, needs implementation.
