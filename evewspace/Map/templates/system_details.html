@@ -1,10 +1,10 @@
 {% load humanize %}
 {% include 'system_menu.html' %}
 <ul class="nav nav-pills" id="sysInfoTab">
-    <li class="active"><a href="#sysDetails" data-toggle="tab">Details</a></li>
-    <li><a href="#sigsPanel" data-toggle="tab">Signatures ({{mapsys.system.signatures.count}})</a></li>
-    <li><a href="#activePlayerPanel" data-toggle="tab">Pilots ({{locations|length}})</a></li>
-    <li><a href="#systemPosPanel" data-toggle="tab">Starbases ({{mapsys.system.poses.count}})</a></li>
+    <li class="active"><a href="#sysDetails">Details</a></li>
+    <li><a href="#sigsPanel">Signatures ({{mapsys.system.signatures.count}})</a></li>
+    <li><a href="#activePlayerPanel">Pilots ({{locations|length}})</a></li>
+    <li><a href="#systemPosPanel">Starbases ({{mapsys.system.poses.count}})</a></li>
 </ul>
 <div id="sysTabHolder" class="well"> <!-- removed tab-content , no tabbing -->
 <a name="sysDetails"></a>
