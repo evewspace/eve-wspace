@@ -37,8 +37,8 @@
     width: 200px;
     display: none;
 }
-.systemStatsList
-{
+.systemStatsList {
+    display: inline;
     list-style: none;
 }
 .systemStatItem {
