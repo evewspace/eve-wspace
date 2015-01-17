@@ -973,7 +973,7 @@ function DrawSystem(system) {
         friendly = system.Friendly + "\n";
     }
     var sysName = friendly + system.Name + " " + classString + effectString + "";
-    if (zenMode && ((classString == "H") || (classString == "N") || (classString == "L") || (classString == "T"))) {
+    if (zenMode && ((classString != "H") && (classString != "N") || (classString != "L") || (classString != "T"))) {
         sysName = friendly + classString;
     }
     var extraText = "";
