@@ -231,12 +231,12 @@ textarea
     color: #f3b839;
 }
 #backtotop {
-    display: fixed;
+    position: fixed;
     left: 2;
     top: 40%;
     background: url(../images/back_to_top.png);
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    min-height: 48px;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
 }
