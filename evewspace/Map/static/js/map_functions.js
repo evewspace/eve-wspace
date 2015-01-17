@@ -1455,7 +1455,7 @@ function onWhOver(e) {
         var mouseX = e.clientX + getScrollX();
         var mouseY = e.clientY + getScrollY();
 
-        div.css({position: "absolute", top: mouseY + "px", left: mouseX + 10 + "px"});
+        div.css({position: "absolute", top: mouseY + 20 + "px", left: mouseX + 20 + "px"});
         div.show();
     }
 }
@@ -1474,7 +1474,7 @@ function onSysOver(e) {
         var mouseX = e.clientX + getScrollX();
         var mouseY = e.clientY + getScrollY();
 
-        div.css({position: "absolute", top: mouseY + "px", left: mouseX + "px"});
+        div.css({position: "absolute", top: mouseY + 20 + "px", left: mouseX + 20 + "px"});
         div.show();
     }
 }
