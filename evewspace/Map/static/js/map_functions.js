@@ -1237,8 +1237,8 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
         }
     }
     if (zenMode) {
-        sysColor = "#ddd";
         textColor = sysColor;
+        sysColor = "#ddd";
     }
     if (system.msID === focusMS) {
         textColor = "#000";
