@@ -1188,37 +1188,37 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
          case 6:
             sysColor = "#0022FF";
             sysStroke = WormholeEffectColor(system,"#0000FF");
-            if (sysStroke != "#0000FF") sysStrokeWidth = s(4);
+            if ((sysStroke != "#0000FF") && (!zenMode)) sysStrokeWidth = s(4);
             textColor = "#FFF";
             break;
          case 5:
             sysColor = "#0044FF";
             sysStroke = WormholeEffectColor(system,"#0000FF");
-            if (sysStroke != "#0000FF") sysStrokeWidth = s(4);
+            if ((sysStroke != "#0000FF") && (!zenMode)) sysStrokeWidth = s(4);
             textColor = "#FFF";
             break; 
         case 4:
             sysColor = "#0066FF";
             sysStroke = WormholeEffectColor(system,"#0022FF");
-            if (sysStroke != "#0022FF") sysStrokeWidth = s(4);
+            if ((sysStroke != "#0022FF") && (!zenMode)) sysStrokeWidth = s(4);
             textColor = "#FFF";
             break;
         case 3:
             sysColor = "#0088FF";
             sysStroke = WormholeEffectColor(system,"#0044FF");
-            if (sysStroke != "#0044FF") sysStrokeWidth = s(4);
+            if ((sysStroke != "#0044FF") && (!zenMode)) sysStrokeWidth = s(4);
             textColor = "#FFF";
             break;
          case 2:
             sysColor = "#00AAFF";
             sysStroke = WormholeEffectColor(system,"#0066FF");
-            if (sysStroke != "#0066FF") sysStrokeWidth = s(4);
+            if ((sysStroke != "#0066FF") && (!zenMode)) sysStrokeWidth = s(4);
             textColor = "#FFF";
             break;
          case 1:
             sysColor = "#00CDFF";
             sysStroke = WormholeEffectColor(system,"#0088FF");
-            if (sysStroke != "#0088FF") sysStrokeWidth = s(4);
+            if ((sysStroke != "#0088FF") && (!zenMode)) sysStrokeWidth = s(4);
             textColor = "#FFF"; 
             break;
          // Thera
