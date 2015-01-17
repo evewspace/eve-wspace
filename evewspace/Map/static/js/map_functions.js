@@ -48,6 +48,7 @@ var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
 var silentSystem = true; // Are systems added automatically wihthout a pop-up?
 var kspaceIGBMapping = false; // Do we map K<>K connections from the IGB?
+var zenMode = false;
 
 
 
@@ -969,6 +970,9 @@ function DrawSystem(system) {
         friendly = system.Friendly + "\n";
     }
     var sysName = friendly + system.Name + " " + classString + effectString + "";
+    if (zenMode && classString) {
+        sysName = friendly + classString;
+    }
     var extraText = "";
     if (system.activePilots) {
         if (system.activePilots == 1) {
@@ -1225,15 +1229,24 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
             break;
     }
 
+
     if (system.shattered) {
         sysStroke = "#FFA500";
         if (sysStrokeWidth < s(3)) {
             sysStrokeWidth = s(3);
         }
     }
+    if (zenMode) {
+        sysColor = "#ddd";
+        textColor = sysColor;
+    }
     if (system.msID === focusMS) {
         textColor = "#000";
-        sysStroke = "#FFFC00";
+        if (zenMode) {
+            sysStroke = "#F00";
+        } else {
+            sysStroke = "#FFFC00";
+        }
         sysStrokeDashArray = "--"
     }
     var iconX = ellipseSystem.attr("cx")+s(40);
@@ -1525,5 +1538,14 @@ function scale(factor) {
     indentY = s(70); // The amount of space (in px) between system ellipses on the Y axis.
     strokeWidth = s(3); // The width in px of the line connecting wormholes
     interestWidth = s(3); // The width in px of the line connecting wormholes when interest is on
+    RefreshMap();
+}
+
+function togglezen() {
+    if (zenMode == 1) {
+        zenMode = 0;
+    } else {
+        zenMode = 1;
+    }
     RefreshMap();
 }
