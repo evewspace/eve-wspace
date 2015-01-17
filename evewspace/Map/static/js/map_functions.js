@@ -1560,9 +1560,8 @@ function scale(factor) {
 function togglezen() {
     if (zenMode == 1) {
         zenMode = 0;
-        RefreshMap();
     } else {
         zenMode = 1;
-        scale(0.8);
     }
+    RefreshMap();
 }
