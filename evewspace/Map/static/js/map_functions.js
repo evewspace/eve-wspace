@@ -976,7 +976,7 @@ function DrawSystem(system) {
         } else {
             for (var i = 0; i < system.pilot_list.length; i++) {
                 var pilot = system.pilot_list[i].substr(0,5);
-                if (extratext != "") extratext += ",";
+                if (extraText != "") extraText += ",";
                 extraText += pilot;
             }
         }
