@@ -759,8 +759,7 @@ function StartDrawing() {
 
 function GetSysID(msID) {
     //get systemID from msID
-    for (var i = 0; i < stellarSystemsLength; i++) {
-        var stellarSystem = systemsJSON[i];
+    for (var i = 0; i < systemsJSON.length; i++) {
         if (systemsJSON[i].msID == msID) return systemsJSON[i].sysID;
     }
     return null;
