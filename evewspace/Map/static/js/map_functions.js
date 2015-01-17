@@ -1232,7 +1232,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
         "stroke-dasharray": sysStrokeDashArray
     });
     textSysName.attr({fill: textColor, "font-size": textFontSize, cursor: "pointer"});
-    textExtra.attr({fill: textColor, "font-size": textFontSize-2, cursor: "pointer"});
+    textExtra.attr({fill: "#fff", "font-size": textFontSize-2, cursor: "pointer"});
 
 
 
