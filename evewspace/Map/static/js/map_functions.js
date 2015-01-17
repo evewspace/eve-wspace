@@ -973,8 +973,12 @@ function DrawSystem(system) {
         friendly = system.Friendly + "\n";
     }
     var sysName = friendly + system.Name + " " + classString + effectString + "";
-    if (zenMode && ((classString != "H") && (classString != "N") || (classString != "L") || (classString != "T"))) {
-        sysName = friendly + classString;
+    if (zenMode) {
+        if ((classString == "H") || (classString == "N") || (classString == "L") || (classString == "T")) {
+            sysName = system.Name.subst(0,6)
+        } else {
+            sysName = friendly + classString;
+        }
     }
     var extraText = "";
     if (system.activePilots) {
