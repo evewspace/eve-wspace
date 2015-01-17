@@ -921,6 +921,30 @@ function DrawSystem(system) {
             classString = "C" + system.SysClass;
             break;
     }
+    var effectString;
+    switch (system.effect) {
+        case "Wolf-Rayet Star":
+            effectString = "+W"
+            break;
+        case "Pulsar":
+            effectString = "+P"
+            break;
+        case "Magnetar":
+            effectString = "+M"
+            break;
+        case "Red Giant":
+            effectString = "+R"
+            break;
+        case "Cataclysmic Variable":
+            effectString = "+C"
+            break;
+        case "Black Hole":
+            effectString = "+B"
+            break;
+        default:
+            effectString = "";
+            break;
+    }
     var friendly = "";
     if (system.Friendly) {
         if (system.Friendly.length > 8) {
@@ -932,8 +956,14 @@ function DrawSystem(system) {
         }
         friendly = system.Friendly + "\n";
     }
-    var sysName = friendly + system.Name;
-    sysName += "\n(" + classString + "+" + system.activePilots + "P)";
+    var sysName = friendly + system.Name + " (" + classString + effectString + ")";
+    if (system.activePilots) {
+        if (system.activePilots == 1) {
+            sysName += "\n" + system.activePilots + " pilot";
+        } else {
+            sysName += "\n" + system.activePilots + " pilots";
+        }
+    }
     var sysText;
     if (system.LevelX != null && system.LevelX > 0) {
         var childSys = paper.ellipse(sysX, sysY, 40, 28);
@@ -1174,6 +1204,8 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     }
     if (system.msID === focusMS) {
         textColor = "#000";
+        sysStroke = "#FFFC00";
+        sysStrokeDashArray = "0.9";
     }
     var iconX = ellipseSystem.attr("cx")+40;
     var iconY = ellipseSystem.attr("cy")-35;
