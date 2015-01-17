@@ -307,6 +307,19 @@ function GetSystemTooltips() {
         url: address,
         success: function (data) {
             $('#systemTooltipHolder').html(data);
+            $('#systemTooltipHolder>div').off();
+            //clicking the tooltip acts as clicking the system 
+            //(IG browser can be sloppy)
+            $('#systemTooltipHolder>div').click(function(){
+                var msID = this.id.substr(3,this.id.length -3);
+                var sysID = GetSysID(msID);
+                DisplaySystemDetails(msID, sysID);
+                var div = $('#sys' + msID + "Tip").hide();
+
+                if (div[0]) {
+                    div.hide();
+                }
+            });
         }
     });
 }
@@ -743,6 +756,16 @@ function StartDrawing() {
     }
 }
 
+
+function GetSysID(msID) {
+    //get systemID from msID
+    for (var i = 0; i < stellarSystemsLength; i++) {
+        var stellarSystem = systemsJSON[i];
+        if (systemsJSON[i].msID == msID) return systemsJSON[i].sysID;
+    }
+    return null;
+}
+
 function ConnectSystems(obj1, obj2, line, bg, interest, dasharray) {
     var systemTo = obj2;
     if (obj1.line && obj1.from && obj1.to) {
@@ -1057,7 +1080,7 @@ function ColorSystem(system, ellipseSystem, textSysName) {
     var textColor = "#000";
     if (system.interest == true) {
         sysStrokeWidth = 7;
-        sysStrokeDashArray = "--";
+        sysStrokeDashArray = "0.6";
     }
     if (system.msID === focusMS) {
         textColor = "#f0ff00";
