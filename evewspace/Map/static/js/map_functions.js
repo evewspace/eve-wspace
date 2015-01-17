@@ -970,7 +970,7 @@ function DrawSystem(system) {
         friendly = system.Friendly + "\n";
     }
     var sysName = friendly + system.Name + " " + classString + effectString + "";
-    if (zenMode && classString) {
+    if (zenMode && (classString != "")) {
         sysName = friendly + classString;
     }
     var extraText = "";
@@ -1238,7 +1238,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
     }
     if (zenMode) {
         textColor = sysColor;
-        sysColor = "#ddd";
+        sysColor = "#aaa";
     }
     if (system.msID === focusMS) {
         textColor = "#000";
