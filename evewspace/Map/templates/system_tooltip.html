@@ -4,7 +4,11 @@
    <div class="sysClassSpan span3">
        <h4 class="sysFriendlySpan">{{mapsys.friendlyname}}{% if mapsys.parent_wormhole.collapsed %} - COLLAPSED{% endif %}</h4>
         <div> 
-            <strong>Name: {{mapsys.system.name}} </strong>
+            <strong>Name: {{mapsys.system.name}} 
+            {% if not mapsys.system.is_wspace %}
+            <button class='btn btn-mini btn-info' onclick="CCPEVE.setDestination({{mapsys.system.pk}});">D</button>
+            {% endif %}
+            </strong>
         </div>
         {% if mapsys.system.is_wspace %}
         <div> 
