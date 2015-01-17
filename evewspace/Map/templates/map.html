@@ -22,6 +22,17 @@
     <button id='btnKspaceIGB' class='btn btn-mini btn-info' onclick='ToggleKspaceMapping();'>Map K-Space Connections: OFF</button>
     {% endif %}
     <button id='btnExportMap' class='btn btn-mini btn-info' onclick='GetExportMap();'>Export</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=0.25; RefreshMap();">25%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=0.5; RefreshMap();">50%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=0.6; RefreshMap();">60%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=0.7; RefreshMap();">70%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=0.8; RefreshMap();">80%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=0.9; RefreshMap();">90%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=1; RefreshMap();">100%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=1.1; RefreshMap();">110%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=1.25; RefreshMap();">125%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=1.5; RefreshMap();">150%</button>
+    <button class='btn btn-mini btn-info' onclick="scalingFactor=2; RefreshMap();">200%</button>
 </div>
 <div id="mapDiv" class="mapDiv">
 </div>
