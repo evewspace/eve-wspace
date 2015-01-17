@@ -158,6 +158,10 @@ function DisplaySystemDetails(msID, sysID) {
             });
             GetPOSList(sysID);
             GetDestinations(msID);
+            $('#btnImport').off();
+            $('#btnImport').click(function(e){
+                BulkImport({{mapsys.pk}});
+            });
             focusMS = msID;
             StartDrawing();
         }
