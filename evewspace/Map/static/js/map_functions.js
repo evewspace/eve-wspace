@@ -1362,71 +1362,73 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
     }
 
     // draws labels near systemTo ellipse if previous same Level X system's levelY = systemTo.levelY - 1
-    if (changePos == true) {
+    if (!zenMode) {
+        if (changePos == true) {
 
-        textCenterX = sysX2 - s(73);
-        textCenterY = sysY2 - s(30);
-        if (renderWormholeTags) {
-            whFromSysX = textCenterX + s(23);
-            whToSysX = textCenterX - s(23);
-        } else {
-            whFromSysX = textCenterX + s(35);
-            whToSysX = textCenterX - s(10);
-        }
-        whFromSysY = textCenterY;
-        whToSysY = textCenterY;
-    }
-
-    var whFromSys = null;
-    var whToSys = null;
-    var whFromColor = null;
-    var whToColor = null;
-    var decoration = null;
-
-    if (systemTo.WhFromParentBubbled == true) {
-        whFromColor = bubbledColor;
-        decoration = "bold";
-    } else {
-        whFromColor = clearWhColor;
-    }
-
-    if (systemTo.WhToParentBubbled == true) {
-        whToColor = bubbledColor;
-        decoration = "bold";
-    } else {
-        whToColor = clearWhColor;
-    }
-
-    if (systemTo.WhFromParent) {
-        var whFromText, whToText;
-        if (!renderWormholeTags) {
-            whFromText = ">";
-            whToText = "<";
-        } else {
-            whFromText = systemTo.WhFromParent + " >";
-            whToText = "< " + systemTo.WhToParent;
+            textCenterX = sysX2 - s(73);
+            textCenterY = sysY2 - s(30);
+            if (renderWormholeTags) {
+                whFromSysX = textCenterX + s(23);
+                whToSysX = textCenterX - s(23);
+            } else {
+                whFromSysX = textCenterX + s(35);
+                whToSysX = textCenterX - s(10);
+            }
+            whFromSysY = textCenterY;
+            whToSysY = textCenterY;
         }
 
-        whFromSys = paper.text(whFromSysX, whFromSysY, whFromText);
-        whFromSys.attr({fill: whFromColor, cursor: "pointer", "font-size": s(11), "font-weight": decoration});  //stroke: "#fff"
-        whFromSys.click(function () {
-            GetEditWormholeDialog(systemTo.whID);
-        });
-        whFromSys.whID = systemTo.whID;
-        whFromSys.mouseover(onWhOver);
-        whFromSys.mouseout(onWhOut);
-    }
+        var whFromSys = null;
+        var whToSys = null;
+        var whFromColor = null;
+        var whToColor = null;
+        var decoration = null;
 
-    if (systemTo.WhToParent) {
-        whToSys = paper.text(whToSysX, whToSysY, whToText);
-        whToSys.attr({fill: whToColor, cursor: "pointer", "font-size": s(11), "font-weight": decoration});
+        if (systemTo.WhFromParentBubbled == true) {
+            whFromColor = bubbledColor;
+            decoration = "bold";
+        } else {
+            whFromColor = clearWhColor;
+        }
 
-        whToSys.whID = systemTo.whID;
-        whToSys.click(function () {
-            GetEditWormholeDialog(systemTo.whID);
-        });
-        whToSys.mouseover(onWhOver);
-        whToSys.mouseout(onWhOut);
+        if (systemTo.WhToParentBubbled == true) {
+            whToColor = bubbledColor;
+            decoration = "bold";
+        } else {
+            whToColor = clearWhColor;
+        }
+
+        if (systemTo.WhFromParent) {
+            var whFromText, whToText;
+            if (!renderWormholeTags) {
+                whFromText = ">";
+                whToText = "<";
+            } else {
+                whFromText = systemTo.WhFromParent + " >";
+                whToText = "< " + systemTo.WhToParent;
+            }
+
+            whFromSys = paper.text(whFromSysX, whFromSysY, whFromText);
+            whFromSys.attr({fill: whFromColor, cursor: "pointer", "font-size": s(11), "font-weight": decoration});  //stroke: "#fff"
+            whFromSys.click(function () {
+                GetEditWormholeDialog(systemTo.whID);
+            });
+            whFromSys.whID = systemTo.whID;
+            whFromSys.mouseover(onWhOver);
+            whFromSys.mouseout(onWhOut);
+        }
+
+        if (systemTo.WhToParent) {
+            whToSys = paper.text(whToSysX, whToSysY, whToText);
+            whToSys.attr({fill: whToColor, cursor: "pointer", "font-size": s(11), "font-weight": decoration});
+
+            whToSys.whID = systemTo.whID;
+            whToSys.click(function () {
+                GetEditWormholeDialog(systemTo.whID);
+            });
+            whToSys.mouseover(onWhOver);
+            whToSys.mouseout(onWhOut);
+        }
     }
 }
 
