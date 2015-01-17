@@ -124,7 +124,7 @@
                     {% if can_edit %}
                     <form id="bulkSigForm" class="bulkSigForm" method="post" action="system/{{mapsys.pk}}/signatures/bulkadd/">
                         <textarea id="pasteField" rows="4" name="paste"></textarea>
-                        <a id="btnImport" class="btn"><i class="icon-download"></i> Bulk Import</a>
+                        <a href="#" id="btnImport" class="btn"><i class="icon-download"></i> Bulk Import</a>
                     </form>
                     <button id="btnPurgeSigs" class="btn btn-danger">Purge Signatures</button>
                     <button id="btnReallyPurgeSigs" class="btn btn-warning" style="display: none;"  onclick="PurgeSignatures({{mapsys.pk}});">Really Purge?</button>
