@@ -1236,9 +1236,11 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
             sysStrokeWidth = s(3);
         }
     }
+    var labelFontSize = textFontSize;
     if (zenMode) {
         textColor = sysColor;
-        sysColor = "#aaa";
+        sysColor = "#000";
+        labelFontSize = s(16);
     }
     if (system.msID === focusMS) {
         textColor = "#000";
@@ -1261,7 +1263,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
         cursor: "pointer",
         "stroke-dasharray": sysStrokeDashArray
     });
-    textSysName.attr({fill: textColor, "font-size": textFontSize, cursor: "pointer"});
+    textSysName.attr({fill: textColor, "font-size": labelFontSize, cursor: "pointer"});
     textExtra.attr({fill: "#fff", "font-size": textFontSize-s(2), cursor: "pointer"});
 
 
