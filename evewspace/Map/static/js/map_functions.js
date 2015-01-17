@@ -1243,10 +1243,11 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
         labelFontSize = s(16);
     }
     if (system.msID === focusMS) {
-        textColor = "#000";
         if (zenMode) {
-            sysStroke = "#F00";
+            textColor = "#FFFC00";
+            sysStroke = "#FFFC00";
         } else {
+            textColor = "#000";
             sysStroke = "#FFFC00";
         }
         sysStrokeDashArray = "--"
