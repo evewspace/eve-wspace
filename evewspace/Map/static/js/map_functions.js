@@ -989,8 +989,8 @@ function DrawSystem(system) {
     if (system.LevelX != null && system.LevelX > 0) {
         var childSys = paper.ellipse(sysX, sysY, s(40), s(28));
         if (system.activePilots > 0 && highlightActivePilots === true) {
-            var notificationRing = paper.ellipse(sysX, sysY, s(45), s(33));
-            notificationRing.attr({'stroke-dasharray': '--', 'stroke-width': s(4), 'stroke': '#ffffff'});
+            //var notificationRing = paper.ellipse(sysX, sysY, s(45), s(33));
+            //notificationRing.attr({'stroke-dasharray': '--', 'stroke-width': s(1), 'stroke': '#ffffff'});
         }
         childSys.msID = system.msID;
         childSys.whID = system.whID;
