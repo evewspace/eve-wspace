@@ -975,8 +975,9 @@ function DrawSystem(system) {
             extraText += system.pilot_list[0];
         } else {
             for (var i = 0; i < system.pilot_list.length; i++) {
-                var pilot = system.pilot_list[i];
-                extraText += pilot + "\r\n";
+                var pilot = system.pilot_list[i].substr(0,5);
+                if (extratext != "") extratext += ",";
+                extraText += pilot;
             }
         }
     }
@@ -1007,7 +1008,7 @@ function DrawSystem(system) {
             childSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        extraText = paper.text(sysX, sysY+s(12), extraText);
+        extraText = paper.text(sysX, sysY+s(28), extraText);
         extraText.msID = system.msID;
         extraText.sysID = system.sysID;
         extraText.click(onSysClick);
@@ -1051,7 +1052,7 @@ function DrawSystem(system) {
             rootSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        extraText = paper.text(sysX, sysY+s(12), extraText);
+        extraText = paper.text(sysX, sysY+s(28), extraText);
         extraText.msID = system.msID;
         extraText.sysID = system.sysID;
         extraText.click(onSysClick);
