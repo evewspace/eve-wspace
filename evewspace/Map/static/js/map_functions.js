@@ -957,11 +957,15 @@ function DrawSystem(system) {
         friendly = system.Friendly + "\n";
     }
     var sysName = friendly + system.Name + " " + classString + effectString + "";
+    var extraText = "";
     if (system.activePilots) {
         if (system.activePilots == 1) {
-            sysName += "\n" + system.activePilots + " pilot";
+            extraText += system.pilot_list[0];
         } else {
-            sysName += "\n" + system.activePilots + " pilots";
+            for (var i = 0; i < system.pilot_list.length; i++) {
+                var pilot = system.pilot_list[i];
+                extraText += pilot + "\n";
+            }
         }
     }
     var sysText;
@@ -991,7 +995,11 @@ function DrawSystem(system) {
             childSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        ColorSystem(system, childSys, sysText);
+        extraText = paper.text(sysX, sysY+12, extraText);
+        extraText.msID = system.msID;
+        extraText.sysID = system.sysID;
+        extraText.click(onSysClick);
+        ColorSystem(system, childSys, sysText, extraText);
         childSys.collapsed = system.collapsed;
         objSystems.push(childSys);
         var parentIndex = GetSystemIndex(system.ParentID);
@@ -1031,7 +1039,11 @@ function DrawSystem(system) {
             rootSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        ColorSystem(system, rootSys, sysText);
+        extraText = paper.text(sysX, sysY+12, extraText);
+        extraText.msID = system.msID;
+        extraText.sysID = system.sysID;
+        extraText.click(onSysClick);
+        ColorSystem(system, rootSys, sysText, extraText);
         objSystems.push(rootSys);
     }
 }
@@ -1096,7 +1108,7 @@ function GetWormholeColor(system) {
     }
 }
 
-function ColorSystem(system, ellipseSystem, textSysName) {
+function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
     if (!system) {
         alert("system is null or undefined");
         return;
@@ -1220,6 +1232,9 @@ function ColorSystem(system, ellipseSystem, textSysName) {
         "stroke-dasharray": sysStrokeDashArray
     });
     textSysName.attr({fill: textColor, "font-size": textFontSize, cursor: "pointer"});
+    textExtra.attr({fill: textColor, "font-size": textFontSize-2, cursor: "pointer"});
+
+
 
     if (selected == false) {
         ellipseSystem.sysInfoPnlID = 0;
@@ -1228,7 +1243,6 @@ function ColorSystem(system, ellipseSystem, textSysName) {
         ellipseSystem.hover(onSysOver, onSysOut);
         textSysName.ellipseIndex = objSystems.length;
         textSysName.hover(onSysOver, onSysOut);
-
     }
 }
 
