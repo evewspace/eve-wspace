@@ -122,7 +122,10 @@
                 <div style="margin-bottom: 10px; text-align: center;">
                     <h4>Signatures: {{system.name}}</h4>
                     {% if can_edit %}
-                    <button class="btn" onclick="GetBulkImport({{mapsys.pk}});"><i class="icon-download"></i> Bulk Import</button>
+                    <form id="bulkSigForm" class="bulkSigForm" method="post" action="system/{{mapsys.pk}}/signatures/bulkadd/">
+                        <textarea id="pasteField" rows="4" name="paste"></textarea>
+                        <a id="btnImport" class="btn"><i class="icon-download"></i> Bulk Import</a>
+                    </form>
                     <button id="btnPurgeSigs" class="btn btn-danger">Purge Signatures</button>
                     <button id="btnReallyPurgeSigs" class="btn btn-warning" style="display: none;"  onclick="PurgeSignatures({{mapsys.pk}});">Really Purge?</button>
                     <script type="text/javascript">
