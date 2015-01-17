@@ -978,6 +978,10 @@ function DrawSystem(system) {
                 var pilot = system.pilot_list[i].substr(0,5);
                 if (extraText != "") extraText += ",";
                 extraText += pilot;
+                if (extraText.length > 23) {
+                    extraText += "+" + (system.pilot_list.length - 4);
+                    break;
+                }
             }
         }
     }
