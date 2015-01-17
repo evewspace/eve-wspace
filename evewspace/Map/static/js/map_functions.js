@@ -956,7 +956,7 @@ function DrawSystem(system) {
         }
         friendly = system.Friendly + "\n";
     }
-    var sysName = friendly + system.Name + " (" + classString + effectString + ")";
+    var sysName = friendly + system.Name + " " + classString + effectString + "";
     if (system.activePilots) {
         if (system.activePilots == 1) {
             sysName += "\n" + system.activePilots + " pilot";
