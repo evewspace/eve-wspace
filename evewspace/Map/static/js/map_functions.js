@@ -24,7 +24,7 @@ var updateTimerID;
 var refreshTimerID;
 var systemsJSON;
 var activityLimit = 100;
-var textFontSize = 12; // The base font size
+var textFontSize = 11; // The base font size
 var indentX = 150; // The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180
 var indentY = 70; // The amount of space (in px) between system ellipses on the Y axis.
 var strokeWidth = 3; // The width in px of the line connecting wormholes
