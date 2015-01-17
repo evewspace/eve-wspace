@@ -29,11 +29,11 @@ var refreshTimerID;
 var systemsJSON;
 var activityLimit = 100;
 var scalingFactor = 1; //scale the interface
-var textFontSize = s(11); // The base font size
-var indentX = s(150); // The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180
-var indentY = s(70); // The amount of space (in px) between system ellipses on the Y axis.
-var strokeWidth = s(3); // The width in px of the line connecting wormholes
-var interestWidth = s(3); // The width in px of the line connecting wormholes when interest is on
+var textFontSize = 11; // The base font size
+var indentX = 150; // The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180
+var indentY = 70; // The amount of space (in px) between system ellipses on the Y axis.
+var strokeWidth = 3; // The width in px of the line connecting wormholes
+var interestWidth = 3; // The width in px of the line connecting wormholes when interest is on
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map
 var sliceLastChars = false; // Friendly name should show last 8 chars if over 8, shows first 8 if false
 var highlightActivePilots = true; // Draw a notification ring around systems with active pilots.
@@ -48,7 +48,6 @@ var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
 var silentSystem = true; // Are systems added automatically wihthout a pop-up?
 var kspaceIGBMapping = false; // Do we map K<>K connections from the IGB?
-
 
 
 
@@ -71,6 +70,7 @@ $(document).ready(function () {
     $('#mapDiv').html(ajax_image);
     RefreshMap();
 });
+
 
 //Make sure timers stop when unloading the page
 $(document).ready(function () {
@@ -1128,7 +1128,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
     var selected = false;
     var sysColor = "#f00";
     var sysStroke = "#fff";
-    var sysStrokeWidth = 2;
+    var sysStrokeWidth = s(2);
     var sysStrokeDashArray = "none";
     var textColor = "#000";
     if (system.interest == true) {
@@ -1511,4 +1511,14 @@ function onSysOut() {
     if (div[0]){
         div.hide();
     }
+}
+
+function scale(factor) {
+    scalingFactor = factor;
+    textFontSize = s(11); // The base font size
+    indentX = s(150); // The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180
+    indentY = s(70); // The amount of space (in px) between system ellipses on the Y axis.
+    strokeWidth = s(3); // The width in px of the line connecting wormholes
+    interestWidth = s(3); // The width in px of the line connecting wormholes when interest is on
+    RefreshMap();
 }
