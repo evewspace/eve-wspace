@@ -976,7 +976,7 @@ function DrawSystem(system) {
         } else {
             for (var i = 0; i < system.pilot_list.length; i++) {
                 var pilot = system.pilot_list[i];
-                extraText += pilot + "\n";
+                extraText += pilot + "\r\n";
             }
         }
     }
@@ -1051,7 +1051,7 @@ function DrawSystem(system) {
             rootSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        extraText = paper.text(sysX, sysY+s(48), extraText);
+        extraText = paper.text(sysX, sysY+s(12), extraText);
         extraText.msID = system.msID;
         extraText.sysID = system.sysID;
         extraText.click(onSysClick);
