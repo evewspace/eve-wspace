@@ -451,7 +451,6 @@ def set_importance(request,map_id, ms_id):
         if imp >= 0 and imp <= 2:
             map_system.system.importance = imp
             map_system.system.save()
-
             if imp == 1:
                 map_system.map.add_log(request.user, "Danger in %s (%s)"
                                     % (map_system.system.name,

@@ -142,7 +142,7 @@ class MapJSONGenerator(object):
                     'iconImageURL': self.get_system_icon(system),
                     'whID': parentWH.pk, 'msID': system.pk,
                     'backgroundImageURL': self.get_system_background(system),
-                    'effect': effect, 'collapsed': collapsed,
+                    'effect': effect, 'collapsed': collapsed,'importance': system.system.importance,
                     'shattered': shattered}
         else:
             result = {'sysID': system.system.pk, 'Name': system.system.name,
@@ -159,7 +159,7 @@ class MapJSONGenerator(object):
                     'iconImageURL': self.get_system_icon(system),
                     'whID': None, 'msID': system.pk,
                     'backgroundImageURL': self.get_system_background(system),
-                    'effect': effect, 'collapsed': False,
+                    'effect': effect, 'collapsed': False,'importance': system.system.importance,
                     'shattered': shattered}
         return result
 
@@ -186,7 +186,7 @@ class MapJSONGenerator(object):
         if cached == None:
             self.systems = defaultdict(list)
             for system in self.map.systems.all()\
-                    .select_related('system', 'parentsystem', 'parent_womrhole')\
+                    .select_related('system', 'parentsystem', 'parent_wormhole')\
                     .iterator():
                 self.systems[system.parentsystem_id].append(system)
             root = self.systems[None][0]
