@@ -15,9 +15,6 @@
 //  
 //  Portions Copyright (c) 2011 Georgi Kolev (arcanis@wiadvice.com). Licensed under the Apache 2.0 license.
 
-function s(n) { //apply scaling factor
-    return Math.ceil(n * scalingFactor)
-}
 
 var loadtime = null;
 var paper = null;
@@ -43,10 +40,18 @@ var badColor = "#FF0000"; // Color of first shrink connections
 var bubbledColor = "#FF0000"; // Color of first shrink connections
 var clearWhColor = "#BBFFBB"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
-var frigWhColor = "#FFFFFF"; // Color of Hyperion Frigate Hole
-var frigWhColor_zen = "#71cbff"; // Color of Hyperion Frigate Hole
 var eolColor = "#F0FF00"; //color for eol
 var sysColor_zen = "#222"; //color for eol
+var frigWhColor = "#FFFFFF"; // Color of Hyperion Frigate Hole
+var frigWhColor_zen = "#71cbff"; // Color of Hyperion Frigate Hole
+var effectColorWolfRayet = "#ff5500";
+var effectColorPulsar = "0000ff";
+var effectColorMagnetar = "#ff0000";
+var effectColorRedGiant = "#ff00ff";
+var effectColorCataclysmic = "#5555ff";
+var effectColorBlackHole = "#000";
+var borderColorSelect = "#FFFC00"; //selected system
+var borderColorSelect_zen = "#FFFC00"; //selected system
 var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
 var silentSystem = true; // Are systems added automatically wihthout a pop-up?
@@ -54,6 +59,10 @@ var kspaceIGBMapping = false; // Do we map K<>K connections from the IGB?
 var zenMode = false;
 
 
+
+function s(n) { //apply scaling factor, short function name so it's quick to type
+    return Math.ceil(n * scalingFactor)
+}
 
 $(document).ready(function () {
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
@@ -980,17 +989,17 @@ function DrawSystem(system) {
             sysName = friendly + classString;
         }
     }
-    var extraText = "";
+    var pilotText = "";
     if (system.activePilots) {
         if (system.activePilots == 1) {
-            extraText += system.pilot_list[0];
+            pilotText += system.pilot_list[0];
         } else {
             for (var i = 0; i < system.pilot_list.length; i++) {
                 var pilot = system.pilot_list[i].substr(0,5);
-                if (extraText != "") extraText += ",";
-                extraText += pilot;
-                if (extraText.length > 23) {
-                    extraText += "+" + (system.pilot_list.length - 4);
+                if (pilotText != "") pilotText += ",";
+                pilotText += pilot;
+                if (pilotText.length > 23) {
+                    pilotText += "+" + (system.pilot_list.length - 4);
                     break;
                 }
             }
@@ -1023,11 +1032,11 @@ function DrawSystem(system) {
             childSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        extraText = paper.text(sysX, sysY+s(28), extraText);
-        extraText.msID = system.msID;
-        extraText.sysID = system.sysID;
-        extraText.click(onSysClick);
-        ColorSystem(system, childSys, sysText, extraText);
+        pilotText = paper.text(sysX, sysY+s(30), pilotText);
+        pilotText.msID = system.msID;
+        pilotText.sysID = system.sysID;
+        pilotText.click(onSysClick);
+        ColorSystem(system, childSys, sysText, pilotText);
         childSys.collapsed = system.collapsed;
         objSystems.push(childSys);
         var parentIndex = GetSystemIndex(system.ParentID);
@@ -1067,11 +1076,11 @@ function DrawSystem(system) {
             rootSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        extraText = paper.text(sysX, sysY+s(28), extraText);
-        extraText.msID = system.msID;
-        extraText.sysID = system.sysID;
-        extraText.click(onSysClick);
-        ColorSystem(system, rootSys, sysText, extraText);
+        pilotText = paper.text(sysX, sysY+s(28), pilotText);
+        pilotText.msID = system.msID;
+        pilotText.sysID = system.sysID;
+        pilotText.click(onSysClick);
+        ColorSystem(system, rootSys, sysText, pilotText);
         objSystems.push(rootSys);
     }
 }
@@ -1144,7 +1153,7 @@ function GetWormholeColor(system) {
     }
 }
 
-function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
+function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     if (!system) {
         alert("system is null or undefined");
         return;
@@ -1260,10 +1269,10 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
     if (system.msID === focusMS) {
         if (zenMode) {
             textColor = "#FFFC00";
-            sysStroke = "#FFFC00";
+            sysStroke = borderColorSelect_zen;
         } else {
             textColor = "#000";
-            sysStroke = "#FFFC00";
+            sysStroke = borderColorSelect;
         }
         sysStrokeDashArray = "--"
     }
@@ -1280,7 +1289,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
         "stroke-dasharray": sysStrokeDashArray
     });
     textSysName.attr({fill: textColor, "font-size": labelFontSize, cursor: "pointer"});
-    textExtra.attr({fill: "#fff", "font-size": textFontSize-s(2), cursor: "pointer"});
+    textPilot.attr({fill: "#fff", "font-size": textFontSize-s(1), cursor: "pointer"});
 
 
 
@@ -1294,28 +1303,28 @@ function ColorSystem(system, ellipseSystem, textSysName, textExtra) {
     }
 }
 
-/* Currently unused, needs implementation.
+/*
  * Colors wormhole systems by effect.
  */
 function WormholeEffectColor(system, defaultcolor) {
     switch (system.effect) {
         case "Wolf-Rayet Star":
-            return "#FF5500";
+            return effectColorWolfRayet;
             break;
         case "Pulsar":
-            return "#0000FF";
+            return effectColorPulsar;
             break;
         case "Magnetar":
-            return "#FF0000";
+            return effectColorMagnetar;
             break;
         case "Red Giant":
-            return "#FF00FF";
+            return effectColorRedGiant;
             break;
         case "Cataclysmic Variable":
-            return "#5555FF";
+            return effectColorCataclysmic;
             break;
         case "Black Hole":
-            return "#000000";
+            return effectColorBlackHole;
             break;
         default:
             return defaultcolor;
