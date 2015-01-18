@@ -223,6 +223,7 @@ textarea
     clear: both;
     display: block;
     margin-top: 20px;
+    margin-left: 20px;
 }
 .sigWH {
     color: #63a5ff;
@@ -278,4 +279,7 @@ label {
 #editWormholeDialog label[for=massStatusCritical], #editSystemDialog label[for=sysTypeDangerous] {
     font-weight: bold;
     color: #ff0000;
+}
+#legendDiv ul {
+    display: inline;
 }

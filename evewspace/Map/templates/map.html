@@ -51,8 +51,9 @@
             <li> <img src='{{STATIC_URL}}images/carebears.png' height='32' width='32'></img>  NPC Kills </li>
             <li> <img src='{{STATIC_URL}}images/mylocation.png' height='32' width='32'></img>  You are here! </li>
         {% if perms.SiteTracker.can_sitetracker %}
-        <li><img src='{{STATIC_URL}}images/farm.png' height='32' width='32'></img>  SiteTracker Up! </li>
+            <li><img src='{{STATIC_URL}}images/farm.png' height='32' width='32'></img>  SiteTracker Up! </li>
         {% endif %}
+        </ul>
     </p>
 </div>
 <div id="logDiv" class="logDiv">
