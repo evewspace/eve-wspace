@@ -218,12 +218,14 @@ textarea
   top: 21px;
   content: '';
 }
+#sysInfoDiv {
+    margin-left: 12px;
+}
 #sysInfoDiv h4 {
     border-top: 1px solid #ccc;
     clear: both;
     display: block;
     margin-top: 20px;
-    margin-left: 20px;
 }
 .sigWH {
     color: #63a5ff;
