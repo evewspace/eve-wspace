@@ -293,6 +293,7 @@ function SetImportance(msid, sysid,importance) {
         async: false,
         data: {'importance':importance},
         success: function (data) {
+            DisplaySystemMenu(msid);
             RefreshMap();
         }
     });
@@ -1116,7 +1117,7 @@ function DrawSystem(system) {
             rootSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        pilotText = paper.text(sysX, sysY+s(28), pilotText);
+        pilotText = paper.text(sysX, sysY+s(35), pilotText);
         pilotText.msID = system.msID;
         pilotText.sysID = system.sysID;
         pilotText.click(onSysClick);

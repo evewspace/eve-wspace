@@ -440,7 +440,7 @@ def mark_scanned(request, map_id, ms_id):
 # noinspection PyUnusedLocal
 @login_required()
 @require_map_permission(permission=2)
-def set_importance(request,id, ms_id):
+def set_importance(request,map_id, ms_id):
     """Takes a POST request from AJAX with a system ID and marks that system
     as scanned.
 
@@ -451,6 +451,11 @@ def set_importance(request,id, ms_id):
         if imp >= 0 and imp <= 2:
             map_system.system.importance = imp
             map_system.system.save()
+
+            if imp == 1:
+                map_system.map.add_log(request.user, "Danger in %s (%s)"
+                                    % (map_system.system.name,
+                                        map_system.friendlyname))
         return HttpResponse()
     else:
         raise PermissionDenied
