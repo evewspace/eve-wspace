@@ -269,18 +269,31 @@ function GetExportMap(mapID) {
     });
 }
 
-function MarkScanned(msID, fromPanel, sysID) {
-    var address = "system/" + msID + "/scanned/";
+function MarkScanned(msid, frompanel, sysid) {
+    var address = "system/" + msid + "/scanned/";
     $.ajax({
-        type: "POST",
+        type: "post",
         url: address,
         async: false,
         data: {},
         success: function (data) {
-            GetSystemTooltips();
-            if (fromPanel) {
-                LoadSignatures(msID, false);
+            getsystemtooltips();
+            if (frompanel) {
+                loadsignatures(msid, false);
             }
+        }
+    });
+}
+
+function SetImportance(msid, sysid,importance) {
+    var address = "system/" + msid + "/importance/";
+    $.ajax({
+        type: "post",
+        url: address,
+        async: false,
+        data: {'importance':importance},
+        success: function (data) {
+            RefreshMap();
         }
     });
 }
