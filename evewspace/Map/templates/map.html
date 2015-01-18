@@ -44,17 +44,15 @@
 <div id="systemTooltipHolder">
 </div>
 <div id="legendDiv">
-    <p class="text-info">
-        <em>Legend:</em> &nbsp;
-        <ul class="inline">
-            <li><img src='{{STATIC_URL}}images/pvp.png' height='32' width='32'></img>  PVP Activity </li>
-            <li> <img src='{{STATIC_URL}}images/carebears.png' height='32' width='32'></img>  NPC Kills </li>
-            <li> <img src='{{STATIC_URL}}images/mylocation.png' height='32' width='32'></img>  You are here! </li>
-        {% if perms.SiteTracker.can_sitetracker %}
-            <li><img src='{{STATIC_URL}}images/farm.png' height='32' width='32'></img>  SiteTracker Up! </li>
-        {% endif %}
-        </ul>
-    </p>
+    <em>Legend:</em>&nbsp;
+    <ul class="inline">
+        <li><img src='{{STATIC_URL}}images/pvp.png' height='32' width='32'></img>  PVP Activity </li>
+        <li> <img src='{{STATIC_URL}}images/carebears.png' height='32' width='32'></img>  NPC Kills </li>
+        <li> <img src='{{STATIC_URL}}images/mylocation.png' height='32' width='32'></img>  You are here! </li>
+    {% if perms.SiteTracker.can_sitetracker %}
+        <li><img src='{{STATIC_URL}}images/farm.png' height='32' width='32'></img>  SiteTracker Up! </li>
+    {% endif %}
+    </ul>
 </div>
 <div id="logDiv" class="logDiv">
 </div>
