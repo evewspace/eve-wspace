@@ -236,17 +236,34 @@ textarea
 .sigGAS {
     color: #f3b839;
 }
-#backtotop {
+
+#scrollmenu {
     position: fixed;
     left: 2;
     top: 40%;
+    width: 24px;
+    margin: 0px;
+    padding: 0px;
+    z-index: 100;
+}
+#backtotop {
     background: url(../images/back_to_top.png);
     width: 24px;
     height: 24px;
     min-width: 24px;
     min-height: 24px;
     cursor: pointer;
+    padding-bottom: 3px;
 }
+#tobuttons {
+    background: url(../images/to_buttons.png);
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    cursor: pointer;
+}
+
 label {
     display: inline;
 }
