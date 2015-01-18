@@ -1059,7 +1059,7 @@ function DrawSystem(system) {
             childSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        pilotText = paper.text(sysX, sysY+s(30), pilotText);
+        pilotText = paper.text(sysX, sysY+s(32), pilotText);
         pilotText.msID = system.msID;
         pilotText.sysID = system.sysID;
         pilotText.click(onSysClick);
