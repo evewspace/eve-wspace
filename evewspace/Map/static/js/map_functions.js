@@ -1042,7 +1042,7 @@ function DrawSystem(system) {
                 if (pilotText != "") pilotText += ",";
                 pilotText += pilot;
                 if (pilotText.length > 18){
-                    if  (system.pilot_list_length > pilotsadded)) {
+                    if  (system.pilot_list_length > pilotsadded) {
                         pilotText += "+" + (system.pilot_list.length - pilotsadded);
                     }
                     break;
