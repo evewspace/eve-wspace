@@ -247,3 +247,6 @@ textarea
     min-height: 24px;
     cursor: pointer;
 }
+label {
+    display: inline;
+}
