@@ -442,7 +442,7 @@ def mark_scanned(request, map_id, ms_id):
 @require_map_permission(permission=2)
 def set_importance(request,map_id, ms_id):
     """Takes a POST request from AJAX with a system ID and marks that system
-    as scanned.
+    's importance
 
     """
     if request.is_ajax():

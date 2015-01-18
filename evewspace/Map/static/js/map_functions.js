@@ -1031,16 +1031,18 @@ function DrawSystem(system) {
         }
     }
     var pilotText = "";
+    var pilotsadded = 0;
     if (system.activePilots) {
         if (system.activePilots == 1) {
             pilotText += system.pilot_list[0];
         } else {
             for (var i = 0; i < system.pilot_list.length; i++) {
                 var pilot = system.pilot_list[i].substr(0,5);
+                pilotsadded++;
                 if (pilotText != "") pilotText += ",";
                 pilotText += pilot;
                 if (pilotText.length > 23) {
-                    pilotText += "+" + (system.pilot_list.length - 4);
+                    pilotText += "+" + (system.pilot_list.length - pilotsadded);
                     break;
                 }
             }
