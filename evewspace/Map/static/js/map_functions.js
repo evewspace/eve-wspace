@@ -1025,7 +1025,7 @@ function DrawSystem(system) {
     var sysName = friendly + system.Name + " " + classString + effectString + "";
     if (zenMode) {
         if ((classString == "H") || (classString == "N") || (classString == "L") || (classString == "T")) {
-            sysName = system.Name.substr(0,6);
+            sysName = friendly + system.Name.substr(0,6);
         } else {
             sysName = friendly + classString;
         }
