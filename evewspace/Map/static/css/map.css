@@ -280,6 +280,6 @@ label {
     font-weight: bold;
     color: #ff0000;
 }
-#legendDiv ul {
+#legendDiv ul.inline {
     display: inline;
 }
