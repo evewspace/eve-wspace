@@ -44,6 +44,8 @@ var eolColor = "#F0FF00"; //color for eol
 var sysColor_zen = "#222"; //color for eol
 var frigWhColor = "#FFFFFF"; // Color of Hyperion Frigate Hole
 var frigWhColor_zen = "#71cbff"; // Color of Hyperion Frigate Hole
+var textColorSelect = "#000"; //selected system text colour
+var textColorSelect_zen = "#FFFC00"; //selected system text colour (zen mode)
 var effectColorWolfRayet = "#ff5500";
 var effectColorPulsar = "0000ff";
 var effectColorMagnetar = "#ff0000";
@@ -52,6 +54,31 @@ var effectColorCataclysmic = "#5555ff";
 var effectColorBlackHole = "#000";
 var borderColorSelect = "#FFFC00"; //selected system
 var borderColorSelect_zen = "#FFFC00"; //selected system
+var shatteredBorderColor = "#FFA500";
+var colorNullSec = "#CC0000";
+var colorHighSec = "#009F00";
+var colorLowSec = "#93841E";
+var colorC6 = "#0022FF";
+var colorC5 = "#0044FF";
+var colorC4 = "#0066FF";
+var colorC3 = "#0088FF";
+var colorC2 = "#00AAFF";
+var colorC1 = "#00CDFF";
+var colorThera = "#800080";
+var colorSmallShipHole = "#FFA500";
+var borderColorNullSec = "#990000"; //(border colours not used in zen mode. In zen mode, the above colours are used for border instead.), border colours are overridden by wormhole effects
+var borderColorLowSec = "#60510A";
+var borderColorHighSec = "#006B00";
+var borderColorC6 = "#0000FF";
+var borderColorC5 = "#0000FF";
+var borderColorC4 = "#0022FF";
+var borderColorC3 = "#0044FF";
+var borderColorC2 = "#0066FF";
+var borderColorC1 = "#0088FF";
+var borderColorThera = "#7F3939";
+var borderColorSmallShipHole = "#7f5200";
+var systemTextColor = "#fff";
+var pilotColor = "#fff";
 var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
 var silentSystem = true; // Are systems added automatically wihthout a pop-up?
@@ -1182,83 +1209,86 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     switch (system.SysClass) {
         // Null
         case 9:
-            sysColor = "#CC0000";
-            sysStroke = "#990000";
-            textColor = "#fff";
+            sysColor = colorNullSec; 
+            sysStroke = borderColorNullSec; 
+            textColor = systemTextColor;
             break;
         // Low
         case 8:
-            sysColor = "#93841E";
-            sysStroke = "#60510A";
-            textColor = "#fff";
+            sysColor = colorLowSec ;
+            sysStroke = borderColorLowSec; 
+            textColor = systemTextColor;
             break;
         // High
         case 7:
-            sysColor = "#009F00";
-            sysStroke = "#006B00";
-            textColor = "#fff";
+            sysColor = colorHighSec; 
+            sysStroke = borderColorHighSec; 
+            textColor = systemTextColor;
             break;
          case 6:
-            sysColor = "#0022FF";
-            sysStroke = WormholeEffectColor(system,"#0000FF");
-            if ((sysStroke != "#0000FF") && (!zenMode)) sysStrokeWidth = s(4);
-            textColor = "#FFF";
+            sysColor = colorC6; 
+            sysStroke = WormholeEffectColor(system,borderColorC6);
+            if ((sysStroke != borderColorC6) && (!zenMode)) sysStrokeWidth = s(4);
+            textColor = systemTextColor;
             break;
          case 5:
-            sysColor = "#0044FF";
-            sysStroke = WormholeEffectColor(system,"#0000FF");
-            if ((sysStroke != "#0000FF") && (!zenMode)) sysStrokeWidth = s(4);
-            textColor = "#FFF";
+            sysColor = colorC5; 
+            sysStroke = WormholeEffectColor(system,borderColorC5);
+            if ((sysStroke != borderColorC5) && (!zenMode)) sysStrokeWidth = s(4);
+            textColor = systemTextColor;
             break; 
         case 4:
-            sysColor = "#0066FF";
-            sysStroke = WormholeEffectColor(system,"#0022FF");
-            if ((sysStroke != "#0022FF") && (!zenMode)) sysStrokeWidth = s(4);
-            textColor = "#FFF";
+            sysColor = colorC4; 
+            sysStroke = WormholeEffectColor(system,borderColorC4);
+            if ((sysStroke != borderColorC4) && (!zenMode)) sysStrokeWidth = s(4);
+            textColor = systemTextColor;
             break;
         case 3:
-            sysColor = "#0088FF";
-            sysStroke = WormholeEffectColor(system,"#0044FF");
-            if ((sysStroke != "#0044FF") && (!zenMode)) sysStrokeWidth = s(4);
-            textColor = "#FFF";
+            sysColor = colorC3;
+            sysStroke = WormholeEffectColor(system,borderColorC3);
+            if ((sysStroke != borderColorC3) && (!zenMode)) sysStrokeWidth = s(4);
+            textColor = systemTextColor;
             break;
          case 2:
-            sysColor = "#00AAFF";
-            sysStroke = WormholeEffectColor(system,"#0066FF");
-            if ((sysStroke != "#0066FF") && (!zenMode)) sysStrokeWidth = s(4);
-            textColor = "#FFF";
+            sysColor = colorC2;
+            sysStroke = WormholeEffectColor(system,borderColorC2);
+            if ((sysStroke != borderColorC2) && (!zenMode)) sysStrokeWidth = s(4);
+            textColor = systemTextColor;
             break;
          case 1:
-            sysColor = "#00CDFF";
-            sysStroke = WormholeEffectColor(system,"#0088FF");
-            if ((sysStroke != "#0088FF") && (!zenMode)) sysStrokeWidth = s(4);
-            textColor = "#FFF"; 
+            sysColor = colorC1; 
+            sysStroke = WormholeEffectColor(system,borderColorC1);
+            if ((sysStroke != borderColorC1) && (!zenMode)) sysStrokeWidth = s(4);
+            textColor = systemTextColor; 
             break;
          // Thera
          case 12:
-            sysColor = "#800080";
-            sysStroke = "#7F3939";
-            textColor = "#FFF";
+            sysColor = colorThera; 
+            sysStroke = borderColorThera;
+            textColor = systemTextColor;
             break;
          // Small Ship Hole
          case 13:
-            sysColor = "#FFA500";
-            sysStroke = "#7f5200";
-            textColor = "#000";
+            sysColor = colorSmallShipHole; 
+            sysStroke = borderColorSmallShipHole; 
+            textColor = systemTextColor;
             break;
         default:
-            sysColor = "#F2F4FF";
-            sysStroke = "#0657B9";
-            textColor = "#0974EA";
+            sysColor = "#000";
+            sysStroke = "#fff";
+            textColor = systemTextColor;
             break;
     }
 
 
     if (system.shattered) {
-        sysStroke = "#FFA500";
+        if (shatteredBorderColor != null) {
+            sysStroke = shatteredBorderColor; 
+        }
         if (sysStrokeWidth < s(3)) {
             sysStrokeWidth = s(3);
         }
+        sysStrokeDashArray = "- ";
     }
     var labelFontSize = textFontSize;
     if (zenMode) {
@@ -1268,10 +1298,10 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     }
     if (system.msID === focusMS) {
         if (zenMode) {
-            textColor = "#FFFC00";
+            textColor = textColorSelect_zen; 
             sysStroke = borderColorSelect_zen;
         } else {
-            textColor = "#000";
+            textColor = textColorSelect;
             sysStroke = borderColorSelect;
         }
         sysStrokeDashArray = "--"
@@ -1289,7 +1319,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         "stroke-dasharray": sysStrokeDashArray
     });
     textSysName.attr({fill: textColor, "font-size": labelFontSize, cursor: "pointer"});
-    textPilot.attr({fill: "#fff", "font-size": textFontSize-s(1), cursor: "pointer"});
+    textPilot.attr({fill: pilotColor, "font-size": textFontSize-s(1), cursor: "pointer"});
 
 
 
