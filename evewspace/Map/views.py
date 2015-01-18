@@ -440,7 +440,7 @@ def mark_scanned(request, map_id, ms_id):
 # noinspection PyUnusedLocal
 @login_required()
 @require_map_permission(permission=2)
-def set_importance(id, ms_id):
+def set_importance(request,id, ms_id):
     """Takes a POST request from AJAX with a system ID and marks that system
     as scanned.
 
