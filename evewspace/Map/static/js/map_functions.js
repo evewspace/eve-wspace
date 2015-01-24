@@ -33,7 +33,8 @@ var strokeWidth = 3; // The width in px of the line connecting wormholes
 var interestWidth = 3; // The width in px of the line connecting wormholes when interest is on
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map
 var sliceLastChars = false; // Friendly name should show last 8 chars if over 8, shows first 8 if false
-var highlightActivePilots = true; // Draw a notification ring around systems with active pilots.
+var showPilotList = true; // Show pilot names under systems
+var highlightActivePilots = false; // Draw a notification ring around systems with active pilots.
 var goodColor = "#00FF00"; // Color of good status connections
 var goodColor_zen = "#999"; // Color of good status connections
 var badColor = "#FF0000"; // Color of first shrink connections
@@ -103,6 +104,16 @@ $(document).ready(function () {
         $('#btnKspaceIGB').text('Map K-Space Connections: ON');
     } else {
         $('#btnKspaceIGB').text('Map K-Space Connections: OFF');
+    }
+    if (zenMode) {
+        $('#btnZen').text("Zen: ON");
+    } else {
+        $('#btnZen').text("Zen: OFF");
+    }
+    if (showPilotList) {
+        $('#btnPilotList').text("Pilot List: ON");
+    } else {
+        $('#btnPilotList').text("Pilot List: OFF");
     }
 });
 
@@ -1030,6 +1041,11 @@ function DrawSystem(system) {
             sysName = friendly + classString;
         }
     }
+    if ((!showPilotList) && (system.activePilots > 0)) {
+        //no pilot list, add pilot counter to node name
+        sysName += "\n(" + system.activePilots + ")";
+    }
+
     var pilotText = "";
     var pilotsadded = 0;
     if (system.activePilots) {
@@ -1041,8 +1057,8 @@ function DrawSystem(system) {
                 pilotsadded++;
                 if (pilotText != "") pilotText += ",";
                 pilotText += pilot;
-                if (pilotText.length > 18){
-                    if  (system.pilot_list.length > pilotsadded) {
+                if (pilotText.length > 18) {
+                    if  (system.pilot_list_length > pilotsadded) {
                         pilotText += "+" + (system.pilot_list.length - pilotsadded);
                     }
                     break;
@@ -1054,8 +1070,8 @@ function DrawSystem(system) {
     if (system.LevelX != null && system.LevelX > 0) {
         var childSys = paper.ellipse(sysX, sysY, s(40), s(28));
         if (system.activePilots > 0 && highlightActivePilots === true) {
-            //var notificationRing = paper.ellipse(sysX, sysY, s(45), s(33));
-            //notificationRing.attr({'stroke-dasharray': '--', 'stroke-width': s(1), 'stroke': '#ffffff'});
+            var notificationRing = paper.ellipse(sysX, sysY, s(45), s(33));
+            notificationRing.attr({'stroke-dasharray': '--', 'stroke-width': s(1), 'stroke': '#ffffff'});
         }
         childSys.msID = system.msID;
         childSys.whID = system.whID;
@@ -1077,10 +1093,14 @@ function DrawSystem(system) {
             childSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        pilotText = paper.text(sysX, sysY+s(32), pilotText);
-        pilotText.msID = system.msID;
-        pilotText.sysID = system.sysID;
-        pilotText.click(onSysClick);
+        if (showPilotList) {
+            pilotText = paper.text(sysX, sysY+s(32), pilotText);
+            pilotText.msID = system.msID;
+            pilotText.sysID = system.sysID;
+            pilotText.click(onSysClick);
+        } else {
+            pilotText = null;
+        }
         ColorSystem(system, childSys, sysText, pilotText);
         childSys.collapsed = system.collapsed;
         objSystems.push(childSys);
@@ -1121,10 +1141,14 @@ function DrawSystem(system) {
             rootSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        pilotText = paper.text(sysX, sysY+s(35), pilotText);
-        pilotText.msID = system.msID;
-        pilotText.sysID = system.sysID;
-        pilotText.click(onSysClick);
+        if (showPilotList) {
+            pilotText = paper.text(sysX, sysY+s(35), pilotText);
+            pilotText.msID = system.msID;
+            pilotText.sysID = system.sysID;
+            pilotText.click(onSysClick);
+        } else {
+            pilotText = null;
+        }
         ColorSystem(system, rootSys, sysText, pilotText);
         objSystems.push(rootSys);
     }
@@ -1337,7 +1361,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         "stroke-dasharray": sysStrokeDashArray
     });
     textSysName.attr({fill: textColor, "font-size": labelFontSize, cursor: "pointer"});
-    textPilot.attr({fill: pilotColor, "font-size": textFontSize-s(1), cursor: "pointer"});
+    if (textPilot != null) textPilot.attr({fill: pilotColor, "font-size": textFontSize-s(1), cursor: "pointer"});
 
 
 
@@ -1621,8 +1645,21 @@ function scale(factor) {
 function togglezen() {
     if (zenMode == 1) {
         zenMode = 0;
+        $('#btnZen').text("Zen: OFF");
     } else {
         zenMode = 1;
+        $('#btnZen').text("Zen: ON");
+    }
+    RefreshMap();
+}
+
+function togglepilotlist() {
+    if (showPilotList == 1) {
+        showPilotList = 0;
+        $('#btnPilotList').text("Pilot List: OFF");
+    } else {
+        showPilotList = 1;
+        $('#btnPilotList').text("Pilot List: ON");
     }
     RefreshMap();
 }
