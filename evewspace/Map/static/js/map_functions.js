@@ -1656,9 +1656,11 @@ function togglezen() {
 function togglepilotlist() {
     if (showPilotList == 1) {
         showPilotList = 0;
+        highlightActivePilots = 1;
         $('#btnPilotList').text("Pilot List: OFF");
     } else {
         showPilotList = 1;
+        highlightActivePilots = 0;
         $('#btnPilotList').text("Pilot List: ON");
     }
     RefreshMap();
