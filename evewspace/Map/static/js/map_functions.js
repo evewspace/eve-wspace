@@ -1643,24 +1643,24 @@ function scale(factor) {
 }
 
 function togglezen() {
-    if (zenMode == 1) {
-        zenMode = 0;
+    if (zenMode == true) {
+        zenMode = false;
         $('#btnZen').text("Zen: OFF");
     } else {
-        zenMode = 1;
+        zenMode = true;
         $('#btnZen').text("Zen: ON");
     }
     RefreshMap();
 }
 
 function togglepilotlist() {
-    if (showPilotList == 1) {
-        showPilotList = 0;
-        highlightActivePilots = 1;
+    if (showPilotList == true) {
+        showPilotList = false;
+        highlightActivePilots = true;
         $('#btnPilotList').text("Pilot List: OFF");
     } else {
-        showPilotList = 1;
-        highlightActivePilots = 0;
+        showPilotList = true;
+        highlightActivePilots = false;
         $('#btnPilotList').text("Pilot List: ON");
     }
     RefreshMap();
