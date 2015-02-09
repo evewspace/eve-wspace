@@ -447,14 +447,15 @@ def set_importance(request,map_id, ms_id):
     """
     if request.is_ajax():
         map_system = get_object_or_404(MapSystem, pk=ms_id)
-        imp = request.REQUEST.get('importance',0)
+        imp = int(request.REQUEST.get('importance',0))
         if imp >= 0 and imp <= 2:
             map_system.system.importance = imp
             map_system.system.save()
             if imp == 1:
                 map_system.map.add_log(request.user, "Danger in %s (%s)"
                                     % (map_system.system.name,
-                                        map_system.friendlyname))
+                                        map_system.friendlyname),
+                                    visible=True)
         return HttpResponse()
     else:
         raise PermissionDenied
