@@ -3,8 +3,10 @@
 {% block scripts %}
     <script type="text/javascript" src="{{STATIC_URL}}js/raphael-min.js"></script>
     <script type="text/javascript" src="{{STATIC_URL}}js/map_functions.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/bootstrap-slider.js"></script>
     <link rel="stylesheet" href="{{STATIC_URL}}css/map.css" type="text/css" />
     <link rel="stylesheet" href="{{STATIC_URL}}css/map-slate.css" type="text/css" />
+    <link rel="stylesheet" href="{{STATIC_URL}}css/slider.css" type="text/css" />
     {% if is_igb %}
     <script type="text/javascript">var is_igb = true;</script>
     {% else %}
@@ -26,19 +28,9 @@
     {% endif %}
     <button id='btnPilotList' class='btn btn-mini btn-info' onclick="togglepilotlist()">Pilot List</button>
     <button id='btnExportMap' class='btn btn-mini btn-info' onclick='GetExportMap();'>Export</button>
-    <br />
-    <button id='btnZen' class='btn btn-mini btn-info' onclick="togglezen()">Zen</button>
-    <button class='btn btn-mini btn-info' onclick="scale(0.25)">25%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(0.5)">50%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(0.6)">60%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(0.7)">70%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(0.8)">80%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(0.9)">90%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(1)">100%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(1.1)">110%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(1.25)">125%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(1.5)">150%</button>
-    <button class='btn btn-mini btn-info' onclick="scale(2)">200%</button>
+    <button id='btnZen' class='btn btn-mini btn-info' onclick="togglezen()">Zen</button> 
+    <span style="margin-right: 5px; margin-left: 5px;"></span>
+    <input id='scaleSlider' type="text" class="slider" value="" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
 </div>
 <div id="mapDiv" class="mapDiv">
 </div>

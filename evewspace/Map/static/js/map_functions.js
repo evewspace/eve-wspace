@@ -93,6 +93,9 @@ function s(n) { //apply scaling factor, short function name so it's quick to typ
 }
 
 $(document).ready(function () {
+    $('.slider').slider().on('slide', function(ev) {
+        scale(ev.value);
+    });
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
     if (autoRefresh === true) {
         refreshTimerID = setInterval(RefreshMap, 15000);
@@ -1033,7 +1036,7 @@ function DrawSystem(system) {
         }
         friendly = system.Friendly + "\n";
     }
-    var sysName = friendly + system.Name + " " + classString + effectString + "";
+    var sysName = friendly + system.Name + "\n" + classString + effectString + "(" + system.activePilots + ")";
     if (zenMode) {
         if ((classString == "H") || (classString == "N") || (classString == "L") || (classString == "T")) {
             sysName = friendly + system.Name.substr(0,6);
@@ -1041,11 +1044,6 @@ function DrawSystem(system) {
             sysName = friendly + classString;
         }
     }
-    if ((!showPilotList) && (system.activePilots > 0)) {
-        //no pilot list, add pilot counter to node name
-        sysName += "\n(" + system.activePilots + ")";
-    }
-
     var pilotText = "";
     var pilotsadded = 0;
     if (system.activePilots) {
