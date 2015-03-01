@@ -122,7 +122,7 @@
     "fields": {
         "name": "C248", 
         "destination": 9, 
-        "source": "NH", 
+        "source": 6, 
         "jumpmass": 1800000000, 
         "target": "Nullsec", 
         "lifetime": 24, 
@@ -135,7 +135,7 @@
     "fields": {
         "name": "C391", 
         "destination": 8, 
-        "source": "NH", 
+        "source": 6, 
         "jumpmass": 1800000000, 
         "target": "Lowsec", 
         "lifetime": 24, 
@@ -1089,6 +1089,19 @@
         "target": "Thera", 
         "lifetime": 16, 
         "maxmass": 750000000
+    }
+},
+{
+    "pk": 152, 
+    "model": "Map.wormholetype", 
+    "fields": {
+        "name": "F355", 
+        "destination": 12, 
+        "source": 1, 
+        "jumpmass": 20000000, 
+        "target": "Thera", 
+        "lifetime": 16, 
+        "maxmass": 100000000
     }
 },
 {
