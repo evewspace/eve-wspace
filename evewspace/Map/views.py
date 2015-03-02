@@ -1105,6 +1105,26 @@ def _process_user_display_settings(request, user):
     silent_mapping.save()
     render_collapsed.save()
 
+    saved = True
+
+    return TemplateResponse(
+        request, 'display_settings.html',
+        {
+            'zen_mode': zen_mode.value,
+            'pilot_list': pilot_list.value,
+            'details_combined': details_combined.value,
+            'render_tags': render_tags.value,
+            'highlight_active': highlight_active.value,
+            'auto_refresh': auto_refresh.value,
+            'kspace_mapping': kspace_mapping.value,
+            'silent_mapping': silent_mapping.value,
+            'render_collapsed': render_collapsed.value,
+            'saved': saved,
+            'context_user': user
+         }
+    )
+
+
 def display_settings(request, user=None):
     """
     Returns and processes the display settings section.
@@ -1126,7 +1146,7 @@ def display_settings(request, user=None):
     saved = False
     if request.method == "POST":
         if user:
-            _process_user_display_settings(request, user)
+            return _process_user_display_settings(request, user)
         else:
             zen_mode.value = request.POST.get('zen_mode', 0)
             pilot_list.value = request.POST.get('pilot_list', 0)

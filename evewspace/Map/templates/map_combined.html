@@ -12,7 +12,23 @@
     {% else %}
     <script type="text/javascript">var is_igb = false;</script>
     {% endif %}
-    <script type="text/javascript">var ajax_image = "<img src= '{{STATIC_URL}}images/loading.gif'></img>"; </script>
+    <script type="text/javascript">
+        var ajax_image = "<img src= '{{STATIC_URL}}images/loading.gif'></img>";
+        var zenMode = {% if user.get_settings.MAP_ZEN_MODE == '1' %}true{% else %}false{% endif %};
+        var showPilotList = {% if user.get_settings.MAP_PILOT_LIST == '1' %}true{% else %}false{% endif %};
+        var renderWormholeTags = {% if user.get_settings.MAP_RENDER_WH_TAGS == '1' %}true{% else %}false{% endif %};
+        var scalingFactor = {{user.get_settings.MAP_SCALING_FACTOR}};
+        var defaultScalingFactor = {{user.get_settings.MAP_SCALING_FACTOR}};
+        var autoRefresh = {% if user.get_settings.MAP_AUTO_REFRESH == '1' %}true{% else %}false{% endif %};
+        var kspaceIGBMapping = {% if user.get_settings.MAP_KSPACE_MAPPING == '1' %}true{% else %}false{% endif %};
+        var highlightActivePilots  = {% if user.get_settings.MAP_HIGHLIGHT_ACTIVE == '1' %}true{% else %}false{% endif %};
+        var silentSystem = {% if user.get_settings.MAP_SILENT_MAPPING == '1' %}true{% else %}false{% endif %};
+        var renderCollapsedConnections = {% if user.get_settings.MAP_RENDER_COLLAPSED == '1' %}true{% else %}false{% endif %};
+        $(document).ready(function() {
+                $('#mapDiv').html(ajax_image);
+                scale({{user.get_settings.MAP_SCALING_FACTOR}});
+                });
+    </script>
 {% endblock %}
 {% block contentheader %}
 <div id="scrollmenu">
