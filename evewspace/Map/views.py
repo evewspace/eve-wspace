@@ -67,7 +67,10 @@ def get_map(request, map_id):
         'map': current_map,
         'access': current_map.get_permission(request.user),
     }
-    return TemplateResponse(request, 'map.html', context)
+    template = 'map.html'
+    if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
+        template = 'map_combined.html'
+    return TemplateResponse(request, template, context)
 
 
 @login_required
@@ -322,8 +325,10 @@ def system_details(request, map_id, ms_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-
-    return render(request, 'system_details.html',
+    template = 'system_details.html'
+    if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
+        template = 'system_details_combined.html'
+    return render(request, template,
             get_system_context(ms_id, request.user))
 
 

@@ -12,21 +12,13 @@
     {% else %}
     <script type="text/javascript">var is_igb = false;</script>
     {% endif %}
-    <script type="text/javascript">
-        var ajax_image = "<img src= '{{STATIC_URL}}images/loading.gif'></img>";
-        var zenMode = {% if user.get_settings.MAP_ZEN_MODE == '1' %}true{% else %}false{% endif %};
-        var showPilotList = {% if user.get_settings.MAP_PILOT_LIST == '1' %}true{% else %}false{% endif %};
-        var renderWormholeTags = {% if user.get_settings.MAP_RENDER_WH_TAGS == '1' %}true{% else %}false{% endif %};
-        var scalingFactor = {{user.get_settings.MAP_SCALING_FACTOR}};
-        var defaultScalingFactor = {{user.get_settings.MAP_SCALING_FACTOR}};
-        var autoRefresh = {% if user.get_settings.MAP_AUTO_REFRESH == '1' %}true{% else %}false{% endif %};
-        var kspaceIGBMapping = {% if user.get_settings.MAP_KSPACE_MAPPING == '1' %}true{% else %}false{% endif %};
-        var highlightActivePilots  = {% if user.get_settings.MAP_HIGHLIGHT_ACTIVE == '1' %}true{% else %}false{% endif %};
-        var silentSystem = {% if user.get_settings.MAP_SILENT_MAPPING == '1' %}true{% else %}false{% endif %};
-        var renderCollapsedConnections = {% if user.get_settings.MAP_RENDER_COLLAPSED == '1' %}true{% else %}false{% endif %};
-    </script>
+    <script type="text/javascript">var ajax_image = "<img src= '{{STATIC_URL}}images/loading.gif'></img>"; </script>
 {% endblock %}
 {% block contentheader %}
+<div id="scrollmenu">
+<div id="backtotop" onclick="scroll(0,0);"></div>
+<div id="tobuttons" onclick="window.location.href = '#sysInfoDiv';"></div>
+</div>
 <div class="btn-toolbar">
     <button class='btn btn-mini' onclick="RefreshMap();"><i class="icon-refresh"></i> Refresh</button>
     <button id="btnRefreshToggle" class="btn btn-mini btn-info" onclick="ToggleAutoRefresh();">Auto Refresh: ON</button>
@@ -38,7 +30,7 @@
     <button id='btnExportMap' class='btn btn-mini btn-info' onclick='GetExportMap();'>Export</button>
     <button id='btnZen' class='btn btn-mini btn-info' onclick="togglezen()">Zen</button> 
     <span style="margin-right: 5px; margin-left: 5px;"></span>
-    <input id='scaleSlider' type="text" class="slider" value="" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="{{user.get_settings.MAP_SCALING_FACTOR}}" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
+    <input id='scaleSlider' type="text" class="slider" value="" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
 </div>
 <div id="mapDiv" class="mapDiv">
 </div>
@@ -61,7 +53,7 @@
 </div>
 {% endblock %}
 {% block content %}
-<div id="sysInfoDiv" class="sysInfoDiv">
+<div id="sysInfoDiv" class="sysInfoCombinedDiv sysInfoDiv">
     <a name="sysInfo"></a>
 </div>
 {% endblock %}

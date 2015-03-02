@@ -221,7 +221,7 @@ textarea
 #sysInfoDiv {
     margin-left: 15px;
 }
-#sysInfoDiv h4 {
+.sysInfoCombinedDiv h4 {
     border-top: 1px solid #ccc;
     clear: both;
     display: block;
