@@ -56,9 +56,12 @@ class Corporation(models.Model):
 
 class ConfigEntry(models.Model):
     """A configuration setting that may be changed at runtime."""
-    name = models.CharField(max_length=32, unique=True)
+    name = models.CharField(max_length=32)
     value = models.CharField(max_length=255, null=True, blank=True)
     user = models.ForeignKey(User, related_name='settings', null=True, blank=True)
+
+    class Meta:
+        unique_together = ('name', 'user')
 
 
 class MarketGroup(models.Model):

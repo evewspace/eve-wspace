@@ -33,6 +33,7 @@ from Map.models import *
 from Map import utils, signals
 from core.utils import get_config
 from POS.models import POS
+from core.models import ConfigEntry
 
 # Decorator to check map permissions. Takes request and map_id
 # Permissions are 0 = None, 1 = View, 2 = Change
@@ -1055,45 +1056,100 @@ def general_settings(request):
          'escdowntimes': escalation_burn.value}
     )
 
+def _process_user_display_settings(request, user):
+    zen_mode = get_config("MAP_ZEN_MODE", user)
+    pilot_list = get_config("MAP_PILOT_LIST", user)
+    details_combined = get_config("MAP_DETAILS_COMBINED", user)
+    render_tags = get_config("MAP_RENDER_WH_TAGS", user)
+    highlight_active = get_config("MAP_HIGHLIGHT_ACTIVE", user)
+    auto_refresh = get_config("MAP_AUTO_REFRESH", user)
+    kspace_mapping = get_config('MAP_KSPACE_MAPPING', user)
+    silent_mapping = get_config("MAP_SILENT_MAPPING", user)
+    render_collapsed = get_config("MAP_RENDER_COLLAPSED", user)
 
-@permission_required('Map.map_admin')
-def display_settings(request):
+    # Create seperate configs for the user if they are falling back to defaults
+    if not zen_mode.user:
+        zen_mode = ConfigEntry(name=zen_mode.name, user=user)
+    if not pilot_list.user:
+        pilot_list = ConfigEntry(name=pilot_list.name, user=user)
+    if not details_combined.user:
+        details_combined = ConfigEntry(name=details_combined.name, user=user)
+    if not render_tags.user:
+        render_tags = ConfigEntry(name=render_tags.name, user=user)
+    if not highlight_active.user:
+        highlight_active = ConfigEntry(name=highlight_active.name, user=user)
+    if not auto_refresh.user:
+        auto_refresh = ConfigEntry(name=auto_refresh.name, user=user)
+    if not kspace_mapping.user:
+        kspace_mapping = ConfigEntry(name=kspace_mapping.name, user=user)
+    if not silent_mapping.user:
+        silent_mapping = ConfigEntry(name=silent_mapping.name, user=user)
+    if not render_collapsed.user:
+        render_collapsed = ConfigEntry(name=render_collapsed.name, user=user)
+    zen_mode.value = request.POST.get('zen_mode', 0)
+    pilot_list.value = request.POST.get('pilot_list', 0)
+    details_combined.value = request.POST.get('details_combined', 0)
+    render_tags.value = request.POST.get('render_tags', 0)
+    highlight_active.value = request.POST.get('highlight_active', 0)
+    auto_refresh.value = request.POST.get('auto_refresh', 0)
+    kspace_mapping.value = request.POST.get('kspace_mapping', 0)
+    silent_mapping.value = request.POST.get('silent_mapping', 0)
+    render_collapsed.value = request.POST.get('render_collapsed', 0)
+    zen_mode.save()
+    pilot_list.save()
+    details_combined.save()
+    render_tags.save()
+    highlight_active.save()
+    auto_refresh.save()
+    kspace_mapping.save()
+    silent_mapping.save()
+    render_collapsed.save()
+
+def display_settings(request, user=None):
     """
     Returns and processes the display settings section.
     """
-    zen_mode = get_config("MAP_ZEN_MODE", None)
-    pilot_list = get_config("MAP_PILOT_LIST", None)
-    details_combined = get_config("MAP_DETAILS_COMBINED", None)
-    render_tags = get_config("MAP_RENDER_WH_TAGS", None)
-    scaling_factor = get_config("MAP_SCALING_FACTOR", None)
-    highlight_active = get_config("MAP_HIGHLIGHT_ACTIVE", None)
-    auto_refresh = get_config("MAP_AUTO_REFRESH", None)
-    kspace_mapping = get_config('MAP_KSPACE_MAPPING', None)
-    silent_mapping = get_config("MAP_SILENT_MAPPING", None)
-    render_collapsed = get_config("MAP_RENDER_COLLAPSED", None)
-
+    if not user and not request.user.has_perm('Map.map_admin'):
+        raise PermissionDenied
+    if user:
+        user = request.user
+    zen_mode = get_config("MAP_ZEN_MODE", user)
+    pilot_list = get_config("MAP_PILOT_LIST", user)
+    details_combined = get_config("MAP_DETAILS_COMBINED", user)
+    render_tags = get_config("MAP_RENDER_WH_TAGS", user)
+    highlight_active = get_config("MAP_HIGHLIGHT_ACTIVE", user)
+    auto_refresh = get_config("MAP_AUTO_REFRESH", user)
+    scaling_factor = get_config("MAP_SCALING_FACTOR", user)
+    kspace_mapping = get_config('MAP_KSPACE_MAPPING', user)
+    silent_mapping = get_config("MAP_SILENT_MAPPING", user)
+    render_collapsed = get_config("MAP_RENDER_COLLAPSED", user)
+    saved = False
     if request.method == "POST":
-        zen_mode.value = request.POST.get('zen_mode', 0)
-        pilot_list.value = request.POST.get('pilot_list', 0)
-        details_combined.value = request.POST.get('details_combined', 0)
-        render_tags.value = request.POST.get('render_tags', 0)
-        scaling_factor.value = request.POST.get('scaling_factor', 1)
-        highlight_active.value = request.POST.get('highlight_active', 0)
-        auto_refresh.value = request.POST.get('auto_refresh', 0)
-        kspace_mapping.value = request.POST.get('kspace_mapping', 0)
-        silent_mapping.value = request.POST.get('silent_mapping', 0)
-        render_collapsed.value = request.POST.get('render_collapsed', 0)
-        zen_mode.save()
-        pilot_list.save()
-        details_combined.save()
-        render_tags.save()
-        scaling_factor.save()
-        highlight_active.save()
-        auto_refresh.save()
-        kspace_mapping.save()
-        silent_mapping.save()
-        render_collapsed.save()
-        return HttpResponse()
+        if user:
+            _process_user_display_settings(request, user)
+        else:
+            zen_mode.value = request.POST.get('zen_mode', 0)
+            pilot_list.value = request.POST.get('pilot_list', 0)
+            details_combined.value = request.POST.get('details_combined', 0)
+            render_tags.value = request.POST.get('render_tags', 0)
+            scaling_factor.value = request.POST.get('scaling_factor', 1)
+            highlight_active.value = request.POST.get('highlight_active', 0)
+            auto_refresh.value = request.POST.get('auto_refresh', 0)
+            kspace_mapping.value = request.POST.get('kspace_mapping', 0)
+            silent_mapping.value = request.POST.get('silent_mapping', 0)
+            render_collapsed.value = request.POST.get('render_collapsed', 0)
+            zen_mode.save()
+            pilot_list.save()
+            details_combined.save()
+            render_tags.save()
+            scaling_factor.save()
+            highlight_active.save()
+            auto_refresh.save()
+            kspace_mapping.save()
+            silent_mapping.save()
+            render_collapsed.save()
+        saved = True
+
     return TemplateResponse(
         request, 'display_settings.html',
         {
@@ -1107,6 +1163,8 @@ def display_settings(request):
             'kspace_mapping': kspace_mapping.value,
             'silent_mapping': silent_mapping.value,
             'render_collapsed': render_collapsed.value,
+            'saved': saved,
+            'context_user': user
          }
     )
 

@@ -80,8 +80,13 @@ function SaveDisplaySettings(){
         type: "POST",
         data: $('#mapGlobalDisplayForm').serialize(),
         url: "/map/settings/display/",
-        success: function(){GetDisplaySettings();},
-        error: function(){alert("Invalid values, please make sure only integers are used.");}
+        success: function(data){
+            $("#globalDisplayDiv").html(data);
+            $('.slider').slider();
+        },
+        error: function(){
+            alert("Invalid values, please make sure only integers are used.");
+            }
     });
 }
 

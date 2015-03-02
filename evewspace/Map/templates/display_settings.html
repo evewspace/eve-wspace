@@ -1,4 +1,4 @@
-<form id="mapGlobalDisplayForm" action="/map/settings/permissions/" method="POST" class='form form-horizontal'>
+<form {% if not context_user %}id="mapGlobalDisplayForm"{% else %}id="mapDisplayForm"{% endif %} action="/map/settings/permissions/" method="POST" class='form form-horizontal'>
     {% csrf_token %}
     {% if saved %}
         <div class='alert alert-success' style='margin-left: 200px; width: 250px;'>
@@ -33,12 +33,14 @@
             <input type='radio' name='render_tags' value='0' {% if render_tags == '0' %}checked='checked'{% endif %} /> Off
         </div>
     </div>
+    {% if not context_user %}
     <div class='control-group'>
         <label class='control-label' for="scalingFactor">Scaling Factor:</label>
         <div class='controls'>
             <input id='scalingFactor' name='scaling_factor' type="text" class="slider" value="" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="{{scaling_factor}}" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
         </div>
     </div>
+    {% endif %}
     <div class='control-group'>
         <label class='control-label' for="highlightActive">Highlight Active Pilots:</label>
         <div class='controls'>
@@ -75,12 +77,20 @@
         </div>
     </div>
 
-    <input type="submit" class="btn btn-primary" value="Save Settings">
+    <input type="submit" class="btn btn-primary" value="Save Display Settings">
 </form>
 <script type="text/javascript">
-    $('#mapGlobalDisplayForm').submit(function(e){
-            e.preventDefault();
-            SaveDisplaySettings();
-            return false;
-            });
+    {% if context_user %}
+        $('#mapDisplayForm').submit(function(e){
+                e.preventDefault();
+                SaveProfDisplaySettings();
+                return false;
+                });
+    {% else %}
+        $('#mapGlobalDisplayForm').submit(function(e){
+                e.preventDefault();
+                SaveDisplaySettings();
+                return false;
+                });
+    {% endif %}
 </script>
