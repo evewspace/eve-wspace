@@ -1057,38 +1057,59 @@ def general_settings(request):
 
 
 @permission_required('Map.map_admin')
-def sites_settings(request):
+def display_settings(request):
     """
-    Returns the site spawns section.
+    Returns and processes the display settings section.
     """
-    return TemplateResponse(request, 'spawns_settings.html',
-                            {'spawns': SiteSpawn.objects.all()})
+    zen_mode = get_config("MAP_ZEN_MODE", None)
+    pilot_list = get_config("MAP_PILOT_LIST", None)
+    details_combined = get_config("MAP_DETAILS_COMBINED", None)
+    render_tags = get_config("MAP_RENDER_WH_TAGS", None)
+    scaling_factor = get_config("MAP_SCALING_FACTOR", None)
+    highlight_active = get_config("MAP_HIGHLIGHT_ACTIVE", None)
+    auto_refresh = get_config("MAP_AUTO_REFRESH", None)
+    kspace_mapping = get_config('MAP_KSPACE_MAPPING', None)
+    silent_mapping = get_config("MAP_SILENT_MAPPING", None)
+    render_collapsed = get_config("MAP_RENDER_COLLAPSED", None)
 
+    if request.method == "POST":
+        zen_mode.value = request.POST.get('zen_mode', 0)
+        pilot_list.value = request.POST.get('pilot_list', 0)
+        details_combined.value = request.POST.get('details_combined', 0)
+        render_tags.value = request.POST.get('render_tags', 0)
+        scaling_factor.value = request.POST.get('scaling_factor', 1)
+        highlight_active.value = request.POST.get('highlight_active', 0)
+        auto_refresh.value = request.POST.get('auto_refresh', 0)
+        kspace_mapping.value = request.POST.get('kspace_mapping', 0)
+        silent_mapping.value = request.POST.get('silent_mapping', 0)
+        render_collapsed.value = request.POST.get('render_collapsed', 0)
+        zen_mode.save()
+        pilot_list.save()
+        details_combined.save()
+        render_tags.save()
+        scaling_factor.save()
+        highlight_active.save()
+        auto_refresh.save()
+        kspace_mapping.save()
+        silent_mapping.save()
+        render_collapsed.save()
+        return HttpResponse()
+    return TemplateResponse(
+        request, 'display_settings.html',
+        {
+            'zen_mode': zen_mode.value,
+            'pilot_list': pilot_list.value,
+            'details_combined': details_combined.value,
+            'render_tags': render_tags.value,
+            'scaling_factor': scaling_factor.value,
+            'highlight_active': highlight_active.value,
+            'auto_refresh': auto_refresh.value,
+            'kspace_mapping': kspace_mapping.value,
+            'silent_mapping': silent_mapping.value,
+            'render_collapsed': render_collapsed.value,
+         }
+    )
 
-@permission_required('Map.map_admin')
-def add_spawns(request):
-    """
-    Adds a site spawn.
-    """
-    return HttpResponse()
-
-
-# noinspection PyUnusedLocal
-@permission_required('Map.map_admin')
-def delete_spawns(request, spawn_id):
-    """
-    Deletes a site spawn.
-    """
-    return HttpResponse()
-
-
-# noinspection PyUnusedLocal
-@permission_required('Map.map_admin')
-def edit_spawns(request, spawn_id):
-    """
-    Alters a site spawn.
-    """
-    return HttpResponse()
 
 
 def destination_settings(request, user=None):
@@ -1133,41 +1154,6 @@ def delete_destination(request, dest_id):
     if destination.user and not request.user == destination.user:
         raise PermissionDenied
     destination.delete()
-    return HttpResponse()
-
-
-@permission_required('Map.map_admin')
-def sigtype_settings(request):
-    """
-    Returns the signature types section.
-    """
-    return TemplateResponse(request, 'sigtype_settings.html',
-                            {'sigtypes': SignatureType.objects.all()})
-
-
-# noinspection PyUnusedLocal
-@permission_required('Map.map_admin')
-def edit_sigtype(request, sigtype_id):
-    """
-    Alters a signature type.
-    """
-    return HttpResponse()
-
-
-@permission_required('Map.map_admin')
-def add_sigtype(request):
-    """
-    Adds a signature type.
-    """
-    return HttpResponse()
-
-
-# noinspection PyUnusedLocal
-@permission_required('Map.map_admin')
-def delete_sigtype(request, sigtype_id):
-    """
-    Deletes a signature type.
-    """
     return HttpResponse()
 
 

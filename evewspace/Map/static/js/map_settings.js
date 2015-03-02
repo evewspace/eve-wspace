@@ -17,8 +17,7 @@ $(document).ready(function(){
     GetGeneralSettings();
     GetDestinationSettings();
     GetPermissionSettings();
-    GetSigTypeSettings();
-    GetSiteSpawnSettings();
+    GetDisplaySettings();
 });
 
 function GetGeneralSettings(){
@@ -62,31 +61,30 @@ function GetPermissionSettings(){
     });
 }
 
-function GetSigTypeSettings(){
+function GetDisplaySettings(){
     $.ajax({
         type: "GET",
-        url: "/map/settings/sigtypes/",
+        url: "/map/settings/display/",
         success: function(data){
-            $("#sigTypesDiv").html(data);
+            $("#globalDisplayDiv").html(data);
+            $('.slider').slider();
         },
         error: function(data){
-            alert("There was an error getting the signature types settings.");
+            alert("There was an error getting the global display settings.");
         }
     });
 }
 
-function GetSiteSpawnSettings(){
+function SaveDisplaySettings(){
     $.ajax({
-        type: "GET",
-        url: "/map/settings/sitespawns/",
-        success: function(data){
-            $("#siteSpawnsDiv").html(data);
-        },
-        error: function(data){
-            alert("There was an error getting the site spawn settings.");
-        }
+        type: "POST",
+        data: $('#mapGlobalDisplayForm').serialize(),
+        url: "/map/settings/display/",
+        success: function(){GetDisplaySettings();},
+        error: function(){alert("Invalid values, please make sure only integers are used.");}
     });
 }
+
 
 function GetMapSettings(mapID){
     $.ajax({

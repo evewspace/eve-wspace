@@ -75,17 +75,13 @@ sigtypepatterns = patterns('Map.views',
 
 settingspatterns = patterns('Map.views',
         url(r'^general/$', 'general_settings'),
-        url(r'^sitespawns/$', 'sites_settings'),
         url(r'^permissions/$', 'global_permissions'),
-        url(r'^sitespawns/add/$', 'add_spawns'),
-        url(r'^sitespawns/(?P<spawn_id>\d+)/', include(spawnspatterns)),
         url(r'^destinations/$', 'destination_settings'),
+        url(r'^display/$', 'display_settings'),
         url(r'^user-destinations/$', 'destination_settings', {'user': True}),
         url(r'^user-destinations/new/$', 'add_personal_destination'),
         url(r'^destinations/new/$', 'add_destination'),
         url(r'^destinations/(?P<dest_id>\d+)/delete/$', 'delete_destination'),
-        url(r'^sigtypes/$', 'sigtype_settings'),
-        url(r'^sigtypes/(?P<sigtype_id>\d+)/', include(sigtypepatterns)),
         )
 
 urlpatterns = patterns('Map.views',

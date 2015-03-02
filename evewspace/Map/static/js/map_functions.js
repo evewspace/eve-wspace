@@ -125,11 +125,6 @@ $(document).ready(function () {
     }
 });
 
-$(document).ready(function () {
-    $('#mapDiv').html(ajax_image);
-    RefreshMap();
-});
-
 
 //Make sure timers stop when unloading the page
 $(document).ready(function () {
