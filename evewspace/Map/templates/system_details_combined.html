@@ -1,12 +1,13 @@
 {% load humanize %}
 {% include 'system_menu.html' %}
 <ul class="nav nav-pills" id="sysInfoTab">
-    <li class="active"><a href="#sysDetails" data-toggle='tab'>Details</a></li>
-    <li><a href="#sigsPanel" data-toggle='tab'>Signatures ({{mapsys.system.signatures.count}})</a></li>
-    <li><a href="#activePlayerPanel" data-toggle='tab'>Pilots ({{locations|length}})</a></li>
-    <li><a href="#systemPosPanel" data-toggle='tab'>Starbases ({{mapsys.system.poses.count}})</a></li>
+    <li class="active"><a href="#sysDetails">Details</a></li>
+    <li><a href="#sigsPanel">Signatures ({{mapsys.system.signatures.count}})</a></li>
+    <li><a href="#activePlayerPanel">Pilots ({{locations|length}})</a></li>
+    <li><a href="#systemPosPanel">Starbases ({{mapsys.system.poses.count}})</a></li>
 </ul>
-<div id="sysTabHolder" class="well tab-content">
+<div id="sysTabHolder" class="well"> <!-- removed tab-content , no tabbing -->
+<a name="sysDetails"></a>
 <div id="sysDetails" class="tab-pane active">
 <div id="sysPanelHeader" class="systemPanelHeader row">
     <h4>{% if can_edit %}<i title="Edit Info" class="icon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %}System Details: {{mapsys.system.name}} </h4>
@@ -120,6 +121,7 @@
      
 </div>
 </div>
+  <a name="sigsPanel"></a>
   <div id="sigsPanel" class="sigsPanel tab-pane">
             <div id="sigAddPanel" class"sigAddPanel">
                 <div style="margin-bottom: 10px; text-align: center;">
@@ -146,6 +148,7 @@
             <div id="sys{{mapsys.pk}}Signatures" class="signatureListDiv">
             </div>
     </div>
+    <a name="activePlayerPanel"></a>
     <div id="activePlayerPanel" class="activePlayerPanel tab-pane">
         <div id="activePlayerList" class="activePlayerList">
             <h4 style="margin-left: 120px;">Active Pilots: {{system.name}}</h4>
@@ -168,6 +171,7 @@
         </div>
     </div>
         {% load poslist %}    
+    <a name="systemPosPanel"></a>
     <div id="systemPosPanel" class="systemPosPanel tab-pane">
         <div style="text-align: center; margin-bottom: 10px;">
             <h4>Starbases: {{system.name}}</h4>

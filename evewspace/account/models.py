@@ -130,6 +130,14 @@ class EWSUser(AbstractBaseUser, PermissionsMixin):
         cache.set(user_cache_key, user_locations_dict, 60 * 15)
         return user_locations_dict
 
+    def get_settings(self):
+        from core.utils import get_config
+        from core.models import ConfigEntry
+        config_dict = dict()
+        for x in ConfigEntry.objects.filter(user=None).all():
+            config_dict[x.name] = get_config(x.name, self).value
+        return config_dict
+
 
 class GroupProfile(models.Model):
     """GroupProfile defines custom fields tied to each Group record."""

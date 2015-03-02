@@ -33,6 +33,7 @@ from Map.models import *
 from Map import utils, signals
 from core.utils import get_config
 from POS.models import POS
+from core.models import ConfigEntry
 
 # Decorator to check map permissions. Takes request and map_id
 # Permissions are 0 = None, 1 = View, 2 = Change
@@ -67,7 +68,10 @@ def get_map(request, map_id):
         'map': current_map,
         'access': current_map.get_permission(request.user),
     }
-    return TemplateResponse(request, 'map.html', context)
+    template = 'map.html'
+    if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
+        template = 'map_combined.html'
+    return TemplateResponse(request, template, context)
 
 
 @login_required
@@ -322,8 +326,10 @@ def system_details(request, map_id, ms_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
-
-    return render(request, 'system_details.html',
+    template = 'system_details.html'
+    if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
+        template = 'system_details_combined.html'
+    return render(request, template,
             get_system_context(ms_id, request.user))
 
 
@@ -437,6 +443,28 @@ def mark_scanned(request, map_id, ms_id):
     else:
         raise PermissionDenied
 
+# noinspection PyUnusedLocal
+@login_required()
+@require_map_permission(permission=2)
+def set_importance(request,map_id, ms_id):
+    """Takes a POST request from AJAX with a system ID and marks that system
+    's importance
+
+    """
+    if request.is_ajax():
+        map_system = get_object_or_404(MapSystem, pk=ms_id)
+        imp = int(request.REQUEST.get('importance',0))
+        if imp >= 0 and imp <= 2:
+            map_system.system.importance = imp
+            map_system.system.save()
+            if imp == 1:
+                map_system.map.add_log(request.user, "Danger in %s (%s)"
+                                    % (map_system.system.name,
+                                        map_system.friendlyname),
+                                    visible=True)
+        return HttpResponse()
+    else:
+        raise PermissionDenied
 
 # noinspection PyUnusedLocal
 @login_required()
@@ -1028,40 +1056,138 @@ def general_settings(request):
          'escdowntimes': escalation_burn.value}
     )
 
+def _process_user_display_settings(request, user):
+    zen_mode = get_config("MAP_ZEN_MODE", user)
+    pilot_list = get_config("MAP_PILOT_LIST", user)
+    details_combined = get_config("MAP_DETAILS_COMBINED", user)
+    render_tags = get_config("MAP_RENDER_WH_TAGS", user)
+    highlight_active = get_config("MAP_HIGHLIGHT_ACTIVE", user)
+    auto_refresh = get_config("MAP_AUTO_REFRESH", user)
+    kspace_mapping = get_config('MAP_KSPACE_MAPPING', user)
+    silent_mapping = get_config("MAP_SILENT_MAPPING", user)
+    render_collapsed = get_config("MAP_RENDER_COLLAPSED", user)
 
-@permission_required('Map.map_admin')
-def sites_settings(request):
-    """
-    Returns the site spawns section.
-    """
-    return TemplateResponse(request, 'spawns_settings.html',
-                            {'spawns': SiteSpawn.objects.all()})
+    # Create seperate configs for the user if they are falling back to defaults
+    if not zen_mode.user:
+        zen_mode = ConfigEntry(name=zen_mode.name, user=user)
+    if not pilot_list.user:
+        pilot_list = ConfigEntry(name=pilot_list.name, user=user)
+    if not details_combined.user:
+        details_combined = ConfigEntry(name=details_combined.name, user=user)
+    if not render_tags.user:
+        render_tags = ConfigEntry(name=render_tags.name, user=user)
+    if not highlight_active.user:
+        highlight_active = ConfigEntry(name=highlight_active.name, user=user)
+    if not auto_refresh.user:
+        auto_refresh = ConfigEntry(name=auto_refresh.name, user=user)
+    if not kspace_mapping.user:
+        kspace_mapping = ConfigEntry(name=kspace_mapping.name, user=user)
+    if not silent_mapping.user:
+        silent_mapping = ConfigEntry(name=silent_mapping.name, user=user)
+    if not render_collapsed.user:
+        render_collapsed = ConfigEntry(name=render_collapsed.name, user=user)
+    zen_mode.value = request.POST.get('zen_mode', 0)
+    pilot_list.value = request.POST.get('pilot_list', 0)
+    details_combined.value = request.POST.get('details_combined', 0)
+    render_tags.value = request.POST.get('render_tags', 0)
+    highlight_active.value = request.POST.get('highlight_active', 0)
+    auto_refresh.value = request.POST.get('auto_refresh', 0)
+    kspace_mapping.value = request.POST.get('kspace_mapping', 0)
+    silent_mapping.value = request.POST.get('silent_mapping', 0)
+    render_collapsed.value = request.POST.get('render_collapsed', 0)
+    zen_mode.save()
+    pilot_list.save()
+    details_combined.save()
+    render_tags.save()
+    highlight_active.save()
+    auto_refresh.save()
+    kspace_mapping.save()
+    silent_mapping.save()
+    render_collapsed.save()
+
+    saved = True
+
+    return TemplateResponse(
+        request, 'display_settings.html',
+        {
+            'zen_mode': zen_mode.value,
+            'pilot_list': pilot_list.value,
+            'details_combined': details_combined.value,
+            'render_tags': render_tags.value,
+            'highlight_active': highlight_active.value,
+            'auto_refresh': auto_refresh.value,
+            'kspace_mapping': kspace_mapping.value,
+            'silent_mapping': silent_mapping.value,
+            'render_collapsed': render_collapsed.value,
+            'saved': saved,
+            'context_user': user
+         }
+    )
 
 
-@permission_required('Map.map_admin')
-def add_spawns(request):
+def display_settings(request, user=None):
     """
-    Adds a site spawn.
+    Returns and processes the display settings section.
     """
-    return HttpResponse()
+    if not user and not request.user.has_perm('Map.map_admin'):
+        raise PermissionDenied
+    if user:
+        user = request.user
+    zen_mode = get_config("MAP_ZEN_MODE", user)
+    pilot_list = get_config("MAP_PILOT_LIST", user)
+    details_combined = get_config("MAP_DETAILS_COMBINED", user)
+    render_tags = get_config("MAP_RENDER_WH_TAGS", user)
+    highlight_active = get_config("MAP_HIGHLIGHT_ACTIVE", user)
+    auto_refresh = get_config("MAP_AUTO_REFRESH", user)
+    scaling_factor = get_config("MAP_SCALING_FACTOR", user)
+    kspace_mapping = get_config('MAP_KSPACE_MAPPING', user)
+    silent_mapping = get_config("MAP_SILENT_MAPPING", user)
+    render_collapsed = get_config("MAP_RENDER_COLLAPSED", user)
+    saved = False
+    if request.method == "POST":
+        if user:
+            return _process_user_display_settings(request, user)
+        else:
+            zen_mode.value = request.POST.get('zen_mode', 0)
+            pilot_list.value = request.POST.get('pilot_list', 0)
+            details_combined.value = request.POST.get('details_combined', 0)
+            render_tags.value = request.POST.get('render_tags', 0)
+            scaling_factor.value = request.POST.get('scaling_factor', 1)
+            highlight_active.value = request.POST.get('highlight_active', 0)
+            auto_refresh.value = request.POST.get('auto_refresh', 0)
+            kspace_mapping.value = request.POST.get('kspace_mapping', 0)
+            silent_mapping.value = request.POST.get('silent_mapping', 0)
+            render_collapsed.value = request.POST.get('render_collapsed', 0)
+            zen_mode.save()
+            pilot_list.save()
+            details_combined.save()
+            render_tags.save()
+            scaling_factor.save()
+            highlight_active.save()
+            auto_refresh.save()
+            kspace_mapping.save()
+            silent_mapping.save()
+            render_collapsed.save()
+        saved = True
 
+    return TemplateResponse(
+        request, 'display_settings.html',
+        {
+            'zen_mode': zen_mode.value,
+            'pilot_list': pilot_list.value,
+            'details_combined': details_combined.value,
+            'render_tags': render_tags.value,
+            'scaling_factor': scaling_factor.value,
+            'highlight_active': highlight_active.value,
+            'auto_refresh': auto_refresh.value,
+            'kspace_mapping': kspace_mapping.value,
+            'silent_mapping': silent_mapping.value,
+            'render_collapsed': render_collapsed.value,
+            'saved': saved,
+            'context_user': user
+         }
+    )
 
-# noinspection PyUnusedLocal
-@permission_required('Map.map_admin')
-def delete_spawns(request, spawn_id):
-    """
-    Deletes a site spawn.
-    """
-    return HttpResponse()
-
-
-# noinspection PyUnusedLocal
-@permission_required('Map.map_admin')
-def edit_spawns(request, spawn_id):
-    """
-    Alters a site spawn.
-    """
-    return HttpResponse()
 
 
 def destination_settings(request, user=None):
@@ -1106,41 +1232,6 @@ def delete_destination(request, dest_id):
     if destination.user and not request.user == destination.user:
         raise PermissionDenied
     destination.delete()
-    return HttpResponse()
-
-
-@permission_required('Map.map_admin')
-def sigtype_settings(request):
-    """
-    Returns the signature types section.
-    """
-    return TemplateResponse(request, 'sigtype_settings.html',
-                            {'sigtypes': SignatureType.objects.all()})
-
-
-# noinspection PyUnusedLocal
-@permission_required('Map.map_admin')
-def edit_sigtype(request, sigtype_id):
-    """
-    Alters a signature type.
-    """
-    return HttpResponse()
-
-
-@permission_required('Map.map_admin')
-def add_sigtype(request):
-    """
-    Adds a signature type.
-    """
-    return HttpResponse()
-
-
-# noinspection PyUnusedLocal
-@permission_required('Map.map_admin')
-def delete_sigtype(request, sigtype_id):
-    """
-    Deletes a signature type.
-    """
     return HttpResponse()
 
 
