@@ -20,6 +20,16 @@ defaults = [
         ("MAP_SCAN_WARNING", "3"),
         ("MAP_INTEREST_TIME", "15"),
         ("MAP_ESCALATION_BURN", "3"),
+        ("MAP_ZEN_MODE", "0"),
+        ("MAP_PILOT_LIST", "0"),
+        ("MAP_DETAILS_COMBINED", "0"),
+        ("MAP_RENDER_WH_TAGS", "1"),
+        ("MAP_SCALING_FACTOR", "1"),
+        ("MAP_HIGHLIGHT_ACTIVE", "1"),
+        ("MAP_AUTO_REFRESH", "1"),
+        ("MAP_KSPACE_MAPPING", "0"),
+        ("MAP_SILENT_MAPPING", "0"),
+        ("MAP_RENDER_COLLAPSED", "0"),
         ]
 
 def load_defaults():
