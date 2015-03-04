@@ -93,6 +93,10 @@
 {
     text-align: left;
 }
+.detailLeftCombined
+{
+    margin-left: 40px;	
+}
 .infoText
 {
     text-align: left;
@@ -222,10 +226,13 @@ textarea
     margin-left: 15px;
 }
 .sysInfoCombinedDiv h4 {
-    border-top: 1px solid #ccc;
     clear: both;
     display: block;
     margin-top: 20px;
+}
+.sysInfoCombinedHr {
+	width: 600px;
+	border-color: #ccc; 	
 }
 .sigWH {
     color: #63a5ff;
