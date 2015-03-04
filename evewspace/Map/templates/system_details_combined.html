@@ -51,7 +51,7 @@
         {% if system.sysclass = 9 %}
         Null Sec
         {% endif %}
-        {% if system.is_kspace %}
+        {% if system.is_kspace and is_igb %}
         <button class='btn btn-mini btn-info' onclick="CCPEVE.setDestination({{system.pk}});">Set destination</button>
         {% endif %}
         {% if system.sov %}
@@ -66,7 +66,7 @@
     <div class="row span6">
     {% load humanize %}
     <div class="visited">First Visit: {{system.first_visited|naturaltime}} &bull; Last Visit: {{system.last_visited|naturaltime}}</div>
-    <div class="detailsLeft">
+    <div class="detailsLeft detailsLeftCombined">
     {% if system.occupied or system.poses.all %}
     <div class="occupiedDiv label label-important">
         <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|linebreaks}}</p>
@@ -106,7 +106,7 @@
 <div class="sysDetailsFooter row">
     {% if system.is_kspace %}
     <div id="systemStatsPanel" class="systemStatsPanel">
-         <h6>System Statistics (Last Hour) </h6>
+    	<h6>System Statistics (Last Hour) </h6>
             <ul class="systemStatsList">
                 <li class="systemStatItem">NPC Kills: {{system.npckills}}</li>
                 <li class="systemStatItem">Ship Kills: {{system.shipkills}}</li>
