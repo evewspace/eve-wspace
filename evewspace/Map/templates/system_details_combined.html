@@ -8,6 +8,7 @@
 </ul>
 <div id="sysTabHolder" class="well"> <!-- removed tab-content , no tabbing -->
 <a name="sysDetails"></a>
+<hr class="sysInfoCombinedHr">
 <div id="sysDetails" class="tab-pane active">
 <div id="sysPanelHeader" class="systemPanelHeader row">
     <h4>{% if can_edit %}<i title="Edit Info" class="icon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %}System Details: {{mapsys.system.name}} </h4>
@@ -62,7 +63,6 @@
         {% endif %}
     </div>
     <br />
-</div>
     <div class="row span6">
     {% load humanize %}
     <div class="visited">First Visit: {{system.first_visited|naturaltime}} &bull; Last Visit: {{system.last_visited|naturaltime}}</div>
@@ -118,10 +118,11 @@
         </div>
         {% endif %}
     </div>
-     
+</div>     
 </div>
 </div>
   <a name="sigsPanel"></a>
+  <hr class="sysInfoCombinedHr">
   <div id="sigsPanel" class="sigsPanel tab-pane">
             <div id="sigAddPanel" class"sigAddPanel">
                 <div style="margin-bottom: 10px; text-align: center;">
@@ -149,6 +150,7 @@
             </div>
     </div>
     <a name="activePlayerPanel"></a>
+    <hr class="sysInfoCombinedHr">
     <div id="activePlayerPanel" class="activePlayerPanel tab-pane">
         <div id="activePlayerList" class="activePlayerList">
             <h4 style="margin-left: 120px;">Active Pilots: {{system.name}}</h4>
@@ -172,6 +174,7 @@
     </div>
         {% load poslist %}    
     <a name="systemPosPanel"></a>
+    <hr class="sysInfoCombinedHr">
     <div id="systemPosPanel" class="systemPosPanel tab-pane">
         <div style="text-align: center; margin-bottom: 10px;">
             <h4>Starbases: {{system.name}}</h4>
