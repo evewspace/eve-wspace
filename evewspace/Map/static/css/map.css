@@ -277,15 +277,15 @@ textarea
 label {
     display: inline;
 }
-#editWormholeDialog label[for=timeStatusEol],#editWormholeDialog label[for=massStatusReduced], #editSystemDialog label[for=sysTypeImportant] {
+label[for=massStatusReduced],label[for=sysTypeImportant] {
     font-weight: bold;
     color: #fffc00;
 }
-#editWormholeDialog label[for=timeStatusNormal], #editWormholeDialog label[for=massStatusNormal] #editSystemDialog label[for=sysTypeRegular] {
+label[for=massStatusNormal], label[for=sysTypeRegular] {
     font-weight: bold;
     color: #00ff00;
 }
-#editWormholeDialog label[for=massStatusCritical], #editSystemDialog label[for=sysTypeDangerous] {
+label[for=massStatusCritical], label[for=sysTypeDangerous] {
     font-weight: bold;
     color: #ff0000;
 }
