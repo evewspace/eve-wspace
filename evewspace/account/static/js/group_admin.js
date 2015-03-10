@@ -145,3 +145,24 @@ function RemoveGroupUser(group_id, user_id) {
         }
     });
 }
+
+function GetPermissions(group_id){
+	$.ajax({
+        url: "/account/admin/group/" + group_id + "/permissions/",
+        type: "GET",
+        success: function(data) {
+            $('#permissionHolder').html(data);
+        }
+    });
+}
+
+function SavePermissions(group_id){
+	$.ajax({
+        type: "POST",
+        data: $('#permForm').serialize(),
+        url: "/account/admin/group/" + group_id + "/permissions/",
+        success: function(data) {
+            $('#permissionHolder').html('Succesfully saved');
+        }
+    });
+}
