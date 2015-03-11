@@ -28,10 +28,6 @@ def update_char_data():
     #Get all users
     user_list = User.objects.all()
     for user in user_list:
-        #Get all API keys of a user 
+        #Get all API keys of a user and validate them
         for key in user.api_keys.all():
-            #Grab key and validate
-            current_key = MemberAPIKey(user=user,
-                keyid=key.keyid,
-                vcode=key.vcode)
-            current_key.validate()
+            key.validate()
