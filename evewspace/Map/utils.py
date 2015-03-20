@@ -185,13 +185,15 @@ class MapJSONGenerator(object):
         cached = cache.get(cache_key)
         if cached == None:
             self.systems = defaultdict(list)
+            self.parents = dict()
             for system in self.map.systems.all()\
                     .select_related('system', 'parentsystem', 'parent_wormhole')\
                     .iterator():
                 self.systems[system.parentsystem_id].append(system)
-            root = self.systems[None][0]
-            syslist = [self.system_to_dict(root, 0),]
-            self.recursive_system_data_generator(root, syslist, 1)
+                self.parents[system.pk] = system.parentsystem_id
+            syslist = self.create_syslist()
+            #syslist = [self.system_to_dict(root, 0),]
+            #self.recursive_system_data_generator(root, syslist, 1)
             cached = syslist
             cache.set(cache_key, cached, 15)
 
@@ -204,22 +206,77 @@ class MapJSONGenerator(object):
                     system['iconImageURL'] = user_img
         return json.dumps(cached, sort_keys=True)
 
-    def recursive_system_data_generator(self, start_sys, syslist, levelX):
+    def create_syslist(self):
         """
-        Prepares a list of MapSystem objects for conversion to JSON for map JS.
-        Takes a queryset of MapSystems and the current list of systems prepared
-        for JSON.
+        Return list of system dictionaries with appropriate x/y levels
+        for map display.
         """
-        # We will need an index later, so let's enumerate the mapSystems
-        enumSystems = enumerate(self.systems[start_sys.pk], start=0)
-        for item in enumSystems:
-            i = item[0]
-            system = item[1]
-            if i > 0:
-                self.levelY +=1
-            syslist.append(self.system_to_dict(system, levelX))
-            self.recursive_system_data_generator(system,
-                    syslist, levelX + 1)
+        root = self.systems[None][0]
+        
+        columns = []
+        systems = { root.pk: root }
+        todo = [(root.pk, 0, 0)]
+        done = []
+        xs = dict()
+        ys = dict()
+
+        # insert systems into columns
+        while len(todo) > 0:
+            sys_id, x, y_min = todo.pop(0)
+            if len(columns) <= x:
+                columns.append([])
+            xs[sys_id] = x
+            column = columns[x]
+            y = len(column)
+            if y < y_min:
+                column += [-1] * (y_min - y)
+                y = y_min
+            ys[sys_id] = y
+            column.append(sys_id)
+            for child in self.systems[sys_id]:
+                systems[child.pk] = child
+                todo.append((child.pk, x + 1, y))
+            done.append(sys_id)
+        
+        # adjust nodes to be at the same level as their first child
+        while len(done) > 1:
+            sys_id = done.pop()
+            parent = self.parents[sys_id]
+            # first child
+            if self.systems[parent][0].pk == sys_id:
+                parent_y = ys[parent]
+                dy = ys[sys_id] - parent_y
+                if dy > 0:
+                    for i in column[parent_y:]:
+                        if i > 0:
+                            ys[i] += dy
+                    column = columns[xs[parent]]
+                    for i in range(dy):
+                        column.insert(parent_y, -1)
+
+        syslist = []
+        for x, col in enumerate(columns):
+            for y, sys_id in enumerate(col):
+                if sys_id >= 0:
+                    system_dict = self.system_to_dict(systems[sys_id], x)
+                    system_dict['LevelX'] = x
+                    system_dict['LevelY'] = y
+                    syslist.append(system_dict)
+        return syslist
+
+    #def recursive_system_data_generator(self, start_sys, syslist, levelX):
+    #    """
+    #    Prepares a list of MapSystem objects for conversion to JSON for map JS.
+    #    Takes a queryset of MapSystems and the current list of systems prepared
+    #    for JSON.
+    #    """
+    #    # We will need an index later, so let's enumerate the mapSystems
+    #    for i, system in enumerate(self.systems[start_sys.pk], start=0):
+    #        if i > 0:
+    #            self.levelY +=1
+    #        syslist.append(self.system_to_dict(system, levelX))
+    #        self.recursive_system_data_generator(system, syslist,
+    #                                             levelX + 1)
 
 
 def get_wormhole_type(system1, system2):
