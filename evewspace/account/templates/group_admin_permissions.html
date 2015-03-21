@@ -1,0 +1,31 @@
+<form id="permForm" action="/map/settings/permissions/" method="POST">
+<div class="GroupPermissionsContainer">
+    <br /><br />
+    <table class="table table-hover">
+        <tr>
+            <th></th>
+            <th>Permission</th>
+            <th>Category</th>
+        </tr>
+        {% for perm in perm_list.all %}
+        <tr>
+            <td><input title="{{perm.name}}" type="checkbox" name="perm_{{perm.pk}}"
+            {% if perm in group.permissions.all %}
+                checked="checked"
+            {% endif %}
+            ></td>
+            <td>{{perm.name}}</td>
+            <td>{{perm.content_type.app_label}} / {{perm.content_type.name}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <input type="submit" class="btn btn-primary" value="Save Permissions">
+</div>
+</form>
+<script type="text/javascript">
+    $('#permForm').submit(function(e){
+            e.preventDefault();
+            SavePermissions({{group.pk}});
+            return false;
+            });
+</script>
