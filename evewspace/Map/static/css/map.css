@@ -93,6 +93,10 @@
 {
     text-align: left;
 }
+.detailsLeftCombined
+{
+    margin-left: 40px;	
+}
 .infoText
 {
     text-align: left;
@@ -222,10 +226,13 @@ textarea
     margin-left: 15px;
 }
 .sysInfoCombinedDiv h4 {
-    border-top: 1px solid #ccc;
     clear: both;
     display: block;
     margin-top: 20px;
+}
+.sysInfoCombinedHr {
+	width: 600px;
+	border-color: #ccc; 	
 }
 .sigWH {
     color: #63a5ff;
@@ -270,15 +277,15 @@ textarea
 label {
     display: inline;
 }
-#editWormholeDialog label[for=timeStatusEol],#editWormholeDialog label[for=massStatusReduced], #editSystemDialog label[for=sysTypeImportant] {
+label[for=massStatusReduced],label[for=sysTypeImportant] {
     font-weight: bold;
     color: #fffc00;
 }
-#editWormholeDialog label[for=timeStatusNormal], #editWormholeDialog label[for=massStatusNormal] #editSystemDialog label[for=sysTypeRegular] {
+label[for=massStatusNormal], label[for=sysTypeRegular] {
     font-weight: bold;
     color: #00ff00;
 }
-#editWormholeDialog label[for=massStatusCritical], #editSystemDialog label[for=sysTypeDangerous] {
+label[for=massStatusCritical], label[for=sysTypeDangerous] {
     font-weight: bold;
     color: #ff0000;
 }

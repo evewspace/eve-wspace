@@ -360,3 +360,31 @@ def create_group(request):
             return HttpResponse()
     else:
         return TemplateResponse(request, 'create_group.html')
+        
+		
+@permission_required('auth.change_permission')        
+def permissions(request, group_id):
+    """
+    Get & change permissions as set in the Django auth.
+    """
+    from django.contrib.auth.models import Permission
+    if not request.is_ajax():
+        raise PermissionDenied
+    else:
+    
+        group = get_object_or_404(Group, pk=group_id)
+        permission_list = Permission.objects.all().order_by('content_type')
+        
+        if request.method == "POST":
+            for perm in permission_list:
+                if request.POST.get('perm_%s' % perm.pk, False):
+                    if perm not in group.permissions.all():
+                        group.permissions.add(perm)
+                else:
+                    if perm in group.permissions.all():
+                        group.permissions.remove(perm)
+    
+            return HttpResponse()
+        else:
+            return TemplateResponse(request, 'group_admin_permissions.html',
+                {'group': group, 'perm_list': permission_list})
