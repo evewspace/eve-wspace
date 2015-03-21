@@ -12,7 +12,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-#from Map.models import *
 from collections import defaultdict
 from core.models import SystemJump, Type, Location
 from core.utils import get_config
@@ -35,7 +34,6 @@ class MapJSONGenerator(object):
     def __init__(self, map, user):
         self.map = map
         self.user = user
-        self.levelY = 0
         self.pvp_threshold = int(get_config("MAP_PVP_THRESHOLD", user).value)
         self.npc_threshold = int(get_config("MAP_NPC_THRESHOLD", user).value)
         self.interest_time = int(get_config("MAP_INTEREST_TIME", user).value)
@@ -48,9 +46,9 @@ class MapJSONGenerator(object):
         try:
             return self._interest_path
         except AttributeError:
-            threshold = datetime.datetime.now(pytz.utc)\
-                        - timedelta(minutes=self.interest_time)
-            systems =[]
+            threshold = datetime.datetime.now(pytz.utc) - \
+                        timedelta(minutes=self.interest_time)
+            systems = []
             for system in self.map.systems.filter(
                 interesttime__gt=threshold).iterator():
                 systems.extend(self.get_path_to_map_system(system))
@@ -96,103 +94,91 @@ class MapJSONGenerator(object):
 
         return None
 
-    def system_to_dict(self, system, levelX):
+    def system_to_dict(self, system, levelX, levelY):
         """
         Takes a MapSystem and X,Y data and returns the dict of information to be passed to
         the map JS as JSON.
         """
-        interesttime = self.interest_time
-        threshold = datetime.datetime.now(pytz.utc) - timedelta(minutes=interesttime)
-        if system.interesttime and system.interesttime > threshold:
-            interest = True
-        else:
-            interest = False
-        path = False
-        if system in self._get_interest_path():
-            path = True
-        if system.system.is_wspace():
-            shattered = system.system.wsystem.is_shattered
-        else:
-            shattered = False
-        if system.system.is_wspace():
-            effect = system.system.wsystem.effect
-        else:
-            effect = None
+        system_obj = system.system
+        is_wspace = system_obj.is_wspace()
+        system_dict = {
+            'sysID': system_obj.pk,
+            'Name': system_obj.name,
+            'LevelX': levelX,
+            'LevelY': levelY,
+            'SysClass': system_obj.sysclass,
+            'Friendly': system.friendlyname,
+            'interest': system.interesttime and system.interesttime > \
+                        datetime.datetime.now(pytz.utc) - \
+                        timedelta(minutes=self.interest_time),
+            'interestpath': system in self._get_interest_path(),
+            'activePilots': len(system_obj.pilot_list),
+            'pilot_list': [x[1][1] for x in system_obj.pilot_list.items() \
+                           if x[1][1] != "OOG Browser"],
+            'iconImageURL': self.get_system_icon(system),
+            'msID': system.pk,
+            'backgroundImageURL': self.get_system_background(system),
+            'effect': system_obj.wsystem.effect if is_wspace else None,
+            'importance': system_obj.importance,
+            'shattered': system_obj.wsystem.is_shattered \
+                         if is_wspace else False,
+        }
+
         if system.parentsystem:
             parentWH = system.parent_wormhole
-            if parentWH.collapsed:
-                collapsed = True
-            else:
-                collapsed = False
-            result = {'sysID': system.system.pk, 'Name': system.system.name,
-                    'LevelX': levelX,
-                    'LevelY': self.levelY, 'SysClass': system.system.sysclass,
-                    'Friendly': system.friendlyname, 'interest': interest,
-                    'interestpath': path, 'ParentID': system.parentsystem.pk,
-                    'activePilots': len(system.system.pilot_list),
-                    'pilot_list': [x[1][1] for x in system.system.pilot_list.items() if x[1][1] != "OOG Browser" ] ,
-                    'WhToParent': parentWH.bottom_type.name,
-                    'WhFromParent': parentWH.top_type.name,
-                    'WhMassStatus': parentWH.mass_status,
-                    'WhTimeStatus': parentWH.time_status,
-                    'WhTotalMass': parentWH.max_mass,
-                    'WhJumpMass': parentWH.jump_mass,
-                    'WhToParentBubbled': parentWH.bottom_bubbled,
-                    'WhFromParentBubbled': parentWH.top_bubbled,
-                    'iconImageURL': self.get_system_icon(system),
-                    'whID': parentWH.pk, 'msID': system.pk,
-                    'backgroundImageURL': self.get_system_background(system),
-                    'effect': effect, 'collapsed': collapsed,'importance': system.system.importance,
-                    'shattered': shattered}
+            system_dict.update({
+                'ParentID': system.parentsystem.pk,
+                'WhToParent': parentWH.bottom_type.name,
+                'WhFromParent': parentWH.top_type.name,
+                'WhMassStatus': parentWH.mass_status,
+                'WhTimeStatus': parentWH.time_status,
+                'WhTotalMass': parentWH.max_mass,
+                'WhJumpMass': parentWH.jump_mass,
+                'WhToParentBubbled': parentWH.bottom_bubbled,
+                'WhFromParentBubbled': parentWH.top_bubbled,
+                'whID': parentWH.pk,
+                'collapsed': bool(parentWH.collapsed),
+            })
         else:
-            result = {'sysID': system.system.pk, 'Name': system.system.name,
-                    'LevelX': levelX,
-                    'LevelY': self.levelY, 'SysClass': system.system.sysclass,
-                    'Friendly': system.friendlyname, 'interest': interest,
-                    'activePilots': len(system.system.pilot_list),
-                    'pilot_list': [x[1][1] for x in system.system.pilot_list.items() if x[1][1] != "OOG Browser" ] ,
-                    'interestpath': path, 'ParentID': None,
-                    'WhToParent': "", 'WhFromParent': "",
-                    'WhTotalMass': None, 'WhJumpMass': None,
-                    'WhMassStatus': None, 'WhTimeStatus': None,
-                    'WhToParentBubbled': None, 'WhFromParentBubbled': None,
-                    'iconImageURL': self.get_system_icon(system),
-                    'whID': None, 'msID': system.pk,
-                    'backgroundImageURL': self.get_system_background(system),
-                    'effect': effect, 'collapsed': False,'importance': system.system.importance,
-                    'shattered': shattered}
-        return result
+            system_dict.update({
+                'ParentID': None,
+                'WhToParent': "",
+                'WhFromParent': "",
+                'WhTotalMass': None,
+                'WhJumpMass': None,
+                'WhMassStatus': None,
+                'WhTimeStatus': None,
+                'WhToParentBubbled': None,
+                'WhFromParentBubbled': None,
+                'whID': None,
+                'collapsed': False,
+            })
+
+        return system_dict
 
     def get_system_background(self, system):
         """
         Takes a MapSystem and returns the appropriate background icon
         as a relative URL or None.
         """
-        staticPrefix = "%s" % (settings.STATIC_URL + "images/")
-
-        if system.system.importance == 0:
+        importance = system.system.importance
+        if importance == 0:
             return None
-        if system.system.importance == 1:
-            return staticPrefix + "skull.png"
-        if system.system.importance == 2:
-            return staticPrefix + "mark.png"
-        raise ValueError
+        elif importance == 1:
+            image = 'skull.png'
+        elif importance == 2:
+            image = 'mark.png'
+        else:
+            raise ValueError
 
+        return "{}images/{}".format(settings.STATIC_URL, image)
 
     def get_systems_json(self):
         """Returns a JSON string representing the systems in a map."""
         cache_key = self.get_cache_key(self.map)
         cached = cache.get(cache_key)
-        if cached == None:
-            self.systems = defaultdict(list)
-            for system in self.map.systems.all()\
-                    .select_related('system', 'parentsystem', 'parent_wormhole')\
-                    .iterator():
-                self.systems[system.parentsystem_id].append(system)
-            root = self.systems[None][0]
-            syslist = [self.system_to_dict(root, 0),]
-            self.recursive_system_data_generator(root, syslist, 1)
-            cached = syslist
+        if cached is None:
+            cached = self.create_syslist()
             cache.set(cache_key, cached, 15)
 
         user_locations_dict = cache.get('user_%s_locations' % self.user.pk)
@@ -200,26 +186,76 @@ class MapJSONGenerator(object):
             user_img = "%s/images/mylocation.png" % (settings.STATIC_URL)
             user_locations = [i[1][0] for i in user_locations_dict.items()]
             for system in cached:
-                if system['sysID'] in user_locations and system['iconImageURL'] == None:
+                if system['sysID'] in user_locations and system['iconImageURL'] is None:
                     system['iconImageURL'] = user_img
         return json.dumps(cached, sort_keys=True)
 
-    def recursive_system_data_generator(self, start_sys, syslist, levelX):
+    def create_syslist(self):
         """
-        Prepares a list of MapSystem objects for conversion to JSON for map JS.
-        Takes a queryset of MapSystems and the current list of systems prepared
-        for JSON.
+        Return list of system dictionaries with appropriate x/y levels
+        for map display.
         """
-        # We will need an index later, so let's enumerate the mapSystems
-        enumSystems = enumerate(self.systems[start_sys.pk], start=0)
-        for item in enumSystems:
-            i = item[0]
-            system = item[1]
-            if i > 0:
-                self.levelY +=1
-            syslist.append(self.system_to_dict(system, levelX))
-            self.recursive_system_data_generator(system,
-                    syslist, levelX + 1)
+        # maps system ids to child/parent system ids
+        children = defaultdict(list)
+        parents = dict()
+        # maps system ids to objects
+        systems = dict() 
+
+        for system in self.map.systems.all() \
+              .select_related('system', 'parentsystem', 'parent_wormhole') \
+              .iterator():
+            children[system.parentsystem_id].append(system.pk)
+            parents[system.pk] = system.parentsystem_id
+            systems[system.pk] = system
+
+        columns = []
+        todo = [(children[None][0], 0, 0)]
+
+        # maps system id to current x,y position
+        xs = dict()
+        ys = dict()
+
+        # insert systems into columns
+        # ensuring child.levelY >= parent.levelY
+        # None instead of a system id serves as placeholder
+        while len(todo) > 0:
+            sys_id, x, y_min = todo.pop(0)
+            if len(columns) <= x:
+                columns.append([])
+            xs[sys_id] = x
+            column = columns[x]
+            y = len(column)
+            if y < y_min:
+                column += [None] * (y_min - y)
+                y = y_min
+            ys[sys_id] = y
+            column.append(sys_id)
+            for child in children[sys_id]:
+                todo.append((child, x + 1, y))
+        
+        # adjust nodes to be at the same level as their first child
+        # (parent.levelY = children[0].levelY)
+        for column in reversed(columns):
+            for sys_id in column:
+                if sys_id is None:
+                    continue
+                parent_id = parents[sys_id]
+                if parent_id is None:
+                    continue
+                if children[parent_id][0] == sys_id:
+                    y_parent = ys[parent_id]
+                    dy = ys[sys_id] - y_parent
+                    if dy > 0:
+                        parent_column = columns[xs[parent_id]]
+                        for i in parent_column[y_parent:]:
+                            if i >= 0:
+                                ys[i] += dy
+                        for i in range(dy):
+                            parent_column.insert(y_parent, None)
+
+        # create list of system dicts from system ids in columns
+        return [self.system_to_dict(obj, xs[i], ys[i]) \
+                for i, obj in systems.items()]
 
 
 def get_wormhole_type(system1, system2):
@@ -262,7 +298,7 @@ def get_wormhole_type(system1, system2):
                     Q(source="Z") | Q(source='W')).filter(
                             destination=destination).all()
 
-    if sourcewh == None:
+    if sourcewh is None:
         sourcewh = WormholeType.objects.filter(Q(source=source) | Q(source='W')
                 ).filter(destination=destination).all()
     return sourcewh
