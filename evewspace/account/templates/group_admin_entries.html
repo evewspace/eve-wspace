@@ -1,3 +1,10 @@
 {% for data in group_admin_registry %}
-    <li><a href="#group-admin-{{data|slugify}}" data-toggle="tab">{{data}}</a></li>
+    <li><a href="#group-admin-{{data|slugify}}" id="tab-group-admin-{{data|slugify}}" data-toggle="tab">{{data}}</a></li>
 {% endfor %}
+
+<script>
+$("#tab-group-admin-permissions").click( function(){
+	$('#permissionHolder').html('Loading...');
+	GetPermissions({{group.pk}});
+});
+</script> 

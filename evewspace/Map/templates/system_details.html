@@ -49,7 +49,7 @@
         {% if system.sysclass = 9 %}
         Null Sec
         {% endif %}
-        {% if system.is_kspace %}
+        {% if system.is_kspace and is_igb %}
         <button class='btn btn-mini btn-info' onclick="CCPEVE.setDestination({{system.pk}});">Set destination</button>
         {% endif %}
         {% if system.sov %}

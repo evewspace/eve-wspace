@@ -41,16 +41,15 @@ var badColor = "#FF0000"; // Color of first shrink connections
 var bubbledColor = "#FF0000"; // Color of first shrink connections
 var clearWhColor = "#BBFFBB"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
-var eolColor = "#F0FF00"; //color for eol
 var sysColor_zen = "#222"; //color for eol
 var frigWhColor = "#FFFFFF"; // Color of Hyperion Frigate Hole
 var frigWhColor_zen = "#71cbff"; // Color of Hyperion Frigate Hole
 var textColorSelect = "#FFF"; //selected system text colour
 var textColorSelect_zen = "#FFFC00"; //selected system text colour (zen mode)
-var effectColorWolfRayet = "#ff5500";
+var effectColorWolfRayet = "#ff00ff";
 var effectColorPulsar = "0000ff";
 var effectColorMagnetar = "#ff0000";
-var effectColorRedGiant = "#ff00ff";
+var effectColorRedGiant = "#ff5500";
 var effectColorCataclysmic = "#5555ff";
 var effectColorBlackHole = "#000";
 var borderColorSelect = "#FFFC00"; //selected system
@@ -1185,9 +1184,6 @@ function GetConnectionColor(system) {
     }
     if (warningFlag == true) {
         return warningColor;
-    }
-    if (system.WhTimeStatus == 1) {
-        return eolColor;
     }
     // If jump mass is not 0 (K162 / Gate), but less than 10M,
     // we have a Hyperion frigate-sized hole
