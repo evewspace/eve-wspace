@@ -114,7 +114,7 @@ class MapJSONGenerator(object):
             'interestpath': system in self._get_interest_path(),
             'activePilots': len(system_obj.pilot_list),
             'pilot_list': [x[1][1] for x in system_obj.pilot_list.items() \
-                           if x[1][1] != "OOG Browser" ] ,
+                           if x[1][1] != "OOG Browser"],
             'iconImageURL': self.get_system_icon(system),
             'msID': system.pk,
             'backgroundImageURL': self.get_system_background(system),
