@@ -138,7 +138,7 @@ class MapJSONGenerator(object):
                       'whID': parentWH.pk, 'msID': system.pk,
                       'backgroundImageURL': self.get_system_background(system),
                       'effect': effect,
-                      'collapsed': parentWH.collapsed == True,
+                      'collapsed': bool(parentWH.collapsed),
                       'importance': system.system.importance,
                       'shattered': shattered}
         else:
@@ -243,7 +243,7 @@ class MapJSONGenerator(object):
                     continue
                 if self.systems[parent_id][0].pk == sys_id:
                     y_parent = ys[parent_id]
-                    dy = ys[sys_id] - ys[parent_id]
+                    dy = ys[sys_id] - y_parent
                     if dy > 0:
                         parent_column = columns[xs[parent_id]]
                         for i in parent_column[y_parent:]:
