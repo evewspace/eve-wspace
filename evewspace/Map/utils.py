@@ -114,7 +114,7 @@ class MapJSONGenerator(object):
             'interestpath': system in self._get_interest_path(),
             'activePilots': len(system_obj.pilot_list),
             'pilot_list': [x[1][1] for x in system_obj.pilot_list.items() \
-                           if x[1][1] != "OOG Browser" ] ,
+                           if x[1][1] != "OOG Browser"],
             'iconImageURL': self.get_system_icon(system),
             'msID': system.pk,
             'backgroundImageURL': self.get_system_background(system),
@@ -161,29 +161,23 @@ class MapJSONGenerator(object):
         Takes a MapSystem and returns the appropriate background icon
         as a relative URL or None.
         """
-        staticPrefix = "%s" % (settings.STATIC_URL + "images/")
-
-        if system.system.importance == 0:
+        importance = system.system.importance
+        if importance == 0:
             return None
-        if system.system.importance == 1:
-            return staticPrefix + "skull.png"
-        if system.system.importance == 2:
-            return staticPrefix + "mark.png"
-        raise ValueError
+        elif importance == 1:
+            image = 'skull.png'
+        elif importance == 2:
+            image = 'mark.png'
+        else:
+            raise ValueError
 
+        return "{}images/{}".format(settings.STATIC_URL, image)
 
     def get_systems_json(self):
         """Returns a JSON string representing the systems in a map."""
         cache_key = self.get_cache_key(self.map)
         cached = cache.get(cache_key)
-        if cached == None:
-            self.systems = defaultdict(list)
-            self.parents = dict()
-            for system in self.map.systems.all()\
-                    .select_related('system', 'parentsystem', 'parent_wormhole')\
-                    .iterator():
-                self.systems[system.parentsystem_id].append(system)
-                self.parents[system.pk] = system.parentsystem_id
+        if cached is None:
             cached = self.create_syslist()
             cache.set(cache_key, cached, 15)
 
@@ -192,7 +186,7 @@ class MapJSONGenerator(object):
             user_img = "%s/images/mylocation.png" % (settings.STATIC_URL)
             user_locations = [i[1][0] for i in user_locations_dict.items()]
             for system in cached:
-                if system['sysID'] in user_locations and system['iconImageURL'] == None:
+                if system['sysID'] in user_locations and system['iconImageURL'] is None:
                     system['iconImageURL'] = user_img
         return json.dumps(cached, sort_keys=True)
 
@@ -201,11 +195,18 @@ class MapJSONGenerator(object):
         Return list of system dictionaries with appropriate x/y levels
         for map display.
         """
-        root = self.systems[None][0]
-        
+        children = defaultdict(list)
+        parents = dict()
+        systems = dict()
+        for system in self.map.systems.all()\
+              .select_related('system', 'parentsystem', 'parent_wormhole')\
+              .iterator():
+            children[system.parentsystem_id].append(system.pk)
+            parents[system.pk] = system.parentsystem_id
+            systems[system.pk] = system
+
         columns = []
-        systems = { root.pk: root }
-        todo = [(root.pk, 0, 0)]
+        todo = [(children[None][0], 0, 0)]
         xs = dict()
         ys = dict()
 
@@ -222,19 +223,18 @@ class MapJSONGenerator(object):
                 y = y_min
             ys[sys_id] = y
             column.append(sys_id)
-            for child in self.systems[sys_id]:
-                systems[child.pk] = child
-                todo.append((child.pk, x + 1, y))
+            for child in children[sys_id]:
+                todo.append((child, x + 1, y))
         
         # adjust nodes to be at the same level as their first child
         for column in reversed(columns):
             for sys_id in column:
                 if sys_id == -1:
                     continue
-                parent_id = self.parents[sys_id]
+                parent_id = parents[sys_id]
                 if parent_id is None:
                     continue
-                if self.systems[parent_id][0].pk == sys_id:
+                if children[parent_id][0] == sys_id:
                     y_parent = ys[parent_id]
                     dy = ys[sys_id] - y_parent
                     if dy > 0:
@@ -295,7 +295,7 @@ def get_wormhole_type(system1, system2):
                     Q(source="Z") | Q(source='W')).filter(
                             destination=destination).all()
 
-    if sourcewh == None:
+    if sourcewh is None:
         sourcewh = WormholeType.objects.filter(Q(source=source) | Q(source='W')
                 ).filter(destination=destination).all()
     return sourcewh
