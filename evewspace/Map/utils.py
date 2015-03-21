@@ -12,7 +12,6 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-#from Map.models import *
 from collections import defaultdict
 from core.models import SystemJump, Type, Location
 from core.utils import get_config
@@ -100,66 +99,62 @@ class MapJSONGenerator(object):
         Takes a MapSystem and X,Y data and returns the dict of information to be passed to
         the map JS as JSON.
         """
-        interesttime = self.interest_time
-        threshold = datetime.datetime.now(pytz.utc) - timedelta(minutes=interesttime)
-        if system.interesttime and system.interesttime > threshold:
-            interest = True
-        else:
-            interest = False
-        path = False
-        if system in self._get_interest_path():
-            path = True
-        if system.system.is_wspace():
-            shattered = system.system.wsystem.is_shattered
-        else:
-            shattered = False
-        if system.system.is_wspace():
-            effect = system.system.wsystem.effect
-        else:
-            effect = None
+        system_obj = system.system
+        is_wspace = system_obj.is_wspace()
+        system_dict = {
+            'sysID': system_obj.pk,
+            'Name': system_obj.name,
+            'LevelX': levelX,
+            'LevelY': levelY,
+            'SysClass': system_obj.sysclass,
+            'Friendly': system.friendlyname,
+            'interest': system.interesttime and system.interesttime > \
+                        datetime.datetime.now(pytz.utc) - \
+                        timedelta(minutes=self.interest_time),
+            'interestpath': system in self._get_interest_path(),
+            'activePilots': len(system_obj.pilot_list),
+            'pilot_list': [x[1][1] for x in system_obj.pilot_list.items() \
+                           if x[1][1] != "OOG Browser" ] ,
+            'iconImageURL': self.get_system_icon(system),
+            'msID': system.pk,
+            'backgroundImageURL': self.get_system_background(system),
+            'effect': system_obj.wsystem.effect if is_wspace else None,
+            'importance': system_obj.importance,
+            'shattered': system_obj.wsystem.is_shattered \
+                         if is_wspace else False,
+        }
+
         if system.parentsystem:
             parentWH = system.parent_wormhole
-            result = {'sysID': system.system.pk, 'Name': system.system.name,
-                      'LevelX': levelX, 'LevelY': levelY,
-                      'SysClass': system.system.sysclass,
-                      'Friendly': system.friendlyname, 'interest': interest,
-                      'interestpath': path, 'ParentID': system.parentsystem.pk,
-                      'activePilots': len(system.system.pilot_list),
-                      'pilot_list': [x[1][1] for x in system.system.pilot_list.items() if x[1][1] != "OOG Browser" ] ,
-                      'WhToParent': parentWH.bottom_type.name,
-                      'WhFromParent': parentWH.top_type.name,
-                      'WhMassStatus': parentWH.mass_status,
-                      'WhTimeStatus': parentWH.time_status,
-                      'WhTotalMass': parentWH.max_mass,
-                      'WhJumpMass': parentWH.jump_mass,
-                      'WhToParentBubbled': parentWH.bottom_bubbled,
-                      'WhFromParentBubbled': parentWH.top_bubbled,
-                      'iconImageURL': self.get_system_icon(system),
-                      'whID': parentWH.pk, 'msID': system.pk,
-                      'backgroundImageURL': self.get_system_background(system),
-                      'effect': effect,
-                      'collapsed': bool(parentWH.collapsed),
-                      'importance': system.system.importance,
-                      'shattered': shattered}
+            system_dict.update({
+                'ParentID': system.parentsystem.pk,
+                'WhToParent': parentWH.bottom_type.name,
+                'WhFromParent': parentWH.top_type.name,
+                'WhMassStatus': parentWH.mass_status,
+                'WhTimeStatus': parentWH.time_status,
+                'WhTotalMass': parentWH.max_mass,
+                'WhJumpMass': parentWH.jump_mass,
+                'WhToParentBubbled': parentWH.bottom_bubbled,
+                'WhFromParentBubbled': parentWH.top_bubbled,
+                'whID': parentWH.pk,
+                'collapsed': bool(parentWH.collapsed),
+            })
         else:
-            result = {'sysID': system.system.pk, 'Name': system.system.name,
-                      'LevelX': levelX, 'LevelY': levelY,
-                      'SysClass': system.system.sysclass,
-                      'Friendly': system.friendlyname, 'interest': interest,
-                      'activePilots': len(system.system.pilot_list),
-                      'pilot_list': [x[1][1] for x in system.system.pilot_list.items() if x[1][1] != "OOG Browser" ] ,
-                      'interestpath': path, 'ParentID': None,
-                      'WhToParent': "", 'WhFromParent': "",
-                      'WhTotalMass': None, 'WhJumpMass': None,
-                      'WhMassStatus': None, 'WhTimeStatus': None,
-                      'WhToParentBubbled': None, 'WhFromParentBubbled': None,
-                      'iconImageURL': self.get_system_icon(system),
-                      'whID': None, 'msID': system.pk,
-                      'backgroundImageURL': self.get_system_background(system),
-                      'effect': effect, 'collapsed': False,
-                      'importance': system.system.importance,
-                      'shattered': shattered}
-        return result
+            system_dict.update({
+                'ParentID': None,
+                'WhToParent': "",
+                'WhFromParent': "",
+                'WhTotalMass': None,
+                'WhJumpMass': None,
+                'WhMassStatus': None,
+                'WhTimeStatus': None,
+                'WhToParentBubbled': None,
+                'WhFromParentBubbled': None,
+                'whID': None,
+                'collapsed': False,
+            })
+
+        return system_dict
 
     def get_system_background(self, system):
         """
@@ -211,7 +206,6 @@ class MapJSONGenerator(object):
         columns = []
         systems = { root.pk: root }
         todo = [(root.pk, 0, 0)]
-        done = []
         xs = dict()
         ys = dict()
 
@@ -231,7 +225,6 @@ class MapJSONGenerator(object):
             for child in self.systems[sys_id]:
                 systems[child.pk] = child
                 todo.append((child.pk, x + 1, y))
-            done.append(sys_id)
         
         # adjust nodes to be at the same level as their first child
         for column in reversed(columns):
