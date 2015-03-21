@@ -46,8 +46,8 @@ class MapJSONGenerator(object):
         try:
             return self._interest_path
         except AttributeError:
-            threshold = datetime.datetime.now(pytz.utc)\
-                        - timedelta(minutes=self.interest_time)
+            threshold = datetime.datetime.now(pytz.utc) - \
+                        timedelta(minutes=self.interest_time)
             systems = []
             for system in self.map.systems.filter(
                 interesttime__gt=threshold).iterator():
@@ -195,11 +195,14 @@ class MapJSONGenerator(object):
         Return list of system dictionaries with appropriate x/y levels
         for map display.
         """
+        # maps system ids to child/parent system ids
         children = defaultdict(list)
         parents = dict()
-        systems = dict()
-        for system in self.map.systems.all()\
-              .select_related('system', 'parentsystem', 'parent_wormhole')\
+        # maps system ids to objects
+        systems = dict() 
+
+        for system in self.map.systems.all() \
+              .select_related('system', 'parentsystem', 'parent_wormhole') \
               .iterator():
             children[system.parentsystem_id].append(system.pk)
             parents[system.pk] = system.parentsystem_id
@@ -207,10 +210,14 @@ class MapJSONGenerator(object):
 
         columns = []
         todo = [(children[None][0], 0, 0)]
+
+        # maps system id to current x,y position
         xs = dict()
         ys = dict()
 
         # insert systems into columns
+        # ensuring child.levelY >= parent.levelY
+        # None instead of a system id serves as placeholder
         while len(todo) > 0:
             sys_id, x, y_min = todo.pop(0)
             if len(columns) <= x:
@@ -219,7 +226,7 @@ class MapJSONGenerator(object):
             column = columns[x]
             y = len(column)
             if y < y_min:
-                column += [-1] * (y_min - y)
+                column += [None] * (y_min - y)
                 y = y_min
             ys[sys_id] = y
             column.append(sys_id)
@@ -227,9 +234,10 @@ class MapJSONGenerator(object):
                 todo.append((child, x + 1, y))
         
         # adjust nodes to be at the same level as their first child
+        # (parent.levelY = children[0].levelY)
         for column in reversed(columns):
             for sys_id in column:
-                if sys_id == -1:
+                if sys_id is None:
                     continue
                 parent_id = parents[sys_id]
                 if parent_id is None:
@@ -243,16 +251,11 @@ class MapJSONGenerator(object):
                             if i >= 0:
                                 ys[i] += dy
                         for i in range(dy):
-                            parent_column.insert(y_parent, -1)
+                            parent_column.insert(y_parent, None)
 
-        # create list of system dicts
-        syslist = []
-        for x, col in enumerate(columns):
-            for y, sys_id in enumerate(col):
-                if sys_id >= 0:
-                    system_dict = self.system_to_dict(systems[sys_id], x, y)
-                    syslist.append(system_dict)
-        return syslist
+        # create list of system dicts from system ids in columns
+        return [self.system_to_dict(obj, xs[i], ys[i]) \
+                for i, obj in systems.items()]
 
 
 def get_wormhole_type(system1, system2):
