@@ -714,6 +714,7 @@ function BulkImport(msID) {
         data: $('#bulkSigForm').serialize(),
         success: function (data) {
             LoadSignatures(msID, false);
+            $('#pasteField').val('');
         },
         error: function (data) {
             alert(data.responseText);
@@ -1027,7 +1028,7 @@ function DrawSystem(system) {
     var friendly = "";
     if (system.Friendly) {
         if (system.Friendly.length > 6) {
-            if ((sliceLastChars == true) || (zenMode)) {
+            if (sliceLastChars == true) {
                 system.Friendly = "." + system.Friendly.slice(-6);
             } else {
                 system.Friendly = system.Friendly.slice(0, 6) + ".";
