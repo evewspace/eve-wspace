@@ -254,8 +254,13 @@ class MapJSONGenerator(object):
                             parent_column.insert(y_parent, None)
 
         # create list of system dicts from system ids in columns
-        return [self.system_to_dict(obj, xs[i], ys[i]) \
-                for i, obj in systems.items()]
+        syslist = []
+        for x, column in enumerate(columns):
+            for y, sys_id in enumerate(column):
+                if sys_id is not None:
+                    sys_obj = systems[sys_id]
+                    syslist.append(self.system_to_dict(sys_obj, x, y))
+        return syslist
 
 
 def get_wormhole_type(system1, system2):
