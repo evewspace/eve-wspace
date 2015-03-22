@@ -41,16 +41,15 @@ var badColor = "#FF0000"; // Color of first shrink connections
 var bubbledColor = "#FF0000"; // Color of first shrink connections
 var clearWhColor = "#BBFFBB"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
-var eolColor = "#F0FF00"; //color for eol
 var sysColor_zen = "#222"; //color for eol
 var frigWhColor = "#FFFFFF"; // Color of Hyperion Frigate Hole
 var frigWhColor_zen = "#71cbff"; // Color of Hyperion Frigate Hole
 var textColorSelect = "#FFF"; //selected system text colour
 var textColorSelect_zen = "#FFFC00"; //selected system text colour (zen mode)
-var effectColorWolfRayet = "#ff5500";
+var effectColorWolfRayet = "#ff00ff";
 var effectColorPulsar = "0000ff";
 var effectColorMagnetar = "#ff0000";
-var effectColorRedGiant = "#ff00ff";
+var effectColorRedGiant = "#ff5500";
 var effectColorCataclysmic = "#5555ff";
 var effectColorBlackHole = "#000";
 var borderColorSelect = "#FFFC00"; //selected system
@@ -715,6 +714,7 @@ function BulkImport(msID) {
         data: $('#bulkSigForm').serialize(),
         success: function (data) {
             LoadSignatures(msID, false);
+            $('#pasteField').val('');
         },
         error: function (data) {
             alert(data.responseText);
@@ -1028,7 +1028,7 @@ function DrawSystem(system) {
     var friendly = "";
     if (system.Friendly) {
         if (system.Friendly.length > 6) {
-            if ((sliceLastChars == true) || (zenMode)) {
+            if (sliceLastChars == true) {
                 system.Friendly = "." + system.Friendly.slice(-6);
             } else {
                 system.Friendly = system.Friendly.slice(0, 6) + ".";
@@ -1184,9 +1184,6 @@ function GetConnectionColor(system) {
     }
     if (warningFlag == true) {
         return warningColor;
-    }
-    if (system.WhTimeStatus == 1) {
-        return eolColor;
     }
     // If jump mass is not 0 (K162 / Gate), but less than 10M,
     // we have a Hyperion frigate-sized hole

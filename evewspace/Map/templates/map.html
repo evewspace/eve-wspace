@@ -31,6 +31,10 @@
     </script>
 {% endblock %}
 {% block contentheader %}
+<div id="scrollmenu">
+<div id="backtotop" onclick="window.location.href = '#';"></div>
+<div id="tobuttons" onclick="window.location.href = '#sysInfoDiv';"></div>
+</div>
 <div class="btn-toolbar">
     <button class='btn btn-mini' onclick="RefreshMap();"><i class="icon-refresh"></i> Refresh</button>
     <button id="btnRefreshToggle" class="btn btn-mini btn-info" onclick="ToggleAutoRefresh();">Auto Refresh: ON</button>

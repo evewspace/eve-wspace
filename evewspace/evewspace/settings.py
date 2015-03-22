@@ -56,6 +56,11 @@ CELERYBEAT_SCHEDULE = {
                 'schedule': timedelta(minutes=30),
                 'args': ()
             },
+        'char_data':{
+                'task': 'API.tasks.update_char_data',
+                'schedule': timedelta(hours=1),
+                'args': ()
+            },
         }
 
 

@@ -36,7 +36,9 @@ grouppatterns = patterns('account.views',
         url(r'^disableusers/$', 'disable_group_users'),
         url(r'^enableusers/$', 'enable_group_users'),
         url(r'^user/(?P<user_id>\d+)/add/$', 'add_group_user'),
-        url(r'^user/(?P<user_id>\d+)/remove/$', 'remove_user'),)
+        url(r'^user/(?P<user_id>\d+)/remove/$', 'remove_user'),
+        url(r'^permissions/$', 'permissions'),
+		)
 
 
 urlpatterns = patterns('',
