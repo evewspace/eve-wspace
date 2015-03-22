@@ -171,7 +171,7 @@ class MapJSONGenerator(object):
         else:
             raise ValueError
 
-        return "{}images/{}".format(settings.STATIC_URL, image)
+        return "{0}images/{1}".format(settings.STATIC_URL, image)
 
     def get_systems_json(self):
         """Returns a JSON string representing the systems in a map."""
@@ -278,7 +278,7 @@ class MapJSONGenerator(object):
             for y, sys_id in enumerate(column):
                 if sys_id is not None:
                     sys_obj = systems[sys_id]
-                    syslist.append(self.system_to_dict(sys_obj, x, ys[sys_id]))
+                    syslist.append(self.system_to_dict(sys_obj, x, y))
         return syslist
 
 
