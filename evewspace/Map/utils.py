@@ -171,7 +171,7 @@ class MapJSONGenerator(object):
         else:
             raise ValueError
 
-        return "{}images/{}".format(settings.STATIC_URL, image)
+        return "{0}images/{1}".format(settings.STATIC_URL, image)
 
     def get_systems_json(self):
         """Returns a JSON string representing the systems in a map."""
@@ -209,53 +209,77 @@ class MapJSONGenerator(object):
             systems[system.pk] = system
 
         columns = []
-        todo = [(children[None][0], 0, 0)]
+        todo = [(children[None][0], 0)]
 
         # maps system id to current x,y position
         xs = dict()
         ys = dict()
 
         # insert systems into columns
-        # ensuring child.levelY >= parent.levelY
-        # None instead of a system id serves as placeholder
         while len(todo) > 0:
-            sys_id, x, y_min = todo.pop(0)
-            if len(columns) <= x:
-                columns.append([])
+            sys_id, x = todo.pop(0)
+            try:
+                column = columns[x]
+            except IndexError:
+                column = []
+                columns.append(column)
             xs[sys_id] = x
-            column = columns[x]
-            y = len(column)
-            if y < y_min:
-                column += [None] * (y_min - y)
-                y = y_min
-            ys[sys_id] = y
+            ys[sys_id] = len(column)
             column.append(sys_id)
             for child in children[sys_id]:
-                todo.append((child, x + 1, y))
-        
-        # adjust nodes to be at the same level as their first child
-        # (parent.levelY = children[0].levelY)
-        for column in reversed(columns):
-            for sys_id in column:
-                if sys_id is None:
-                    continue
-                parent_id = parents[sys_id]
-                if parent_id is None:
-                    continue
-                if children[parent_id][0] == sys_id:
-                    y_parent = ys[parent_id]
-                    dy = ys[sys_id] - y_parent
+                todo.append((child, x + 1))
+
+        map_changed = True
+        while map_changed:
+            map_changed = False
+            # ensure parent.y >= parent.children[0].y
+            for column in reversed(columns):
+                for sys_id in column:
+                    if sys_id is None:
+                        continue
+                    parent_id = parents[sys_id]
+                    if parent_id is None:
+                        continue
+                    if children[parent_id][0] == sys_id:
+                        y_parent = ys[parent_id]
+                        dy = ys[sys_id] - y_parent
+                        if dy > 0:
+                            map_changed = True
+                            parent_column = columns[xs[parent_id]]
+                            for i in parent_column[y_parent:]:
+                                if i >= 0:
+                                    ys[i] += dy
+                            for i in range(dy):
+                                parent_column.insert(y_parent, None)
+
+            # ensure child.y >= parent.y
+            for x, column in enumerate(columns):
+                for sys_id in column:
+                    if sys_id is None:
+                        continue
+                    try:
+                        child = children[sys_id][0]
+                    except IndexError:
+                        continue
+                    y_child = ys[child]
+                    dy = ys[sys_id] - y_child
                     if dy > 0:
-                        parent_column = columns[xs[parent_id]]
-                        for i in parent_column[y_parent:]:
-                            if i >= 0:
+                        map_changed = True
+                        child_col = columns[x + 1]
+                        for i in child_col[y_child:]:
+                            if i is not None:
                                 ys[i] += dy
                         for i in range(dy):
-                            parent_column.insert(y_parent, None)
+                            child_col.insert(y_child, None)
 
         # create list of system dicts from system ids in columns
-        return [self.system_to_dict(obj, xs[i], ys[i]) \
-                for i, obj in systems.items()]
+        syslist = []
+        for x, column in enumerate(columns):
+            for y, sys_id in enumerate(column):
+                if sys_id is not None:
+                    sys_obj = systems[sys_id]
+                    syslist.append(self.system_to_dict(sys_obj, x, y))
+        return syslist
 
 
 def get_wormhole_type(system1, system2):
