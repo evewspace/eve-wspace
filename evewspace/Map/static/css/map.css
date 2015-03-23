@@ -285,6 +285,9 @@ label[for=massStatusCritical], label[for=sysTypeDangerous] {
     font-weight: bold;
     color: #ff0000;
 }
+#legendDiv {
+    margin-left: 24px;
+}
 #legendDiv ul.inline {
     display: inline;
 }
