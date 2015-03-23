@@ -16,10 +16,11 @@ from django import template
 from Map.models import *
 register = template.Library()
 
+
 @register.inclusion_tag('map_list.html')
 def mapnavlist(user):
     """Return list of maps that should appear in the user's nav bar."""
-    #Make a list, yay!
+    # Make a list, yay!
     maplist = []
     for map in Map.objects.all():
         if map.get_permission(user) > 0:
