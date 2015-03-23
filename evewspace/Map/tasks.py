@@ -12,15 +12,16 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from datetime import datetime, timedelta
+
 from celery import task
 from Map.models import System, KSystem, Signature
-from core.models import Faction, SystemJump
-from core.models import Alliance
+from core.models import Faction
 import eveapi
 from API import cache_handler as handler
 from django.core.cache import cache
-from datetime import datetime, timedelta
 import pytz
+
 
 @task()
 def update_system_stats():
@@ -36,18 +37,20 @@ def update_system_stats():
     for entry in jumpapi.solarSystems:
         try:
             KSystem.objects.filter(pk=entry.solarSystemID).update(
-                    jumps=entry.shipJumps)
+                jumps=entry.shipJumps)
         except Exception:
             pass
     # Update kills from Kills API
     for entry in killapi.solarSystems:
         try:
             System.objects.filter(pk=entry.solarSystemID).update(
-                    shipkills = entry.shipKills,
-                    podkills = entry.podKills,
-                    npckills = entry.factionKills)
+                shipkills=entry.shipKills,
+                podkills=entry.podKills,
+                npckills=entry.factionKills
+            )
         except Exception:
             pass
+
 
 @task()
 def update_system_sov():
@@ -66,13 +69,14 @@ def update_system_sov():
         try:
             if sys.factionID:
                 KSystem.objects.filter(pk=sys.solarSystemID).update(
-                        sov = Faction.objects.get(pk=sys.factionID).name)
+                    sov=Faction.objects.get(pk=sys.factionID).name)
             elif sys.allianceID:
                 if sys.allianceID in lookup_table:
                     KSystem.objects.filter(pk=sys.solarSystemID).update(
-                            sov = lookup_table[sys.allianceID])
+                        sov=lookup_table[sys.allianceID])
         except Exception:
             pass
+
 
 @task()
 def fill_jumps_cache():
@@ -81,19 +85,23 @@ def fill_jumps_cache():
     """
     if not cache.get('route_graph'):
         from Map.utils import RouteFinder
+
         rf = RouteFinder()
         # Initializing RouteFinder should be sufficient to cache the graph
         # If it doesn't for some reason, we explicitly cache it
         if not cache.get('route_graph'):
             rf._cache_graph()
+
+
 @task()
 def check_server_status():
     """
-    Checks the server status, if it detects the server is down, set updated=False
-    on all signatures. This is deprecated as of Hyperion and is maintained
-    to prevent older configuration files from breaking on upgrade.
+    Checks the server status, if it detects the server is down,
+    set updated=False on all signatures. This is deprecated as of Hyperion and
+    is maintained to prevent older configuration files from breaking on upgrade.
     """
     return None
+
 
 @task()
 def downtime_site_update():
@@ -106,6 +114,7 @@ def downtime_site_update():
         if sig.downtimes or sig.downtimes == 0:
             sig.increment_downtime()
 
+
 @task()
 def clear_stale_records():
     """
@@ -113,4 +122,5 @@ def clear_stale_records():
     """
     limit = datetime.now(pytz.utc) - timedelta(minutes=15)
     Signature.objects.filter(owned_time__isnull=False,
-            owned_time__lt=limit).update(owned_time=None, owned_by=None)
+                             owned_time__lt=limit).update(owned_time=None,
+                                                          owned_by=None)

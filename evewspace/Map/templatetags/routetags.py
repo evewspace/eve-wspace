@@ -16,18 +16,20 @@ from django import template
 from Map.models import KSystem
 from django.core.cache import cache
 
-register=template.Library()
+register = template.Library()
+
 
 @register.simple_tag
-def jumps(startSys, destSys):
+def jumps(start_sys, dest_sys):
     """
     Return string with number of stargate jumps.
     """
-    return "%s" % (startSys.jumps_to(destSys) - 1)
+    return "%s" % (start_sys.jumps_to(dest_sys) - 1)
+
 
 @register.simple_tag
-def ly(startSys, destSys):
+def ly(start_sys, dest_sys):
     """
     Returns a string with ly distance.
     """
-    return "%s" % (round(startSys.distance(destSys), 3))
+    return "%s" % (round(start_sys.distance(dest_sys), 3))
