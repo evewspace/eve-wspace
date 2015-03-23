@@ -307,3 +307,16 @@ table.activePilotsTable td {
     border-top: 1px solid black;
     text-align: left;
 }
+
+fieldset.addSystemWormholeType {
+    text-align: center;
+}
+fieldset.addSystemWormholeType label.checkbox {
+    display: inline-block;
+    padding-left: 0;
+}
+fieldset.addSystemWormholeType label.checkbox input[type="checkbox"] {
+    float: none;
+    margin: 0.8em 0.2em;
+}
+
