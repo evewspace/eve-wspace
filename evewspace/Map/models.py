@@ -394,6 +394,7 @@ class MapSystem(models.Model):
     interesttime = models.DateTimeField(null=True, blank=True)
     parentsystem = models.ForeignKey('self', related_name="childsystems",
                                      null=True, blank=True)
+    display_order_priority = models.IntegerField(default=0)
 
     def __unicode__(self):
         return "system %s in map %s" % (self.system.name, self.map.name)
@@ -515,6 +516,16 @@ class MapSystem(models.Model):
             "Truncated to: %s (%s)" % (self.system.name, self.friendlyname),
             True)
 
+    def move_up(self):
+        """Assigns this system the highest display priority of its siblings"""
+        if not self.parentsystem:
+            return
+
+        max_priority = self.parentsystem.childsystems.aggregate(
+            max_prio=models.Max('display_order_priority'))['max_prio']
+        self.display_order_priority = max_priority + 1
+        self.save()
+
     def as_dict(self):
         """Returns a dict representation of the system."""
         try:
@@ -541,6 +552,12 @@ class MapSystem(models.Model):
             'children': [x.as_dict() for x in self.childsystems.all()],
         }
         return data
+
+    def has_siblings(self):
+        parent_sys = self.parentsystem
+        if parent_sys is None:
+            return False
+        return parent_sys.childsystems.count() > 1
 
 
 class Wormhole(models.Model):

@@ -25,6 +25,9 @@
     {% if can_edit %}
     <a class="btn btn-small" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
     {% endif %}
+    {% if can_edit and mapsys.has_siblings %}
+    <a class="btn btn-small" onclick="MoveSystemUp({{mapsys.pk}});">Move Up</a>
+    {% endif %}
     {% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
     <a class="btn btn-small" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>
     {% endif %}
