@@ -203,6 +203,8 @@ class MapJSONGenerator(object):
         parents = dict()
         # maps system ids to objects
         systems = dict()
+        # maps system ids to priorities
+        priorities = dict()
 
         for system in (self.map.systems.all()
                        .select_related('system', 'parentsystem',
@@ -211,6 +213,11 @@ class MapJSONGenerator(object):
             children[system.parentsystem_id].append(system.pk)
             parents[system.pk] = system.parentsystem_id
             systems[system.pk] = system
+            priorities[system.pk] = system.display_order_priority
+
+        # sort children by priority
+        for l in children.values():
+            l.sort(key=priorities.__getitem__, reverse=True)
 
         columns = []
         todo = [(children[None][0], 0)]
