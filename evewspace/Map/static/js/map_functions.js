@@ -1660,3 +1660,16 @@ function togglepilotlist() {
     }
     RefreshMap();
 }
+
+function MoveSystemUp(msID) {
+    var address = "system/" + msID + "/moveup/";
+    $.ajax({
+        url: address,
+        type: "POST",
+        success: function () {
+            DisplaySystemMenu(msID);
+            RefreshMap();
+        }
+    });
+}
+

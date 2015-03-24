@@ -227,10 +227,11 @@ def get_system_context(ms_id, user):
     locations = cache.get('sys_%s_locations' % map_system.system.pk)
     if not locations:
         locations = {}
+    has_siblings = map_system.has_siblings()
     return {'system': system, 'mapsys': map_system,
             'scanwarning': scan_warning, 'isinterest': interest,
             'stfleets': st_fleets, 'locations': locations,
-            'can_edit': can_edit}
+            'can_edit': can_edit, 'has_siblings': has_siblings}
 
 
 @login_required
@@ -1389,3 +1390,15 @@ def purge_signatures(request, map_id, ms_id):
         return HttpResponse()
     else:
         return HttpResponse(status=400)
+
+@require_map_permission(permission=2)
+def move_system_up(request, map_id, ms_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    if not request.method == "POST":
+        return HttpResponse(status=400) 
+
+    mapsys = get_object_or_404(MapSystem, pk=ms_id)
+    mapsys.move_up()
+    return HttpResponse()
+
