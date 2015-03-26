@@ -29,12 +29,13 @@ from django.core.cache import cache
 
 User = settings.AUTH_USER_MODEL
 
+
 class WormholeType(models.Model):
     """Stores the permanent information on wormhole types.
-    Any changes to this table should be made with caution.
 
+    Any changes to this table should be made with caution.
     """
-    name = models.CharField(max_length = 4, unique = True)
+    name = models.CharField(max_length=4, unique=True)
     maxmass = models.BigIntegerField()
     jumpmass = models.BigIntegerField()
     lifetime = models.IntegerField()
@@ -48,20 +49,23 @@ class WormholeType(models.Model):
     # L: Lowsec
     # Z: Class 5 or 6 (5/6 > K holes)
     # X: Special ID for K162 and stargates
-    source = models.CharField(max_length = 2)
+    source = models.CharField(max_length=2)
     # Destination is an integer representation of System.sysclass
     # Except that it may be 0 which indicates a K162 or Stargate
     destination = models.IntegerField()
-    target = models.CharField(max_length = 15)
+    target = models.CharField(max_length=15)
 
     def __unicode__(self):
         """Returns Wormhole ID as unicode representation."""
         return self.name
 
     def dest_string(self):
-        """Returns a readable destination. Cx for w-space and H, L, N otherwise."""
-        if self.destination < 7 and self.destination > 0:
-            return "C%s" % (self.destination)
+        """Returns a readable destination.
+
+        Cx for w-space and H, L, N otherwise.
+        """
+        if 7 > self.destination > 0:
+            return "C%s" % (self.destination,)
         if self.destination == 0:
             return "Varies"
         if self.destination == 7:
@@ -72,22 +76,22 @@ class WormholeType(models.Model):
             return "Null Sec"
         return "Unknown"
 
+
 class System(SystemData):
     """Stores the permanent record of a solar system.
-    This table should not have rows added or removed through Django.
 
+    This table should not have rows added or removed through Django.
     """
     sysclass_choices = ((1, "C1"), (2, "C2"), (3, "C3"), (4, "C4"), (5, "C5"),
-            (6, "C6"), (7, "High Sec"), (8, "Low Sec"), (9, "Null Sec"))
-    sysclass = models.IntegerField(choices = sysclass_choices)
+                        (6, "C6"), (7, "High Sec"), (8, "Low Sec"),
+                        (9, "Null Sec"))
+    sysclass = models.IntegerField(choices=sysclass_choices)
     importance_choices = ((0, "Regular"),
-                     (1, "Dangerous System"),
-                     (2, "Important System"))
-    importance = models.IntegerField(choices = importance_choices, default = 0)
-    occupied = models.TextField(blank = True)
-
-    occupied = models.TextField(blank = True)
-    info = models.TextField(blank = True)
+                          (1, "Dangerous System"),
+                          (2, "Important System"))
+    importance = models.IntegerField(choices=importance_choices, default=0)
+    occupied = models.TextField(blank=True)
+    info = models.TextField(blank=True)
     lastscanned = models.DateTimeField()
     npckills = models.IntegerField(null=True, blank=True)
     podkills = models.IntegerField(null=True, blank=True)
@@ -121,11 +125,11 @@ class System(SystemData):
             return 'Small Ship'
 
     def is_kspace(self):
-        if self.sysclass in range(7,12):
+        if self.sysclass in range(7, 12):
             return True
 
     def is_wspace(self):
-        if not self.sysclass in range(7,12):
+        if self.sysclass not in range(7, 12):
             return True
 
     def is_rhea_space(self):
@@ -133,7 +137,7 @@ class System(SystemData):
             return True
 
     def get_spec(self):
-        if self.sysclass in range(7,12):
+        if self.sysclass in range(7, 12):
             return self.ksystem
         else:
             return self.wsystem
@@ -151,7 +155,7 @@ class System(SystemData):
         super(System, self).save(*args, **kwargs)
 
     def add_active_pilot(self, username, charid, charname,
-            shipname, shiptype):
+                         shipname, shiptype):
         sys_cache_key = 'sys_%s_locations' % self.pk
         current_time = time.time()
         time_threshold = current_time - (15 * 60)
@@ -200,62 +204,71 @@ class System(SystemData):
 
 
 class KSystem(System):
-    sov = models.CharField(max_length = 100)
+    """Represents a k-space system."""
+    sov = models.CharField(max_length=100)
     jumps = models.IntegerField(blank=True, null=True)
 
     def jumps_to(self, destination):
-        """
-        Returns the number of gate jumps to the destination by shortest route.
-        """
+        """Returns the number of gate jumps to a system by shortest route."""
         return utils.RouteFinder().route_length(self, destination)
 
     def distance(self, destination):
-        """
-        Returns the light-year distance to the destination.
-        """
+        """Returns the light-year distance to the destination."""
         return utils.RouteFinder().ly_distance(self, destination)
 
 
 class WSystem(System):
-    static1 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="primary_statics")
-    static2 = models.ForeignKey(WormholeType, blank=True, null=True, related_name="secondary_statics")
+    """Represents a w-space system."""
+    static1 = models.ForeignKey(WormholeType, blank=True, null=True,
+                                related_name="primary_statics")
+    static2 = models.ForeignKey(WormholeType, blank=True, null=True,
+                                related_name="secondary_statics")
     effect = models.CharField(max_length=50, blank=True, null=True)
     is_shattered = models.NullBooleanField(default=False)
 
+
 class Map(models.Model):
-    """Stores the maps available in the map tool. root relates to System model."""
-    name = models.CharField(max_length = 100, unique = True)
+    """Stores the maps available in the map tool.
+
+    root relates to System model.
+    """
+    name = models.CharField(max_length=100, unique=True)
     root = models.ForeignKey(System, related_name="root")
-    # Maps with explicitperms = True require an explicit permission entry to access.
+    # Maps with explicitperms = True
+    # require an explicit permission entry to access.
     explicitperms = models.BooleanField(default=False)
     truncate_allowed = models.BooleanField(default=True)
 
     class Meta:
-        permissions = (("map_unrestricted", "Do not require excplicit access to maps."),
-                ("map_admin", "Access map configuration."),)
+        permissions = (("map_unrestricted",
+                        "Do not require excplicit access to maps."),
+                       ("map_admin", "Access map configuration."),)
 
     def __unicode__(self):
         """Returns name of Map as unicode representation."""
         return self.name
 
     def __contains__(self, system):
-        """
-        A convience to allow 'if system in map:' type statements to determine if
-        there exist a MapSystem with map == map and system == system.
+        """Check if a MapSystem is contained in this map.
+
+        A convience to allow 'if system in map:' type statements to
+        determine if there exist a MapSystem with
+        system.map = self and system in self.systems
         NOTE: system must be a System, NOT a MapSystem
         """
-        #I *think* this should be handled by the filter used in the main return
-        #statement, but as I require this behaviour I'll make it explicit
+        # I *think* this should be handled by the filter used in the
+        # main return statement, but as I require this behaviour
+        # I'll make it explicit
         if system is None:
             return False
 
         return self.systems.filter(system=system).exists()
 
-    #Given a __contains__ function I guess it makes sense to implement this
-    #so for ... in ... will work too.
+    # Given a __contains__ function I guess it makes sense to implement this
+    # so for ... in ... will work too.
     def __iter__(self):
-        """
-        Returns an iterator over all Systems in the map
+        """Returns an iterator over all Systems in the map.
+
         NOTE: returns Systems not MapSystems
         """
         for msys in self.systems.all():
@@ -263,9 +276,7 @@ class Map(models.Model):
 
     @classmethod
     def yaml_import(self, user, yaml_string):
-        """
-        Imports a YAML export string into a new Map.
-        """
+        """Imports a YAML export string into a new Map."""
         yaml_dict = yaml.safe_load(yaml_string)
         map_name = yaml_dict['map_name']
         root_system = yaml_dict['systems'][0]
@@ -273,7 +284,7 @@ class Map(models.Model):
         new_map = Map(name=map_name, root=root_sys)
         new_map.save()
         root_mapsys = new_map.add_system(user=user, system=root_sys,
-                friendlyname=root_system['tag'])
+                                         friendlyname=root_system['tag'])
         for sig in root_system['signatures']:
             sig_id = sig['id']
             info = sig['info']
@@ -281,127 +292,124 @@ class Map(models.Model):
                 sig_type = SignatureType.objects.get(shortname=sig['type'])
             else:
                 sig_type = None
-            if sig_type:
-                updated = True
-            if not Signature.objects.filter(sigid=sig_id, system=root_mapsys.system).exists():
+            if not Signature.objects.filter(
+                    sigid=sig_id, system=root_mapsys.system).exists():
                 Signature(sigid=sig_id, sigtype=sig_type,
-                       system=root_mapsys.system, info=info, updated=updated).save()
+                          system=root_mapsys.system, info=info,
+                          updated=bool(sig_type)).save()
         from POS.models import POS
         POS.update_from_import_list(root_mapsys.system,
-                root_system['starbases'])
+                                    root_system['starbases'])
         root_mapsys.add_children_from_list(root_system['children'])
         return new_map
 
     def add_log(self, user, action, visible=False):
-        """
-        Adds a log entry into a MapLog for the map.
-        """
+        """Adds a log entry into a MapLog for the map."""
         log = MapLog(user=user, map=self, action=action,
                      timestamp=datetime.now(pytz.utc),
                      visible=visible)
         log.save()
 
     def get_permission(self, user):
-        """
-        Returns the highest permision that user has on the map.
+        """Returns the highest permision that user has on the map.
+
         0 = No Access
         1 = Read Access
         2 = Write Access
         """
-        #Anonymous users always return 0
+        # Anonymous users always return 0
         if user.is_anonymous():
             return 0
-        #Special case: If user is a map admin, always return 2
+        # Special case: If user is a map admin, always return 2
         if user.has_perm('Map.map_admin'):
             return 2
-        #Special case: if user is unrestricted we don't care unless the map
-        #requires explicit permissions
+        # Special case: if user is unrestricted we don't care unless the map
+        # requires explicit permissions
         if user.has_perm('Map.map_unrestricted') and not self.explicitperms:
             return 2
 
-        #Otherwise take the highest of the permissions granted by the groups
-        #user is a member of
+        # Otherwise take the highest of the permissions granted by the groups
+        # user is a member of
         highestperm = 0
-        #query set of all groups the user is a member of
+        # query set of all groups the user is a member of
         groups = user.groups.all()
-        #Done this way there should only be one db hit which gets all relevant
-        #permissions
+        # Done this way there should only be one db hit which gets all relevant
+        # permissions
         for perm in self.grouppermissions.filter(group__in=groups):
             highestperm = max(highestperm, perm.access)
 
         return highestperm
 
     def add_system(self, user, system, friendlyname, parent=None):
-        """
+        """Add a system to this map.
+
         Adds the provided system to the map with the provided
         friendly name. Returns the new MapSystem object.
         """
-        mapsystem = MapSystem(map=self, system=system, friendlyname=friendlyname, parentsystem = parent)
+        mapsystem = MapSystem(map=self, system=system,
+                              friendlyname=friendlyname,
+                              parentsystem=parent)
         mapsystem.save()
         self.add_log(user, "Added system: %s" % system.name, True)
         return mapsystem
 
     def as_json(self, user):
-        """
-        Returns the json representation of the map for the mapping Javascript.
-        """
+        """Returns the json representation of the map.
+
+        Used for passing map to the mapping Javascript."""
         return utils.MapJSONGenerator(self, user).get_systems_json()
 
     def as_yaml(self):
-        """
-        Returns the yaml representation of the map for import/export.
-        """
-        data = {
-                'map_name': self.name,
+        """Returns the yaml representation of the map for import/export."""
+        data = {'map_name': self.name,
                 'export_time': datetime.now(pytz.utc),
-                'systems': [x.as_dict() for x in self.systems.filter(
-                    parentsystem=None).all()]
-                }
+                'systems': [x.as_dict() for x in
+                            self.systems.filter(parentsystem=None).all()]}
         return yaml.safe_dump(data, encoding='utf-8', allow_unicode=True)
 
     def snapshot(self, user, name, description):
-        """
-        Makes and returns a snapshot of the map.
-        """
+        """Makes and returns a snapshot of the map."""
         result = Snapshot(user=user, name=name, description=description,
-                json=self.as_json(user))
+                          json=self.as_json(user))
         result.save()
-        self.add_log(user, "Created Snapshot: %s" % (name))
+        self.add_log(user, "Created Snapshot: %s" % (name,))
         return result
 
     def clear_caches(self):
-        """
-        Clears the tooltip and json caches for the map.
-        """
+        """Clears the tooltip and json caches for the map."""
         cache.delete('map_%s_wh_tooltip' % self.pk)
         cache.delete('map_%s_sys_tooltip' % self.pk)
         cache.delete(MapJSONGenerator.get_cache_key(self))
 
+
 class MapSystem(models.Model):
-    """
+    """Represents a system contained in a map.
+
     Stores information regarding which systems are active in which maps
     at the present time.
     """
     map = models.ForeignKey(Map, related_name="systems")
     system = models.ForeignKey(System, related_name="maps")
-    friendlyname = models.CharField(max_length = 255)
+    friendlyname = models.CharField(max_length=255)
     interesttime = models.DateTimeField(null=True, blank=True)
     parentsystem = models.ForeignKey('self', related_name="childsystems",
-            null=True, blank=True)
+                                     null=True, blank=True)
+    display_order_priority = models.IntegerField(default=0)
+
     def __unicode__(self):
         return "system %s in map %s" % (self.system.name, self.map.name)
 
-    def add_children_from_list(self, children=[]):
-        """
-        Adds child systems from list generated by the YAML importer.
-        """
+    def add_children_from_list(self, children=None):
+        """Adds child systems from list generated by the YAML importer."""
+        if not children:
+            children = []
         print "Adding %s children to %s" % (len(children), self.system.name)
         for child in children:
             new_sys = System.objects.get(name=child['system'])
             friendlyname = child['tag']
-            parentsystem = self
             new_mapsys = MapSystem(map=self.map, system=new_sys,
-                    friendlyname=friendlyname, parentsystem=self)
+                                   friendlyname=friendlyname,
+                                   parentsystem=self)
             new_mapsys.save()
             parent_wh = child['parent_wh']
             top_type = WormholeType.objects.get(name=parent_wh['near_type'])
@@ -411,10 +419,11 @@ class MapSystem(models.Model):
             mass_status = parent_wh['mass_status']
             time_status = parent_wh['time_status']
 
-            wh = new_mapsys.connect_to(system=self, topType=top_type,
-                    bottomType=bottom_type, topBubbled=top_bubbled,
-                    bottomBubbled=bottom_bubbled, timeStatus=time_status,
-                    massStatus=mass_status)
+            wh = new_mapsys.connect_to(
+                system=self, top_type=top_type,
+                bottom_type=bottom_type, top_bubbled=top_bubbled,
+                bottom_bubbled=bottom_bubbled, time_status=time_status,
+                mass_status=mass_status)
             wh.save()
 
             for sig in child['signatures']:
@@ -428,26 +437,29 @@ class MapSystem(models.Model):
                     updated = True
                 else:
                     updated = False
-                if not Signature.objects.filter(system=self.system, sigid=sig_id).exists():
+                if not Signature.objects.filter(
+                        system=self.system, sigid=sig_id).exists():
                     Signature(sigid=sig_id, sigtype=sig_type,
-                            system=self.system, info=info, updated=updated).save()
+                              system=self.system, info=info,
+                              updated=updated).save()
             from POS.models import POS
             POS.update_from_import_list(self.system, child['starbases'])
             new_mapsys.add_children_from_list(child['children'])
 
     def connect_to(self, system,
-                   topType, bottomType,
-                   topBubbled=False, bottomBubbled=False,
-                   timeStatus=0, massStatus=0):
-        """
+                   top_type, bottom_type,
+                   top_bubbled=False, bottom_bubbled=False,
+                   time_status=0, mass_status=0):
+        """Add a new connection to this system.
+
         Connect self to system and add the connecting WH to map, self is the
         bottom system. Returns the connecting wormhole.
         """
-        wormhole = Wormhole(map=self.map, top = system, bottom=self,
-                      top_type=topType, bottom_type=bottomType,
-                      top_bubbled=topBubbled, bottom_bubbled=bottomBubbled,
-                      time_status=timeStatus, mass_status=massStatus)
-
+        wormhole = Wormhole(
+            map=self.map, top=system, bottom=self,
+            top_type=top_type, bottom_type=bottom_type,
+            top_bubbled=top_bubbled, bottom_bubbled=bottom_bubbled,
+            time_status=time_status, mass_status=mass_status)
         wormhole.save()
         return wormhole
 
@@ -461,17 +473,15 @@ class MapSystem(models.Model):
         super(MapSystem, self).delete(*args, **kwargs)
 
     def remove_system(self, user):
-        """
-        Removes the supplied system and all of its children.
-        """
+        """Removes the supplied system and all of its children."""
         # Raise ValueError if we're trying to delete the root
         if not self.parentsystem:
             raise ValueError("Cannot remove the root system.")
         self.parent_wormhole.delete()
         for system in self.childsystems.all():
             system.remove_system(user)
-        self.map.add_log(user, "Removed system: %s (%s)" % (self.system.name,
-            self.friendlyname), True)
+        self.map.add_log(user, "Removed system: %s (%s)" %
+                         (self.system.name, self.friendlyname), True)
         self.delete()
 
     def get_all_children(self):
@@ -483,9 +493,7 @@ class MapSystem(models.Model):
         return child_list
 
     def promote_system(self, user):
-        """
-        Makes this system the root system and deletes all other chains.
-        """
+        """Makes this system the root system and deletes all other chains."""
         if not self.parentsystem:
             # This is already the root system
             return True
@@ -496,49 +504,65 @@ class MapSystem(models.Model):
         # Generate a list of systems to delete
         child_list = self.get_all_children()
         for sys in self.map.systems.all():
-            if not sys in child_list:
+            if sys not in child_list:
                 try:
                     sys.parent_wormhole.delete()
                 except Exception:
                     # Nasty hack because of race condition for deleting hole
                     pass
                 sys.delete()
-        self.map.add_log(user, "Truncated to: %s (%s)" % (self.system.name,
-            self.friendlyname), True)
+        self.map.add_log(
+            user,
+            "Truncated to: %s (%s)" % (self.system.name, self.friendlyname),
+            True)
+
+    def move_up(self):
+        """Assigns this system the highest display priority of its siblings"""
+        if not self.parentsystem:
+            return
+
+        max_priority = self.parentsystem.childsystems.aggregate(
+            max_prio=models.Max('display_order_priority'))['max_prio']
+        self.display_order_priority = max_priority + 1
+        self.save()
 
     def as_dict(self):
-        """
-        Returns a dict representation of the system.
-        """
+        """Returns a dict representation of the system."""
         try:
             parent_wh_dict = {
-                    'near_type': self.parent_wormhole.top_type.name,
-                    'far_type': self.parent_wormhole.bottom_type.name,
-                    'updated': self.parent_wormhole.updated,
-                    'top_bubbled': self.parent_wormhole.top_bubbled,
-                    'bottom_bubbled': self.parent_wormhole.bottom_bubbled,
-                    'mass_status': self.parent_wormhole.mass_status,
-                    'time_status': self.parent_wormhole.time_status,
-                    'collapsed': self.parent_wormhole.collapsed
-                    }
+                'near_type': self.parent_wormhole.top_type.name,
+                'far_type': self.parent_wormhole.bottom_type.name,
+                'updated': self.parent_wormhole.updated,
+                'top_bubbled': self.parent_wormhole.top_bubbled,
+                'bottom_bubbled': self.parent_wormhole.bottom_bubbled,
+                'mass_status': self.parent_wormhole.mass_status,
+                'time_status': self.parent_wormhole.time_status,
+                'collapsed': self.parent_wormhole.collapsed,
+            }
         except Wormhole.DoesNotExist:
             parent_wh_dict = None
 
         data = {
-                'tag': self.friendlyname,
-                'system': self.system.name,
-                'signatures':[sig.as_dict() for sig in self.system.signatures.all()],
-                'starbases': [pos.as_dict() for pos in self.system.poses.all()],
-                'parent_wh': parent_wh_dict,
-                'children': [x.as_dict() for x in self.childsystems.all()]
-                }
+            'tag': self.friendlyname,
+            'system': self.system.name,
+            'signatures': [sig.as_dict() for sig in
+                           self.system.signatures.all()],
+            'starbases': [pos.as_dict() for pos in self.system.poses.all()],
+            'parent_wh': parent_wh_dict,
+            'children': [x.as_dict() for x in self.childsystems.all()],
+        }
         return data
 
+    def has_siblings(self):
+        parent_sys = self.parentsystem
+        if parent_sys is None:
+            return False
+        return parent_sys.childsystems.count() > 1
 
 
 class Wormhole(models.Model):
-    """
-    An instance of a wormhole in a  map.
+    """An instance of a wormhole in a  map.
+
     Wormhole have a 'top' and a 'bottom', the top refers to the
     side that is found first (and the bottom is obviously the other side)
     """
@@ -546,12 +570,15 @@ class Wormhole(models.Model):
     top = models.ForeignKey(MapSystem, related_name='child_wormholes')
     top_type = models.ForeignKey(WormholeType, related_name='+')
     top_bubbled = models.NullBooleanField(null=True, blank=True)
-    bottom = models.OneToOneField(MapSystem, null=True, related_name='parent_wormhole')
+    bottom = models.OneToOneField(MapSystem, null=True,
+                                  related_name='parent_wormhole')
     bottom_type = models.ForeignKey(WormholeType, related_name='+')
     bottom_bubbled = models.NullBooleanField(null=True, blank=True)
-    time_status = models.IntegerField(choices = ((0, "Fine"), (1, "End of Life")))
-    mass_status = models.IntegerField(choices = ((0, "No Shrink"),
-        (1, "First Shrink"), (2, "Critical")))
+    time_status = models.IntegerField(choices=((0, "Fine"),
+                                               (1, "End of Life")))
+    mass_status = models.IntegerField(choices=((0, "No Shrink"),
+                                               (1, "First Shrink"),
+                                               (2, "Critical")))
     updated = models.DateTimeField(auto_now=True)
     eol_time = models.DateTimeField(null=True)
     collapsed = models.NullBooleanField(null=True)
@@ -593,13 +620,14 @@ class Wormhole(models.Model):
         self.map.clear_caches()
         super(Wormhole, self).save(*args, **kwargs)
 
+
 class SignatureType(models.Model):
-    """
-    Stores the list of possible signature types for the map tool.
+    """Stores the list of possible signature types for the map tool.
+
     Custom signature types may be added at will.
     """
-    shortname = models.CharField(max_length = 6)
-    longname = models.CharField(max_length = 100)
+    shortname = models.CharField(max_length=6)
+    longname = models.CharField(max_length=100)
     # sleepersite and escalatable are used to track wormhole comabt sites.
     # sleepersite = true should give a "Rats cleared" option
     # escalatable = true should cause escalation tracking to kick in in C5/6
@@ -615,8 +643,9 @@ class Signature(models.Model):
     """Stores the signatures active in all systems. Relates to System model."""
     system = models.ForeignKey(System, related_name="signatures")
     modified_by = models.ForeignKey(User, related_name="signatures", null=True)
-    sigtype = models.ForeignKey(SignatureType, related_name="sigs", null=True, blank=True)
-    sigid = models.CharField(max_length = 10)
+    sigtype = models.ForeignKey(SignatureType, related_name="sigs",
+                                null=True, blank=True)
+    sigid = models.CharField(max_length=10)
     updated = models.BooleanField(default=False)
     info = models.CharField(max_length=65, null=True, blank=True)
     # ratscleared and lastescalated are used to track wormhole combat sites.
@@ -642,10 +671,10 @@ class Signature(models.Model):
 
     def as_dict(self):
         data = {
-                'id': self.sigid,
-                'type': self.sigtype.shortname if self.sigtype else None,
-                'info': self.info
-                }
+            'id': self.sigid,
+            'type': self.sigtype.shortname if self.sigtype else None,
+            'info': self.info,
+        }
         return data
 
     def activate(self):
@@ -716,37 +745,41 @@ class Signature(models.Model):
         self.system.clear_sig_cache()
         super(Signature, self).delete(*args, **kwargs)
 
+
 class MapPermission(models.Model):
-    """
-    Relates a user group to it's map permissions.
+    """Relates a user group to it's map permissions.
+
     Non-restricted groups will have change access to all maps.
     """
     group = models.ForeignKey(Group, related_name="mappermissions")
     map = models.ForeignKey(Map, related_name="grouppermissions")
-    access = models.IntegerField(choices=((0,'No Access'),
-        (1,'View Only'), (2,'View / Change')))
+    access = models.IntegerField(choices=((0, 'No Access'),
+                                          (1, 'View Only'),
+                                          (2, 'View / Change')))
 
 
 class MapLog(models.Model):
-    """
-    Represents an action that has taken place on a map (e.g. adding a signature).
+    """Represents an action that has taken place on a map.
+
     This is used for pushing updates since last page load to clients.
+    Includes things like adding a signature.
     """
     map = models.ForeignKey(Map, related_name="logentries")
     user = models.ForeignKey(User, related_name="maplogs")
     timestamp = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=255)
-    # Visible logs are pushed to clients as they ocurr (e.g. system added to map)
+    # Visible logs are pushed to clients as they ocurr
+    # (e.g. system added to map)
     visible = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return "Map: %s  User: %s  Action: %s  Time: %s" % (self.map.name, self.user.username,
-                self.action, self.timestamp)
+        return ("Map: %s  User: %s  Action: %s  Time: %s" %
+                (self.map.name, self.user.username,
+                 self.action, self.timestamp))
 
 
 class Snapshot(models.Model):
-    """Represents a snapshot of the JSON strings that are used to draw a map."""
-
+    """Represents a snapshot of the JSON strings used to draw a map."""
     name = models.CharField(max_length=64)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, related_name='snapshots')
@@ -755,9 +788,12 @@ class Snapshot(models.Model):
 
 
 class Destination(models.Model):
-    """Represents a corp-wide destination whose range should be shown in the map."""
+    """Represents a corp-wide destination.
+
+    Distance to this destination will be shown in the map."""
     system = models.ForeignKey(KSystem, related_name='destinations')
     user = models.ForeignKey(User, related_name='destinations', null=True)
+
 
 class SiteSpawn(models.Model):
     """Contains the site spawn list for a site as HTML."""
@@ -783,25 +819,42 @@ class InlineModelChoiceField(forms.ModelChoiceField):
         try:
             return self.queryset.filter(name=value).get()
         except self.queryset.model.DoesNotExist:
-            raise forms.ValidationError("Please enter a valid %s." % (self.queryset.model._meta.verbose_name,))
+            raise forms.ValidationError(
+                "Please enter a valid %s." %
+                (self.queryset.model._meta.verbose_name,))
+
 
 class MapForm(ModelForm):
-    root = InlineModelChoiceField(queryset=System.objects.all(),
-            widget=forms.TextInput(attrs={'class': 'systemAuto'}))
+    root = InlineModelChoiceField(
+        queryset=System.objects.all(),
+        widget=forms.TextInput(attrs={'class': 'systemAuto'}))
+
     class Meta:
         model = Map
 
 
 class SignatureForm(ModelForm):
-    """
+    """Form for adding a signature.
+
     This form should only be used with commit=False since it does not
     set the system or updated fields.
     """
-    sigid = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-mini'}), label="ID:")
-    sigtype = forms.ModelChoiceField(queryset=SignatureType.objects.all(), label="Type:", required=False)
-    info = forms.CharField(widget=forms.TextInput(attrs={'class': 'input-medium'}),label="Info:", required=False)
+    sigid = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'input-mini'}),
+        label="ID:")
+
+    sigtype = forms.ModelChoiceField(
+        queryset=SignatureType.objects.all(),
+        label="Type:",
+        required=False)
+
+    info = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'input-medium'}),
+        label="Info:",
+        required=False)
+
     sigtype.widget.attrs['class'] = 'input-small'
+
     class Meta:
         model = Signature
         fields = ('sigid', 'sigtype', 'info')
-

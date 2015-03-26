@@ -15,25 +15,27 @@
 from core.models import ConfigEntry
 #defaults = [("TEST_SETTING", "BOB")]
 defaults = [
-        ("MAP_PVP_THRESHOLD", "0"),
-        ("MAP_NPC_THRESHOLD", "10"),
-        ("MAP_SCAN_WARNING", "3"),
-        ("MAP_INTEREST_TIME", "15"),
-        ("MAP_ESCALATION_BURN", "3"),
-        ("MAP_ZEN_MODE", "0"),
-        ("MAP_PILOT_LIST", "0"),
-        ("MAP_DETAILS_COMBINED", "0"),
-        ("MAP_RENDER_WH_TAGS", "1"),
-        ("MAP_SCALING_FACTOR", "1"),
-        ("MAP_HIGHLIGHT_ACTIVE", "1"),
-        ("MAP_AUTO_REFRESH", "1"),
-        ("MAP_KSPACE_MAPPING", "0"),
-        ("MAP_SILENT_MAPPING", "0"),
-        ("MAP_RENDER_COLLAPSED", "0"),
-        ]
+    ("MAP_PVP_THRESHOLD", "0"),
+    ("MAP_NPC_THRESHOLD", "10"),
+    ("MAP_SCAN_WARNING", "3"),
+    ("MAP_INTEREST_TIME", "15"),
+    ("MAP_ESCALATION_BURN", "3"),
+    ("MAP_ZEN_MODE", "0"),
+    ("MAP_PILOT_LIST", "0"),
+    ("MAP_DETAILS_COMBINED", "0"),
+    ("MAP_RENDER_WH_TAGS", "1"),
+    ("MAP_SCALING_FACTOR", "1"),
+    ("MAP_HIGHLIGHT_ACTIVE", "1"),
+    ("MAP_AUTO_REFRESH", "1"),
+    ("MAP_KSPACE_MAPPING", "0"),
+    ("MAP_SILENT_MAPPING", "0"),
+    ("MAP_RENDER_COLLAPSED", "0"),
+]
+
 
 def load_defaults():
     for setting in defaults:
-        config = ConfigEntry.objects.get_or_create(name=setting[0], user=None)[0]
+        config = ConfigEntry.objects.get_or_create(name=setting[0],
+                                                   user=None)[0]
         config.value = setting[1]
         config.save()
