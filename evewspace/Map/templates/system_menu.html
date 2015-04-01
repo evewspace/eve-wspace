@@ -35,32 +35,32 @@
             <li><a onclick="MoveSystem({{mapsys.pk}}, 'down');">Down</a></li>
         </ul>
     </div>
-{% endif %}
-{% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
-<a class="btn btn-small" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>
-{% endif %}
-<div id="intelButton" class="btn-group dropdown">
-    <a class="btn  btn-small dropdown-toggle" data-toggle="dropdown">
-        Intel
-        <span class="caret"></span>
-    </a>
-    <ul id="intelDropdown" class="dropdown-menu" role="menu">
-    <li><a href="https://eveeye.com/?system={{system.name}}" target="_blank">EveEye</a></li>
-    <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
-    {% if system.is_kspace < 7 %}
-    <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
-    {% else %}
-    <li><a href="http://evemaps.dotlan.net/map/{{system.region.name.split|join:"_"}}/{{system.name.split|join:"_"}}" target="_blank">Dotlan</a></li>
     {% endif %}
-    <li><a href="http://zkillboard.com/system/{{system.pk}}" target="_blank">zKillboard</a></li>
-    {% if system.is_wspace < 7 %}
-    <li><a href="http://wh.pasta.gg/{{system.name}}" target="_blank">Wormhol.es</a></li>
+    {% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
+    <a class="btn btn-small" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>
     {% endif %}
-    {% if system.id == 31000005 %}
-    <li><a href="http://eve-scout.com/" target="_blank">EveScout</a></li>
-    {% endif %}
+    <div id="intelButton" class="btn-group dropdown">
+        <a class="btn  btn-small dropdown-toggle" data-toggle="dropdown">
+            Intel
+            <span class="caret"></span>
+        </a>
+        <ul id="intelDropdown" class="dropdown-menu" role="menu">
+        <li><a href="https://eveeye.com/?system={{system.name}}" target="_blank">EveEye</a></li>
+        <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
+        {% if system.is_kspace < 7 %}
+        <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
+        {% else %}
+        <li><a href="http://evemaps.dotlan.net/map/{{system.region.name.split|join:"_"}}/{{system.name.split|join:"_"}}" target="_blank">Dotlan</a></li>
+        {% endif %}
+        <li><a href="http://zkillboard.com/system/{{system.pk}}" target="_blank">zKillboard</a></li>
+        {% if system.is_wspace < 7 %}
+        <li><a href="http://wh.pasta.gg/{{system.name}}" target="_blank">Wormhol.es</a></li>
+        {% endif %}
+        {% if system.id == 31000005 %}
+        <li><a href="http://eve-scout.com/" target="_blank">EveScout</a></li>
+        {% endif %}
 
-</ul>
+    </ul>
 </div>
     {% if can_edit %}
             {% if isinterest %}
