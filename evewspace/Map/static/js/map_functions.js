@@ -1161,7 +1161,8 @@ function GetConnectionDash(system) {
     if (system.interestpath == true || system.interest == true) {
         return interestDash;
     }
-    return "none";
+    // Use blank space instead of none to work around issue with Firefox 37+
+    return " ";
 }
 
 function GetConnectionColor(system) {
