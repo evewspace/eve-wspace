@@ -37,9 +37,15 @@
     width: 200px;
     display: none;
 }
-.systemStatsList
-{
+.systemStatsList {
+    display: inline;
     list-style: none;
+}
+.systemStatItem {
+    display: inline-block;
+    padding-right: 5px;
+    padding-left: 5px;
+    border-right: 1px #555 dotted;
 }
 .popover
 {
@@ -86,6 +92,10 @@
 .detailsLeft
 {
     text-align: left;
+}
+.detailsLeftCombined
+{
+    margin-left: 40px;	
 }
 .infoText
 {
@@ -135,10 +145,6 @@
 .sysFriendlySpan
 {
     text-align: center;
-}
-.activePlayerPanel
-{
-    margin-left: 46px;
 }
 .sysLSdiv
 {
@@ -212,3 +218,108 @@ textarea
   top: 21px;
   content: '';
 }
+#sysInfoDiv {
+    margin-left: 15px;
+}
+.sysInfoCombinedDiv h4 {
+    clear: both;
+    display: block;
+    margin-top: 20px;
+}
+.sysInfoCombinedHr {
+	width: 600px;
+	border-color: #ccc; 	
+}
+.sigWH {
+    color: #63a5ff;
+}
+.sigRELIC {
+    color: #ff63f2;
+}
+.sigDATA {
+    color: #9139f3;
+}
+.sigGAS {
+    color: #f3b839;
+}
+
+#scrollmenu {
+    position: fixed;
+    left: 2px;
+    top: 40%;
+    width: 24px;
+    margin: 0px;
+    padding: 0px;
+    z-index: 100;
+}
+#backtotop {
+    background: url(../images/back_to_top.png);
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    cursor: pointer;
+    padding-bottom: 3px;
+}
+#tobuttons {
+    background: url(../images/to_buttons.png);
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    cursor: pointer;
+}
+
+label {
+    display: inline;
+}
+label[for=massStatusReduced],label[for=sysTypeImportant] {
+    font-weight: bold;
+    color: #fffc00;
+}
+label[for=massStatusNormal], label[for=sysTypeRegular] {
+    font-weight: bold;
+    color: #00ff00;
+}
+label[for=massStatusCritical], label[for=sysTypeDangerous] {
+    font-weight: bold;
+    color: #ff0000;
+}
+#legendDiv {
+    margin-left: 24px;
+}
+#legendDiv ul.inline {
+    display: inline;
+}
+
+div.activePlayerList {
+    text-align: center;
+}
+table.activePilotsTable {
+    border: 1px solid black;
+    margin: auto;
+}
+table.activePilotsTable tr:nth-child(2n) {
+    background-color: rgba(255, 255, 255, 0.04);
+}
+table.activePilotsTable td,
+table.activePilotsTable th {
+    padding: 0.1em 0.5em;
+}
+table.activePilotsTable td {
+    border-top: 1px solid black;
+    text-align: left;
+}
+
+fieldset.addSystemWormholeType {
+    text-align: center;
+}
+fieldset.addSystemWormholeType label.checkbox {
+    display: inline-block;
+    padding-left: 0;
+}
+fieldset.addSystemWormholeType label.checkbox input[type="checkbox"] {
+    float: none;
+    margin: 0.8em 0.2em;
+}
+

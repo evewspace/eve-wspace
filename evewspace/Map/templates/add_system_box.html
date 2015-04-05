@@ -3,80 +3,78 @@
         <h4>Add System Connected To: {{topMs.system.name}}</h4>
     </div>
     <div class="modal-body">
-    <form id="sysAddForm" class="form-horizontal" action="system/new/" method="post">
-        {% csrf_token %}
-        <input type="hidden" class="sysAddInput" name="topMsID" value="{{topMs.pk}}">
-        <div class="control-group">
-            <label class="control-label" for="sysNameBox">System:</label>
-            <div class="controls">
-                <input type="text" class="sysAddInput systemAuto" name="bottomSystem" id="sysNameBox" value ="{{newsystem}}" />
+        <form id="sysAddForm" class="form-horizontal" action="system/new/" method="post">
+            {% csrf_token %}
+            <input type="hidden" class="sysAddInput" name="topMsID" value="{{topMs.pk}}">
+            <div class="control-group">
+                <label class="control-label" for="sysNameBox">System:</label>
+                <div class="controls">
+                    <input type="text" class="sysAddInput systemAuto" name="bottomSystem" id="sysNameBox" value ="{{newsystem}}" />
+                </div>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="friendlyNameBox">Friendly Name <br /> (Max 8 Char.):</label>
-            <div class="controls">
-                <input type="text" class="sysAddInput" name="friendlyName" id="friendlyNameBox" value="">
+            <div class="control-group">
+                <label class="control-label" for="friendlyNameBox">Friendly Name <br /> (Max 8 Char.):</label>
+                <div class="controls">
+                    <input type="text" class="sysAddInput" name="friendlyName" id="friendlyNameBox" value="">
+                </div>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="timeStatusAnchor">Time Status:</label>
-            <div class="controls">
-                <input type="radio" id="timeStatusAnchor" class="sysAddInput" name="timeStatus" value="0" checked="checked">Normal &nbsp
-                <input type="radio" class="sysAddInput" name="timeStatus" value="1">End of Life
+            <div class="control-group">
+                <label class="control-label" for="timeStatusAnchor">Time Status:</label>
+                <div class="controls">
+                    <label for="timeStatusNormal"><input type="radio" id="timeStatusAnchor" class="sysAddInput" name="timeStatus" value="0" checked="checked"> Normal &nbsp</label>
+                    <label for="timeStatusEol"><input type="radio" class="sysAddInput" name="timeStatus" value="1"> End of Life</label>
+                </div>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="massStatusAnchor">Mass Status:</label>
-            <div class="controls">
-                <input type="radio" id="massStatusAnchor" class="sysAddInput" name="massStatus" value="0" checked="checked">Normal &nbsp
-                <input type="radio" class="sysAddInput" name="massStatus" value="1">First Shrink &nbsp
-                <input type="radio" class="sysAddInput" name="massStatus" value="2">Critical<br />
-            </div>
-            <br />
-            <div>
-                <h5>Wormhole Information</h5>
-                <div class="row span6">
-                    <div class="span2"> 
-                        <h5>{{topMs.system.name}} ({{topMs.friendlyname}})</h5>
-                        <fieldset style="margin-left: 25px;">
+            <div class="control-group">
+                <label class="control-label" for="massStatusAnchor">Mass Status:</label>
+                <div class="controls">
+                    <label for="massStatusNormal"><input type="radio" id="massStatusAnchor" class="sysAddInput" name="massStatus" value="0" checked="checked"> Normal &nbsp</label>
+                    <label for="massStatusReduced"><input type="radio" class="sysAddInput" name="massStatus" value="1"> First Shrink &nbsp</label>
+                    <label for="massStatusCritical"><input type="radio" class="sysAddInput" name="massStatus" value="2"> Critical</label><br />
+                </div>
+                <br />
+                <div>
+                    <h5>Wormhole Information</h5>
+                    <div class="row span6">
+                        <div class="span2"> 
+                            <h5>{{topMs.system.name}} ({{topMs.friendlyname}})</h5>
+                            <fieldset class="addSystemWormholeType">
                                 <label for="topTypeInput">Type:</label>
                                 <input type="text" class="sysAddInput wormholeAuto input-mini" id="topTypeInput" name="topType" value="K162" onclick="this.value = '';" />
-                                <label style="margin-top: 5px;" class="checkbox" for="topBubbledCheckbox">
+                                <label class="checkbox" for="topBubbledCheckbox">
                                     <input type="checkbox" class="sysAddInput" name="topBubbled" id="topBubbledCheckbox">Bubbled
                                 </label>
-                        </fieldset>
+                            </fieldset>
+                        </div>
+                        <div class="span1"><h5><-------></h5></div>
+                        <div class="span2">
+                            <h5>Other Side</h5>
+                            <fieldset class="addSystemWormholeType">
+                                <label for="bottomTypeInput">Type:</label>
+                                <input type="text" class="sysAddInput wormholeAuto input-mini" id="bottomTypeInput" name="bottomType" value="K162" onclick="this.value = '';" />
+                                <label class="checkbox" for="bottomBubbledCheckbox">
+                                    <input type="checkbox" id="bottomBubbledCheckbox" class="sysAddInput" name="bottomBubbled">Bubbled
+                                </label>
+                            </fieldset>
+                        </div>
                     </div>
-                    <div class="span1">
-                        <h5><-------></h5>
-                    </div>
-            <div class="span2">
-                <h5>Other Side</h5>
-                <fieldset style="margin-left: 35px;">
-                    <label for="bottomTypeInput">Type:</label>
-                    <input type="text" class="sysAddInput wormholeAuto input-mini" id="bottomTypeInput" name="bottomType" value="K162" onclick="this.value = '';" />
-                    <label style="margin-top: 5px;" class="checkbox" for="bottomBubbledCheckbox">
-                        <input type="checkbox" id="bottomBubbledCheckbox" class="sysAddInput" name="bottomBubbled">Bubbled
-                    </label>
-                </fieldset>
-            </div>
-    </div>
-        </div>
+                </div>
 
-            <input type="submit" style="display: none;">
-        </form>
+                <input type="submit" style="display: none;">
+            </form>
+        </div>
     </div>
-</div>
     <div class="modal-footer">
         <a href="#" id="sysCloseButton" class="btn" data-dismiss="modal">Close</a>
-            <a href="#" id="sysAddSubmit" onclick="$('#sysAddForm').submit();" class="btn btn-primary">Add System</a>
+        <a href="#" id="sysAddSubmit" onclick="$('#sysAddForm').submit();" class="btn btn-primary">Add System</a>
     </div>
-        <script type="text/javascript">
-           $('#sysAddForm').submit(function(e){
-                        e.preventDefault();
-                        AddSystem();
-                        $('#modalHolder').modal('hide');
-                        return false;
-            });
-        </script>
-    </div>
+    <script type="text/javascript">
+        $('#sysAddForm').submit(function(e){
+            e.preventDefault();
+            AddSystem();
+            $('#modalHolder').modal('hide');
+            return false;
+        });
+    </script>
+</div>
 

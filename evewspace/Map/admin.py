@@ -1,6 +1,7 @@
 from Map.models import *
 from django.contrib import admin
 
+
 class SystemAdmin(admin.ModelAdmin):
     fields = ['occupied', 'info']
 

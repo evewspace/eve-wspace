@@ -48,12 +48,17 @@ CELERYBEAT_SCHEDULE = {
             },
         'cache_reddit':{
                 'task': 'core.tasks.cache_eve_reddit',
-                'schedule': timedelta(seconds=45),
+                'schedule': timedelta(minutes=45),
                 'args': ()
             },
         'cache_feeds':{
                 'task': 'core.tasks.update_feeds',
                 'schedule': timedelta(minutes=30),
+                'args': ()
+            },
+        'char_data':{
+                'task': 'API.tasks.update_char_data',
+                'schedule': timedelta(hours=1),
                 'args': ()
             },
         }

@@ -1,7 +1,6 @@
 <div class="accordion" id="map_accordion">
     {% load static %}
     {% load mapconfig %}
-    <script type="text/javascript" src="{% get_static_prefix %}js/map_settings.js"></script>
     <div class="accordion-group">
         <div class="accordion-heading">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#mapGeneral">
@@ -46,35 +45,20 @@
             </div>
         </div>
         <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#SigTypes">
-                Signature Types
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#GlobalDisplay">
+                Display Settings
             </a>
         </div>
-        <div id="SigTypes" class="accordion-body collapse">
+        <div id="GlobalDisplay" class="accordion-body collapse">
             <div class="accordion-inner">
                 <p class="text-info">
-                Here you can define custom signature types. <br />
-                <br />
-                NOTE: Deleting a Signature Type will remove all signatures of that type and all site spawns associated with that type.
+                    These settings will be the default for all users who have not explicitly set them in their profile.
                 </p>
-                <div id="sigTypesDiv">
+                <div id="globalDisplayDiv">
                 </div>
             </div>
         </div>
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#SiteSpawns">
-                Site Spawns
-            </a>
-        </div>
-        <div id="SiteSpawns" class="accordion-body collapse">
-            <div class="accordion-inner">
-                <p class="text-info">
-                    Here you can add, remove, and change site listings.
-                </p>
-                <div id="siteSpawnsDiv">
-                </div>
-            </div>
-        </div>
+
         {% for m in maps %}
         <div class="accordion-heading">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#map{{m.pk}}Settings">

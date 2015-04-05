@@ -12,17 +12,22 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from django import template
-from Map.models import *
-register = template.Library()
 
+from celery import task
+from API.models import APIKey, MemberAPIKey
+from django.core.cache import cache
+from django.contrib.auth import get_user_model
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
-@register.inclusion_tag('map_list.html')
-def mapnavlist(user):
-    """Return list of maps that should appear in the user's nav bar."""
-    # Make a list, yay!
-    maplist = []
-    for map in Map.objects.all():
-        if map.get_permission(user) > 0:
-            maplist.append(map)
-    return {'maps': maplist}
+User = get_user_model()
+
+@task()
+def update_char_data():
+    #Get all users
+    user_list = User.objects.all()
+    for user in user_list:
+        #Get all API keys of a user and validate them
+        for key in user.api_keys.all():
+            key.validate()

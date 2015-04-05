@@ -15,6 +15,7 @@
 
 $(document).ready(function(){
     GetProfileDestinationSettings();
+    GetProfDisplaySettings()
 });
 
 function GetProfileDestinationSettings(){
@@ -47,3 +48,32 @@ function RemoveProfileDestination(destID){
         success: function(){GetProfileDestinationSettings();}
     });
 }
+
+function GetProfDisplaySettings(){
+    $.ajax({
+        type: "GET",
+        url: "/map/settings/user-display/",
+        success: function(data){
+            $("#mapDisplayHolder").html(data);
+        },
+        error: function(data){
+            alert("There was an error getting the display settings.");
+        }
+    });
+}
+
+function SaveProfDisplaySettings(){
+    $.ajax({
+        type: "POST",
+        data: $('#mapDisplayForm').serialize(),
+        url: "/map/settings/user-display/",
+        success: function(data){
+            $("#mapDisplayHolder").html(data);
+            $('.slider').slider();
+        },
+        error: function(){
+            alert("Invalid values, please make sure only integers are used.");
+            }
+    });
+}
+

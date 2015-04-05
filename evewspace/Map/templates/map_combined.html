@@ -46,7 +46,7 @@
     <button id='btnExportMap' class='btn btn-mini btn-info' onclick='GetExportMap();'>Export</button>
     <button id='btnZen' class='btn btn-mini btn-info' onclick="togglezen()">Zen</button> 
     <span style="margin-right: 5px; margin-left: 5px;"></span>
-    <input id='scaleSlider' type="text" class="slider" value="" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="{{user.get_settings.MAP_SCALING_FACTOR}}" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
+    <input id='scaleSlider' type="text" class="slider" value="" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
 </div>
 <div id="mapDiv" class="mapDiv">
 </div>
@@ -69,7 +69,7 @@
 </div>
 {% endblock %}
 {% block content %}
-<div id="sysInfoDiv" class="sysInfoDiv">
+<div id="sysInfoDiv" class="sysInfoCombinedDiv sysInfoDiv">
     <a name="sysInfo"></a>
 </div>
 {% endblock %}

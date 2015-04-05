@@ -25,6 +25,9 @@
     {% if can_edit %}
     <a class="btn btn-small" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
     {% endif %}
+    {% if can_edit and mapsys.has_siblings %}
+    <a class="btn btn-small" onclick="MoveSystemUp({{mapsys.pk}});">Move Up</a>
+    {% endif %}
     {% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
     <a class="btn btn-small" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>
     {% endif %}
@@ -56,7 +59,11 @@
             <a class="btn btn-small" onclick="RemoveInterest({{mapsys.pk}});" >Remove Interest </a>
             {% else %}
             <a class="btn btn-small" onclick="SetInterest({{mapsys.pk}});" >Set Interest</a>
-
+            {% endif %}
+            {% if mapsys.system.importance != 1 %}
+            <a class="btn btn-small" onclick="SetImportance({{mapsys.pk}}, {{mapsys.system.pk}}, 1);">Set Danger</a>
+            {% else %}
+            <a class="btn btn-small" onclick="SetImportance({{mapsys.pk}}, {{mapsys.system.pk}}, 0);">Unset Danger</a>
             {% endif %}
             <a class="btn btn-small" onclick="MarkScanned({{mapsys.pk}}, false, {{mapsys.system.pk}});">Mark Scanned</a>
         <div id="deleteButton" class="btn-group dropdown">
