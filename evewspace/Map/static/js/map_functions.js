@@ -156,12 +156,16 @@ function processAjax(data) {
 
 function doMapAjaxCheckin() {
     var currentPath = "update/";
-    $.ajax({
-        type: "POST",
-        url: currentPath,
-        data: {"loadtime": loadtime, "silent": silentSystem, 'kspace': kspaceIGBMapping},
-        success: processAjax
-    });
+    if (loadtime !== null) {
+        $.ajax({
+            type: "POST",
+            url: currentPath,
+            data: {"loadtime": loadtime, "silent": silentSystem, 'kspace': kspaceIGBMapping},
+            success: processAjax
+        });
+    } else {
+        console.log('Skipping checkin due to null loadtime value.');
+    }
 }
 
 function HideSystemDetails() {
