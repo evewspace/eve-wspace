@@ -213,6 +213,30 @@ function ToggleAutoRefresh() {
     }
 }
 
+function ToggleZen() {
+    if (zenMode === true) {
+        zenMode = false;
+        $('#btnZen').text("Zen: OFF");
+    } else {
+        zenMode = true;
+        $('#btnZen').text("Zen: ON");
+    }
+    RefreshMap();
+}
+
+function TogglePilotList() {
+    if (showPilotList === true) {
+        showPilotList = false;
+        highlightActivePilots = true;
+        $('#btnPilotList').text("Pilot List: OFF");
+    } else {
+        showPilotList = true;
+        highlightActivePilots = false;
+        $('#btnPilotList').text("Pilot List: ON");
+    }
+    RefreshMap();
+}
+
 function DisplaySystemDetails(msID, sysID) {
     var address = "system/" + msID + "/";
     $.ajax({
@@ -1634,30 +1658,6 @@ function scale(factor) {
     indentY = s(70); // The amount of space (in px) between system ellipses on the Y axis.
     strokeWidth = s(3); // The width in px of the line connecting wormholes
     interestWidth = s(3); // The width in px of the line connecting wormholes when interest is on
-    RefreshMap();
-}
-
-function togglezen() {
-    if (zenMode === true) {
-        zenMode = false;
-        $('#btnZen').text("Zen: OFF");
-    } else {
-        zenMode = true;
-        $('#btnZen').text("Zen: ON");
-    }
-    RefreshMap();
-}
-
-function togglepilotlist() {
-    if (showPilotList === true) {
-        showPilotList = false;
-        highlightActivePilots = true;
-        $('#btnPilotList').text("Pilot List: OFF");
-    } else {
-        showPilotList = true;
-        highlightActivePilots = false;
-        $('#btnPilotList').text("Pilot List: ON");
-    }
     RefreshMap();
 }
 
