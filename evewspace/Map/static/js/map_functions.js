@@ -85,8 +85,6 @@ var silentSystem = true; // Are systems added automatically wihthout a pop-up?
 var kspaceIGBMapping = false; // Do we map K<>K connections from the IGB?
 var zenMode = false;
 
-
-
 function s(n) { //apply scaling factor, short function name so it's quick to type
     return Math.ceil(n * scalingFactor)
 }
@@ -130,6 +128,19 @@ $(document).ready(function () {
     } else {
         $('#btnPilotList').text("Pilot List: OFF");
     }
+
+    // Clicking the tooltip acts as clicking the system
+    //(IG browser can be sloppy)
+    $('#systemTooltipHolder').on('click', '> div', function () {
+        var msID = parseInt(this.id.substr(3, this.id.length - 6));
+        var sysID = GetSysID(msID);
+        DisplaySystemDetails(msID, sysID);
+        var div = $('#sys' + msID + "Tip").hide();
+
+        if (div[0]) {
+            div.hide();
+        }
+    });
 });
 
 function processAjax(data) {
@@ -220,8 +231,9 @@ function DisplaySystemDetails(msID, sysID) {
             });
             GetPOSList(sysID);
             GetDestinations(msID);
-            $('#btnImport').off();
-            $('#btnImport').click(function(e){
+            var btnImport = $('#btnImport');
+            btnImport.off();
+            btnImport.click(function(e){
                 BulkImport(msID);
             });
             focusMS = msID;
@@ -387,19 +399,6 @@ function GetSystemTooltips() {
         url: address,
         success: function (data) {
             $('#systemTooltipHolder').html(data);
-            $('#systemTooltipHolder>div').off();
-            //clicking the tooltip acts as clicking the system 
-            //(IG browser can be sloppy)
-            $('#systemTooltipHolder>div').click(function(){
-                var msID = parseInt(this.id.substr(3,this.id.length -6));
-                var sysID = GetSysID(msID);
-                DisplaySystemDetails(msID, sysID);
-                var div = $('#sys' + msID + "Tip").hide();
-
-                if (div[0]) {
-                    div.hide();
-                }
-            });
         }
     });
 }
@@ -1673,4 +1672,3 @@ function MoveSystemUp(msID) {
         }
     });
 }
-
