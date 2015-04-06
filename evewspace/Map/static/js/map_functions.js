@@ -102,31 +102,36 @@ $(document).ready(function () {
         scale(ev.value);
     });
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
+
     if (autoRefresh === true) {
-        $('#btnRefreshToggle').text('Auto Refresh: ON');
+        $('#btnRefreshToggle').find('> span').text('ON');
         refreshTimerID = setInterval(RefreshMap, 15000);
     } else {
-        $('#btnRefreshToggle').text('Auto Refresh: OFF');
+        $('#btnRefreshToggle').find('> span').text('OFF');
     }
+
     if (silentSystem === true) {
-        $('#btnSilentAdd').text('Silent IGB Mapping: ON');
+        $('#btnSilentAdd').find('> span').text('ON');
     } else {
-        $('#btnSilentAdd').text('Silent IGB Mapping: OFF');
+        $('#btnSilentAdd').find('> span').text('OFF');
     }
+
     if (kspaceIGBMapping === true) {
-        $('#btnKspaceIGB').text('Map K-Space Connections: ON');
+        $('#btnKspaceIGB').find('> span').text('ON');
     } else {
-        $('#btnKspaceIGB').text('Map K-Space Connections: OFF');
+        $('#btnKspaceIGB').find('> span').text('OFF');
     }
+
     if (zenMode) {
-        $('#btnZen').text("Zen: ON");
+        $('#btnZen').find('> span').text('ON');
     } else {
-        $('#btnZen').text("Zen: OFF");
+        $('#btnZen').find('> span').text('OFF');
     }
+
     if (showPilotList) {
-        $('#btnPilotList').text("Pilot List: ON");
+        $('#btnPilotList').find('> span').text('ON');
     } else {
-        $('#btnPilotList').text("Pilot List: OFF");
+        $('#btnPilotList').find('> span').text('OFF');
     }
 
     // Clicking the tooltip acts as clicking the system
