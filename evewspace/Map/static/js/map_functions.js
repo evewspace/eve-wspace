@@ -98,6 +98,9 @@ $(document).ready(function () {
         clearTimeout(updateTimerID);
     });
 
+    $('#mapDiv').html(ajax_image);
+    scale(scalingFactor);
+
     $('.slider').slider().on('slide', function(ev) {
         scale(ev.value);
     });
