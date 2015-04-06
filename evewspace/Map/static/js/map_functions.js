@@ -92,6 +92,14 @@ function s(n) { //apply scaling factor, short function name so it's quick to typ
 }
 
 $(document).ready(function () {
+    // Make sure timers stop when unloading the page
+    $(window).bind('unload', function () {
+        if (sigTimerID) {
+            clearTimeout(sigTimerID);
+        }
+        clearTimeout(updateTimerID);
+    });
+
     $('.slider').slider().on('slide', function(ev) {
         scale(ev.value);
     });
@@ -122,17 +130,6 @@ $(document).ready(function () {
     } else {
         $('#btnPilotList').text("Pilot List: OFF");
     }
-});
-
-
-//Make sure timers stop when unloading the page
-$(document).ready(function () {
-    $(window).bind('unload', function () {
-        if (sigTimerID) {
-            clearTimeout(sigTimerID);
-        }
-        clearTimeout(updateTimerID);
-    });
 });
 
 function processAjax(data) {
