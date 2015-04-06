@@ -338,7 +338,7 @@ function MarkScanned(msid, frompanel, sysid) {
         success: function (data) {
             GetSystemTooltips();
             if (frompanel) {
-                loadsignatures(msid, false);
+                LoadSignatures(msid, false);
             }
         }
     });
