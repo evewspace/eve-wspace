@@ -6,8 +6,12 @@ celerybeat-schedule
 bin
 lib
 include
+local
+build
+djcelery
+celerybeat-schedule
 local_settings.py
-.DS_Store
+pip-selfcheck.json
 doc/build/*
 .idea
 
