@@ -291,7 +291,7 @@ function MarkScanned(msid, frompanel, sysid) {
         async: false,
         data: {},
         success: function (data) {
-            getsystemtooltips();
+            GetSystemTooltips();
             if (frompanel) {
                 loadsignatures(msid, false);
             }
@@ -1004,22 +1004,22 @@ function DrawSystem(system) {
     var effectString;
     switch (system.effect) {
         case "Wolf-Rayet Star":
-            effectString = "+W"
+            effectString = "+W";
             break;
         case "Pulsar":
-            effectString = "+P"
+            effectString = "+P";
             break;
         case "Magnetar":
-            effectString = "+M"
+            effectString = "+M";
             break;
         case "Red Giant":
-            effectString = "+R"
+            effectString = "+R";
             break;
         case "Cataclysmic Variable":
-            effectString = "+C"
+            effectString = "+C";
             break;
         case "Black Hole":
-            effectString = "+B"
+            effectString = "+B";
             break;
         default:
             effectString = "";
