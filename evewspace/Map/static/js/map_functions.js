@@ -102,7 +102,7 @@ $(document).ready(function () {
     $('#mapDiv').html(ajax_image);
     scale(scalingFactor);
 
-    $('.slider').slider().on('slide', function(ev) {
+    $('.slider').slider().on('slide', function (ev) {
         scale(ev.value);
     });
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
@@ -266,7 +266,7 @@ function DisplaySystemDetails(msID, sysID) {
             GetDestinations(msID);
             var btnImport = $('#btnImport');
             btnImport.off();
-            btnImport.click(function(e){
+            btnImport.click(function (e) {
                 BulkImport(msID);
             });
             focusMS = msID;
@@ -344,13 +344,13 @@ function MarkScanned(msid, frompanel, sysid) {
     });
 }
 
-function SetImportance(msid, sysid,importance) {
+function SetImportance(msid, sysid, importance) {
     var address = "system/" + msid + "/importance/";
     $.ajax({
         type: "post",
         url: address,
         async: false,
-        data: {'importance':importance},
+        data: {'importance': importance},
         success: function (data) {
             DisplaySystemMenu(msid);
             RefreshMap();
@@ -1083,12 +1083,12 @@ function DrawSystem(system) {
             pilotText += system.pilot_list[0];
         } else {
             for (var i = 0; i < system.pilot_list.length; i++) {
-                var pilot = system.pilot_list[i].substr(0,5);
+                var pilot = system.pilot_list[i].substr(0, 5);
                 pilotsadded++;
                 if (pilotText !== "") pilotText += ",";
                 pilotText += pilot;
                 if (pilotText.length > 18) {
-                    if  (system.pilot_list_length > pilotsadded) {
+                    if (system.pilot_list_length > pilotsadded) {
                         pilotText += "+" + (system.pilot_list.length - pilotsadded);
                     }
                     break;
@@ -1115,7 +1115,7 @@ function DrawSystem(system) {
             paper.image(system.backgroundImageURL, childSys.attr("cx") - s(28), childSys.attr("cy") - s(28), s(55), s(55));
         }
         sysText = paper.text(sysX, sysY, sysName);
-        sysText.attr({"font-weight": 'bold'}); 
+        sysText.attr({"font-weight": 'bold'});
         sysText.msID = system.msID;
         sysText.sysID = system.sysID;
         sysText.click(onSysClick);
@@ -1124,7 +1124,7 @@ function DrawSystem(system) {
             sysText.dblclick(onSysDblClick);
         }
         if (showPilotList) {
-            pilotText = paper.text(sysX, sysY+s(32), pilotText);
+            pilotText = paper.text(sysX, sysY + s(32), pilotText);
             pilotText.msID = system.msID;
             pilotText.sysID = system.sysID;
             pilotText.click(onSysClick);
@@ -1163,7 +1163,7 @@ function DrawSystem(system) {
         }
         rootSys.click(onSysClick);
         sysText = paper.text(sysX, sysY, sysName);
-        sysText.attr({"font-weight": 'bold'}); 
+        sysText.attr({"font-weight": 'bold'});
         sysText.msID = system.msID;
         sysText.sysID = system.sysID;
         sysText.click(onSysClick);
@@ -1172,7 +1172,7 @@ function DrawSystem(system) {
             sysText.dblclick(onSysDblClick);
         }
         if (showPilotList) {
-            pilotText = paper.text(sysX, sysY+s(35), pilotText);
+            pilotText = paper.text(sysX, sysY + s(35), pilotText);
             pilotText.msID = system.msID;
             pilotText.sysID = system.sysID;
             pilotText.click(onSysClick);
@@ -1279,68 +1279,68 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     switch (system.SysClass) {
         // Null
         case 9:
-            sysColor = colorNullSec; 
-            sysStroke = borderColorNullSec; 
+            sysColor = colorNullSec;
+            sysStroke = borderColorNullSec;
             textColor = systemTextColor;
             break;
         // Low
         case 8:
-            sysColor = colorLowSec ;
-            sysStroke = borderColorLowSec; 
+            sysColor = colorLowSec;
+            sysStroke = borderColorLowSec;
             textColor = systemTextColor;
             break;
         // High
         case 7:
-            sysColor = colorHighSec; 
-            sysStroke = borderColorHighSec; 
+            sysColor = colorHighSec;
+            sysStroke = borderColorHighSec;
             textColor = systemTextColor;
             break;
-         case 6:
-            sysColor = colorC6; 
-            sysStroke = WormholeEffectColor(system,borderColorC6);
+        case 6:
+            sysColor = colorC6;
+            sysStroke = WormholeEffectColor(system, borderColorC6);
             if ((sysStroke !== borderColorC6) && (!zenMode)) sysStrokeWidth = s(4);
             textColor = systemTextColor;
             break;
-         case 5:
-            sysColor = colorC5; 
-            sysStroke = WormholeEffectColor(system,borderColorC5);
+        case 5:
+            sysColor = colorC5;
+            sysStroke = WormholeEffectColor(system, borderColorC5);
             if ((sysStroke !== borderColorC5) && (!zenMode)) sysStrokeWidth = s(4);
             textColor = systemTextColor;
-            break; 
+            break;
         case 4:
-            sysColor = colorC4; 
-            sysStroke = WormholeEffectColor(system,borderColorC4);
+            sysColor = colorC4;
+            sysStroke = WormholeEffectColor(system, borderColorC4);
             if ((sysStroke !== borderColorC4) && (!zenMode)) sysStrokeWidth = s(4);
             textColor = systemTextColor;
             break;
         case 3:
             sysColor = colorC3;
-            sysStroke = WormholeEffectColor(system,borderColorC3);
+            sysStroke = WormholeEffectColor(system, borderColorC3);
             if ((sysStroke !== borderColorC3) && (!zenMode)) sysStrokeWidth = s(4);
             textColor = systemTextColor;
             break;
-         case 2:
+        case 2:
             sysColor = colorC2;
-            sysStroke = WormholeEffectColor(system,borderColorC2);
+            sysStroke = WormholeEffectColor(system, borderColorC2);
             if ((sysStroke !== borderColorC2) && (!zenMode)) sysStrokeWidth = s(4);
             textColor = systemTextColor;
             break;
-         case 1:
-            sysColor = colorC1; 
-            sysStroke = WormholeEffectColor(system,borderColorC1);
+        case 1:
+            sysColor = colorC1;
+            sysStroke = WormholeEffectColor(system, borderColorC1);
             if ((sysStroke !== borderColorC1) && (!zenMode)) sysStrokeWidth = s(4);
-            textColor = systemTextColor; 
+            textColor = systemTextColor;
             break;
-         // Thera
-         case 12:
-            sysColor = colorThera; 
+        // Thera
+        case 12:
+            sysColor = colorThera;
             sysStroke = borderColorThera;
             textColor = systemTextColor;
             break;
-         // Small Ship Hole
-         case 13:
-            sysColor = colorSmallShipHole; 
-            sysStroke = borderColorSmallShipHole; 
+        // Small Ship Hole
+        case 13:
+            sysColor = colorSmallShipHole;
+            sysStroke = borderColorSmallShipHole;
             textColor = systemTextColor;
             break;
         default:
@@ -1353,7 +1353,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
 
     if (system.shattered) {
         if (shatteredBorderColor !== null) {
-            sysStroke = shatteredBorderColor; 
+            sysStroke = shatteredBorderColor;
         }
         if (sysStrokeWidth < s(3)) {
             sysStrokeWidth = s(3);
@@ -1368,7 +1368,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     }
     if (system.msID === focusMS) {
         if (zenMode) {
-            textColor = textColorSelect_zen; 
+            textColor = textColorSelect_zen;
             sysStroke = borderColorSelect_zen;
         } else {
             textColor = textColorSelect;
@@ -1376,8 +1376,8 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         }
         sysStrokeDashArray = "--"
     }
-    var iconX = ellipseSystem.attr("cx")+s(40);
-    var iconY = ellipseSystem.attr("cy")-s(35);
+    var iconX = ellipseSystem.attr("cx") + s(40);
+    var iconY = ellipseSystem.attr("cy") - s(35);
     if (system.iconImageURL) {
         paper.image(system.iconImageURL, iconX, iconY, 25, 25);
     }
@@ -1389,8 +1389,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         "stroke-dasharray": sysStrokeDashArray
     });
     textSysName.attr({fill: textColor, "font-size": labelFontSize, cursor: "pointer"});
-    if (textPilot !== null) textPilot.attr({fill: pilotColor, "font-size": textFontSize-s(1), cursor: "pointer"});
-
+    if (textPilot !== null) textPilot.attr({fill: pilotColor, "font-size": textFontSize - s(1), cursor: "pointer"});
 
 
     if (selected === false) {
@@ -1624,7 +1623,7 @@ function onSysDblClick() {
 function onWhOver(e) {
     var div = $('#wh' + this.whID + "Tip");
 
-    if (div[0]){
+    if (div[0]) {
         var mouseX = e.clientX + getScrollX();
         var mouseY = e.clientY + getScrollY();
 
@@ -1643,7 +1642,7 @@ function onWhOut() {
 
 function onSysOver(e) {
     var div = $('#sys' + this.msID + "Tip");
-    if (div[0]){
+    if (div[0]) {
         var mouseX = e.clientX + getScrollX();
         var mouseY = e.clientY + getScrollY();
 
@@ -1655,7 +1654,7 @@ function onSysOver(e) {
 function onSysOut() {
     var div = $('#sys' + this.msID + "Tip");
 
-    if (div[0]){
+    if (div[0]) {
         div.hide();
     }
 }
