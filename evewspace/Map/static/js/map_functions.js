@@ -32,7 +32,8 @@ var indentY = 70; // The amount of space (in px) between system ellipses on the 
 var strokeWidth = 3; // The width in px of the line connecting wormholes
 var interestWidth = 3; // The width in px of the line connecting wormholes when interest is on
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map
-var sliceLastChars = false; // Friendly name should show last 8 chars if over 8, shows first 8 if false
+var sliceLastChars = false; // Friendly name: show first X characters if false; show last X characters if true.
+var sliceNumChars = 6; // Slice after this amount of characters.
 var showPilotList = true; // Show pilot names under systems
 var highlightActivePilots = false; // Draw a notification ring around systems with active pilots.
 var goodColor = "#00FF00"; // Color of good status connections
@@ -1058,11 +1059,11 @@ function DrawSystem(system) {
     }
     var friendly = "";
     if (system.Friendly) {
-        if (system.Friendly.length > 6) {
+        if (system.Friendly.length > sliceNumChars) {
             if (sliceLastChars === true) {
-                system.Friendly = "." + system.Friendly.slice(-6);
+                system.Friendly = "." + system.Friendly.slice(-sliceNumChars);
             } else {
-                system.Friendly = system.Friendly.slice(0, 6) + ".";
+                system.Friendly = system.Friendly.slice(0, sliceNumChars) + ".";
             }
         }
         friendly = system.Friendly + "\n";
@@ -1070,7 +1071,7 @@ function DrawSystem(system) {
     var sysName = friendly + system.Name + "\n" + classString + effectString + "(" + system.activePilots + ")";
     if (zenMode) {
         if ((classString === "H") || (classString === "N") || (classString === "L") || (classString === "T")) {
-            sysName = friendly + system.Name.substr(0,6);
+            sysName = friendly + system.Name.substr(0, sliceNumChars);
         } else {
             sysName = friendly + classString;
         }
