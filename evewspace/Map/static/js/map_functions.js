@@ -1489,13 +1489,15 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         }
 
         if (systemTo.WhFromParent) {
-            var whFromText, whToText;
-            if (!renderWormholeTags) {
-                whFromText = ">";
-                whToText = "<";
+            var whFromText;
+            if (renderWormholeTags === true) {
+                if (systemTo.WhFromParent === systemTo.WhToParent) {
+                    whFromText = "??? >";
+                } else {
+                    whFromText = systemTo.WhFromParent + " >";
+                }
             } else {
-                whFromText = systemTo.WhFromParent + " >";
-                whToText = "< " + systemTo.WhToParent;
+                whFromText = ">";
             }
 
             whFromSys = paper.text(whFromSysX, whFromSysY, whFromText);
@@ -1509,6 +1511,17 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         }
 
         if (systemTo.WhToParent) {
+            var whToText;
+            if (renderWormholeTags === true) {
+                if (systemTo.WhToParent === systemTo.WhFromParent) {
+                    whToText = "< ???";
+                } else {
+                    whToText = "< " + systemTo.WhToParent;
+                }
+            } else {
+                whToText = "<";
+            }
+
             whToSys = paper.text(whToSysX, whToSysY, whToText);
             whToSys.attr({fill: whToColor, cursor: "pointer", "font-size": s(11), "font-weight": decoration});
 
