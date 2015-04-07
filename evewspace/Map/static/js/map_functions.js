@@ -26,11 +26,14 @@ var refreshTimerID;
 var systemsJSON;
 var activityLimit = 100;
 var scalingFactor = 1; //scale the interface
-var textFontSize = 11; // The base font size
-var indentX = 150; // The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180
-var indentY = 70; // The amount of space (in px) between system ellipses on the Y axis.
-var strokeWidth = 3; // The width in px of the line connecting wormholes
-var interestWidth = 3; // The width in px of the line connecting wormholes when interest is on
+var textFontSize, indentX, indentY, strokeWidth, interestWidth; // Initialize scalable variables in the global scope
+var baseTextFontSize = 11; // The base font size
+var baseLabelTextFontSize = 11;
+var baseTextFontSizeZen = 16; // The base font size when zen mode is on.
+var baseIndentX = 150; // The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180
+var baseIndentY = 70; // The amount of space (in px) between system ellipses on the Y axis.
+var baseStrokeWidth = 2; // The width in px of the line connecting wormholes
+var baseInterestWidth = 3; // The width in px of the line connecting wormholes when interest is on
 var renderWormholeTags = true; // Determines whether wormhole types are shown on the map
 var sliceLastChars = false; // Friendly name: show first X characters if false; show last X characters if true.
 var sliceNumChars = 6; // Slice after this amount of characters.
@@ -1258,19 +1261,19 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     var selected = false;
     var sysColor = "#f00";
     var sysStroke = "#fff";
-    var sysStrokeWidth = s(2);
+    var sysStrokeWidth = s(baseStrokeWidth);
     var sysStrokeDashArray = "none";
     var textColor = "#000";
     if (system.interest === true) {
-        sysStrokeWidth = s(7);
+        sysStrokeWidth = s(baseInterestWidth + 4);
         sysStrokeDashArray = "--";
     }
     if (system.msID === focusMS) {
         textColor = "#f0ff00";
         if (system.interest) {
-            sysStrokeWidth = s(7);
+            sysStrokeWidth = s(baseInterestWidth + 4);
         } else {
-            sysStrokeWidth = s(4);
+            sysStrokeWidth = s(baseStrokeWidth + 1);
         }
         sysStrokeDashArray = "- ";
     }
@@ -1298,37 +1301,37 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         case 6:
             sysColor = colorC6;
             sysStroke = WormholeEffectColor(system, borderColorC6);
-            if ((sysStroke !== borderColorC6) && (!zenMode)) sysStrokeWidth = s(4);
+            if ((sysStroke !== borderColorC6) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 5:
             sysColor = colorC5;
             sysStroke = WormholeEffectColor(system, borderColorC5);
-            if ((sysStroke !== borderColorC5) && (!zenMode)) sysStrokeWidth = s(4);
+            if ((sysStroke !== borderColorC5) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 4:
             sysColor = colorC4;
             sysStroke = WormholeEffectColor(system, borderColorC4);
-            if ((sysStroke !== borderColorC4) && (!zenMode)) sysStrokeWidth = s(4);
+            if ((sysStroke !== borderColorC4) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 3:
             sysColor = colorC3;
             sysStroke = WormholeEffectColor(system, borderColorC3);
-            if ((sysStroke !== borderColorC3) && (!zenMode)) sysStrokeWidth = s(4);
+            if ((sysStroke !== borderColorC3) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 2:
             sysColor = colorC2;
             sysStroke = WormholeEffectColor(system, borderColorC2);
-            if ((sysStroke !== borderColorC2) && (!zenMode)) sysStrokeWidth = s(4);
+            if ((sysStroke !== borderColorC2) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 1:
             sysColor = colorC1;
             sysStroke = WormholeEffectColor(system, borderColorC1);
-            if ((sysStroke !== borderColorC1) && (!zenMode)) sysStrokeWidth = s(4);
+            if ((sysStroke !== borderColorC1) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth);
             textColor = systemTextColor;
             break;
         // Thera
@@ -1355,8 +1358,8 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         if (shatteredBorderColor !== null) {
             sysStroke = shatteredBorderColor;
         }
-        if (sysStrokeWidth < s(3)) {
-            sysStrokeWidth = s(3);
+        if (sysStrokeWidth < s(baseStrokeWidth)) {
+            sysStrokeWidth = s(baseStrokeWidth);
         }
         sysStrokeDashArray = "- ";
     }
@@ -1364,7 +1367,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     if (zenMode) {
         textColor = sysColor;
         sysColor = sysColor_zen;
-        labelFontSize = s(16);
+        labelFontSize = s(baseTextFontSizeZen);
     }
     if (system.msID === focusMS) {
         if (zenMode) {
@@ -1402,9 +1405,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     }
 }
 
-/*
- * Colors wormhole systems by effect.
- */
+// Colors wormhole systems by effect.
 function WormholeEffectColor(system, defaultcolor) {
     switch (system.effect) {
         case "Wolf-Rayet Star":
@@ -1497,22 +1498,18 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
 
         var whFromSys = null;
         var whToSys = null;
-        var whFromColor = null;
-        var whToColor = null;
-        var decoration = null;
+        var whFromColor = clearWhColor;
+        var whToColor = clearWhColor;
+        var decoration = "inherit";
 
         if (systemTo.WhFromParentBubbled === true) {
             whFromColor = bubbledColor;
             decoration = "bold";
-        } else {
-            whFromColor = clearWhColor;
         }
 
         if (systemTo.WhToParentBubbled === true) {
             whToColor = bubbledColor;
             decoration = "bold";
-        } else {
-            whToColor = clearWhColor;
         }
 
         if (systemTo.WhFromParent) {
@@ -1526,7 +1523,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
             }
 
             whFromSys = paper.text(whFromSysX, whFromSysY, whFromText);
-            whFromSys.attr({fill: whFromColor, cursor: "pointer", "font-size": s(11), "font-weight": decoration});  //stroke: "#fff"
+            whFromSys.attr({fill: whFromColor, cursor: "pointer", "font-size": s(baseLabelTextFontSize), "font-weight": decoration});  //stroke: "#fff"
             whFromSys.click(function () {
                 GetEditWormholeDialog(systemTo.whID);
             });
@@ -1537,7 +1534,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
 
         if (systemTo.WhToParent) {
             whToSys = paper.text(whToSysX, whToSysY, whToText);
-            whToSys.attr({fill: whToColor, cursor: "pointer", "font-size": s(11), "font-weight": decoration});
+            whToSys.attr({fill: whToColor, cursor: "pointer", "font-size": s(baseLabelTextFontSize), "font-weight": decoration});
 
             whToSys.whID = systemTo.whID;
             whToSys.click(function () {
@@ -1661,11 +1658,11 @@ function onSysOut() {
 
 function scale(factor) {
     scalingFactor = factor;
-    textFontSize = s(11); // The base font size
-    indentX = s(150); // The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180
-    indentY = s(70); // The amount of space (in px) between system ellipses on the Y axis.
-    strokeWidth = s(3); // The width in px of the line connecting wormholes
-    interestWidth = s(3); // The width in px of the line connecting wormholes when interest is on
+    textFontSize = s(baseTextFontSize); // The base font size
+    indentX = s(baseIndentX); // The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180
+    indentY = s(baseIndentY); // The amount of space (in px) between system ellipses on the Y axis.
+    strokeWidth = s(baseStrokeWidth); // The width in px of the line connecting wormholes
+    interestWidth = s(baseInterestWidth); // The width in px of the line connecting wormholes when interest is on
     RefreshMap();
 }
 
