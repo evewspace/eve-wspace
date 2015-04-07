@@ -943,7 +943,7 @@ function ConnectSystems(obj1, obj2, line, bg, interest, dasharray) {
                 stroke: color,
                 fill: "none",
                 "stroke-dasharray": dasharray,
-                "stroke-width": interestWidth,
+                "stroke-width": interestWidth
             });
         } else {
             lineObj = paper.path(path).attr({
@@ -1258,24 +1258,29 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         alert("system is null or undefined");
         return;
     }
-    var selected = false;
+
     var sysColor = "#f00";
     var sysStroke = "#fff";
     var sysStrokeWidth = s(baseStrokeWidth);
     var sysStrokeDashArray = "1.0";
     var textColor = "#000";
+
     if (system.interest === true) {
         sysStrokeWidth = s(baseInterestWidth + 4);
         sysStrokeDashArray = "--";
     }
+
     if (system.msID === focusMS) {
         textColor = "#f0ff00";
-        if (system.interest) {
-            sysStrokeWidth = s(baseInterestWidth + 4);
-        } else {
-            sysStrokeWidth = s(baseStrokeWidth + 1);
-        }
         sysStrokeDashArray = "- ";
+
+        if (!system.interest) {
+            sysStrokeWidth = s(baseStrokeWidth + 2);
+        }
+    }
+
+    if (system.interest === false && (system.msID !== focusMS)) {
+        sysStrokeWidth = s(baseStrokeWidth)
     }
 
     // not selected
@@ -1353,7 +1358,6 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
             break;
     }
 
-
     if (system.shattered) {
         if (shatteredBorderColor !== null) {
             sysStroke = shatteredBorderColor;
@@ -1394,15 +1398,12 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     textSysName.attr({fill: textColor, "font-size": labelFontSize, cursor: "pointer"});
     if (textPilot !== null) textPilot.attr({fill: pilotColor, "font-size": textFontSize - s(1), cursor: "pointer"});
 
+    ellipseSystem.sysInfoPnlID = 0;
+    textSysName.sysInfoPnlID = 0;
 
-    if (selected === false) {
-        ellipseSystem.sysInfoPnlID = 0;
-        textSysName.sysInfoPnlID = 0;
-
-        ellipseSystem.hover(onSysOver, onSysOut);
-        textSysName.ellipseIndex = objSystems.length;
-        textSysName.hover(onSysOver, onSysOut);
-    }
+    ellipseSystem.hover(onSysOver, onSysOut);
+    textSysName.ellipseIndex = objSystems.length;
+    textSysName.hover(onSysOver, onSysOut);
 }
 
 // Colors wormhole systems by effect.
@@ -1671,11 +1672,11 @@ function onSysOut() {
 
 function scale(factor) {
     scalingFactor = factor;
-    textFontSize = s(baseTextFontSize); // The base font size
-    indentX = s(baseIndentX); // The amount of space (in px) between system ellipses on the X axis. Should be between 120 and 180
-    indentY = s(baseIndentY); // The amount of space (in px) between system ellipses on the Y axis.
-    strokeWidth = s(baseStrokeWidth); // The width in px of the line connecting wormholes
-    interestWidth = s(baseInterestWidth); // The width in px of the line connecting wormholes when interest is on
+    textFontSize = s(baseTextFontSize);
+    indentX = s(baseIndentX);
+    indentY = s(baseIndentY);
+    strokeWidth = s(baseStrokeWidth);
+    interestWidth = s(baseInterestWidth);
     RefreshMap();
 }
 
