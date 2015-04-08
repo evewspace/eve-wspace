@@ -1013,8 +1013,7 @@ function DrawSystem(system) {
     if (system === null) {
         return;
     }
-    var sysX = GetSystemX(system);
-    var sysY = GetSystemY(system);
+
     var classString;
     switch (system.SysClass) {
         case 7:
@@ -1060,6 +1059,7 @@ function DrawSystem(system) {
             effectString = "";
             break;
     }
+
     var friendly = "";
     if (system.Friendly) {
         if (system.Friendly.length > sliceNumChars) {
@@ -1071,8 +1071,10 @@ function DrawSystem(system) {
         }
         friendly = system.Friendly + "\n";
     }
+
     var sysName = friendly + system.Name + "\n" + classString + effectString + "(" + system.activePilots + ")";
-    if (zenMode) {
+
+    if (zenMode === true) {
         if ((classString === "H") || (classString === "N") || (classString === "L") || (classString === "T")) {
             sysName = friendly + system.Name.substr(0, sliceNumChars);
         } else {
@@ -1080,63 +1082,71 @@ function DrawSystem(system) {
         }
     }
     var pilotText = "";
-    var pilotsadded = 0;
     if (system.activePilots) {
-        if (system.activePilots === 1) {
-            pilotText += system.pilot_list[0];
-        } else {
-            for (var i = 0; i < system.pilot_list.length; i++) {
-                var pilot = system.pilot_list[i].substr(0, 5);
-                pilotsadded++;
-                if (pilotText !== "") pilotText += ",";
-                pilotText += pilot;
-                if (pilotText.length > 18) {
-                    if (system.pilot_list_length > pilotsadded) {
-                        pilotText += "+" + (system.pilot_list.length - pilotsadded);
-                    }
-                    break;
-                }
+        for (var i = 0; i < system.pilot_list.length; i++) {
+            if (typeof (system.pilot_list[i]) === "undefined") {
+                pilotText += "Unknown";
+            } else var pilot = system.pilot_list[i].substr(0, 5);
+
+            if (pilotText !== "") pilotText += ",";
+            pilotText += pilot;
+
+            if (pilotText.length > 18) {
+                if (system.pilot_list.length > i) pilotText += "+" + (system.pilot_list.length - i);
+                break;
             }
         }
     }
-    var sysText;
-    if (system.LevelX !== null && system.LevelX > 0) {
-        var childSys = paper.ellipse(sysX, sysY, s(40), s(28));
+
+    var sysX, sysY, sysText, curSys;
+    sysX = GetSystemX(system);
+    sysY = GetSystemY(system);
+    curSys = paper.ellipse(sysX, sysY, s(40), s(28));
+    curSys.msID = system.msID;
+    curSys.sysID = system.sysID;
+
+    // Draw the system background image if important or dangerous is set.
+    if (system.backgroundImageURL) {
+        paper.image(system.backgroundImageURL, curSys.attr("cx") - s(28), curSys.attr("cy") - s(28), s(55), s(55));
+    }
+
+    sysText = paper.text(sysX, sysY, sysName);
+    sysText.attr({"font-weight": 'bold'});
+    sysText.msID = system.msID;
+    sysText.sysID = system.sysID;
+    curSys.click(onSysClick);
+    sysText.click(onSysClick);
+
+    // Open system information window if IGB is used.
+    if (is_igb === true) {
+        curSys.dblclick(onSysDblClick);
+        sysText.dblclick(onSysDblClick);
+    }
+
+    if (showPilotList === true) {
+        pilotText = paper.text(sysX, sysY + s(32), pilotText);
+        pilotText.msID = system.msID;
+        pilotText.sysID = system.sysID;
+    } else {
+        pilotText = null;
+    }
+
+    ColorSystem(system, curSys, sysText, pilotText);
+    objSystems.push(curSys);
+
+    // This only executes on non-root systems.
+    if (system.LevelX > 0 && system.LevelX > 0) {
+        // Show a notification ring around systems that have other clients with the mapper open.
         if (system.activePilots > 0 && highlightActivePilots === true) {
             var notificationRing = paper.ellipse(sysX, sysY, s(45), s(33));
             notificationRing.attr({'stroke-dasharray': '--', 'stroke-width': s(1), 'stroke': '#ffffff'});
         }
-        childSys.msID = system.msID;
-        childSys.whID = system.whID;
-        childSys.sysID = system.sysID;
-        childSys.WhFromParentBubbled = system.WhFromParentBubbled;
-        childSys.WhToParentBubbled = system.WhToParentBubbled;
-        childSys.click(onSysClick);
 
-        // Don't even get me started...
-        if (system.backgroundImageURL) {
-            paper.image(system.backgroundImageURL, childSys.attr("cx") - s(28), childSys.attr("cy") - s(28), s(55), s(55));
-        }
-        sysText = paper.text(sysX, sysY, sysName);
-        sysText.attr({"font-weight": 'bold'});
-        sysText.msID = system.msID;
-        sysText.sysID = system.sysID;
-        sysText.click(onSysClick);
-        if (is_igb === true) {
-            childSys.dblclick(onSysDblClick);
-            sysText.dblclick(onSysDblClick);
-        }
-        if (showPilotList === true) {
-            pilotText = paper.text(sysX, sysY + s(32), pilotText);
-            pilotText.msID = system.msID;
-            pilotText.sysID = system.sysID;
-            pilotText.click(onSysClick);
-        } else {
-            pilotText = null;
-        }
-        ColorSystem(system, childSys, sysText, pilotText);
-        childSys.collapsed = system.collapsed;
-        objSystems.push(childSys);
+        curSys.whID = system.whID;
+        curSys.WhFromParentBubbled = system.WhFromParentBubbled;
+        curSys.WhToParentBubbled = system.WhToParentBubbled;
+        curSys.collapsed = system.collapsed;
+
         var parentIndex = GetSystemIndex(system.ParentID);
         var parentSys = systemsJSON[parentIndex];
         var parentSysEllipse = objSystems[parentIndex];
@@ -1149,41 +1159,13 @@ function DrawSystem(system) {
             if (system.interestpath === true || system.interest === true) {
                 interest = true;
             }
-            if (childSys.collapsed === false || renderCollapsedConnections === true) {
-                ConnectSystems(parentSysEllipse, childSys, lineColor, "#fff", interest, dasharray);
+            if (curSys.collapsed === false || renderCollapsedConnections === true) {
+                ConnectSystems(parentSysEllipse, curSys, lineColor, "#fff", interest, dasharray);
                 DrawWormholes(parentSys, system, whColor);
             }
         } else {
             alert("Error processing system " + system.Name);
         }
-    } else {
-        var rootSys = paper.ellipse(sysX, sysY, s(40), s(30));
-        rootSys.msID = system.msID;
-        rootSys.sysID = system.sysID;
-        // Don't even get me started...
-        if (system.backgroundImageURL) {
-            paper.image(system.backgroundImageURL, rootSys.attr("cx") - s(28), rootSys.attr("cy") - s(28), s(55), s(55));
-        }
-        rootSys.click(onSysClick);
-        sysText = paper.text(sysX, sysY, sysName);
-        sysText.attr({"font-weight": 'bold'});
-        sysText.msID = system.msID;
-        sysText.sysID = system.sysID;
-        sysText.click(onSysClick);
-        if (is_igb === true) {
-            rootSys.dblclick(onSysDblClick);
-            sysText.dblclick(onSysDblClick);
-        }
-        if (showPilotList === true) {
-            pilotText = paper.text(sysX, sysY + s(35), pilotText);
-            pilotText.msID = system.msID;
-            pilotText.sysID = system.sysID;
-            pilotText.click(onSysClick);
-        } else {
-            pilotText = null;
-        }
-        ColorSystem(system, rootSys, sysText, pilotText);
-        objSystems.push(rootSys);
     }
 }
 
@@ -1253,7 +1235,7 @@ function GetWormholeColor(system) {
     }
 }
 
-function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
+function ColorSystem(system, ellipseSystem, textSysName, pilotList) {
     if (!system) {
         alert("system is null or undefined");
         return;
@@ -1396,7 +1378,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         "stroke-dasharray": sysStrokeDashArray
     });
     textSysName.attr({fill: textColor, "font-size": labelFontSize, cursor: "pointer"});
-    if (textPilot !== null) textPilot.attr({fill: pilotColor, "font-size": textFontSize - s(1), cursor: "pointer"});
+    if (pilotList !== null) pilotList.attr({fill: pilotColor, "font-size": textFontSize - s(1), cursor: "pointer"});
 
     ellipseSystem.sysInfoPnlID = 0;
     textSysName.sysInfoPnlID = 0;
