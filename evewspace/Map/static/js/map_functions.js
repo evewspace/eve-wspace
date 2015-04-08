@@ -1491,7 +1491,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         if (systemTo.WhFromParent) {
             var whFromText;
             if (renderWormholeTags === true) {
-                if (systemTo.WhFromParent === systemTo.WhToParent) {
+                if (systemTo.WhToParent === "K162" && systemTo.WhFromParent === "K162") {
                     whFromText = "??? >";
                 } else {
                     whFromText = systemTo.WhFromParent + " >";
@@ -1513,7 +1513,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         if (systemTo.WhToParent) {
             var whToText;
             if (renderWormholeTags === true) {
-                if (systemTo.WhToParent === systemTo.WhFromParent) {
+                if (systemTo.WhToParent === "K162" && systemTo.WhFromParent === "K162") {
                     whToText = "< ???";
                 } else {
                     whToText = "< " + systemTo.WhToParent;
