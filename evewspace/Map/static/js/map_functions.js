@@ -1247,6 +1247,11 @@ function ColorSystem(system, ellipseSystem, textSysName, pilotList) {
     var sysStrokeDashArray = "1.0";
     var textColor = "#000";
 
+    // TODO: Figure out rare case where a system has interest and/or focus,
+    // and still doesn't get a larger stroke applied.
+    // system.interest can be true or false (bool) or null (object).
+    // system.msID === focusMS gets passed, color gets applied.
+    // system.interest !== true in system.msID === focusMS sometimes gets skipped.
     if (system.interest === true) {
         sysStrokeWidth = s(baseInterestWidth + 4);
         sysStrokeDashArray = "--";
