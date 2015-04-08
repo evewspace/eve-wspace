@@ -1245,7 +1245,7 @@ function ColorSystem(system, ellipseSystem, textSysName, pilotList) {
     var sysStroke = "#fff";
     var sysStrokeWidth;
     var sysStrokeDashArray = "none";
-    var textColor = "#000";
+    var textColor = systemTextColor;
 
     if (system.interest === true) {
         sysStrokeWidth = s(baseInterestWidth + 4);
@@ -1271,72 +1271,60 @@ function ColorSystem(system, ellipseSystem, textSysName, pilotList) {
         case 9:
             sysColor = colorNullSec;
             sysStroke = borderColorNullSec;
-            textColor = systemTextColor;
             break;
         // Low
         case 8:
             sysColor = colorLowSec;
             sysStroke = borderColorLowSec;
-            textColor = systemTextColor;
             break;
         // High
         case 7:
             sysColor = colorHighSec;
             sysStroke = borderColorHighSec;
-            textColor = systemTextColor;
             break;
         case 6:
             sysColor = colorC6;
             sysStroke = WormholeEffectColor(system, borderColorC6);
             if ((sysStroke !== borderColorC6) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
-            textColor = systemTextColor;
             break;
         case 5:
             sysColor = colorC5;
             sysStroke = WormholeEffectColor(system, borderColorC5);
             if ((sysStroke !== borderColorC5) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
-            textColor = systemTextColor;
             break;
         case 4:
             sysColor = colorC4;
             sysStroke = WormholeEffectColor(system, borderColorC4);
             if ((sysStroke !== borderColorC4) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
-            textColor = systemTextColor;
             break;
         case 3:
             sysColor = colorC3;
             sysStroke = WormholeEffectColor(system, borderColorC3);
             if ((sysStroke !== borderColorC3) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
-            textColor = systemTextColor;
             break;
         case 2:
             sysColor = colorC2;
             sysStroke = WormholeEffectColor(system, borderColorC2);
             if ((sysStroke !== borderColorC2) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
-            textColor = systemTextColor;
             break;
         case 1:
             sysColor = colorC1;
             sysStroke = WormholeEffectColor(system, borderColorC1);
             if ((sysStroke !== borderColorC1) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth);
-            textColor = systemTextColor;
             break;
         // Thera
         case 12:
             sysColor = colorThera;
             sysStroke = borderColorThera;
-            textColor = systemTextColor;
             break;
         // Small Ship Hole
         case 13:
             sysColor = colorSmallShipHole;
             sysStroke = borderColorSmallShipHole;
-            textColor = systemTextColor;
             break;
         default:
             sysColor = "#000";
             sysStroke = "#fff";
-            textColor = systemTextColor;
             break;
     }
 
