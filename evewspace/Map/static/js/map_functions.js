@@ -39,11 +39,12 @@ var sliceLastChars = false; // Friendly name: show first X characters if false; 
 var sliceNumChars = 6; // Slice after this amount of characters.
 var showPilotList = true; // Show pilot names under systems
 var highlightActivePilots = false; // Draw a notification ring around systems with active pilots.
+var interestColor = "#FFFFFF";
 var goodColor = "#00FF00"; // Color of good status connections
 var goodColor_zen = "#999"; // Color of good status connections
 var badColor = "#FF0000"; // Color of first shrink connections
-var bubbledColor = "#FF0000"; // Color of first shrink connections
-var clearWhColor = "#BBFFBB"; // Color of good status connections
+var bubbledColor = "#FF0000"; // Color of bubbled connections
+var clearWhColor = "#FAFA33"; // Color of good status connections
 var warningColor = "#FF00FF"; // Color of mass critical connections
 var sysColor_zen = "#222"; //color for eol
 var frigWhColor = "#FFFFFF"; // Color of Hyperion Frigate Hole
@@ -1470,21 +1471,10 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
             whToSysY = textCenterY;
         }
 
-        var whFromSys = null;
-        var whToSys = null;
-        var whFromColor = clearWhColor;
-        var whToColor = clearWhColor;
-        var decoration = "inherit";
-
-        if (systemTo.WhFromParentBubbled === true) {
-            whFromColor = bubbledColor;
-            decoration = "bold";
-        }
-
-        if (systemTo.WhToParentBubbled === true) {
-            whToColor = bubbledColor;
-            decoration = "bold";
-        }
+        var whFromSys, whToSys, whFromColor, whToColor, whFromDecoration, whToDecoration;
+        whFromSys = whToSys = null;
+        whFromColor = whToColor = clearWhColor;
+        whFromDecoration = whToDecoration = "inherit";
 
         if (systemTo.WhFromParent) {
             var whFromText;
@@ -1497,9 +1487,9 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
             } else {
                 whFromText = ">";
             }
-
             whFromSys = paper.text(whFromSysX, whFromSysY, whFromText);
-            whFromSys.attr({fill: whFromColor, cursor: "pointer", "font-size": s(baseLabelTextFontSize), "font-weight": decoration});
+
+            whFromSys.attr({fill: whFromColor, cursor: "pointer", "font-size": s(baseLabelTextFontSize), "font-weight": whFromDecoration});
             whFromSys.click(function () {
                 GetEditWormholeDialog(systemTo.whID);
             });
@@ -1521,7 +1511,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
             }
 
             whToSys = paper.text(whToSysX, whToSysY, whToText);
-            whToSys.attr({fill: whToColor, cursor: "pointer", "font-size": s(baseLabelTextFontSize), "font-weight": decoration});
+            whToSys.attr({fill: whToColor, cursor: "pointer", "font-size": s(baseLabelTextFontSize), "font-weight": whToDecoration});
 
             whToSys.whID = systemTo.whID;
             whToSys.click(function () {
