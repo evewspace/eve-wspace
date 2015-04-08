@@ -1256,13 +1256,11 @@ function ColorSystem(system, ellipseSystem, textSysName, pilotList) {
         textColor = "#f0ff00";
         sysStrokeDashArray = "- ";
 
-        if (system.interest === false) {
+        if (system.interest !== true) {
             sysStrokeWidth = s(baseStrokeWidth + 2);
         }
-    }
-
-    if (system.interest === false && (system.msID !== focusMS)) {
-        sysStrokeWidth = s(baseStrokeWidth)
+    } else if (system.interest !== true) {
+        sysStrokeWidth = s(baseStrokeWidth);
     }
 
     // not selected
