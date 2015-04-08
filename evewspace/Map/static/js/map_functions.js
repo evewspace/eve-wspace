@@ -129,13 +129,13 @@ $(document).ready(function () {
         $('#btnKspaceIGB').find('> span').text('OFF');
     }
 
-    if (zenMode) {
+    if (zenMode === true) {
         $('#btnZen').find('> span').text('ON');
     } else {
         $('#btnZen').find('> span').text('OFF');
     }
 
-    if (showPilotList) {
+    if (showPilotList === true) {
         $('#btnPilotList').find('> span').text('ON');
     } else {
         $('#btnPilotList').find('> span').text('OFF');
@@ -147,7 +147,7 @@ $(document).ready(function () {
         var msID = parseInt(this.id.substr(3, this.id.length - 6));
         var sysID = GetSysID(msID);
         DisplaySystemDetails(msID, sysID);
-        var div = $('#sys' + msID + "Tip").hide();
+        var div = $('#sys' + msID + 'Tip').hide();
 
         if (div[0]) {
             div.hide();
@@ -175,7 +175,7 @@ function processAjax(data) {
 }
 
 function doMapAjaxCheckin() {
-    var currentPath = "update/";
+    var currentPath = 'update/';
     if (loadtime !== null) {
         $.ajax({
             type: "POST",
@@ -196,55 +196,55 @@ function HideSystemDetails() {
 function ToggleSilentAdd() {
     if (silentSystem === false) {
         silentSystem = true;
-        $('#btnSilentAdd').text('Silent IGB Mapping: ON');
+        $('#btnSilentAdd').find('> span').text('ON');
     } else {
         silentSystem = false;
-        $('#btnSilentAdd').text('Silent IGB Mapping: OFF');
+        $('#btnSilentAdd').find('> span').text('OFF');
     }
 }
 
 function ToggleKspaceMapping() {
     if (kspaceIGBMapping === false) {
         kspaceIGBMapping = true;
-        $('#btnKspaceIGB').text('Map K-Space Connections: ON');
+        $('#btnKspaceIGB').find('> span').text('ON');
     } else {
         kspaceIGBMapping = false;
-        $('#btnKspaceIGB').text('Map K-Space Connections: OFF');
+        $('#btnKspaceIGB').find('> span').text('OFF');
     }
 }
 
 function ToggleAutoRefresh() {
-    if (autoRefresh === true) {
-        autoRefresh = false;
-        clearTimeout(refreshTimerID);
-        $('#btnRefreshToggle').text('Auto Refresh: OFF');
-    } else {
+    if (autoRefresh === false) {
         autoRefresh = true;
         refreshTimerID = setInterval(RefreshMap, 15000);
         $('#btnRefreshToggle').text('Auto Refresh: ON');
+    } else {
+        autoRefresh = false;
+        clearTimeout(refreshTimerID);
+        $('#btnRefreshToggle').text('Auto Refresh: OFF');
     }
 }
 
 function ToggleZen() {
-    if (zenMode === true) {
-        zenMode = false;
-        $('#btnZen').text("Zen: OFF");
-    } else {
+    if (zenMode === false) {
         zenMode = true;
-        $('#btnZen').text("Zen: ON");
+        $('#btnZen').find('> span').text('ON');
+    } else {
+        zenMode = false;
+        $('#btnZen').find('> span').text('OFF');
     }
     RefreshMap();
 }
 
 function TogglePilotList() {
-    if (showPilotList === true) {
-        showPilotList = false;
-        highlightActivePilots = true;
-        $('#btnPilotList').text("Pilot List: OFF");
-    } else {
+    if (showPilotList === false) {
         showPilotList = true;
         highlightActivePilots = false;
         $('#btnPilotList').text("Pilot List: ON");
+    } else {
+        showPilotList = false;
+        highlightActivePilots = true;
+        $('#btnPilotList').text("Pilot List: OFF");
     }
     RefreshMap();
 }
@@ -932,7 +932,7 @@ function ConnectSystems(obj1, obj2, line, bg, interest, dasharray) {
         line.line.attr({path: path});
     } else {
         var color = typeof line === "string" ? line : "#000";
-        if (!renderWormholeTags) {
+        if (renderWormholeTags === false) {
             if (systemTo.WhFromParentBubbled || systemTo.WhToParentBubbled) {
                 color = "#FF9900";
             }
@@ -1126,7 +1126,7 @@ function DrawSystem(system) {
             childSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        if (showPilotList) {
+        if (showPilotList === true) {
             pilotText = paper.text(sysX, sysY + s(32), pilotText);
             pilotText.msID = system.msID;
             pilotText.sysID = system.sysID;
@@ -1174,7 +1174,7 @@ function DrawSystem(system) {
             rootSys.dblclick(onSysDblClick);
             sysText.dblclick(onSysDblClick);
         }
-        if (showPilotList) {
+        if (showPilotList === true) {
             pilotText = paper.text(sysX, sysY + s(35), pilotText);
             pilotText.msID = system.msID;
             pilotText.sysID = system.sysID;
@@ -1274,7 +1274,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         textColor = "#f0ff00";
         sysStrokeDashArray = "- ";
 
-        if (!system.interest) {
+        if (system.interest === false) {
             sysStrokeWidth = s(baseStrokeWidth + 2);
         }
     }
@@ -1306,37 +1306,37 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
         case 6:
             sysColor = colorC6;
             sysStroke = WormholeEffectColor(system, borderColorC6);
-            if ((sysStroke !== borderColorC6) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
+            if ((sysStroke !== borderColorC6) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 5:
             sysColor = colorC5;
             sysStroke = WormholeEffectColor(system, borderColorC5);
-            if ((sysStroke !== borderColorC5) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
+            if ((sysStroke !== borderColorC5) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 4:
             sysColor = colorC4;
             sysStroke = WormholeEffectColor(system, borderColorC4);
-            if ((sysStroke !== borderColorC4) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
+            if ((sysStroke !== borderColorC4) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 3:
             sysColor = colorC3;
             sysStroke = WormholeEffectColor(system, borderColorC3);
-            if ((sysStroke !== borderColorC3) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
+            if ((sysStroke !== borderColorC3) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 2:
             sysColor = colorC2;
             sysStroke = WormholeEffectColor(system, borderColorC2);
-            if ((sysStroke !== borderColorC2) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth + 1);
+            if ((sysStroke !== borderColorC2) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
             textColor = systemTextColor;
             break;
         case 1:
             sysColor = colorC1;
             sysStroke = WormholeEffectColor(system, borderColorC1);
-            if ((sysStroke !== borderColorC1) && (!zenMode)) sysStrokeWidth = s(baseStrokeWidth);
+            if ((sysStroke !== borderColorC1) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth);
             textColor = systemTextColor;
             break;
         // Thera
@@ -1481,7 +1481,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
     }
 
     // draws labels near systemTo ellipse if previous same Level X system's levelY = systemTo.levelY - 1
-    if (!zenMode) {
+    if (zenMode === false) {
         if (changePos === true) {
 
             textCenterX = sysX2 - s(73);
@@ -1526,7 +1526,7 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
             }
 
             whFromSys = paper.text(whFromSysX, whFromSysY, whFromText);
-            whFromSys.attr({fill: whFromColor, cursor: "pointer", "font-size": s(baseLabelTextFontSize), "font-weight": decoration});  //stroke: "#fff"
+            whFromSys.attr({fill: whFromColor, cursor: "pointer", "font-size": s(baseLabelTextFontSize), "font-weight": decoration});
             whFromSys.click(function () {
                 GetEditWormholeDialog(systemTo.whID);
             });
