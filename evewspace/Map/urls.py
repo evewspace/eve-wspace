@@ -45,7 +45,7 @@ syspatterns = patterns(
     url(r'^signatures/(?P<sig_id>\d+)/', include(sigpatterns)),
     url(r'^collapse/$', 'collapse_system'),
     url(r'^resurrect/$', 'resurrect_system'),
-    url(r'^moveup/$', 'move_system_up'),
+    url(r'^movesys/(?P<action>up|down)/$', 'move_system'),
 )
 
 wormholepatterns = patterns(

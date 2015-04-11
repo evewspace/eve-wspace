@@ -217,7 +217,7 @@ class MapJSONGenerator(object):
 
         # sort children by priority
         for l in children.values():
-            l.sort(key=priorities.__getitem__, reverse=True)
+            l.sort(key=priorities.__getitem__)
 
         columns = []
         todo = [(children[None][0], 0)]

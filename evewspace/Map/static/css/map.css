@@ -323,3 +323,6 @@ fieldset.addSystemWormholeType label.checkbox input[type="checkbox"] {
     margin: 0.8em 0.2em;
 }
 
+ul#moveDropdown li {
+    cursor: pointer;
+}

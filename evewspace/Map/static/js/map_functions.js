@@ -1666,8 +1666,8 @@ function togglepilotlist() {
     RefreshMap();
 }
 
-function MoveSystemUp(msID) {
-    var address = "system/" + msID + "/moveup/";
+function MoveSystem(msID, action) {
+    var address = "system/" + msID + "/movesys/" + action + "/";
     $.ajax({
         url: address,
         type: "POST",
