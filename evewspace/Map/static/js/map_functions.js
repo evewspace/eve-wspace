@@ -1231,7 +1231,7 @@ function ColorSystem(system, ellipseSystem, textSysName, textPilot) {
     var sysColor = "#f00";
     var sysStroke = "#fff";
     var sysStrokeWidth = s(2);
-    var sysStrokeDashArray = "none";
+    var sysStrokeDashArray = "1.0";
     var textColor = "#000";
     if (system.interest == true) {
         sysStrokeWidth = s(7);
