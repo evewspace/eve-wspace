@@ -12,20 +12,21 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+from datetime import datetime, timedelta
+import re
+
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
+from django.template.response import TemplateResponse
+from django.contrib.auth.decorators import login_required, permission_required
+from django.shortcuts import get_object_or_404
+
 from POS.models import *
 from Map.models import System
 from core.models import Type
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.http import HttpResponse, Http404
-from django.template.response import TemplateResponse
-from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import render, get_object_or_404
-from datetime import datetime, timedelta, time
-import pytz
-import eveapi
-import re
 from API import cache_handler as handler
 from core import tasks as core_tasks
+
 
 @login_required
 def test_fit(request, posID):
@@ -62,8 +63,8 @@ def get_pos_list(request, sysID):
         raise PermissionDenied
     system = get_object_or_404(System, pk=sysID)
     poses = POS.objects.filter(system=system).all()
-    return TemplateResponse(request, 'poslist.html', {'system': system,
-        'poses': poses})
+    return TemplateResponse(request, 'poslist.html',
+                            {'system': system, 'poses': poses})
 
 
 @permission_required('POS.change_pos', raise_exception=True)
@@ -79,15 +80,13 @@ def edit_pos(request, sysID, posID):
         tower = get_object_or_404(Type, name=request.POST['tower'])
         try:
             corp = Corporation.objects.get(name=request.POST['corp'])
-        except:
-            # Corp isn't in our DB, get its ID and add it
-            try:
-                api = eveapi.EVEAPIConnection(cacheHandler=handler)
-                corpID = api.eve.CharacterID(names=request.POST['corp']).characters[0].characterID
-                corp = core_tasks.update_corporation(corpID)
-            except:
-                # The corp doesn't exist
+        except Corporation.DoesNotExist:
+            api = eveapi.EVEAPIConnection(cacheHandler=handler)
+            corp_id = api.eve.CharacterID(
+                names=request.POST['corp']).characters[0].characterID
+            if corp_id == 0:
                 return HttpResponse('Corp does not exist!', status=404)
+            corp = core_tasks.update_corporation(corp_id)
         pos.corporation = corp
         pos.towertype = tower
         pos.posname = request.POST['name']
@@ -112,17 +111,20 @@ def edit_pos(request, sysID, posID):
             else:
                 rf_minutes = int(request.POST['rfminutes'])
             delta = timedelta(days=rf_days,
-                    hours=rf_hours,
-                    minutes=rf_minutes)
+                              hours=rf_hours,
+                              minutes=rf_minutes)
             pos.rftime = datetime.now(pytz.utc) + delta
         pos.save()
         if request.POST.get('dscan', None) == "1":
             pos.fit_from_dscan(request.POST['fitting'].encode('utf-8'))
         return HttpResponse()
     else:
-        fitting = pos.fitting.replace("<br />", "\n")
+        fitting = pos.fitting
+        if fitting is not None:
+            fitting = fitting.replace("<br />", "\n")
         return TemplateResponse(request, 'edit_pos.html', {'system': system,
-            'pos': pos, 'fitting': fitting})
+                                                           'pos': pos,
+                                                           'fitting': fitting})
 
 
 @login_required
@@ -134,23 +136,22 @@ def add_pos(request, sysID):
         raise PermissionDenied
     system = get_object_or_404(System, pk=sysID)
     if request.method == 'POST':
+        corp_name = request.POST.get('corp', None)
+        if not corp_name:
+            return HttpResponse('Corp cannot be blank!', status=400)
+
         try:
-            corp_name = request.POST.get('corp', None)
-            if not corp_name:
-                return HttpResponse('Corp cannot be blank!', status=400)
             corp = Corporation.objects.get(name=corp_name)
         except Corporation.DoesNotExist:
             # Corp isn't in our DB, get its ID and add it
             api = eveapi.EVEAPIConnection(cacheHandler=handler)
-            corpID = api.eve.CharacterID(
-                    names=corp_name).characters[0].characterID
-            try:
-                corp = core_tasks.update_corporation(corpID, True)
-            except AttributeError:
-                # The corp doesn't exist
+            corp_id = (api.eve.CharacterID(names=corp_name)
+                       .characters[0].characterID)
+            if corp_id == 0:
                 return HttpResponse('Corp does not exist!', status=404)
+            corp = core_tasks.update_corporation(corp_id, True)
         else:
-            # Have the async worker update the corp just so that it is up to date
+            # Have the async worker update the corp so that it is up to date
             core_tasks.update_corporation.delay(corp.id)
 
         if request.POST['auto'] == '1':
@@ -158,27 +159,28 @@ def add_pos(request, sysID):
             moon_distance = 150000000
             for i in request.POST['fitting'].splitlines():
                 cols = i.split('\t')
-                #ignore offgrid stuff
+                # ignore offgrid stuff
                 if cols[2] != '-':
                     fittings.append(cols)
                     if cols[1] == 'Moon' and cols[2].endswith('km'):
-                        #found a moon close by
-                        distance = int(cols[2][:-3].replace(',','').replace('.','').replace(u'\xa0',''))
+                        # found a moon close by
+                        distance = int(cols[2][:-3].replace(',', '')
+                                       .replace('.', '').replace(u'\xa0', ''))
                         if distance < moon_distance:
-                            #closest moon so far
+                            # closest moon so far
                             moon_distance = distance
                             moon_name = cols[0]
             if moon_distance == 150000000:
-                #No moon found
+                # No moon found
                 return HttpResponse('No moon found in d-scan!', status=404)
 
-            #parse POS location
-            regex = '^%s ([IVX]+) - Moon ([0-9]+)$' % (system.name)
+            # parse POS location
+            regex = '^%s ([IVX]+) - Moon ([0-9]+)$' % (system.name,)
             re_result = re.match(regex, moon_name)
             if not re_result:
                 return HttpResponse(
-                        'Invalid D-Scan! Do you have the right system?',
-                        status=400)
+                    'Invalid D-Scan! Do you have the right system?',
+                    status=400)
             else:
                 result = re_result.groups()
             NUMERALS = {'X': 10, 'V': 5, 'I': 1}
@@ -195,9 +197,9 @@ def add_pos(request, sysID):
                     planet += value
             moon = int(result[1])
 
-            pos=POS(system=system, planet=planet,
-                moon=moon, status=int(request.POST['status']),
-                corporation=corp)
+            pos = POS(system=system, planet=planet,
+                      moon=moon, status=int(request.POST['status']),
+                      corporation=corp)
             try:
                 pos.fit_from_iterable(fittings)
             except AttributeError as e:
@@ -205,10 +207,13 @@ def add_pos(request, sysID):
 
         else:
             tower = get_object_or_404(Type, name=request.POST['tower'])
-            pos=POS(system=system, planet=int(request.POST['planet']),
-                moon=int(request.POST['moon']), towertype=tower,
-                posname=request.POST['name'], fitting=request.POST['fitting'],
-                status=int(request.POST['status']), corporation=corp)
+            pos = POS(system=system, planet=int(request.POST['planet']),
+                      moon=int(request.POST['moon']),
+                      towertype=tower,
+                      posname=request.POST['name'],
+                      fitting=request.POST['fitting'],
+                      status=int(request.POST['status']),
+                      corporation=corp)
             if request.POST.get('dscan', None) == "1":
                 pos.fit_from_dscan(request.POST['fitting'].encode('utf-8'))
 
@@ -226,8 +231,8 @@ def add_pos(request, sysID):
             else:
                 rf_minutes = int(request.POST['rfminutes'])
             delta = timedelta(days=rf_days,
-                    hours=rf_hours,
-                    minutes=rf_minutes)
+                              hours=rf_hours,
+                              minutes=rf_minutes)
             pos.rftime = datetime.now(pytz.utc) + delta
         pos.save()
 
