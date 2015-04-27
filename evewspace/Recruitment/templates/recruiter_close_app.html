@@ -1,0 +1,102 @@
+{% load humanize %}
+<div id="recruiterApprovalAction">
+        <h3>Close Application</h3>
+        <p class="infoText label label-info">If not all required actions and votes have been completed or acquired the application cannot be accepted</p>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th width='60%'>Actions completed</th>
+                <th>{{app.completion}}%</th>
+            </tr>
+            <tr>
+                <th>Required actions completed</th>
+                <th>
+                {% if app.can_be_accepted %}
+                     <span class="badge badge-success">&#x2713;</span>
+                {% else %} 
+                	 <span class="badge badge-important">&#x2717;</span>
+                {% endif %}
+                </th>
+            </tr>
+            <tr>
+                <th>Meets required accept votes</th>
+                <th>
+                {% if accept < app.app_type.required_votes %}
+                	 <span class="badge badge-important">&#x2717;</span>
+                {% else %} 
+                	 <span class="badge badge-success">&#x2713;</span>
+                {% endif %}
+                </th>
+            </tr>
+            {% if app.closetime %}
+            <tr>
+                <th>Application closed by</th>
+                <td>{{app.closed_by.username}}</td>
+            </tr>
+            <tr>
+                <th>Application closed on</th>
+                <td>{{app.closetime|date:"Y-m-d H:i"}}</td>
+            </tr>
+            <tr>
+               <th>Closed as</th>
+               <td>
+               {% if app.disposition == 0 %}
+                   Duplicate
+               {% elif app.disposition == 1 %}
+                   Accept
+               {% elif app.disposition == 2 %}
+                   Reject
+               {% else %}
+                   Defer
+               {% endif %}
+               </td>
+            </tr>
+	            {% if app.status_text %}
+		            <tr>
+		               <th>Comment</th>
+		               <td>{{app.status_text|linebreaksbr}}</td>
+		            </tr>
+	            {% endif %}
+            {% endif %}
+         </table>
+         <form id="closeAppForm">
+			<div id="closeAppDiv">
+			    Close as:
+			    {% if app.can_be_accepted and accept >= app.app_type.required_votes %}
+				    <label class="radio">
+	                    <input name="appClose" value="1" type="radio"> Accept
+	                </label>
+                {% endif %}
+                <label class="radio">
+                    <input name="appClose" value="2" type="radio"> Reject
+                </label>
+                <label class="radio">
+                    <input name="appClose" value="3" type="radio"> Defer
+                </label>
+                <label class="radio">
+                    <input name="appClose" value="0" type="radio"> Duplicate
+                </label>
+                <br />
+				<label for="closeAppComment" class="control-label">Comment:</label>
+			    <div class="controls">
+			        <textarea class="form-control input-xxlarge" rows="5" id="closeAppComment" name="closeAppComment"></textarea>
+				</div>
+			</div>
+			<div class="controls">
+		    	<button id="btnCloseApp" type="submit" class="btn btn-success" onclick=";">Close application</button>
+		    	<button id="btnReallyCloseApp" class="btn btn-warning" style="display: none;"  onclick=";">Really close?</button>
+			</div>
+		</form>
+</div>
+<script type="text/javascript">
+    $('#closeAppForm').submit(function(e){
+        e.preventDefault();  
+        return false;
+    });
+    $('#btnCloseApp').click(function(){
+        $('#btnReallyCloseApp').show();
+        $('#btnCloseApp').hide();
+    });
+    $('#btnReallyCloseApp').click(function(){
+        RecruiterSubmitCloseApp({{app.pk}});        
+    });
+</script>

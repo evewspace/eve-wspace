@@ -1,0 +1,7 @@
+    {% load rotags %}
+    <h3>Questionaire</h3>
+	    <div>
+	        {% for r in responses.all %}
+	            {% render_view_question question=r.question response=r %}
+	        {% endfor %}
+	    </div>

@@ -1,0 +1,27 @@
+<h3>Interviews</h3>
+<form id="addInterviewForm">
+	<div id="addInterview">
+		<label for="interview" class="control-label">Text interview:</label>
+	    <div class="controls">
+	        <textarea class="form-control input-xxlarge" rows="5" id="interview" name="interview"></textarea>
+		</div>
+	</div>
+	<div class="controls">
+	    <button type="submit" class="btn btn-success" onclick=";">Submit</button>
+	</div>
+</form>
+<div id="interviewListHolder">
+<ul class="nav nav-pills nav-stacked">
+{% for interview in app.interviews.all %}
+	<li><a onclick="RecruiterToggleChatlog('chatlog_{{interview.pk}}')" href='#here'>Chatlog by {{interview.interviewer.username}} added on {{interview.timestamp|date:"Y-m-d H:i"}}</a></li>
+	<div id='chatlog_{{interview.pk}}' style='display: none;'>{{interview.chatlog|linebreaksbr}}</div>
+{% endfor %}
+</ul>
+</div>
+<script type="text/javascript">
+    $('#addInterviewForm').submit(function(e){
+                e.preventDefault();
+                RecruiterAddInterview({{app.pk}});          
+                return false;
+            });
+</script>

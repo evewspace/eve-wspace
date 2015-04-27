@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -8,195 +8,34 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'Action'
-        db.create_table(u'Recruitment_action', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=100)),
-            ('descripiton', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('required', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal(u'Recruitment', ['Action'])
-
-        # Adding model 'AppComment'
-        db.create_table(u'Recruitment_appcomment', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('application', self.gf('django.db.models.fields.related.ForeignKey')(related_name='ro_comments', to=orm['Recruitment.Application'])),
-            ('author', self.gf('django.db.models.fields.related.ForeignKey')(related_name='ro_comments', to=orm['auth.User'])),
-            ('comment', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'Recruitment', ['AppComment'])
-
-        # Adding model 'Application'
-        db.create_table(u'Recruitment_application', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('applicant', self.gf('django.db.models.fields.related.ForeignKey')(related_name='applications', to=orm['auth.User'])),
-            ('app_type', self.gf('django.db.models.fields.related.ForeignKey')(related_name='applications', to=orm['Recruitment.AppType'])),
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('closetime', self.gf('django.db.models.fields.DateTimeField')(null=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2013, 11, 7, 0, 0))),
-            ('submitted', self.gf('django.db.models.fields.DateTimeField')(null=True)),
-            ('closed_by', self.gf('django.db.models.fields.related.ForeignKey')(related_name='applications_closed', null=True, to=orm['auth.User'])),
-            ('disposition', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('status_text', self.gf('django.db.models.fields.TextField')(null=True)),
-        ))
-        db.send_create_signal(u'Recruitment', ['Application'])
-
-        # Adding model 'AppVote'
-        db.create_table(u'Recruitment_appvote', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('application', self.gf('django.db.models.fields.related.ForeignKey')(related_name='votes', to=orm['Recruitment.Application'])),
-            ('vote', self.gf('django.db.models.fields.related.ForeignKey')(related_name='appvotes', to=orm['auth.User'])),
-            ('disposition', self.gf('django.db.models.fields.IntegerField')()),
-            ('note', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'Recruitment', ['AppVote'])
-
-        # Adding model 'AppAction'
-        db.create_table(u'Recruitment_appaction', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('application', self.gf('django.db.models.fields.related.ForeignKey')(related_name='actions', to=orm['Recruitment.Application'])),
-            ('action', self.gf('django.db.models.fields.related.ForeignKey')(related_name='instances', to=orm['Recruitment.Action'])),
-            ('note', self.gf('django.db.models.fields.TextField')()),
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'Recruitment', ['AppAction'])
-
-        # Adding model 'Interview'
-        db.create_table(u'Recruitment_interview', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('application', self.gf('django.db.models.fields.related.ForeignKey')(related_name='interviews', to=orm['Recruitment.Application'])),
-            ('interviewer', self.gf('django.db.models.fields.related.ForeignKey')(related_name='interviews', to=orm['auth.User'])),
-            ('chatlog', self.gf('django.db.models.fields.TextField')()),
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-        ))
-        db.send_create_signal(u'Recruitment', ['Interview'])
-
-        # Adding model 'AppQuestion'
-        db.create_table(u'Recruitment_appquestion', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('question', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('question_type', self.gf('django.db.models.fields.IntegerField')()),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('required', self.gf('django.db.models.fields.BooleanField')(default=True)),
-            ('app_type', self.gf('django.db.models.fields.related.ForeignKey')(related_name='questions', to=orm['Recruitment.AppType'])),
-            ('app_stage', self.gf('django.db.models.fields.related.ForeignKey')(related_name='questions', to=orm['Recruitment.AppStage'])),
-            ('order', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'Recruitment', ['AppQuestion'])
-
-        # Adding model 'AppResponse'
-        db.create_table(u'Recruitment_appresponse', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('application', self.gf('django.db.models.fields.related.ForeignKey')(related_name='responses', to=orm['Recruitment.Application'])),
-            ('question', self.gf('django.db.models.fields.related.ForeignKey')(related_name='responses', to=orm['Recruitment.AppQuestion'])),
-            ('response', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-        ))
-        db.send_create_signal(u'Recruitment', ['AppResponse'])
-
-        # Adding model 'AppQuestionChoice'
-        db.create_table(u'Recruitment_appquestionchoice', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('question', self.gf('django.db.models.fields.related.ForeignKey')(related_name='choices', to=orm['Recruitment.AppQuestion'])),
-            ('value', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=255, null=True, blank=True)),
-        ))
-        db.send_create_signal(u'Recruitment', ['AppQuestionChoice'])
-
-        # Adding model 'AppType'
-        db.create_table(u'Recruitment_apptype', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
-            ('instructions', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('use_standings', self.gf('django.db.models.fields.related.ForeignKey')(related_name='applications', null=True, to=orm['core.Corporation'])),
-            ('accept_group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='applications', null=True, to=orm['auth.Group'])),
-            ('require_account', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('disable_user_on_failure', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('purge_api_on_failure', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('accept_mail', self.gf('django.db.models.fields.TextField')(null=True)),
-            ('accept_subject', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
-            ('reject_mail', self.gf('django.db.models.fields.TextField')(null=True)),
-            ('reject_subject', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
-            ('defer_mail', self.gf('django.db.models.fields.TextField')(null=True)),
-            ('defer_subject', self.gf('django.db.models.fields.CharField')(max_length=255, null=True)),
-        ))
-        db.send_create_signal(u'Recruitment', ['AppType'])
-
-        # Adding model 'AppStage'
-        db.create_table(u'Recruitment_appstage', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255)),
-            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('app_type', self.gf('django.db.models.fields.related.ForeignKey')(related_name='stages', to=orm['Recruitment.AppType'])),
-            ('order', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'Recruitment', ['AppStage'])
-
-        # Adding model 'StandigsRequirement'
-        db.create_table(u'Recruitment_standigsrequirement', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('entity', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('standing', self.gf('django.db.models.fields.FloatField')(null=True, blank=True)),
-            ('entitytype', self.gf('django.db.models.fields.IntegerField')()),
-        ))
-        db.send_create_signal(u'Recruitment', ['StandigsRequirement'])
+        # Adding field 'Action.order'
+        db.add_column(u'Recruitment_action', 'order',
+                      self.gf('django.db.models.fields.IntegerField')(default=0),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting model 'Action'
-        db.delete_table(u'Recruitment_action')
-
-        # Deleting model 'AppComment'
-        db.delete_table(u'Recruitment_appcomment')
-
-        # Deleting model 'Application'
-        db.delete_table(u'Recruitment_application')
-
-        # Deleting model 'AppVote'
-        db.delete_table(u'Recruitment_appvote')
-
-        # Deleting model 'AppAction'
-        db.delete_table(u'Recruitment_appaction')
-
-        # Deleting model 'Interview'
-        db.delete_table(u'Recruitment_interview')
-
-        # Deleting model 'AppQuestion'
-        db.delete_table(u'Recruitment_appquestion')
-
-        # Deleting model 'AppResponse'
-        db.delete_table(u'Recruitment_appresponse')
-
-        # Deleting model 'AppQuestionChoice'
-        db.delete_table(u'Recruitment_appquestionchoice')
-
-        # Deleting model 'AppType'
-        db.delete_table(u'Recruitment_apptype')
-
-        # Deleting model 'AppStage'
-        db.delete_table(u'Recruitment_appstage')
-
-        # Deleting model 'StandigsRequirement'
-        db.delete_table(u'Recruitment_standigsrequirement')
+        # Deleting field 'Action.order'
+        db.delete_column(u'Recruitment_action', 'order')
 
 
     models = {
         u'Recruitment.action': {
-            'Meta': {'object_name': 'Action'},
+            'Meta': {'ordering': "['order', 'name']", 'object_name': 'Action'},
+            'action_type': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'descripiton': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'}),
-            'required': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+            'order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'required': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'required_votes': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
-        u'Recruitment.appaction': {
-            'Meta': {'object_name': 'AppAction'},
-            'action': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'instances'", 'to': u"orm['Recruitment.Action']"}),
+        u'Recruitment.actionentry': {
+            'Meta': {'unique_together': "(['action', 'application'],)", 'object_name': 'ActionEntry'},
+            'action': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['Recruitment.Action']"}),
             'application': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'actions'", 'to': u"orm['Recruitment.Application']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'note': ('django.db.models.fields.TextField', [], {}),
-            'timestamp': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
+            'completed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         u'Recruitment.appcomment': {
             'Meta': {'object_name': 'AppComment'},
@@ -212,7 +51,7 @@ class Migration(SchemaMigration):
             'applicant': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'applications'", 'to': u"orm['auth.User']"}),
             'closed_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'applications_closed'", 'null': 'True', 'to': u"orm['auth.User']"}),
             'closetime': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 11, 7, 0, 0)'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2014, 2, 17, 0, 0)'}),
             'disposition': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'status_text': ('django.db.models.fields.TextField', [], {'null': 'True'}),
@@ -243,6 +82,13 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'question': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'responses'", 'to': u"orm['Recruitment.AppQuestion']"}),
             'response': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
+        },
+        u'Recruitment.approvalaction': {
+            'Meta': {'object_name': 'ApprovalAction', '_ormbases': [u'Recruitment.ActionEntry']},
+            'action_entry': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'approval_info'", 'unique': 'True', 'primary_key': 'True', 'to': u"orm['Recruitment.ActionEntry']"}),
+            'approval_comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'approval_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'approver': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'ro_approvals'", 'null': 'True', 'to': u"orm['auth.User']"})
         },
         u'Recruitment.appstage': {
             'Meta': {'ordering': "['order']", 'object_name': 'AppStage'},
@@ -279,6 +125,16 @@ class Migration(SchemaMigration):
             'timestamp': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'vote': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'appvotes'", 'to': u"orm['auth.User']"})
         },
+        u'Recruitment.countersignaction': {
+            'Meta': {'object_name': 'CountersignAction', '_ormbases': [u'Recruitment.ActionEntry']},
+            'action_entry': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'countersign_info'", 'unique': 'True', 'primary_key': 'True', 'to': u"orm['Recruitment.ActionEntry']"}),
+            'approver1': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'counter_approve1'", 'null': 'True', 'to': u"orm['auth.User']"}),
+            'approver1_comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'approver1_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'approver2': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'counter_approve2'", 'null': 'True', 'to': u"orm['auth.User']"}),
+            'approver2_comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'approver2_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'})
+        },
         u'Recruitment.interview': {
             'Meta': {'object_name': 'Interview'},
             'application': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'interviews'", 'to': u"orm['Recruitment.Application']"}),
@@ -293,6 +149,12 @@ class Migration(SchemaMigration):
             'entitytype': ('django.db.models.fields.IntegerField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'standing': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'})
+        },
+        u'Recruitment.voteaction': {
+            'Meta': {'object_name': 'VoteAction', '_ormbases': [u'Recruitment.ActionEntry']},
+            'action_entry': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'vote_info'", 'unique': 'True', 'primary_key': 'True', 'to': u"orm['Recruitment.ActionEntry']"}),
+            'votes_against': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'ro_votes_against'", 'symmetrical': 'False', 'to': u"orm['auth.User']"}),
+            'votes_for': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'ro_votes_for'", 'symmetrical': 'False', 'to': u"orm['auth.User']"})
         },
         u'auth.group': {
             'Meta': {'object_name': 'Group'},

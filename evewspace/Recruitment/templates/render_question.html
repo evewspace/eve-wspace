@@ -1,0 +1,32 @@
+
+<label style="margin-top: 25px;" class="" for="question-{{question.pk}}"><strong>{{question.question}}{% if question.required %} (Required) {% endif %}</strong></label>
+{% if question.description %}
+<p class="text-info">{{question.description}}</p>
+{% endif %}
+    <div style="margin-top: 10px;">
+        {% if question.question_type == 1 %}
+        <input class="input-xlarge" type="text" id="question-{{question.pk}}" name="question-{{question.pk}}">
+        {% endif %}
+        {% if question.question_type == 2 %}
+        <textarea class="input-xxlarge" name="question-{{question.pk}}" rows="5" id="question-{{question.pk}}"></textarea>
+        {% endif %}
+        {% if question.question_type == 3 %}
+        {% for choice in question.choices.all %}
+        <label class="radio">
+            <input name="question-{{question.pk}}" value="{{choice.pk}}" type="radio"> {{choice.value}}
+        </label>
+        {% endfor %}
+        {% endif %}
+        {% if question.question_type == 4 %}
+        {% for choice in question.choices.all %}
+        <label class="checkbox">
+            <input name="choice-{{choice.pk}}" type="checkbox"> {{choice.value}}
+        </label>
+        {% endfor %}
+        {% endif %}
+        <br />
+        {% if edit_mode %}
+        <button class="btn btn-mini btn-danger" onclick="DeleteQuestion({{question.app_type.pk}}, {{question.app_stage.pk}}, {{question.pk}});">Delete</button>
+        <button class="btn btn-mini btn-primary" onclick="GetQuestionEditDialog({{question.app_type.pk}}, {{question.app_stage.pk}}, {{question.pk}});">Edit</button>
+        {% endif %}
+    </div>

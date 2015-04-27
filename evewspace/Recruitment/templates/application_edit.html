@@ -1,0 +1,180 @@
+<ul style="margin-top: 15px;" class="nav nav-pills">
+    <li class="active"><a data-toggle="pill" href="#app{{application.pk}}Global">Settings</a></li>
+    {% for stage in stages %}
+    <li><a data-toggle="pill" onclick="UpdateApplicationStage({{application.pk}}, {{stage.pk}});" href="#app{{application.pk}}stage{{stage.pk}}">Stage: {{stage.name}}</a></li>
+    {% endfor %}
+    <li><a data-toggle="pill" href="#app{{application.pk}}NewStage"><i class="icon-plus"></i> Add Stage</a></li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" id="app{{application.pk}}Global">
+        {% if app_saved  %}
+        <div class="alert alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>The application type was saved successfully.</strong>
+        </div>
+        {% endif %}
+        {% if error %}
+         <div class="alert alert-danger">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>{{error}}</strong>
+        </div>
+       {% endif %}
+        <form class="form-horizontal" id="app{{application.pk}}Form">
+            <h5>Application Settings:</h5>
+            <div class="control-group">
+                <label for="applicationName{{application.pk}}" class="control-label">Name:</label>
+                <div class="controls">
+                    <input type="text" id="applicationName{{application.pk}}" name="name" value="{{application.name}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="appLink{{application.pk}}" class="control-label">Apply URL:</label>
+                <div class="controls">
+                    <a id="appLink{{application.pk}}" href="{% url 'Recruitment.views.get_application' application.pk %}">{% url 'Recruitment.views.get_application' application.pk %}</a>
+                </div>
+            </div>
+             <div class="control-group">
+                 <label for="appInstructions{{application.pk}}" class="control-label">Instructions:</label>
+                <div class="controls">
+                    <textarea type="text" id="appInstructions{{application.pk}}" name="instructions">{{application.instructions}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                 <label for="appStandings{{application.pk}}" class="control-label">Use Standings From:</label>
+                <div class="controls">
+                    <input type="text" id="appStandings{{application.pk}}" class="corpAPIAuto" name="standings" {% if application.use_standings %}value="{{application.use_standings.name}}"{% endif %}>
+                </div>
+            </div>
+             <div class="control-group">
+                 <label for="appAcceptGroup{{application.pk}}" class="control-label">Group on Accept:</label>
+                <div class="controls">
+                    <input type="text" id="appAcceptGroup{{application.pk}}" class="groupAuto" name="accept_group" {% if application.accept_group %}value="{{application.accept_group.name}}"{% endif %}>
+                </div>
+            </div>
+             <div class="control-group">
+                 <label for="appAcceptVotes{{application.pk}}" class="control-label">Required number of votes to accept:</label>
+                <div class="controls">
+                    <input type="text" id="appAcceptVotes{{application.pk}}" class="groupAuto" name="required_votes" {% if application.required_votes %}value="{{application.required_votes}}"{% endif %}>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <label class="checkbox">
+                        <input type="checkbox" id="appUserRequire{{application.pk}}" name="require_user" {% if application.require_account %}checked="checked"{% endif %}> Require pre-existing account
+                    </label>
+                   <label class="checkbox">
+                       <input type="checkbox" id="appDisable{{application.pk}}" name="disable_user" {% if application.disable_user_on_failure %}checked="checked"{% endif %}> Disable Account on Reject
+                    </label>
+                     <label class="checkbox">
+                         <input type="checkbox" id="appPurge{{application.pk}}" name="purge_api" {% if application.purge_api_on_failure %}checked="checked"{% endif %}> Purge API on Reject
+                    </label>
+               </div>
+           </div>
+           <h5>Mail Templates:</h5>
+           <p class="text-info">
+                The following will be sent via email to the applicant if they provide an email address on registration. The text %APPLICANT% will be replaced by the applicant's username. If left blank, no email will be sent.
+            </p>
+            <div class="control-group">
+                <label for="accept_sbj{{application.pk}}" class="control-label">Accept Subject:</label>
+                <div class="controls">
+                    <input type="text" id="accept_sbj{{application.pk}}" name="accept_sbj" {% if application.accept_subject %}value="{{application.accept_subject}}"{% endif %}>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="accept_mail{{application.pk}}" class="control-label">Accept Mail:</label>
+                <div class="controls">
+                    <textarea id="accept_mail{{application.pk}}" name="accept_mail">{% if application.accept_mail %} {{application.accept_mail}} {% endif %}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                 <label for="defer_sbj{{application.pk}}" class="control-label">Defer Subject:</label>
+                <div class="controls">
+                    <input type="text" id="defer_sbj{{application.pk}}" name="defer_sbj" {% if application.defer_subject %}value="{{application.defer_subject}}"{% endif %}>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="defer_mail{{application.pk}}" class="control-label">Defer Mail:</label>
+                <div class="controls">
+                    <textarea id="defer_mail{{application.pk}}" name="defer_mail">{% if application.defer_mail %}{{application.defer_mail}}{% endif %}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                 <label for="reject_sbj{{application.pk}}" class="control-label">Reject Subject:</label>
+                <div class="controls">
+                    <input type="text" id="reject_sbj{{application.pk}}" name="reject_sbj" {% if application.reject_subject %}value="{{application.reject_subject}}"{% endif %}>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="reject_mail{{application.pk}}" class="control-label">Reject Mail:</label>
+                <div class="controls">
+                    <textarea id="reject_mail{{application.pk}}" name="reject_mail">{% if application.reject_mail %}{{application.reject_mail}}{% endif %}</textarea>
+                </div>
+            </div>
+         <div class="control-group">
+               <div class="controls">
+                   <button type="submit" class="btn btn-large btn-success">Save</button>
+                   <button id="btnDeleteApp{{application.pk}}" class="btn btn-large btn-danger">Delete App Type</button>
+                   <button id="btnReallyDeleteApp{{application.pk}}" class="btn btn-large btn-warning" style="display: none;">Really Delete</button>
+               </div>
+            </div>
+        </form>
+        <script type="text/javascript">
+            $('#app{{application.pk}}Form').submit(function(e){
+                    e.preventDefault();
+                    UpdateApplication({{application.pk}});
+                    return false;
+                    });
+            $('#btnDeleteApp{{application.pk}}').click(function(e){
+                    e.preventDefault();
+                    $('#btnDeleteApp{{application.pk}}').hide();
+                    $('#btnReallyDeleteApp{{application.pk}}').show();
+                    return false;
+                    });
+            $('#btnReallyDeleteApp{{application.pk}}').click(function(e){
+                    e.preventDefault();
+                    DeleteAppType({{application.pk}});
+                    return false;
+                    });
+        </script>
+    </div>
+    {% for stage in stages %}
+    <div class="tab-pane" id="app{{application.pk}}stage{{stage.pk}}">
+        {{stage.name}}
+    </div>
+    {% endfor %}
+    <div class="tab-pane" id="app{{application.pk}}NewStage">
+        <h5>New stage</h5>
+        <form class="form-horizontal" id="newStageForm{{application.pk}}">
+            <div class="control-group">
+                <label for="newStageName{{application.pk}}" class="control-label">Name:</label>
+                <div class="controls">
+                    <input type="text" id="newStageName{{application.pk}}" name="name">
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="newStageDescribe{{application.pk}}" class="control-label">Description:</label>
+                <div class="controls">
+                    <textarea id="newStageDescribe{{application.pk}}" name="description"></textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="newStageOrder{{application.pk}}" class="control-label">Order:</label>
+                <div class="controls">
+                    <input type="text" id="newStageOrder{{application.pk}}" class="input-mini" name="order">
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <button type="submit" class="btn btn-large btn-success">Create</button>
+                </div>
+            </div>
+        </form>
+        <script type="text/javascript">
+            $('#newStageForm{{application.pk}}').submit(function(e){
+                    e.preventDefault();
+                    NewStage({{application.pk}});
+                    return false;
+                    });
+        </script>
+    </div>
+</div>

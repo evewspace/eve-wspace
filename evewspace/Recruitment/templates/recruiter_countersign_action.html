@@ -1,0 +1,99 @@
+{% load humanize %}
+<div id="recruiterCountersignAction">
+        <h3>{{countersign_action.action.name}}</h3>
+        {% if countersign_action.action.description %}
+            <p class="infoText label label-info">{{countersign_action.action.description}}</p>
+        {% endif %}
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th width='60%'>Action status</th>
+                <th>
+                {% if not countersign_action.completed %}
+                    <span class="badge badge-important">&#x2717;</span>
+                {% else %} 
+                    <span class="badge badge-success">&#x2713;</span>
+                {% endif %}
+                </th>
+            </tr>
+            <tr>
+                <th>Sign off completed by</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                {% if not countersign_action.approver1 %}
+                     <td>Nobody</td>
+                	 <td><span class="badge badge-important">&#x2717;</span></td>
+                {% else %} 
+                     <td>{{countersign_action.approver1.username}}</td>
+                	 <td><span class="badge badge-success">&#x2713;</span></td>
+                {% endif %}
+            </tr>
+            {% if countersign_action.approver1 %}
+                <tr>
+                     <td colspan='2'>Completed on {{countersign_action.approver1_time|date:"Y-m-d H:i"}}</td>
+                </tr>
+                <tr>
+                     <td colspan='2'>{{countersign_action.approver1_comment|linebreaksbr}}</td>
+                </tr>
+            {% endif %}
+        </table>
+        <form id="signForm">
+            <input type="hidden" name="signoff_type" value="signoff">
+			<div id="signDiv">
+				<label for="actionComment" class="control-label">Comment:</label>
+			    <div class="controls">
+			        <textarea class="form-control input-xxlarge" rows="5" id="actionComment" name="actionComment"></textarea>
+				</div>
+			</div>
+			<div class="controls">
+		    	<button type="submit" class="btn btn-success" onclick=";">Sign off</button>
+			</div>
+		</form>
+		<table class="table table-hover table-bordered">
+            <tr>
+                <th  width='60%'>Countersign off completed by</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                {% if not countersign_action.approver2 %}
+                     <td>Nobody</td>
+                	 <td><span class="badge badge-important">&#x2717;</span></td>
+                {% else %} 
+                     <td>{{countersign_action.approver2.username}}</td>
+                	 <td><span class="badge badge-success">&#x2713;</span></td>
+                {% endif %}
+            </tr>
+            {% if countersign_action.approver2 %}
+                <tr>
+                     <td colspan='2'>Completed on {{countersign_action.approver2_time|date:"Y-m-d H:i"}}</td>
+                </tr>
+                <tr>
+                     <td colspan='2'>{{countersign_action.approver2_comment|linebreaksbr}}</td>
+                </tr>
+            {% endif %}
+        </table>
+        <form id="countersignForm">
+            <input type="hidden" name="signoff_type" value="counter">
+			<div id="countersignDiv">
+				<label for="actionComment2" class="control-label">Comment:</label>
+			    <div class="controls">
+			        <textarea class="form-control input-xxlarge" rows="5" id="actionComment2" name="actionComment2"></textarea>
+				</div>
+			</div>
+			<div class="controls">
+		    	<button type="submit" class="btn btn-success" onclick=";">Counter sign off</button>
+			</div>
+		</form>
+</div>
+<script type="text/javascript">
+    $('#signForm').submit(function(e){
+                e.preventDefault();
+                RecruiterSignAction({{app.pk}}, {{countersign_action.action.pk}});          
+                return false;
+            });
+    $('#countersignForm').submit(function(e){
+                e.preventDefault();
+                RecruiterCountersignAction({{app.pk}}, {{countersign_action.action.pk}});          
+                return false;
+            });
+</script>
