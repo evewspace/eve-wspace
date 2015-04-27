@@ -1392,13 +1392,19 @@ def purge_signatures(request, map_id, ms_id):
         return HttpResponse(status=400)
 
 @require_map_permission(permission=2)
-def move_system_up(request, map_id, ms_id):
+def move_system(request, map_id, ms_id, action):
     if not request.is_ajax():
         raise PermissionDenied
     if not request.method == "POST":
         return HttpResponse(status=400) 
 
     mapsys = get_object_or_404(MapSystem, pk=ms_id)
-    mapsys.move_up()
+    if action == 'up':
+        mapsys.move_up()
+    elif action == 'down':
+        mapsys.move_down();
+    else:
+        raise Http404
+
     return HttpResponse()
 

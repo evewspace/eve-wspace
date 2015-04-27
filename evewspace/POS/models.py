@@ -12,34 +12,41 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+import csv
+
 from django.db import models
+from django.conf import settings
+import eveapi
+
 from core.models import Type, Location
 from API.models import CorpAPIKey
 from core.models import Corporation, Alliance
 from Map.models import System
 from API import cache_handler as handler
-from django.conf import settings
-import pytz
-import csv
-import eveapi
+
 
 User = settings.AUTH_USER_MODEL
+
 
 class POS(models.Model):
     """Represents a POS somewhere in space."""
     system = models.ForeignKey(System, related_name="poses")
     planet = models.IntegerField()
-    moon   = models.IntegerField()
+    moon = models.IntegerField()
     towertype = models.ForeignKey(Type, related_name="inspace")
     corporation = models.ForeignKey(Corporation, related_name="poses")
     posname = models.CharField(max_length=100, blank=True, null=True)
     fitting = models.TextField(blank=True, null=True)
-    #Using CCP's status codes here for sanity with API checks
-    status = models.IntegerField(choices = ((0, 'Unanchored'), (1, 'Anchored'),
-        (2, 'Onlining'), (3, 'Reinforced'), (4, 'Online')))
+    # Using CCP's status codes here for sanity with API checks
+    status = models.IntegerField(choices=((0, 'Unanchored'),
+                                          (1, 'Anchored'),
+                                          (2, 'Onlining'),
+                                          (3, 'Reinforced'),
+                                          (4, 'Online')))
 
-    #This should be the time the tower exits RF
-    #TODO: add a validator to make sure this is only set if status = 3 (Reinforced)
+    # This should be the time the tower exits RF
+    # TODO: add a validator to make sure this is only set
+    #       if status = 3 (Reinforced)
     rftime = models.DateTimeField(null=True, blank=True)
     updated = models.DateTimeField()
     # These values will be set by the TSV parser from d-scan data if available
@@ -54,7 +61,7 @@ class POS(models.Model):
         ordering = ['system__name', 'planet', 'moon']
 
     @classmethod
-    def update_from_import_list(self, system, import_list):
+    def update_from_import_list(cls, system, import_list):
         """
         Imports starbases from YAML importer.
         """
@@ -71,14 +78,15 @@ class POS(models.Model):
             except Corporation.DoesNotExist:
                 from core import tasks
                 api = eveapi.EVEAPIConnection(cacheHandler=handler)
-                corpID = api.eve.CharacterID(
-                        names=pos['owner']).characters[0].characterID
-                owner = tasks.update_corporation(corpID, True)
+                corp_id = api.eve.CharacterID(
+                    names=pos['owner']).characters[0].characterID
+                owner = tasks.update_corporation(corp_id, True)
             if POS.objects.filter(system=system, planet=planet,
-                    moon=moon, corporation=owner).exists():
+                                  moon=moon, corporation=owner).exists():
                 # Update first existing record
                 starbase = POS.objects.filter(system=system, planet=planet,
-                        moon=moon, corporation=owner).all()[0]
+                                              moon=moon,
+                                              corporation=owner).all()[0]
                 starbase.status = status
                 starbase.name = name
                 starbase.towertype = tower
@@ -87,30 +95,31 @@ class POS(models.Model):
                 starbase.warpin_notice = warpin
             else:
                 new_pos = POS(system=system, planet=planet, moon=moon,
-                        corporation=owner, towertype=tower,
-                        warpin_notice=warpin, status=status)
+                              corporation=owner, towertype=tower,
+                              warpin_notice=warpin, status=status)
                 if status == 3:
                     new_pos.rftime = rftime
                 new_pos.save()
 
     def as_dict(self):
         data = {
-                'planet': self.planet, 'moon': self.moon,
-                'tower': self.towertype.name, 'owner': self.corporation.name,
-                'status': self.status, 'name': self.posname,
-                'rftime': self.rftime, 'warpin': self.warpin_notice
-                }
+            'planet': self.planet, 'moon': self.moon,
+            'tower': self.towertype.name, 'owner': self.corporation.name,
+            'status': self.status, 'name': self.posname,
+            'rftime': self.rftime, 'warpin': self.warpin_notice,
+        }
         return data
 
     def clean(self):
         from django.core.exceptions import ValidationError
         if self.rftime and self.status != 3:
-            raise ValidationError("A POS cannot have an rftime unless it is reinforced")
+            raise ValidationError("A POS cannot have an rftime unless "
+                                  "it is reinforced")
 
     def __unicode__(self):
         return self.posname
 
-    #overide save to implement posname defaulting to towertype.name
+    # override save to implement posname defaulting to towertype.name
     def save(self, *args, **kwargs):
         if not self.posname:
             self.posname = self.towertype.name
@@ -135,19 +144,20 @@ class POS(models.Model):
         """
         Fills in a POS's fitting from a copy / paste of d-scan results.
         """
-        return self.fit_from_iterable(csv.reader(dscan.splitlines(), delimiter="\t"))
+        return self.fit_from_iterable(csv.reader(dscan.splitlines(),
+                                                 delimiter="\t"))
 
     def fit_from_iterable(self, fit):
         """
         Fills in a POS's fitting from an iterable (normally parsed d-scan)
         """
         from core.models import Type
-        itemDict={}
+        item_dict = dict()
         # marketGroupIDs to consider guns, ewar, hardeners, and smas
-        gunsGroups = [480, 479, 594, 595, 596]
-        ewarGroups = [481, 1009]
-        smaGroups = [484,]
-        hardenerGroups = [485,]
+        guns_groups = [480, 479, 594, 595, 596]
+        ewar_groups = [481, 1009]
+        sma_groups = [484]
+        hardener_groups = [485]
         towers = 0
         self.sma = 0
         self.hardener = 0
@@ -155,35 +165,36 @@ class POS(models.Model):
         self.ewar = 0
         for row in fit:
             try:
-                itemType = Type.objects.get(name=row[1])
-            except Type.DoesNotExist: #odd bug where invalid items get into dscan
+                item_type = Type.objects.get(name=row[1])
+            # odd bug where invalid items get into dscan
+            except Type.DoesNotExist:
                 continue
-            if itemType.marketgroup:
-                groupTree = []
-                parent = itemType.marketgroup
+            if item_type.marketgroup:
+                group_tree = []
+                parent = item_type.marketgroup
                 while parent:
-                    groupTree.append(parent.id)
+                    group_tree.append(parent.id)
                     parent = parent.parentgroup
-                if itemType.marketgroup.id in gunsGroups:
+                if item_type.marketgroup.id in guns_groups:
                     self.guns += 1
-                if itemType.marketgroup.id in ewarGroups:
+                if item_type.marketgroup.id in ewar_groups:
                     self.ewar += 1
-                if itemType.marketgroup.id in smaGroups:
+                if item_type.marketgroup.id in sma_groups:
                     self.sma += 1
-                if itemType.marketgroup.id in hardenerGroups:
+                if item_type.marketgroup.id in hardener_groups:
                     self.hardener += 1
-                if itemType.marketgroup.id == 478:
+                if item_type.marketgroup.id == 478:
                     towers += 1
-                    towertype = itemType
+                    towertype = item_type
                     posname = row[0]
-                if itemDict.has_key(itemType.name):
-                    itemDict[itemType.name] += 1
-                elif 1285 in groupTree and 478 not in groupTree:
-                    itemDict.update({itemType.name: 1})
+                if item_type.name in item_dict:
+                    item_dict[item_type.name] += 1
+                elif 1285 in group_tree and 478 not in group_tree:
+                    item_dict.update({item_type.name: 1})
 
         self.fitting = "Imported from D-Scan:\n"
-        for itemtype in itemDict:
-            self.fitting += "\n%s : %s" % (itemtype, itemDict[itemtype])
+        for itemtype in item_dict:
+            self.fitting += "\n%s : %s" % (itemtype, item_dict[itemtype])
         if towers == 1 and self.towertype_id is None and self.posname is None:
             self.towertype = towertype
             self.posname = posname
@@ -194,41 +205,52 @@ class POS(models.Model):
         else:
             raise AttributeError('Too many towers detected in the D-Scan!')
 
+
 class CorpPOS(POS):
     """A corp-controlled POS with manager and password data."""
-    manager = models.ForeignKey(User, null=True, blank=True, related_name='poses')
+    manager = models.ForeignKey(User, null=True, blank=True,
+                                related_name='poses')
     password = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
-    #Let's store the CCP Item ID for the tower here to make API lookup easier
-    #If it is null, then we are not tracking this POS via API
+    # Let's store the CCP Item ID for the tower here to make API lookup easier
+    # If it is null, then we are not tracking this POS via API
     apiitemid = models.BigIntegerField(null=True, blank=True)
-    apikey = models.ForeignKey(CorpAPIKey, null=True, blank=True, related_name='poses')
+    apikey = models.ForeignKey(CorpAPIKey, null=True, blank=True,
+                               related_name='poses')
 
     class Meta:
         permissions = (('can_see_pos_pw', 'Can see corp POS passwords.'),
-        ('can_see_all_pos', 'Sees all corp POSes regardless of manager.'),)
+                       ('can_see_all_pos', 'Sees all corp POSes '
+                                           'regardless of manager.'),)
 
 
 class POSApplication(models.Model):
     """Represents an application for a personal POS."""
-    applicant = models.ForeignKey(User, null=True, blank=True, related_name='posapps')
-    towertype = models.ForeignKey(Type, null=True, blank=True, related_name='posapps')
+    applicant = models.ForeignKey(User, null=True, blank=True,
+                                  related_name='posapps')
+    towertype = models.ForeignKey(Type, null=True, blank=True,
+                                  related_name='posapps')
     residents = models.ManyToManyField(User)
     normalfit = models.TextField()
     siegefit = models.TextField()
-    #Once it is approved, we will fill in these two to tie the records together
+    # Once it is approved, we will fill in these two to tie the records together
     approved = models.DateTimeField(blank=True, null=True)
-    posrecord = models.ForeignKey(CorpPOS, blank=True, null=True, related_name='application')
+    posrecord = models.ForeignKey(CorpPOS, blank=True, null=True,
+                                  related_name='application')
 
     class Meta:
-        permissions = (('can_close_pos_app', 'Can dispose of corp POS applications.'),)
+        permissions = (('can_close_pos_app',
+                        'Can dispose of corp POS applications.'),)
 
     def __unicode__(self):
-        return 'Applicant: %s  Tower: %s' % (self.applicant.username, self.towertype.name)
+        return 'Applicant: %s  Tower: %s' % (self.applicant.username,
+                                             self.towertype.name)
 
 
 class POSVote(models.Model):
     """Represents a vote on a personal POS application."""
     application = models.ForeignKey(POSApplication, related_name='votes')
     voter = models.ForeignKey(User, related_name='posvotes')
-    vote = models.IntegerField(choices=((0,'Deny'), (1, 'Approve'), (2, 'Abstain')))
+    vote = models.IntegerField(choices=((0, 'Deny'),
+                                        (1, 'Approve'),
+                                        (2, 'Abstain')))
