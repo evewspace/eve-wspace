@@ -24,6 +24,7 @@ import time
 import yaml
 from Map import utils
 from Map.utils import MapJSONGenerator
+from core.utils import get_config
 from django.core.cache import cache
 # Create your models here.
 
@@ -789,7 +790,7 @@ class Signature(models.Model):
         updated = None
         action = "None"
 
-        if wascreated is True:
+        if wascreated:
             # new sig
             updated = False
             action = "Created"
@@ -839,11 +840,20 @@ class Signature(models.Model):
     def log_sig(self, user, action, map_system):
         """Log the fact that the signature was scanned."""
         
-        map_system.map.add_log(
-            user, 
-            "%s signature %s in %s (%s), %s jumps out from root system."
-            %(action, self.sigid, map_system.system.name, 
-              map_system.friendlyname, map_system.distance_from_root()))
+        # only include advanced logging if enabled
+        include_distance = get_config("MAP_ADVANCED_LOGGING", None).value
+        if include_distance == "1":
+            map_system.map.add_log(
+                user, 
+                "%s signature %s in %s (%s), %s jumps out from root system."
+                %(action, self.sigid, map_system.system.name, 
+                  map_system.friendlyname, map_system.distance_from_root()))
+        else:
+            map_system.map.add_log(
+                user, 
+                "%s signature %s in %s (%s)."
+                %(action, self.sigid, map_system.system.name, 
+                  map_system.friendlyname))
 
     def toggle_ownership(self, user):
         """Toggles ownership."""

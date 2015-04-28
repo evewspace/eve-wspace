@@ -561,7 +561,9 @@ def bulk_sig_import(request, map_id, ms_id):
                     sigid=sig_id, system=map_system.system)
 
                 # Update sig with copied TSV data
-                sig, update_type = sig.update_from_tsv(request.user, sigcreated, row, map_system)
+                sig, update_type = sig.update_from_tsv(request.user, 
+                                                       sigcreated, 
+                                                       row, map_system)
                 
                 sig.modified_by = request.user
                 sig.save()
@@ -998,17 +1000,20 @@ def general_settings(request):
     scan_threshold = get_config("MAP_SCAN_WARNING", None)
     interest_time = get_config("MAP_INTEREST_TIME", None)
     escalation_burn = get_config("MAP_ESCALATION_BURN", None)
+    advanced_logging = get_config("MAP_ADVANCED_LOGGING", None)
     if request.method == "POST":
         scan_threshold.value = int(request.POST['scanwarn'])
         interest_time.value = int(request.POST['interesttimeout'])
         pvp_threshold.value = int(request.POST['pvpthreshold'])
         npc_threshold.value = int(request.POST['npcthreshold'])
         escalation_burn.value = int(request.POST['escdowntimes'])
+        advanced_logging.value = int(request.POST['advlogging'])
         scan_threshold.save()
         interest_time.save()
         pvp_threshold.save()
         npc_threshold.save()
         escalation_burn.save()
+        advanced_logging.save()
         return HttpResponse()
     return TemplateResponse(
         request, 'general_settings.html',
@@ -1016,7 +1021,8 @@ def general_settings(request):
          'pvpthreshold': pvp_threshold.value,
          'scanwarn': scan_threshold.value,
          'interesttimeout': interest_time.value,
-         'escdowntimes': escalation_burn.value}
+         'escdowntimes': escalation_burn.value,
+         'advlogging': advanced_logging.value}
     )
 
 

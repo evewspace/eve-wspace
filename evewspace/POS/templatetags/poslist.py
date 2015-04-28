@@ -21,12 +21,12 @@ register=template.Library()
 
 @register.inclusion_tag('poslist.html', takes_context=True)
 def poslist(context, mapsystem):
-	mapsystem = get_object_or_404(MapSystem, pk=mapsystem)
-	system = get_object_or_404(System, pk=mapsystem.system.pk)
-	poses = POS.objects.filter(system=system)
-	return {'poses': poses, 'mapsystem': mapsystem, 'request': context['request']}
+    mapsystem = get_object_or_404(MapSystem, pk=mapsystem)
+    system = get_object_or_404(System, pk=mapsystem.system.pk)
+    poses = POS.objects.filter(system=system)
+    return {'poses': poses, 'mapsystem': mapsystem, 'request': context['request']}
 
 
 @register.inclusion_tag('posdetails_small.html', takes_context=True)
 def posdetails(context, mapsystem, pos):
-	return {'pos' : pos, 'mapsystem': mapsystem, 'perms': context['perms']}
+    return {'pos' : pos, 'mapsystem': mapsystem, 'perms': context['perms']}
