@@ -19,15 +19,16 @@ from django.contrib.auth.models import Group
 register = template.Library()
 
 
-@register.inclusion_tag('map_settings.html')
-def map_global_admin():
+@register.inclusion_tag('map_settings.html', takes_context=True)
+def map_global_admin(context):
     """
     Returns the Map admin panel for the settings page.
     """
     return {'maps': Map.objects.all(),
             'destinations': Destination.objects.all(),
             'sigtypes': SignatureType.objects.all(),
-            'spawns': SiteSpawn.objects.all()}
+            'spawns': SiteSpawn.objects.all(),
+            'STATIC_URL': context['STATIC_URL']}
 
 
 @register.inclusion_tag('map_settings_single.html')
