@@ -242,7 +242,7 @@ class Map(models.Model):
 
     class Meta:
         permissions = (("map_unrestricted",
-                        "Do not require excplicit access to maps."),
+                        "Do not require explicit access to maps."),
                        ("map_admin", "Access map configuration."),)
 
     def __unicode__(self):
