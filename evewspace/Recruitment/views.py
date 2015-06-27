@@ -181,6 +181,7 @@ def recruiter_api_key_delete(request, app_id, key_id):
     if not request.is_ajax():
         raise PermissionDenied
     api_key = get_object_or_404(MemberAPIKey, keyid=key_id)
+    app = get_object_or_404(Application, pk=app_id)
     auto_comment = "An API (%s) was deleted by %s" % (key_id, request.user)
     app_comment = AppComment(application=app, author=request.user, comment=auto_comment)
     api_key.delete()
