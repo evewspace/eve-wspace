@@ -67,6 +67,31 @@ def applicant_register(request, app_type=None):
                             'next_page': next_page,
                             'app_type': app_type.pk})
 
+def applicant_login(request, app_type=None):
+    email_required = get_config('RECRUIT_REQUIRE_EMAIL', None).value == "1"
+    form = RecruitRegistrationForm()
+    if not app_type:
+        app_type = get_object_or_404(AppType, pk=request.POST.get('app_type'))
+    if request.method == "POST":
+        log_user = authenticate(username=request.POST.get('username2', ''),
+                password=request.POST.get('password3', ''))
+        if log_user is not None:
+            login(request, log_user)
+            return HttpResponseRedirect(request.POST.get('next_page'))
+        else:
+            next_page = reverse('Recruitment.views.get_application',
+                args=(app_type.pk,))
+            return TemplateResponse(request, "recruit_register.html", {'form': form,
+                            'email_required': email_required,
+                            'next_page': next_page,
+                            'app_type': app_type.pk})
+    else:
+        next_page = reverse('Recruitment.views.get_application',
+            args=(app_type.pk,))
+        return TemplateResponse(request, "recruit_register.html", {'form': form,
+                            'email_required': email_required,
+                            'next_page': next_page,
+                            'app_type': app_type.pk})
 
 def get_application(request, app_type_id):
     app_type = get_object_or_404(AppType, pk=app_type_id)
