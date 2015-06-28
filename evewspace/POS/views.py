@@ -22,7 +22,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404
 
 from POS.models import *
-from Map.models import System
+from Map.models import System, MapSystem
 from core.models import Type
 from API import cache_handler as handler
 from core import tasks as core_tasks
@@ -43,38 +43,44 @@ def test_fit(request, posID):
 
 
 @permission_required('POS.delete_pos', raise_exception=True)
-def remove_pos(request, sysID,  posID):
+def remove_pos(request, msID, posID):
     """
     Removes the POS. Raises PermissionDenied if it is a CorpPOS.
     """
     if not request.is_ajax():
         raise PermissionDenied
+    mapsystem = get_object_or_404(MapSystem, pk=msID)
     pos = get_object_or_404(POS, pk=posID)
     if CorpPOS.objects.filter(pk=posID).count():
         raise PermissionDenied
 
     pos.delete()
+    pos.log(request.user, "Deleted", mapsystem)
+
     return HttpResponse()
 
 
 @login_required
-def get_pos_list(request, sysID):
+def get_pos_list(request, msID):    
     if not request.is_ajax():
         raise PermissionDenied
-    system = get_object_or_404(System, pk=sysID)
-    poses = POS.objects.filter(system=system).all()
-    return TemplateResponse(request, 'poslist.html',
-                            {'system': system, 'poses': poses})
+    mapsystem = get_object_or_404(MapSystem, pk=msID)
+    system = get_object_or_404(System, pk=mapsystem.system.pk)
+    poses = POS.objects.filter(system=system).all()    
+
+    return TemplateResponse(request, 'poslist.html', {'mapsystem': mapsystem,
+        'poses': poses})
 
 
 @permission_required('POS.change_pos', raise_exception=True)
-def edit_pos(request, sysID, posID):
+def edit_pos(request, msID, posID):
     """
     GET gets the edit POS dialog, POST processes it.
     """
     if not request.is_ajax():
         raise PermissionDenied
-    system = get_object_or_404(System, pk=sysID)
+    mapsystem = get_object_or_404(MapSystem, pk=msID)
+    system = get_object_or_404(System, pk=mapsystem.system.pk)
     pos = get_object_or_404(POS, pk=posID)
     if request.method == 'POST':
         tower = get_object_or_404(Type, name=request.POST['tower'])
@@ -123,18 +129,21 @@ def edit_pos(request, sysID, posID):
         if fitting is not None:
             fitting = fitting.replace("<br />", "\n")
         return TemplateResponse(request, 'edit_pos.html', {'system': system,
+                                                           'mapsystem': mapsystem,
                                                            'pos': pos,
                                                            'fitting': fitting})
 
 
 @login_required
-def add_pos(request, sysID):
+def add_pos(request, msID):
     """
     GET gets the add POS dialog, POST processes it.
     """
+
     if not request.is_ajax():
         raise PermissionDenied
-    system = get_object_or_404(System, pk=sysID)
+    mapsystem = get_object_or_404(MapSystem, pk=msID)
+    system = get_object_or_404(System, pk=mapsystem.system.pk)
     if request.method == 'POST':
         corp_name = request.POST.get('corp', None)
         if not corp_name:
@@ -144,12 +153,16 @@ def add_pos(request, sysID):
             corp = Corporation.objects.get(name=corp_name)
         except Corporation.DoesNotExist:
             # Corp isn't in our DB, get its ID and add it
-            api = eveapi.EVEAPIConnection(cacheHandler=handler)
-            corp_id = (api.eve.CharacterID(names=corp_name)
-                       .characters[0].characterID)
-            if corp_id == 0:
-                return HttpResponse('Corp does not exist!', status=404)
-            corp = core_tasks.update_corporation(corp_id, True)
+            try:
+                api = eveapi.EVEAPIConnection(cacheHandler=handler)
+                corp_id = (api.eve.CharacterID(names=corp_name)
+                           .characters[0].characterID)
+                if corp_id == 0:
+                    return HttpResponse('Corp does not exist!', status=404)
+                corp = core_tasks.update_corporation(corp_id, True)
+            except:
+                # Error while talking to the EVE API
+                return HttpResponse('Could not verify Corp name. Please try again later.', status=404)                
         else:
             # Have the async worker update the corp so that it is up to date
             core_tasks.update_corporation.delay(corp.id)
@@ -234,8 +247,9 @@ def add_pos(request, sysID):
                               hours=rf_hours,
                               minutes=rf_minutes)
             pos.rftime = datetime.now(pytz.utc) + delta
+        pos.log(request.user, "Added", mapsystem)
         pos.save()
 
         return HttpResponse()
     else:
-        return TemplateResponse(request, 'add_pos.html', {'system': system})
+        return TemplateResponse(request, 'add_pos.html', {'system': system, 'mapsystem': mapsystem})

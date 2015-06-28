@@ -20,6 +20,7 @@ defaults = [
     ("MAP_SCAN_WARNING", "3"),
     ("MAP_INTEREST_TIME", "15"),
     ("MAP_ESCALATION_BURN", "3"),
+    ("MAP_ADVANCED_LOGGING", "1"),
     ("MAP_ZEN_MODE", "0"),
     ("MAP_PILOT_LIST", "0"),
     ("MAP_DETAILS_COMBINED", "0"),
@@ -34,6 +35,9 @@ defaults = [
 
 
 def load_defaults():
+    '''
+    Loads default configuration settings.
+    '''
     for setting in defaults:
         config = ConfigEntry.objects.get_or_create(name=setting[0],
                                                    user=None)[0]
