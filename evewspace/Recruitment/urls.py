@@ -46,6 +46,7 @@ recruiterpatterns = patterns('Recruitment.views',
 
 urlpatterns = patterns('Recruitment.views',
         url(r'register/$', 'applicant_register'),
+        url(r'login/$', 'applicant_login'),
         url(r'application/(?P<app_id>\d+)/$', 'get_application_form'),
         url(r'application/(?P<app_id>\d+)/save/$', 'save_application'),
         url(r'application/(?P<app_id>\d+)/api/$', 'get_api_keys'),
