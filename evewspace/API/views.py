@@ -20,6 +20,7 @@ from django.http import Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import permission_required
 
 from API.models import CorpAPIKey, MemberAPIKey, APIKey, APIShipLog, APICharacter
 import API.cache_handler as handler
@@ -40,6 +41,14 @@ def api_key_admin(request, user_id):
     return TemplateResponse(request, "api_key_admin.html",
             {'member': member})
 
+@permission_required('API.change_corpapikey')
+def api_corp_key_dialog(request):
+    if not request.is_ajax():
+        raise PermissionDenied
+    api_keys = CorpAPIKey.objects.all()
+    return TemplateResponse(request, "corp_api_admin.html",
+            {'api_keys': api_keys})
+            
 def edit_keys(request, key_id=None, user_id=None):
     if not request.is_ajax():
         raise PermissionDenied
@@ -70,6 +79,28 @@ def edit_keys(request, key_id=None, user_id=None):
     return TemplateResponse(request, "api_key_form.html", {'key': api_key,
         'member': user})
 
+@permission_required('API.add_corpapikey')    
+def edit_corp_keys(request, key_id=None, user_id=None):
+    if not request.is_ajax():
+        raise PermissionDenied
+    api_key = None
+    user = None
+    if user_id:
+        user = get_object_or_404(User, pk=user_id)
+    if request.method == 'POST':
+        key_id = int(request.POST.get('key_id', None).replace(' ',''))
+        user = get_object_or_404(User, pk=request.POST.get('user_id', None))
+        if user != request.user and not request.user.has_perm(
+                'API.add_corpapikey'):
+           raise PermissionDenied
+        vcode = request.POST.get('vcode', None).replace(' ', '')
+        api_key = CorpAPIKey(user=user,
+                        keyid=key_id,
+                        vcode=vcode)
+        api_key.validate()
+    return TemplateResponse(request, "corp_api_key_form.html", {'key': api_key,
+        'member': user})
+        
 def delete_key(request, key_id, purge=False):
     if not request.is_ajax():
         raise PermissionDenied
@@ -83,5 +114,13 @@ def delete_key(request, key_id, purge=False):
         for character in api_key.characters.all():
             APIShipLog.objects.filter(character__name=character.name).delete()
             character.delete()
+    api_key.delete()
+    return HttpResponse()
+
+@permission_required('API.delete_corpapikey')    
+def delete_corp_key(request, key_id):
+    if not request.is_ajax():
+        raise PermissionDenied
+    api_key = get_object_or_404(CorpAPIKey, keyid=key_id)    
     api_key.delete()
     return HttpResponse()
