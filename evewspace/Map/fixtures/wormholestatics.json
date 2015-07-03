@@ -1,5 +1,45 @@
 [
 {
+    "pk": 31000001, 
+    "model": "Map.wsystem", 
+    "fields": {
+        "static1": null, 
+        "is_shattered": false, 
+        "static2": null, 
+        "effect": "Red Giant"
+    }
+},
+{
+    "pk": 31000002, 
+    "model": "Map.wsystem", 
+    "fields": {
+        "static1": null, 
+        "is_shattered": false, 
+        "static2": null, 
+        "effect": "Cataclysmic Variable"
+    }
+},
+{
+    "pk": 31000003, 
+    "model": "Map.wsystem", 
+    "fields": {
+        "static1": null, 
+        "is_shattered": false, 
+        "static2": null, 
+        "effect": "Magnetar"
+    }
+},
+{
+    "pk": 31000004, 
+    "model": "Map.wsystem", 
+    "fields": {
+        "static1": null, 
+        "is_shattered": false, 
+        "static2": null, 
+        "effect": "Pulsar"
+    }
+},
+{
     "pk": 31000005, 
     "model": "Map.wsystem", 
     "fields": {
@@ -7,6 +47,16 @@
         "is_shattered": true, 
         "static2": null, 
         "effect": null
+    }
+},
+{
+    "pk": 31000006, 
+    "model": "Map.wsystem", 
+    "fields": {
+        "static1": null, 
+        "is_shattered": false, 
+        "static2": null, 
+        "effect": "Wolf-Rayet Star"
     }
 },
 {

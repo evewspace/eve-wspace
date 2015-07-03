@@ -30,6 +30,26 @@ from django.core.cache import cache
 
 User = settings.AUTH_USER_MODEL
 
+SYSCLASS_MAPPING = {
+        1: 'C1',
+        2: 'C2',
+        3: 'C3',
+        4: 'C4',
+        5: 'C5',
+        6: 'C6',
+        7: 'Highsec',
+        8: 'Lowsec',
+        9: 'Nullsec',
+        10: 'Odd Jove Space',
+        11: 'Odd Jove Space',
+        12: 'Thera',
+        13: 'Small Ship',
+        14: 'Sentinel',
+        15: 'Barbican',
+        16: 'Vidette',
+        17: 'Conflux',
+        18: 'The Redoubt',
+        }
 
 class WormholeType(models.Model):
     """Stores the permanent information on wormhole types.
@@ -65,17 +85,10 @@ class WormholeType(models.Model):
 
         Cx for w-space and H, L, N otherwise.
         """
-        if 7 > self.destination > 0:
-            return "C%s" % (self.destination,)
-        if self.destination == 0:
-            return "Varies"
-        if self.destination == 7:
-            return "High Sec"
-        if self.destination == 8:
-            return "Low Sec"
-        if self.destination == 9:
-            return "Null Sec"
-        return "Unknown"
+        try:
+            return SYSCLASS_MAPPING[self.destination]
+        except KeyError:
+            return "Unknown"
 
 
 class System(SystemData):
@@ -107,23 +120,10 @@ class System(SystemData):
 
     @property
     def class_string(self):
-        if self.sysclass < 7:
-            return 'C%s' % self.sysclass
-        if self.sysclass == 7:
-            return 'Highsec'
-        if self.sysclass == 8:
-            return 'Lowsec'
-        if self.sysclass == 9:
-            return 'Nullsec'
-        # Class 10/11 appear in two Jovian constellations. Reason unknown.
-        if self.sysclass == 10:
-            return 'Odd Jove Space'
-        if self.sysclass == 11:
-            return 'Odd Jove Space'
-        if self.sysclass == 12:
-            return 'Thera'
-        if self.sysclass == 13:
-            return 'Small Ship'
+        try:
+            return SYSCLASS_MAPPING[self.sysclass]
+        except KeyError:
+            return 'Unknown'
 
     def is_kspace(self):
         if self.sysclass in range(7, 12):
@@ -774,7 +774,7 @@ class Signature(models.Model):
 
     def update_from_tsv(self, user, wascreated, row, map_system):
         """Takes a line of copied data, converts it into a signature and checks if the
-        import updated an existing signature on the map, and whether or not the update 
+        import updated an existing signature on the map, and whether or not the update
         includes new scan data (for logging purposes).
 
         """
@@ -794,7 +794,7 @@ class Signature(models.Model):
             # new sig
             updated = False
             action = "Created"
-        
+
         # Is there a valid signature type from pasted data - is it valid?
         scan_group = self._translate_client_string(row[COL_SIG_SCAN_GROUP])
         if scan_group == "Cosmic Signature" or scan_group == "Cosmic Anomaly":
@@ -821,10 +821,10 @@ class Signature(models.Model):
             if self.info != info:
                 self.info = info
                 if action != "Created":
-                    action = "Updated"                    
+                    action = "Updated"
                     if scan_group == "Cosmic Signature":
                         # only record new scanning activity for signatures
-                        action = "Scanned"                        
+                        action = "Scanned"
         if action != "None":
             self.log_sig(user, action, map_system)
 
@@ -839,20 +839,20 @@ class Signature(models.Model):
 
     def log_sig(self, user, action, map_system):
         """Log the fact that the signature was scanned."""
-        
+
         # only include advanced logging if enabled
         include_distance = get_config("MAP_ADVANCED_LOGGING", None).value
         if include_distance == "1":
             map_system.map.add_log(
-                user, 
+                user,
                 "%s signature %s in %s (%s), %s jumps out from root system."
-                %(action, self.sigid, map_system.system.name, 
+                %(action, self.sigid, map_system.system.name,
                   map_system.friendlyname, map_system.distance_from_root()))
         else:
             map_system.map.add_log(
-                user, 
+                user,
                 "%s signature %s in %s (%s)."
-                %(action, self.sigid, map_system.system.name, 
+                %(action, self.sigid, map_system.system.name,
                   map_system.friendlyname))
 
     def toggle_ownership(self, user):
