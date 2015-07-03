@@ -1,0 +1,37 @@
+{% load humanize %}
+<div id="apiCorpKeyEditDialog">
+    <div class="modal-header">
+        <h3>Corp API Keys</h3>
+    </div>
+    <div class="modal-body">
+        
+    <div id="apiCorpKeyFormHolder">
+        
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <tr>
+            <th>Key ID</th>
+            <th>Access</th>
+            <th>Corp</th>
+            <th>Valid</th>
+            <th>Actions</th>
+        </tr>
+        {% for api_key in api_keys.all %}
+        <tr>
+            <td>{{api_key.keyid}}</td>
+            <td>{{api_key.access_mask}}</td>
+            <td>{{api_key.corp}}</td>
+            <td><span title="{{api_key.validation_error}}">{% if api_key.valid %} Yes {% else %} No {% endif %}</span></td>
+            <td>
+                <button class="btn-small btn-danger" title="Remove key, but keep log entries."  onclick="APIDeleteCorpKey({{api_key.keyid}});">Delete</button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td>No Keys!</td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+</div>

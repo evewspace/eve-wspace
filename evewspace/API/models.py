@@ -68,6 +68,7 @@ class CorpAPIKey(APIKey):
     """
     corp = models.ForeignKey(Corporation, related_name="api_keys")
     character_name = models.CharField(max_length=255, null=True, blank=True)
+    user = models.ForeignKey(User, related_name="corp_api_keys")
 
     def validate(self):
         """
