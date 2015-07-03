@@ -20,6 +20,13 @@
             <td>Downtimes before Burning Escalation:</td>
             <td> <input type="text" class="input-mini" name="escdowntimes" value="{{escdowntimes}}"></td>
         </tr>
+        <tr>
+            <td>Advanced Logging:</td>
+            <td> 
+                <input id='advlogging' type='radio' name='advlogging' value='1' {% if advlogging == '1' %}checked='checked'{% endif %} /> On &nbsp;
+                <input type='radio' name='advlogging' value='0' {% if advlogging == '0' %}checked='checked'{% endif %} /> Off
+            </td>
+        </tr>
     </table>
     <br />
     <input type="submit" class="btn btn-primary" value="Save Changes">

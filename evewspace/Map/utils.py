@@ -217,7 +217,7 @@ class MapJSONGenerator(object):
 
         # sort children by priority
         for l in children.values():
-            l.sort(key=priorities.__getitem__, reverse=True)
+            l.sort(key=priorities.__getitem__)
 
         columns = []
         todo = [(children[None][0], 0)]
@@ -240,11 +240,39 @@ class MapJSONGenerator(object):
             for child in children[sys_id]:
                 todo.append((child, x + 1))
 
+        # repeat until nothing changed:
+        #   - move one child system down to match parent
+        #   - move all parents down to match first child
         map_changed = True
         while map_changed:
             map_changed = False
+
+            # ensure child.y >= parent.y
+            for x, column in enumerate(columns):
+                if map_changed:
+                    break
+                for sys_id in column:
+                    if map_changed:
+                        break
+                    if sys_id is None:
+                        continue
+                    try:
+                        child = children[sys_id][0]
+                    except IndexError:
+                        continue
+                    y_child = ys[child]
+                    dy = ys[sys_id] - y_child
+                    if dy > 0:
+                        map_changed = True
+                        child_col = columns[x + 1]
+                        for i in child_col[y_child:]:
+                            if i is not None:
+                                ys[i] += dy
+                        for i in range(dy):
+                            child_col.insert(y_child, None)
+
             # ensure parent.y >= parent.children[0].y
-            for column in reversed(columns):
+            for column in columns:
                 for sys_id in column:
                     if sys_id is None:
                         continue
@@ -262,26 +290,6 @@ class MapJSONGenerator(object):
                                     ys[i] += dy
                             for i in range(dy):
                                 parent_column.insert(y_parent, None)
-
-            # ensure child.y >= parent.y
-            for x, column in enumerate(columns):
-                for sys_id in column:
-                    if sys_id is None:
-                        continue
-                    try:
-                        child = children[sys_id][0]
-                    except IndexError:
-                        continue
-                    y_child = ys[child]
-                    dy = ys[sys_id] - y_child
-                    if dy > 0:
-                        map_changed = True
-                        child_col = columns[x + 1]
-                        for i in child_col[y_child:]:
-                            if i is not None:
-                                ys[i] += dy
-                        for i in range(dy):
-                            child_col.insert(y_child, None)
 
         # create list of system dicts from system ids in columns
         syslist = []

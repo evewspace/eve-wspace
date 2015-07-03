@@ -37,7 +37,7 @@
     <div class='control-group'>
         <label class='control-label' for="scalingFactor">Scaling Factor:</label>
         <div class='controls'>
-            <input id='scalingFactor' name='scaling_factor' type="text" class="slider" value="" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="{{scaling_factor}}" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
+            <input id='scalingFactor' name='scaling_factor' type="text" class="slider" value="{% if scaling_factor|length > 0 %}{{scaling_factor}}{% else %}1{% endif %}" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="{{scaling_factor}}" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
         </div>
     </div>
     {% endif %}
