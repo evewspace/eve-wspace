@@ -218,7 +218,7 @@ function ToggleKspaceMapping() {
 function ToggleAutoRefresh() {
     if (autoRefresh === false) {
         autoRefresh = true;
-        refreshTimerID = setInterval(RefreshMap, 15000);
+        refreshTimerID = setInterval(RefreshMap, autoRefreshInterval);
         $('#btnRefreshToggle').text('Auto Refresh: ON');
     } else {
         autoRefresh = false;
