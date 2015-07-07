@@ -26,7 +26,15 @@
     <a class="btn btn-small" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
     {% endif %}
     {% if can_edit and mapsys.has_siblings %}
-    <a class="btn btn-small" onclick="MoveSystemUp({{mapsys.pk}});">Move Up</a>
+    <div id="moveButton" class="btn-group dropdown">
+        <a class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+            Move <span class="caret"></span>
+        </a>
+        <ul id="moveDropdown" class="dropdown-menu" role="menu">
+            <li><a onclick="MoveSystem({{mapsys.pk}}, 'up');">Up</a></li>
+            <li><a onclick="MoveSystem({{mapsys.pk}}, 'down');">Down</a></li>
+        </ul>
+    </div>
     {% endif %}
     {% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
     <a class="btn btn-small" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>

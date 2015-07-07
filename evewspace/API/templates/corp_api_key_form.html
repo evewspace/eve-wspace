@@ -1,0 +1,15 @@
+<form class="form-inline" id="apiCorpKeyForm" action="/api/corp_key/new/" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="user_id" value="{{user.pk}}">
+    Key ID: <input type="text" class="input-small" value="" name="key_id"></input>
+    vCode: <input type="text" class="input" name="vcode" value=""></input>
+    <input id="apiCorpKeySubmit" type="submit" class="btn btn-success" value="Submit"></input>
+</form>
+<script type="text/javascript">
+    $('#apiCorpKeyForm').submit(function(e){
+                e.preventDefault();
+                $("#apiCorpKeySubmit").attr("disabled", "true");
+                SaveNewCorpAPIKey();
+                return false;
+            });
+</script>

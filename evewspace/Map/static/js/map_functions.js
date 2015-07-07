@@ -266,7 +266,7 @@ function DisplaySystemDetails(msID, sysID) {
                     $('#sysInfoDiv').focus();
                 }
             });
-            GetPOSList(sysID);
+            GetPOSList(msID);
             GetDestinations(msID);
             var btnImport = $('#btnImport');
             btnImport.off();
@@ -279,13 +279,13 @@ function DisplaySystemDetails(msID, sysID) {
     });
 }
 
-function GetPOSList(sysID) {
-    var address = "/pos/" + sysID + "/";
+function GetPOSList(msID) {
+    var address = "/pos/" + msID + "/";
     $.ajax({
         type: "GET",
         url: address,
         success: function (data) {
-            var POSlist = $('#sys' + sysID + "POSDiv");
+            var POSlist = $('#sys' + msID + "POSDiv");
             POSlist.empty();
             POSlist.html(data);
         }
@@ -440,8 +440,8 @@ function GetSystemTooltips() {
     });
 }
 
-function GetAddPOSDialog(sysID) {
-    var address = "/pos/" + sysID + "/add/";
+function GetAddPOSDialog(msID) {
+    var address = "/pos/" + msID + "/add/";
     $.ajax({
         url: address,
         type: "GET",
@@ -468,9 +468,9 @@ function GetSiteSpawns(msID, sigID) {
     });
 }
 
-function AddPOS(sysID) {
+function AddPOS(msID) {
     //This function adds a system using the information in a form named #sysAddForm
-    var address = "/pos/" + sysID + "/add/";
+    var address = "/pos/" + msID + "/add/";
     var btnAddPOS = $('#btnAddPOS');
     var pos_message = $('#pos_message');
     pos_message.hide();
@@ -481,7 +481,7 @@ function AddPOS(sysID) {
         url: address,
         data: $('#addPOSForm').serialize(),
         success: function (data) {
-            GetPOSList(sysID);
+            GetPOSList(msID);
             $('#modalHolder').modal('hide');
             btnAddPOS.html('Add POS');
             btnAddPOS.removeClass('disabled');
@@ -495,19 +495,19 @@ function AddPOS(sysID) {
     });
 }
 
-function DeletePOS(posID, sysID) {
-    var address = "/pos/" + sysID + "/" + posID + "/remove/";
+function DeletePOS(posID, msID) {
+    var address = "/pos/" + msID + "/" + posID + "/remove/";
     $.ajax({
         type: "POST",
         url: address,
         success: function () {
-            GetPOSList(sysID);
+            GetPOSList(msID);
         }
     });
 }
 
-function GetEditPOSDialog(posID, sysID) {
-    var address = "/pos/" + sysID + "/" + posID + "/edit/";
+function GetEditPOSDialog(posID, msID) {
+    var address = "/pos/" + msID + "/" + posID + "/edit/";
     $.ajax({
         url: address,
         type: "GET",
@@ -520,8 +520,8 @@ function GetEditPOSDialog(posID, sysID) {
     });
 }
 
-function EditPOS(posID, sysID) {
-    var address = "/pos/" + sysID + "/" + posID + "/edit/";
+function EditPOS(posID, msID) {
+    var address = "/pos/" + msID + "/" + posID + "/edit/";
     var btnEditPOS = $('#btnAddPOS');
     $('#pos_message').hide();
     btnEditPOS.html('Saving...');
@@ -531,7 +531,7 @@ function EditPOS(posID, sysID) {
         url: address,
         data: $('#editPOSForm').serialize(),
         success: function (data) {
-            GetPOSList(sysID);
+            GetPOSList(msID);
             $('#modalHolder').modal('hide');
             btnEditPOS.html('Save POS');
             btnEditPOS.removeClass('disabled');
@@ -1244,8 +1244,8 @@ function ColorSystem(system, ellipseSystem, textSysName, pilotList) {
 
     var sysColor = "#f00";
     var sysStroke = "#fff";
-    var sysStrokeWidth;
-    var sysStrokeDashArray = "none";
+    var sysStrokeWidth = s(2);
+    var sysStrokeDashArray = "1.0";
     var textColor = systemTextColor;
 
     // TODO: Figure out rare case where a system has interest and/or focus,
@@ -1477,18 +1477,15 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         whFromDecoration = whToDecoration = "inherit";
 
         if (systemTo.WhFromParent) {
-            if (systemTo.WhFromParentBubbled === true) {
-                whFromColor = bubbledColor;
-                whFromDecoration = "bold";
-            }
-
-            var whFromText, whToText;
-            if (!renderWormholeTags) {
-                whFromText = ">";
-                whToText = "<";
+            var whFromText;
+            if (renderWormholeTags === true) {
+                if (systemTo.WhToParent === "K162" && systemTo.WhFromParent === "K162") {
+                    whFromText = "??? >";
+                } else {
+                    whFromText = systemTo.WhFromParent + " >";
+                }
             } else {
-                whFromText = systemTo.WhFromParent + " >";
-                whToText = "< " + systemTo.WhToParent;
+                whFromText = ">";
             }
             whFromSys = paper.text(whFromSysX, whFromSysY, whFromText);
 
@@ -1502,9 +1499,15 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         }
 
         if (systemTo.WhToParent) {
-            if (systemTo.WhToParentBubbled === true) {
-                whToColor = bubbledColor;
-                whToDecoration = "bold";
+            var whToText;
+            if (renderWormholeTags === true) {
+                if (systemTo.WhToParent === "K162" && systemTo.WhFromParent === "K162") {
+                    whToText = "< ???";
+                } else {
+                    whToText = "< " + systemTo.WhToParent;
+                }
+            } else {
+                whToText = "<";
             }
 
             whToSys = paper.text(whToSysX, whToSysY, whToText);

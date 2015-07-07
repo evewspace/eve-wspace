@@ -24,6 +24,17 @@ function GetAPIKeyDialog(){
     });
 }
 
+function GetCorpAPIKeyDialog(){
+    $.ajax({
+        url: '/api/corp_key/',
+        type: 'GET',
+        success: function(data){
+            $('#modalHolder').empty().html(data).modal('show');
+            GetNewCorpAPIKeyForm();
+        }
+    });
+}
+
 function RefreshAdminAPISection(user_id){
     $.ajax({
         url: '/api/user/' + user_id + '/',
@@ -40,6 +51,16 @@ function GetNewAPIKeyForm(){
         type: 'GET',
         success: function(data){
             $('#apiKeyFormHolder').html(data);
+        }
+    });
+}
+
+function GetNewCorpAPIKeyForm(){
+    $.ajax({
+        url: '/api/corp_key/new/',
+        type: 'GET',
+        success: function(data){
+            $('#apiCorpKeyFormHolder').html(data);
         }
     });
 }
@@ -65,6 +86,20 @@ function SaveNewAPIKey(){
         data: $('#apiKeyForm').serialize(),
         success: function(data){
             GetAPIKeyDialog();
+        },
+        error: function(){
+            alert('There was an error saving the key. Please check the key and try again.');
+        }
+    });
+}
+
+function SaveNewCorpAPIKey(){
+    $.ajax({
+        url: '/api/corp_key/new/',
+        type: 'POST',
+        data: $('#apiCorpKeyForm').serialize(),
+        success: function(data){
+            GetCorpAPIKeyDialog();
         },
         error: function(){
             alert('There was an error saving the key. Please check the key and try again.');
@@ -146,6 +181,16 @@ function APIDeleteKey(key_id){
         type: 'POST',
         success: function(data){
             GetAPIKeyDialog();
+        }
+    });
+}
+
+function APIDeleteCorpKey(key_id){
+    $.ajax({
+        url: '/api/corp_key/' + key_id + '/delete/',
+        type: 'POST',
+        success: function(data){
+            GetCorpAPIKeyDialog();
         }
     });
 }

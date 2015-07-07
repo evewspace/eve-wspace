@@ -11,6 +11,11 @@ local
 build
 djcelery
 celerybeat-schedule
+local_settings.py
+.DS_Store
 doc/build/*
 pip-selfcheck.json
-local_settings.py
+
+.idea
+*.sublime-project
+*.sublime-workspace
