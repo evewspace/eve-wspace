@@ -333,8 +333,8 @@ function GetExportMap(mapID) {
     });
 }
 
-function MarkScanned(msid, frompanel, sysid) {
-    var address = "system/" + msid + "/scanned/";
+function MarkScanned(msID, frompanel, sysid) {
+    var address = "system/" + msID + "/scanned/";
     $.ajax({
         type: "post",
         url: address,
@@ -343,21 +343,21 @@ function MarkScanned(msid, frompanel, sysid) {
         success: function (data) {
             GetSystemTooltips();
             if (frompanel) {
-                LoadSignatures(msid, false);
+                LoadSignatures(msID, false);
             }
         }
     });
 }
 
-function SetImportance(msid, sysid, importance) {
-    var address = "system/" + msid + "/importance/";
+function SetImportance(msID, sysID, importance) {
+    var address = "system/" + msID + "/importance/";
     $.ajax({
         type: "post",
         url: address,
         async: false,
         data: {'importance': importance},
         success: function (data) {
-            DisplaySystemMenu(msid);
+            DisplaySystemMenu(msID);
             RefreshMap();
         }
     });
@@ -1315,7 +1315,7 @@ function ColorSystem(system, ellipseSystem, textSysName, pilotList) {
         case 1:
             sysColor = colorC1;
             sysStroke = WormholeEffectColor(system, borderColorC1);
-            if ((sysStroke !== borderColorC1) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth);
+            if ((sysStroke !== borderColorC1) && (zenMode === false)) sysStrokeWidth = s(baseStrokeWidth + 1);
             break;
         // Thera
         case 12:
