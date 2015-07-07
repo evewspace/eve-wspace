@@ -40,15 +40,15 @@ var sliceNumChars = 6; // Slice after this amount of characters.
 var showPilotList = true; // Show pilot names under systems
 var highlightActivePilots = false; // Draw a notification ring around systems with active pilots.
 var interestColor = "#FFFFFF";
-var goodColor = "#00FF00"; // Color of good status connections
-var goodColor_zen = "#999"; // Color of good status connections
-var badColor = "#FF0000"; // Color of first shrink connections
+var stageOneColor = "#00FF00"; // Color of good status connections
+var stageOneColor_zen = "#999"; // Color of good status connections
+var stageTwoColor = "#FF00FF"; // Color of first shrink connections
+var stageThreeColor = "#FF0000"; // Color of critical connections
 var bubbledColor = "#FF0000"; // Color of bubbled connections
 var clearWhColor = "#FAFA33"; // Color of good status connections
-var warningColor = "#FF00FF"; // Color of mass critical connections
 var sysColor_zen = "#222"; //color for eol
 var frigWhColor = "#FFFFFF"; // Color of Hyperion Frigate Hole
-var frigWhColor_zen = "#71cbff"; // Color of Hyperion Frigate Hole
+var frigWhColor_zen = "#71CBFF"; // Color of Hyperion Frigate Hole
 var textColorSelect = "#FFF"; //selected system text colour
 var textColorSelect_zen = "#FFFC00"; //selected system text colour (zen mode)
 var effectColorWolfRayet = "#ff00ff";
@@ -86,7 +86,8 @@ var systemTextColor = "#fff";
 var pilotColor = "#fff";
 var renderCollapsedConnections = false; // Are collapsed connections shown?
 var autoRefresh = true; // Does map automatically refresh every 15s?
-var silentSystem = true; // Are systems added automatically wihthout a pop-up?
+var autoRefreshInterval = 15000; // Interval in milliseconds
+var silentSystem = false; // Are systems added automatically without a pop-up?
 var kspaceIGBMapping = false; // Do we map K<>K connections from the IGB?
 var zenMode = false;
 
@@ -113,7 +114,7 @@ $(document).ready(function () {
 
     if (autoRefresh === true) {
         $('#btnRefreshToggle').find('> span').text('ON');
-        refreshTimerID = setInterval(RefreshMap, 15000);
+        refreshTimerID = setInterval(RefreshMap, autoRefreshIntervale);
     } else {
         $('#btnRefreshToggle').find('> span').text('OFF');
     }
@@ -1199,10 +1200,10 @@ function GetConnectionColor(system) {
         warningFlag = true;
     }
     if (badFlag === true) {
-        return badColor;
+        return stageThreeColor;
     }
     if (warningFlag === true) {
-        return warningColor;
+        return stageTwoColor;
     }
     // If jump mass is not 0 (K162 / Gate), but less than 10M,
     // we have a Hyperion frigate-sized hole
@@ -1214,9 +1215,9 @@ function GetConnectionColor(system) {
         }
     }
     if (zenMode) {
-        return goodColor_zen;
+        return stageOneColor_zen;
     } else {
-        return goodColor;
+        return stageOneColor;
     }
 }
 
