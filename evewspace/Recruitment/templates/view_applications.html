@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block scripts %}
+	<script type="text/javascript" src="{{STATIC_URL}}js/recruitment_functions.js"></script>
+	<script type="text/javascript">
+		var app;
+	</script>
+{% endblock %}
+{% block content %}
+	<div class="container-fluid">
+  		<div class="row">
+  			<div id="applicationList" class="span3 well">
+  				<ul id="userList" class="nav nav-pills">
+  					{% for app in apps %}
+  						<li class="appItem"><a id="app_{{app.applicant_id}}" href="#" style="width: 180px" onclick="OpenActions(this, {{app.applicant_id}})">{{app.applicant}}</a></li>
+  					{% empty %}
+  						No applications
+  					{% endfor %}
+  				</ul>
+  			</div>
+  			<div id="applicationActions" class="span3 well">
+	  			<span id="actionListSpan" style="display: none;">
+	  				<ul id="actionList" class="nav nav-pills">
+	  					<li class='actionItem'><a id="Status" href="#" style="width: 180px" onclick="OpenAction(this)">Status</a></li>
+	  					<li class='actionItem'><a id="APIs" href="#" style="width: 180px" onclick="OpenAction(this)">API Management</a></li>
+	  					<li class='actionItem'><a id="Interview" href="#" style="width: 180px" onclick="OpenAction(this)">Interview</a></li>
+	  					<li class='actionItem'><a id="Questionaire" href="#" style="width: 180px" onclick="OpenAction(this)">Questionaire</a></li>
+	  					<li class='actionItem'><a id="Standings" href="#" style="width: 180px" onclick="OpenAction(this)">Contacts & Standings</a></li>
+	  					{% for action in actions %}
+	  						<li class='actionItem'><a id="ExtraAction{{action.id }}" href="#" style="width: 180px" onclick="OpenAction(this)">{{action.name}}</a></li>
+  						{% endfor %}
+  						<li class='actionItem'><a id="Vote" href="#" style="width: 180px" onclick="OpenAction(this)">Vote</a></li>
+  						<li class='actionItem'><a id="CloseApp" href="#" style="width: 180px" onclick="OpenAction(this)">Close Application</a></li>
+	  				</ul>
+	  			</span>
+  			</div>
+  			<div id="applicationActionDetails" class="span8 well">
+  			
+  			</div>
+  		</div>
+  	</div>
+{% endblock %}

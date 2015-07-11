@@ -1,0 +1,48 @@
+{% load humanize %}
+<div id="recruiterApprovalAction">
+        <h3>{{approve_action.action.name}}</h3>
+        {% if approve_action.action.description %}
+            <p class="infoText label label-info">{{approve_action.action.description}}</p>
+        {% endif %}
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th width='60%'>Completed by</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                {% if not approve_action.completed %}
+                     <td>Nobody</td>
+                	 <td><span class="badge badge-important">&#x2717;</span></td>
+                {% else %} 
+                     <td>{{approve_action.approver.username}}</td>
+                	 <td><span class="badge badge-success">&#x2713;</span></td>
+                {% endif %}
+            </tr>
+            {% if approve_action.completed %}
+                <tr>
+                     <td colspan='2'>Completed on {{approve_action.approval_time|date:"Y-m-d H:i"}}</td>
+                </tr>
+                <tr>
+                     <td colspan='2'>{{approve_action.approval_comment|linebreaksbr}}</td>
+                </tr>
+            {% endif %}
+        </table>
+        <form id="approveForm">
+			<div id="approveDiv">
+				<label for="actionComment" class="control-label">Comment:</label>
+			    <div class="controls">
+			        <textarea class="form-control input-xxlarge" rows="5" id="actionComment" name="actionComment"></textarea>
+				</div>
+			</div>
+			<div class="controls">
+		    	<button type="submit" class="btn btn-success" onclick=";">Sign off</button>
+			</div>
+		</form>
+</div>
+<script type="text/javascript">
+    $('#approveForm').submit(function(e){
+                e.preventDefault();
+                RecruiterApproveAction({{app.pk}}, {{approve_action.action.pk}});          
+                return false;
+            });
+</script>

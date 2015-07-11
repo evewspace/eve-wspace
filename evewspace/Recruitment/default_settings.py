@@ -14,19 +14,16 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
+from core.models import ConfigEntry
+#defaults = [("TEST_SETTING", "BOB")]
+defaults = [
+        ("RECRUIT_REQUIRE_EMAIL", "1"),
+        ("RECRUIT_SHOW_FULL_STATUS", "0"),
+        ("RECRUIT_PROXY_ENABLED", "1"),
+        ]
 
-Replace this with more appropriate tests for your application.
-"""
-
-from django.test import TestCase
-
-
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
-        """
-        Tests that 1 + 1 always equals 2.
-        """
-        self.assertEqual(1 + 1, 2)
+def load_defaults():
+    for setting in defaults:
+        config = ConfigEntry.objects.get_or_create(name=setting[0], user=None)[0]
+        config.value = setting[1]
+        config.save()

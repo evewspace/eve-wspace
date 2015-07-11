@@ -1,0 +1,54 @@
+		{% if search %}
+		<div class="row">
+			<div id="applicationList" class="span6 well">
+			    <p class="infoText label label-info">Search old applications or review the last 20 closed applications</p><br /><br />
+  			    <form id="usernameFilterForm" class="form-search" action="/recruitment/applications/search/" method="POST">
+				    <input type="text" name="filter" class="input-medium search-query">
+				    <button type="submit" class="btn btn-default">Search by Username</button>
+				</form>
+			</div>
+		</div>
+		<script type="text/javascript">
+	    $('#usernameFilterForm').submit(function(e){
+	                e.preventDefault();
+	                RecruiterSearchApplications();          
+	                return false;
+	            });
+	    </script>
+  		{% endif %}
+	    <div class="row">
+  			<div id="applicationList" class="span3 well">
+  				<ul id="userList" class="nav nav-pills">
+  					{% for app in apps %}
+  						<li class="appItem"><a id="app_{{app.pk}}" href="#" style="width: 180px" onclick="OpenActions(this, {{app.pk}}); OpenAction('#Status_{{app.pk}}'); RecruiterStatus({{app.pk}});">{{app.applicant}}</a></li>
+  					{% empty %}
+  						No applications
+  					{% endfor %}
+  				</ul>
+  			</div>
+  			<div id="applicationActions_{{app.pk}}" class="span3 well">
+  			{% for app in apps %}
+	  			<span class="actionListSpan" id="actionListSpan_{{app.pk}}" style="display: none;">
+	  				<ul id="actionList" class="nav nav-pills">
+	  					<li class='actionItem'><a id="Status_{{app.pk}}" href="#" style="width: 180px" onclick="OpenAction(this); RecruiterStatus({{app.pk}});">Status</a></li>
+	  					{% if not app.closetime %} 
+	  					    <li class='actionItem'><a id="APIs_{{app.pk}}" href="#" style="width: 180px" onclick="OpenAction(this); RecruiterGetAPIKeys({{app.pk}});">API Management</a></li>
+	  					{% endif %}
+	  					<li class='actionItem'><a id="Interview_{{app.pk}}" href="#" style="width: 180px" onclick="OpenAction(this); RecruiterGetInterviews({{app.pk}});">Interview</a></li>
+	  					<li class='actionItem'><a id="Questionaire_{{app.pk}}" href="#" style="width: 180px" onclick="OpenAction(this); RecruiterGetQuestionaire({{app.pk}});">Questionaire</a></li>
+	  					{% if app.app_type.use_standings %} 
+	  					    <li class='actionItem'><a id="Standings_{{app.pk}}" href="#" style="width: 180px" onclick="OpenAction(this); RecruiterGetStandings({{app.pk}});">Standings</a></li>
+	  					{% endif %} 
+	  					{% for actionentry in app.actionentry_set.all %}
+	  						<li class='actionItem'><a id="ExtraAction{{actionentry.action_id}}_{{app.pk}}" href="#" style="width: 180px" onclick="OpenAction(this); RecruiterOpenAction({{app.pk}}, {{actionentry.action.pk}});">{{actionentry.action.name}}</a></li>
+  						{% endfor %}
+  						<li class='actionItem'><a id="Vote_{{app.pk}}" href="#" style="width: 180px" onclick="OpenAction(this); RecruiterGetAppVotes({{app.pk}});">Vote</a></li>
+  						<li class='actionItem'><a id="CloseApp_{{app.pk}}" href="#" style="width: 180px" onclick="OpenAction(this); RecruiterCloseApp({{app.pk}});">Close Application</a></li>
+	  				</ul>
+	  			</span>
+	  	    {% endfor %}
+  			</div>
+  			<div id="applicationActionDetails" class="span8 well">
+  			
+  			</div>
+  		</div>

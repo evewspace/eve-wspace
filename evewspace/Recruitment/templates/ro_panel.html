@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block scripts %}
+	<script type="text/javascript" src="{{STATIC_URL}}js/recruitment_functions.js"></script>
+	<script type="text/javascript">
+		var app;
+	</script>
+{% endblock %}
+{% block content %}
+	<div id="ro_panel" class="container-fluid">
+		{% include "recruiter_applications.html" %}
+  	</div>
+{% endblock %}

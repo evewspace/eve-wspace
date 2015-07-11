@@ -1,0 +1,85 @@
+{% extends "app_base.html" %}
+{% block contentheader %}
+<div class="" style="text-align: center;">
+    <h4 class="text-info">
+        Welcome! Before we begin with your application, we need to set up your account. <br />
+        <br />
+        Please fill out the form below:
+    </h4>
+</div>
+{% endblock %}
+{% block content %}
+<div class="application-holder">
+    <form class="form form-horizontal" action="/recruitment/register/" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next_page" value="{{next_page}}">
+        <input type="hidden" name="app_type" value="{{app_type}}">
+        {{ form.non_field_errors}}
+        <div class="control-group">
+            <label class="control-label" for="id_username">Username:</label>
+            <div class="controls">
+                {{form.username.errors}}
+                {{form.username}}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="id_password1">Password:</label>
+            <div class="controls">
+                {{form.password1.errors}}
+                {{form.password1}}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="id_password2">Confirm Password:</label>
+            <div class="controls">
+                {{form.password2.errors}}
+                {{form.password2}}
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="id_email">Email Address:{% if not email_required %} (Optional){% endif %}</label>
+            <div class="controls">
+                <input type="text" class="input" name="email" id="id_email" />
+            </div>
+        </div>
+        <br />
+        <div class="control-group">
+            <div class="controls">
+                <button class="btn btn-info" type="submit">Register</button>
+            </div>
+        </div>
+    </form>
+</div>
+<br /><br />
+<div class="" style="text-align: center;">
+    <h4 class="text-info">
+        If you have applied before, please fill out the form below to login: <br />
+        <br />
+        If you do not remember your password, please contact a recruiter. <br /><br />
+    </h4>
+</div>
+<div class="application-holder">
+    <form class="form form-horizontal" action="/recruitment/login/" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next_page" value="{{next_page}}">
+        <input type="hidden" name="app_type" value="{{app_type}}">
+        <div class="control-group">
+            <label class="control-label" for="username2">Username:</label>
+            <div class="controls">
+                <input type="text" class="input" name="username2" widt>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="password3">Password:</label>
+            <div class="controls">
+                <input type="password" class="input" name="password3">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <br /><button class="btn btn-info" type="submit">Login</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% load humanize %}
+<div id="recruiterApprovalAction">
+        <h3>Application vote</h3>
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th width='60%'>Status</th>
+                <th>
+                {% if accept < app.app_type.required_votes %}
+                	 <span class="badge badge-important">&#x2717;</span>
+                {% else %} 
+                	 <span class="badge badge-success">&#x2713;</span>
+                {% endif %}
+                </th>
+            </tr>
+            <tr>
+                <td>Votes required</td>
+                <td>{{app.app_type.required_votes}}</td>
+            </tr>
+            <tr>
+                <td>Votes accept</td>
+                <td>{{accept}}</td>
+            </tr>
+            <tr>
+                <td>Votes reject</td>
+                <td>{{reject}}</td>
+            </tr>
+            <tr>
+                <td>Votes defer</td>
+                <td>{{defer}}</td>
+            </tr>
+        </table>
+        <form id="voteForm">
+			<div id="voteDiv">
+			    <label class="radio">
+                    <input name="appVote" value="1" type="radio"> Accept
+                </label>
+                <label class="radio">
+                    <input name="appVote" value="2" type="radio"> Reject
+                </label>
+                <label class="radio">
+                    <input name="appVote" value="3" type="radio"> Defer
+                </label>
+                <br />
+				<label for="appVoteComment" class="control-label">Comment:</label>
+			    <div class="controls">
+			        <textarea class="form-control input-xxlarge" rows="5" id="appVoteComment" name="appVoteComment"></textarea>
+				</div>
+			</div>
+			<div class="controls">
+		    	<button type="submit" class="btn btn-success" onclick=";">Vote</button>
+			</div>
+		</form>
+		<table class="table table-hover table-bordered">
+            <tr>
+                <th width='60%'>Voter</th>
+                <th>Vote</th>
+            </tr>
+        {% for vote in app.votes.all %}
+            <tr>
+                <td width='60%'>{{vote.vote.username}}</td>
+                <td>{% if vote.disposition == 1 %} Accept {% elif vote.disposition == 2 %} Reject {% else %} Defer {% endif %}</td>
+            </tr>
+            {% if vote.note %}
+                <tr>
+                    <td colspan='2'><b>Comment:</b> {{vote.note}}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+</div>
+<script type="text/javascript">
+    $('#voteForm').submit(function(e){
+                e.preventDefault();
+                RecruiterVoteApp({{app.pk}});          
+                return false;
+            });
+</script>
