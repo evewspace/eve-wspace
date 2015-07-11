@@ -2,7 +2,8 @@
 *.pyc
 *.bak
 .vagrant
-celerybeat-schedule
+.idea
+.DS_Store
 bin
 lib
 include
@@ -13,8 +14,8 @@ celerybeat-schedule
 local_settings.py
 pip-selfcheck.json
 doc/build/*
+pip-selfcheck.json
+
 .idea
-
 *.sublime-project
-
 *.sublime-workspace

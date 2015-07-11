@@ -1247,7 +1247,7 @@ function ColorSystem(system, ellipseSystem, textSysName, pilotList) {
     var sysStroke = "#fff";
     var sysStrokeWidth = s(baseStrokeWidth);
     var sysStrokeDashArray = "1.0";
-    var textColor = "#000";
+    var textColor = systemTextColor;
 
     // TODO: Figure out rare case where a system has interest and/or focus,
     // and still doesn't get a larger stroke applied.
