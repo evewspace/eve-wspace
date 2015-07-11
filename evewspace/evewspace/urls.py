@@ -39,8 +39,6 @@ urlpatterns = patterns('',
         url(r'^search/', include('search.urls')),
         url(r'^pos/', include('POS.urls')),
         url(r'^sitetracker/', include('SiteTracker.urls')),
-        url(r'^recruitment/', include('Recruitment.urls')),
         url(r'^alerts/', include('Alerts.urls')),
         url(r'^api/', include('API.urls')),
-        url(r'^teamspeak/', include('Teamspeak.urls')),
 )
