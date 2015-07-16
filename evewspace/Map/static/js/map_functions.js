@@ -114,7 +114,7 @@ $(document).ready(function () {
 
     if (autoRefresh === true) {
         $('#btnRefreshToggle').find('> span').text('ON');
-        refreshTimerID = setInterval(RefreshMap, autoRefreshIntervale);
+        refreshTimerID = setInterval(RefreshMap, autoRefreshInterval);
     } else {
         $('#btnRefreshToggle').find('> span').text('OFF');
     }
