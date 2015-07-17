@@ -22,6 +22,7 @@
 #sysTabHolder
 {
     width: 600px;
+    padding-top: 5px;
 }
 .sysDetailsFooter
 {
@@ -325,4 +326,16 @@ fieldset.addSystemWormholeType label.checkbox input[type="checkbox"] {
 
 ul#moveDropdown li {
     cursor: pointer;
+}
+
+#bulkSigForm {
+  margin-bottom: 10px;
+}
+#bulkSigForm textarea {
+  margin-bottom: 0;
+}
+#pasteField {
+    width: 350px;
+    font-size: 12px;
+    line-height: 12px;
 }
