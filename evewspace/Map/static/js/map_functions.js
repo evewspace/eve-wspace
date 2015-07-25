@@ -273,6 +273,7 @@ function DisplaySystemDetails(msID, sysID) {
             btnImport.off();
             btnImport.click(function (e) {
                 BulkImport(msID);
+                e.preventDefault();
             });
             focusMS = msID;
             StartDrawing();
