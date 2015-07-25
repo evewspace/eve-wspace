@@ -4,7 +4,7 @@
     "model": "Map.wsystem", 
     "fields": {
         "static1": null, 
-        "is_shattered": false, 
+        "is_shattered": true, 
         "static2": null, 
         "effect": "Red Giant"
     }
@@ -14,7 +14,7 @@
     "model": "Map.wsystem", 
     "fields": {
         "static1": null, 
-        "is_shattered": false, 
+        "is_shattered": true, 
         "static2": null, 
         "effect": "Cataclysmic Variable"
     }
@@ -24,7 +24,7 @@
     "model": "Map.wsystem", 
     "fields": {
         "static1": null, 
-        "is_shattered": false, 
+        "is_shattered": true, 
         "static2": null, 
         "effect": "Magnetar"
     }
@@ -34,7 +34,7 @@
     "model": "Map.wsystem", 
     "fields": {
         "static1": null, 
-        "is_shattered": false, 
+        "is_shattered": true, 
         "static2": null, 
         "effect": "Pulsar"
     }
@@ -54,7 +54,7 @@
     "model": "Map.wsystem", 
     "fields": {
         "static1": null, 
-        "is_shattered": false, 
+        "is_shattered": true, 
         "static2": null, 
         "effect": "Wolf-Rayet Star"
     }
