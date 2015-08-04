@@ -27,6 +27,7 @@ class MapSystemSerializer(serializers.HyperlinkedModelSerializer):
                 'friendlyname',
                 'interesttime',
                 'parentsystem',
+                'childsystems',
                 'display_order_priority'
                 )
 
