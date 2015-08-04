@@ -13,7 +13,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from django.conf.urls import patterns, include, url
-
 sigpatterns = patterns(
     'Map.views',
     url(r'^activate/$', 'activate_signature'),

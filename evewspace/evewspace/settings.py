@@ -185,6 +185,7 @@ INSTALLED_APPS = (
         'django.contrib.humanize',
         # Uncomment the next line to enable the admin:
         #'django.contrib.admin',
+        'rest_framework',
         'core',
         'Map',
         'POS',
@@ -201,6 +202,16 @@ INSTALLED_APPS = (
         # Uncomment the next line to enable admin documentation:
         # 'django.contrib.admindocs',
 )
+REST_FRAMEWORK = {
+        'DEFAULT_PERMISSION_CLASSES': (
+            'rest_framework.permissions.DjangoModelPermissions',
+            ),
+        'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework.authentication.SessionAuthentication',
+            'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+            )
+        }
+
 #Require a registration code to register
 ACCOUNT_REQUIRE_REG_CODE=True
 

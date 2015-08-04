@@ -41,4 +41,7 @@ urlpatterns = patterns('',
         url(r'^sitetracker/', include('SiteTracker.urls')),
         url(r'^alerts/', include('Alerts.urls')),
         url(r'^api/', include('API.urls')),
+        url(r'^rest-auth/', include('rest_framework.urls', namespace='rest_framework')),
+        url(r'^api-token-auth/', 'rest_framework_jwt.views.obtain_jwt_token'),
+        url(r'^rest-api/mapping/', include('Map.rest_urls')),
 )
