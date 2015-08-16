@@ -1156,7 +1156,6 @@ function DrawSystem(system) {
 
         if (parentSysEllipse) {
             var lineColor = GetConnectionColor(system);
-            var whColor = GetWormholeColor(system);
             var dasharray = GetConnectionDash(system);
             var interest = false;
             if (system.interestpath === true || system.interest === true) {
@@ -1164,7 +1163,7 @@ function DrawSystem(system) {
             }
             if (curSys.collapsed === false || renderCollapsedConnections === true) {
                 ConnectSystems(parentSysEllipse, curSys, lineColor, "#fff", interest, dasharray);
-                DrawWormholes(parentSys, system, whColor);
+                DrawWormholes(parentSys, system);
             }
         } else {
             alert("Error processing system " + system.Name);
@@ -1219,22 +1218,6 @@ function GetConnectionColor(system) {
         return stageOneColor_zen;
     } else {
         return stageOneColor;
-    }
-}
-
-function GetWormholeColor(system) {
-    var goodColor = "#009900";
-    var badColor = "#FF3300";
-    if (!system) {
-        return "#000";
-    }
-    if (system.LevelX < 1) {
-        return "#000";
-    }
-    if (system.WhToParentBubbled === true && system.WhFromParentBubbled === true) {
-        return badColor;
-    } else {
-        return goodColor;
     }
 }
 
@@ -1477,6 +1460,14 @@ function DrawWormholes(systemFrom, systemTo, textColor) {
         whFromSys = whToSys = null;
         whFromColor = whToColor = clearWhColor;
         whFromDecoration = whToDecoration = "inherit";
+        if (systemTo.WhToParentBubbled === true) {
+            whToColor = bubbledColor;
+            whToDecoration = 'bold';
+        }
+        if (systemTo.WhFromParentBubbled === true) {
+            whFromColor = bubbledColor;
+            whFromDecoration = 'bold';
+        }
 
         if (systemTo.WhFromParent) {
             var whFromText;
