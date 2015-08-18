@@ -1,0 +1,22 @@
+include ../_mixins
+
++navbar('EVE-WSpace', 'evewspace-main', 'default navbar-static-top')(ng-controller='NavCtrl')
+
+  +navCollapse
+    +navDropdown('Maps')()
+      +navItemRepeat('maps')
+      +navDivider
+      +navItem('maps.new') Add Map
+      +navItem('maps.import') Import Map
+    +navDropdown('POS')
+    +navDropdown('Alerts')
+    +navDropdown('SiteTracker')
+
+  div.ng-cloak(ng-if='user')
+    +navRight
+      +navItem('api') API
+      +navItem('settings') Settings
+      +navItem('accounts.logout') Logout
+  div.ng-cloak(ng-if='!user')
+    +navRight
+      +navItem('accounts.login') Log In

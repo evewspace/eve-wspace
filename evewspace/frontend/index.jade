@@ -1,0 +1,39 @@
+//- index.jade
+//- @todo Work on Chrome v3 support
+include ./html/_mixins
+
+doctype html
+html.no-js(lang='en', ng-app='eve-wspace', ng-strict-di, ng-csp, ng-jq)
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='description', content='')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    title(ng-bind-template='EVE-WSpace{{ $state.current.data.pageTitle ? " - " + $state.current.data.pageTitle : ""}}') EVE-WSpace
+
+    link(rel='stylesheet', href='/css/vendors.css')
+    link(rel='stylesheet', href='/css/app.css')
+    script(type='text/javascript', src='/js/modernizr.js')
+    script(type='text/javascript', src='/js/init.js')
+
+  body(ng-controller='AppCtrl as vm')
+
+    header.eve-wspace-header
+      include ./html/templates/_navbar
+
+      .alerts.ng-cloak(ng-controller='AlertsCtrl')
+        alert(ng-repeat='alert in alerts', type='{{ alert.type }}', close='closeAlert($index)') {{ alert.msg }}
+
+    .content.container-fluid
+      div.row.ng-cloak(ui-view)
+
+      div(ng-controller='MapCtrl', ng-cloak)
+        div(wspace-map map-data='mapData')
+
+        div(ng-if='selectedSystem')
+
+    footer.eve-wspace-footer.ng-cloak(role='contentinfo')
+      include ./html/templates/_footer
+
+    script(type='text/javascript', src='/js/vendors.js')
+    script(type='text/javascript', src='/js/app.js')

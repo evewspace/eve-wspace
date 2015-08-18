@@ -1,0 +1,19 @@
+@import 'bemify';
+@import 'bourbon';
+
+[d3-tt] {
+  width: 150px;
+  max-width: 150px;
+  min-width: 150px;
+}
+
+@include block('wspace-tooltip') {
+  position: absolute;
+
+  > .panel-body {
+    padding: 0;
+    > .list-group {
+      margin: 0;
+    }
+  }
+}

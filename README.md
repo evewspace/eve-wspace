@@ -30,6 +30,7 @@ Generally, Eve W-Space requires:
 * RabbitMQ (preferred)
 * memcached (preferred)
 * An RDBMS (MariaDB, MySQL, and PostgreSQL tested)
+* Nodejs >= 0.12.0 < 0.13.0 || iojs >= 2.0.0 < 3.0.0
 
 Other required python modules are listed in requirements.txt.
 
