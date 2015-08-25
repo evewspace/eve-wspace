@@ -14,3 +14,6 @@ doc/build/*
 *.sublime-project
 
 *.sublime-workspace
+.python-version
+.cache
+.npm

@@ -1,0 +1,22 @@
+{
+  "bitwise": true,
+  "curly": true,
+  "eqeqeq": true,
+  "es5": true,
+  "forin": true,
+  "freeze": true,
+  "futurehostile": true,
+  "latedef": true,
+  "maxcomplexity": 10,
+  "noarg": true,
+  "nonbsp": true,
+  "nonew": true,
+  "strict": true,
+  "varstmt": true,
+  "undef": true,
+  "unused": true,
+  "browserify": true,
+  "module": true,
+  "node": true,
+  "browser": true
+}

@@ -1,0 +1,10 @@
+@import 'bemify';
+@import 'bourbon';
+
+@include block('wspace-map-panel') {
+  > .panel-footer {
+    img {
+      @include size(32px);
+    }
+  }
+}

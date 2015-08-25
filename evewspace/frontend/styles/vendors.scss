@@ -1,0 +1,18 @@
+// Bootstrap
+@import 'yeti/variables';
+@import 'bootstrap/variables';
+@import 'bootstrap.scss';
+@import 'yeti/bootswatch';
+
+// JS Vendors
+@import 'vendors/angular-csp';
+@import 'vendors/angular-loading-bar';
+
+// MD-Font
+@import 'material-design-iconic-font/scss/variables';
+$zmdi-font-path: '../fonts';
+$zmdi-css-prefix: mdi;
+$zmdi-icon-prefix: mdi;
+$md-css-prefix: mdi;
+$md-icon-prefix: mdi;
+@import 'material-design-iconic-font/scss/material-design-iconic-font';

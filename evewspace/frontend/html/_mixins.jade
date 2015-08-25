@@ -1,0 +1,133 @@
+//- Material design icons
+mixin materialIcon(icon, size)
+  if(typeof size !== 'undefined')
+    i(class=['mdi', "mdi-#{icon}", "mdi-#{size}"])
+  else
+    i(class=['mdi',"mdi-#{icon}"])
+
+//- Navbar mixins
+
+//- Navbar mixin
+mixin navbar(name, id, style)
+  - var style = (typeof style === 'undefined') ? "default" : style
+  nav( role='navigation', class=['navbar','navbar-' + style])&attributes(attributes)
+    .container-fluid
+      .navbar-header
+        button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#' + id, aria-expanded='false', aria-controls='navbar')
+          span.sr-only Toggle navigation
+          span.icon-bar
+          span.icon-bar
+          span.icon-bar
+        a.navbar-brand(sref='home')= name
+      .navbar-collapse.collapse(id=id)
+        block
+//- End Navbar mixin
+
+//- NavCollapse mixin
+mixin navCollapse
+  ul(class=['nav', 'navbar-nav'])&attributes(attributes)
+    block
+//- End NavCollapse mixin
+
+//- NavItem mixin
+mixin navItem(state, active)
+  li(class=active)&attributes(attributes)
+    a(href=href)
+      block
+//- End NavItem mixin
+
+mixin navItemRepeat(model, active)
+  li(class=active, ng-repeat='link in #{model}')
+    a(sref=model + '({id:link.id})') {{ link.name }}
+
+mixin navDropdown(label, active)
+  li(class=['dropdown', active], dropdown)
+    a.dropdown-toggle(dropdown-toggle)&attributes(attributes)= label
+      | &nbsp;<span class='caret'></span>
+    ul.dropdown-menu(role='menu')
+      block
+
+mixin navDivider
+  li.divider
+
+mixin navHeaderDropdown
+  li.dropdown-header
+    block
+
+mixin navRight
+  ul.nav.navbar-nav.navbar-right
+    block
+
+//- End navbar mixins
+
+//- panel mixin
+
+mixin panel(heading, style)
+  - var style = (typeof style === 'undefined') ? 'default': style
+  div(class=['panel', 'panel-' + style])
+    .panel-heading
+      h1.panel-title= heading
+    .panel-body
+      block
+
+//- End panel mixin
+
+//- Button mixin
+mixin anchorButton(style, size)
+  - var style = (typeof style === 'undefined') ? 'default': style
+  - var sref = (typeof sref === 'undefined') ? '': sref
+  case size
+    when 'large'
+      - size = 'btn-large'
+    when 'small'
+      - size = 'btn-sm'
+    when 'mini'
+      - size = 'btn-xs'
+
+  a(class=['btn', 'btn-' + style, size])&attributes(attributes)
+    block
+
+//- End Button mixin
+
+//- Column mixin
+mixin column(lg, md, sm, xs)
+ - var lg = (typeof lg === 'undefined' || md === 0) ? '' : 'col-lg-' + lg
+ - var md = (typeof md === 'undefined' || md === 0) ? '' : 'col-md-' + md
+ - var sm = (typeof sm === 'undefined' || sm === 0) ? '' : 'col-sm-' + sm
+ - var xs = (typeof xs === 'undefined' || xs === 0) ? '' : 'col-xs-' + xs
+ div(class=[lg, md, sm, xs])&attributes(attributes)
+  block
+
+//- End Column mixin
+
+//- ListGroup mixins
+- var groupType
+mixin listGroup(type)
+  - groupType = type
+  case  groupType
+    when 'list'
+      ul(class=['list-group'])&attributes(attributes)
+        block
+    default
+      div(class=['list-group'])&attributes(attributes)
+        block
+
+mixin listItem(arg1, arg2)
+  case groupType
+    when 'list'
+      li(class=['list-group-item', arg1])&attributes(attributes)
+        block
+    when 'links'
+      a(href=arg1, class=['list-group-item', arg1])&attributes(attributes)
+        block
+    default
+      div(class=['list-group-item', arg1])&attributes(attributes)
+        block
+
+mixin listHeading
+  h4.list-group-item-heading
+    block
+
+mixin listText
+  .list-group-item-text
+    block

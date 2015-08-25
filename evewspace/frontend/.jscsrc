@@ -1,0 +1,6 @@
+{
+  "maxErrors": 30,
+  "verbose": false,
+  "disallowAnonymousFunctions": null,
+  "excludeFiles": ["node_modules/**"]
+}
