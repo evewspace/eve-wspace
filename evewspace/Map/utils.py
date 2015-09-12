@@ -200,7 +200,6 @@ class MapJSONGenerator(object):
         """
         # maps system ids to child/parent system ids
         children = defaultdict(list)
-        parents = dict()
         # maps system ids to objects
         systems = dict()
         # maps system ids to priorities
@@ -211,7 +210,6 @@ class MapJSONGenerator(object):
                                        'parent_wormhole')
                        .iterator()):
             children[system.parentsystem_id].append(system.pk)
-            parents[system.pk] = system.parentsystem_id
             systems[system.pk] = system
             priorities[system.pk] = system.display_order_priority
 
@@ -219,85 +217,17 @@ class MapJSONGenerator(object):
         for l in children.values():
             l.sort(key=priorities.__getitem__)
 
-        columns = []
-        todo = [(children[None][0], 0)]
+        # actual map layout generation
+        layout_gen = LayoutGenerator(children)
+        system_positions = layout_gen.get_layout()
 
-        # maps system id to current x,y position
-        xs = dict()
-        ys = dict()
-
-        # insert systems into columns
-        while len(todo) > 0:
-            sys_id, x = todo.pop(0)
-            try:
-                column = columns[x]
-            except IndexError:
-                column = []
-                columns.append(column)
-            xs[sys_id] = x
-            ys[sys_id] = len(column)
-            column.append(sys_id)
-            for child in children[sys_id]:
-                todo.append((child, x + 1))
-
-        # repeat until nothing changed:
-        #   - move one child system down to match parent
-        #   - move all parents down to match first child
-        map_changed = True
-        while map_changed:
-            map_changed = False
-
-            # ensure child.y >= parent.y
-            for x, column in enumerate(columns):
-                if map_changed:
-                    break
-                for sys_id in column:
-                    if map_changed:
-                        break
-                    if sys_id is None:
-                        continue
-                    try:
-                        child = children[sys_id][0]
-                    except IndexError:
-                        continue
-                    y_child = ys[child]
-                    dy = ys[sys_id] - y_child
-                    if dy > 0:
-                        map_changed = True
-                        child_col = columns[x + 1]
-                        for i in child_col[y_child:]:
-                            if i is not None:
-                                ys[i] += dy
-                        for i in range(dy):
-                            child_col.insert(y_child, None)
-
-            # ensure parent.y >= parent.children[0].y
-            for column in columns:
-                for sys_id in column:
-                    if sys_id is None:
-                        continue
-                    parent_id = parents[sys_id]
-                    if parent_id is None:
-                        continue
-                    if children[parent_id][0] == sys_id:
-                        y_parent = ys[parent_id]
-                        dy = ys[sys_id] - y_parent
-                        if dy > 0:
-                            map_changed = True
-                            parent_column = columns[xs[parent_id]]
-                            for i in parent_column[y_parent:]:
-                                if i >= 0:
-                                    ys[i] += dy
-                            for i in range(dy):
-                                parent_column.insert(y_parent, None)
-
-        # create list of system dicts from system ids in columns
+        # generate list of system dictionaries for conversion to JSON
         syslist = []
-        for x, column in enumerate(columns):
-            for y, sys_id in enumerate(column):
-                if sys_id is not None:
-                    sys_obj = systems[sys_id]
-                    syslist.append(self.system_to_dict(sys_obj, x, y))
+        for sys_id in layout_gen.processed:
+            sys_obj = systems[sys_id]
+            x, y = system_positions[sys_id]
+            syslist.append(self.system_to_dict(sys_obj, x, y))
+
         return syslist
 
 
@@ -457,3 +387,70 @@ class RouteFinder(object):
             else:
                 self.graph = cPickle.loads(cache.get('route_graph'))
         return nx.shortest_path(self.graph, source=sys1.pk, target=sys2.pk)
+
+
+class LayoutGenerator(object):
+    """Generate map layout."""
+    def __init__(self, children):
+        """Create new LayoutGenerator.
+        
+        children should be a dictionary of system ids as
+                 keys and their child ids as values.
+        """
+        self.children = children
+        self.positions = dict()
+        self.occupied = []
+        self.processed = []
+
+    def get_layout(self):
+        """Create map layout.
+
+        returns a dictionary containing x, y positions for
+        the given system ids.
+        """
+        root_node = self.children[None][0]
+        self.place_node(root_node, 0, 0)
+        return self.positions
+
+    def place_node(self, node_id, x, min_y):
+        """Determine x, y position for a node.
+
+        node_id: id of the node to be positioned
+        x: x position (depth) of the node
+        min_y: minimal y position of the node
+               (can't be above parent nodes)
+        """
+        self.processed.append(node_id)
+
+        y = min_y
+        while self.is_occupied(x, y):
+            y += 1
+
+        # position forst child (and thus its children)
+        # and move this node down if child moved down
+        try:
+            first_child = self.children[node_id][0]
+            y += self.place_node(first_child, x + 1, y)
+        except IndexError:
+            pass
+
+        self.set_occupied(x, y)
+        self.positions[node_id] = (x, y)
+
+        for child in self.children[node_id][1:]:
+            self.place_node(child, x + 1, y)
+
+        return y - min_y
+
+    def is_occupied(self, x, y):
+        while x >= len(self.occupied):
+            self.occupied.append(-1)
+        if y <= self.occupied[x]:
+            return True
+        return False
+
+    def set_occupied(self, x, y):
+        while x >= len(self.occupied):
+            self.occupied.append(-1)
+        if y > self.occupied[x]:
+            self.occupied[x] = y
