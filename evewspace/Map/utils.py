@@ -399,7 +399,7 @@ class LayoutGenerator(object):
         """
         self.children = children
         self.positions = dict()
-        self.occupied = []
+        self.occupied = [-1]
         self.processed = []
 
     def get_layout(self):
@@ -422,11 +422,9 @@ class LayoutGenerator(object):
         """
         self.processed.append(node_id)
 
-        y = min_y
-        while self.is_occupied(x, y):
-            y += 1
+        y = max(min_y, self.next_free(x))
 
-        # position forst child (and thus its children)
+        # position first child (and thus its children)
         # and move this node down if child moved down
         try:
             first_child = self.children[node_id][0]
@@ -442,15 +440,14 @@ class LayoutGenerator(object):
 
         return y - min_y
 
-    def is_occupied(self, x, y):
+    def next_free(self, x):
+        """Get next free row in column x."""
         while x >= len(self.occupied):
             self.occupied.append(-1)
-        if y <= self.occupied[x]:
-            return True
-        return False
+        return self.occupied[x] + 1
 
     def set_occupied(self, x, y):
-        while x >= len(self.occupied):
-            self.occupied.append(-1)
-        if y > self.occupied[x]:
-            self.occupied[x] = y
+        """Set number of occupied rows for column x to y.
+        
+        next_free should be called before this to ensure the column exists."""
+        self.occupied[x] = y
