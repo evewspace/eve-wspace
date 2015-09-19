@@ -125,7 +125,7 @@
         "source": "6", 
         "jumpmass": 1800000000, 
         "target": "Nullsec", 
-        "lifetime": 24, 
+        "lifetime": 16, 
         "maxmass": 5000000000
     }
 },
@@ -216,7 +216,7 @@
         "source": "2", 
         "jumpmass": 300000000, 
         "target": "Nullsec", 
-        "lifetime": 24, 
+        "lifetime": 16, 
         "maxmass": 2000000000
     }
 },
@@ -320,7 +320,7 @@
         "source": "NH", 
         "jumpmass": 1800000000, 
         "target": "Nullsec", 
-        "lifetime": 24, 
+        "lifetime": 16, 
         "maxmass": 5000000000
     }
 },
@@ -333,7 +333,7 @@
         "source": "3", 
         "jumpmass": 300000000, 
         "target": "Nullsec", 
-        "lifetime": 24, 
+        "lifetime": 16, 
         "maxmass": 3000000000
     }
 },
@@ -619,7 +619,7 @@
         "source": "9", 
         "jumpmass": 1350000000, 
         "target": "Nullsec", 
-        "lifetime": 24, 
+        "lifetime": 16, 
         "maxmass": 3000000000
     }
 },
@@ -697,7 +697,7 @@
         "source": "H", 
         "jumpmass": 1000000000, 
         "target": "Nullsec", 
-        "lifetime": 24, 
+        "lifetime": 16, 
         "maxmass": 3000000000
     }
 },
@@ -814,7 +814,7 @@
         "source": "1", 
         "jumpmass": 20000000, 
         "target": "Nullsec", 
-        "lifetime": 24, 
+        "lifetime": 16, 
         "maxmass": 1000000000
     }
 },
@@ -827,7 +827,7 @@
         "source": "Z", 
         "jumpmass": 1350000000, 
         "target": "Nullsec", 
-        "lifetime": 24, 
+        "lifetime": 16, 
         "maxmass": 3000000000
     }
 },
