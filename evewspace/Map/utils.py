@@ -178,20 +178,20 @@ class MapJSONGenerator(object):
     def get_systems_json(self):
         """Returns a JSON string representing the systems in a map."""
         cache_key = self.get_cache_key(self.map)
-        cached = cache.get(cache_key)
-        if cached is None:
-            cached = self.create_syslist()
-            cache.set(cache_key, cached, 15)
+        systems = cache.get(cache_key)
+        if systems is None:
+            systems = self.create_syslist()
+            cache.set(cache_key, systems, 15)
 
         user_locations_dict = cache.get('user_%s_locations' % self.user.pk)
         if user_locations_dict:
             user_img = "%s/images/mylocation.png" % (settings.STATIC_URL,)
             user_locations = [i[1][0] for i in user_locations_dict.items()]
-            for system in cached:
+            for system in systems:
                 if (system['sysID'] in user_locations and
                         system['iconImageURL'] is None):
                     system['iconImageURL'] = user_img
-        return json.dumps(cached, sort_keys=True)
+        return json.dumps(systems, sort_keys=True)
 
     def create_syslist(self):
         """
@@ -390,7 +390,7 @@ class RouteFinder(object):
 
 
 class LayoutGenerator(object):
-    """Generate map layout."""
+    """Provides methods for generating the map layout."""
     def __init__(self, children):
         """Create new LayoutGenerator.
         
@@ -398,8 +398,11 @@ class LayoutGenerator(object):
                  keys and their child ids as values.
         """
         self.children = children
-        self.positions = dict()
+        self.positions = None
         self.occupied = [-1]
+
+        # after processing is done, this contains the processed
+        # system ids in drawing order
         self.processed = []
 
     def get_layout(self):
@@ -408,17 +411,23 @@ class LayoutGenerator(object):
         returns a dictionary containing x, y positions for
         the given system ids.
         """
+        if self.positions is not None:
+            return self.positions
+
+        self.positions = {}
         root_node = self.children[None][0]
-        self.place_node(root_node, 0, 0)
+        self._place_node(root_node, 0, 0)
         return self.positions
 
-    def place_node(self, node_id, x, min_y):
+    def _place_node(self, node_id, x, min_y):
         """Determine x, y position for a node.
 
         node_id: id of the node to be positioned
         x: x position (depth) of the node
         min_y: minimal y position of the node
                (can't be above parent nodes)
+
+        returns: y offset relative to min_y
         """
         self.processed.append(node_id)
 
@@ -427,7 +436,7 @@ class LayoutGenerator(object):
         try:
             y_occupied = self.occupied[x]
         except IndexError:
-            self.occupied += [-1] * (x - len(self.occupied) + 1)
+            self.occupied.append(-1)
             y_occupied = -1
         y = max(min_y, y_occupied + 1)
 
@@ -435,14 +444,16 @@ class LayoutGenerator(object):
         # and move this node down if child moved down
         try:
             first_child = self.children[node_id][0]
-            y += self.place_node(first_child, x + 1, y)
+            y += self._place_node(first_child, x + 1, y)
         except IndexError:
             pass  # node has no children, ignore that.
 
+        # system position is now final, save it
         self.occupied[x] = y
         self.positions[node_id] = (x, y)
 
+        # place the rest of the children
         for child in self.children[node_id][1:]:
-            self.place_node(child, x + 1, y)
+            self._place_node(child, x + 1, y)
 
         return y - min_y
