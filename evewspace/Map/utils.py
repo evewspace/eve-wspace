@@ -91,7 +91,10 @@ class MapJSONGenerator(object):
         if system.system.npckills > npc_threshold:
             return static_prefix + "carebears.png"
 
-        return None
+        if system.system.signatures.filter(modified_time__gte=(datetime.datetime.now(pytz.utc)-datetime.timedelta(days=1))).filter(sigtype__isnull=False).exists():
+            return None
+        else:
+            return static_prefix + "scan.png"
 
     def system_to_dict(self, system, level_x, level_y):
         """Get dict representation of a system.
