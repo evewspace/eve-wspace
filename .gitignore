@@ -15,6 +15,7 @@ local_settings.py
 pip-selfcheck.json
 doc/build/*
 pip-selfcheck.json
+share
 
 .idea
 *.sublime-project
