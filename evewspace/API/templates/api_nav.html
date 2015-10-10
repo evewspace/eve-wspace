@@ -2,6 +2,9 @@
 {% if perms.API.add_apikey or perms.API.change_apikey or perms.API.delete_apikey %}
 <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">API</a><ul class="dropdown-menu">
 	<li><a href="#" onclick="GetAPIKeyDialog();">My API Keys</a></li>
+	{% if perms.API.change_corpapikey %}
+	    <li><a href="#" onclick="GetCorpAPIKeyDialog();">Corp API Keys</a></li>
+	{% endif %}
 	{% if perms.API.audit_keys %}
 		<li><a href="#">Audit API Keys</a></li>
 	{% endif %}

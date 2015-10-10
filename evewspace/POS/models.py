@@ -21,7 +21,7 @@ import eveapi
 from core.models import Type, Location
 from API.models import CorpAPIKey
 from core.models import Corporation, Alliance
-from Map.models import System
+from Map.models import System, MapSystem, Map
 from API import cache_handler as handler
 
 
@@ -129,6 +129,16 @@ class POS(models.Model):
         self.updated = datetime.now(pytz.utc)
         super(POS, self).save(*args, **kwargs)
 
+    def log(self, user, action, map_system):
+        """
+        Records a log entry for POS updates and additions.
+        """
+        map_system.map.add_log(
+            user,
+            "%s POS (Planet %s Moon %s, owner %s) in %s (%s), %s jumps out from root system."
+            %(action, self.planet, self.moon, self.corporation, map_system.system.name,
+              map_system.friendlyname, map_system.distance_from_root()))
+
     def size(self):
         """
         Returns the size of the tower, Small Medium or Large.
@@ -169,6 +179,11 @@ class POS(models.Model):
             # odd bug where invalid items get into dscan
             except Type.DoesNotExist:
                 continue
+            except Type.MultipleObjectsReturned:
+                # Some types have multiple records for the same name
+                # When this happens, we will return the first even though
+                # it may not actually be the POS module type.
+                item_type = Type.objects.filter(name=row[1]).all()[0]
             if item_type.marketgroup:
                 group_tree = []
                 parent = item_type.marketgroup

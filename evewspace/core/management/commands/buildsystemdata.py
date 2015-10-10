@@ -61,8 +61,20 @@ class Command(NoArgsCommand):
         for system in basedata:
             try:
                 sysclass = LocationWormholeClass.objects.get(location = system.id).sysclass
-                lowsec = KSystem.objects.get(name=system.name)
-                lowsec.sysclass = sysclass
-                lowsec.save()
+                if sysclass in range(7,12):
+                    lowsec = KSystem.objects.get(name=system.name)
+                    lowsec.sysclass = sysclass
+                    lowsec.save()
+                else:
+                    newdata = WSystem(static1=None, static2=None, sysclass=sysclass,
+                            lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
+                            info='', occupied='')
+                    for field in system._meta.fields:
+                        setattr(newdata, field.attname, getattr(system, field.attname))
+                    newdata.systemdata_ptr = system
+                    newdata.podkills = 0
+                    newdata.npckills = 0
+                    newdata.shipkills = 0
+                    newdata.save()
             except LocationWormholeClass.DoesNotExist:
                 pass

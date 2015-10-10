@@ -8,8 +8,11 @@ key_patterns = patterns('API.views',
 
 urlpatterns = patterns('API.views',
         url(r'^key/$', 'api_key_dialog'),
+        url(r'^corp_key/$', 'api_corp_key_dialog'),
         url(r'^key/new/$', 'edit_keys'),
+        url(r'^corp_key/new/$', 'edit_corp_keys'),
         url(r'^key/(?P<key_id>\d+)/', include(key_patterns)),
+        url(r'^corp_key/(?P<key_id>\d+)/delete/', 'delete_corp_key'),
         url(r'^user/(?P<user_id>\d+)/$', 'api_key_admin'),
         url(r'^user/(?P<user_id>\d+)/key/(?P<key_id>\d+)/$', 'edit_keys'),
         )

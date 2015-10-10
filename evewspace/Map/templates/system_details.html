@@ -12,12 +12,12 @@
     <h4>{% if can_edit %}<i title="Edit Info" class="icon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %}System Details: {{mapsys.system.name}} </h4>
     {% if mapsys.friendlyname %}
     <div class="mapSysInfo">
-        <h5 class="friendlyName"> Friendly Name: <small>{{mapsys.friendlyname}}</small> </h5> 
+        <h5 class="friendlyName"> Friendly Name: <small>{{mapsys.friendlyname}}</small> </h5>
     </div>
     {% endif %}
     <div class="sysClassSpan">
         {% if system.is_wspace %}
-        <div class="span2"> 
+        <div class="span2">
             <strong>Class: {{system.sysclass}}</strong>
         </div>
         <div class="span2">
@@ -30,7 +30,7 @@
                 {% else %}
                 <span title="Time: {{system.static1.lifetime}}H &nbsp Mass: {{system.static1.maxmass|intcomma}}kg &nbsp Jump Mass: {{system.static1.jumpmass|intcomma}}kg">
                     {{system.static1}} ({{system.static1.dest_string}})
-            </span> 
+            </span>
             {% if system.static2 %}
             <span title="Time: {{system.static2.lifetime}}H &nbsp Mass: {{system.static2.maxmass|intcomma}}kg &nbsp Jump Mass: {{system.static2.jumpmass|intcomma}}">
                 {{system.static2}} ({{system.static2.dest_string}})
@@ -40,13 +40,13 @@
         </strong>
         </div>
         {% endif %}
-        {% if system.sysclass = 7 %}
+        {% if system.sysclass == 7 %}
         High Sec
         {% endif %}
-        {% if system.sysclass = 8 %}
+        {% if system.sysclass == 8 %}
         Low Sec
         {% endif %}
-        {% if system.sysclass = 9 %}
+        {% if system.sysclass == 9 %}
         Null Sec
         {% endif %}
         {% if system.is_kspace and is_igb %}
@@ -68,11 +68,11 @@
     <div class="detailsLeft">
     {% if system.occupied or system.poses.all %}
     <div class="occupiedDiv label label-important">
-        <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|linebreaks}}</p>
+        <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|linebreaks}}
         Towers:
         <ul>
             {% for pos in system.poses.all %}
-            <li>P:{{pos.planet}} &nbsp;M: {{pos.moon}} - {{pos.towertype.name}} - {{pos.corporation.name}} - 
+            <li>P:{{pos.planet}} &nbsp;M: {{pos.moon}} - {{pos.towertype.name}} - {{pos.corporation.name}} -
                 {% if pos.status == 0 %}
 	            <span class="label label-info">Status: UNANCHORED</span>
 	           	{% endif %}
@@ -117,11 +117,11 @@
         </div>
         {% endif %}
     </div>
-     
+
 </div>
 </div>
   <div id="sigsPanel" class="sigsPanel tab-pane">
-            <div id="sigAddPanel" class"sigAddPanel">
+            <div id="sigAddPanel" class="sigAddPanel">
                 <div style="margin-bottom: 10px; text-align: center;">
                     <h4>Signatures: {{system.name}}</h4>
                     {% if can_edit %}
@@ -167,16 +167,15 @@
             </table>
         </div>
     </div>
-        {% load poslist %}    
+        {% load poslist %}
     <div id="systemPosPanel" class="systemPosPanel tab-pane">
         <div style="text-align: center; margin-bottom: 10px;">
             <h4>Starbases: {{system.name}}</h4>
-            {% if can_edit %}<button class="btn" onclick="GetAddPOSDialog({{mapsys.system.pk}});"><img height=32 width=32 title="Add POS" src='{{STATIC_URL}}images/plus.png'/>Add POS</button>{% endif %}
+            {% if can_edit %}<button class="btn" onclick="GetAddPOSDialog({{mapsys.pk}});"><img height=32 width=32 title="Add POS" src='{{STATIC_URL}}images/plus.png'/>Add POS</button>{% endif %}
         </div>
         <div id="systemPosWell" class="systemPosWell">
-            <div id="sys{{system.pk}}POSDiv">
+            <div id="sys{{mapsys.pk}}POSDiv">
             </div>
         </div>
     </div>
 </div>
-</script>
