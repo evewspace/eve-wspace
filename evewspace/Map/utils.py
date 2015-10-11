@@ -96,7 +96,7 @@ class MapJSONGenerator(object):
             return static_prefix + "scan.png"
 
         # partially scanned
-        if system.system.signatures.filter(sigtype__isnull=False).exists():
+        if system.system.signatures.filter(sigtype__isnull=True).exists():
             return static_prefix + "isis_scan.png"
 
         return None
