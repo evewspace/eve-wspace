@@ -1,5 +1,6 @@
 {% if perms.SiteTracker.can_sitetracker %}
 	<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">SiteTracker</a><ul class="dropdown-menu">
+    <li><a href="{% url 'SiteTracker.views.st_status' %}">Active Fleets</a></li>
 		<li><a href="#">My Sites</a></li>
 		<li><a href="#">Claims</a></li>
 		<li><a href="#">Payouts</a></li>
