@@ -125,8 +125,8 @@
             <div id="sigAddPanel" class="sigAddPanel">
                 <div style="margin-bottom: 10px; text-align: center;">
                     {% if can_edit %}
-                    <button id="btnPurgeSigs" class="btn btn-danger">Purge Signatures</button>
-                    <button id="btnReallyPurgeSigs" class="btn btn-warning" style="display: none;"  onclick="PurgeSignatures({{mapsys.pk}});">Really Purge?</button>
+                    <button id="btnPurgeSigs" class="btn btn-danger">Purge</button>
+                    <button id="btnReallyPurgeSigs" class="btn btn-warning" style="display: none;"  onclick="PurgeSignatures({{mapsys.pk}});">Really<br/>Purge?</button>
                     <script type="text/javascript">
                         $('#btnPurgeSigs').click(function() {
                             $('#btnReallyPurgeSigs').show();
@@ -135,7 +135,7 @@
                     </script>
                     <form id="bulkSigForm" class="bulkSigForm" method="post" action="system/{{mapsys.pk}}/signatures/bulkadd/">
                         <textarea id="pasteField" name="paste"></textarea>
-                        <a href="#" id="btnImport" class="btn"><i class="icon-download"></i> Bulk Import</a>
+                        <a href="#" id="btnImport" class="btn"><i class="icon-download"></i> Import</a>
                     </form>
                     {% endif %}
 
