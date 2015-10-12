@@ -91,10 +91,15 @@ class MapJSONGenerator(object):
         if system.system.npckills > npc_threshold:
             return static_prefix + "carebears.png"
 
-        if system.system.signatures.filter(modified_time__gte=(datetime.datetime.now(pytz.utc)-datetime.timedelta(days=1))).filter(sigtype__isnull=False).exists():
-            return None
-        else:
+        # unscanned for >24h
+        if not system.system.signatures.filter(modified_time__gte=(datetime.datetime.now(pytz.utc)-datetime.timedelta(days=1))).filter(sigtype__isnull=False).exists():
             return static_prefix + "scan.png"
+
+        # partially scanned
+        if system.system.signatures.filter(sigtype__isnull=True).exists():
+            return static_prefix + "isis_scan.png"
+
+        return None
 
     def system_to_dict(self, system, level_x, level_y):
         """Get dict representation of a system.
@@ -396,7 +401,7 @@ class LayoutGenerator(object):
     """Provides methods for generating the map layout."""
     def __init__(self, children):
         """Create new LayoutGenerator.
-        
+
         children should be a dictionary of system ids as
                  keys and their child ids as values.
         """
