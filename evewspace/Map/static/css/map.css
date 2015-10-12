@@ -252,6 +252,7 @@ textarea
     padding: 0px;
     z-index: 100;
 }
+
 #backtotop {
     background: url(../images/back_to_top.png);
     width: 24px;
@@ -261,6 +262,7 @@ textarea
     cursor: pointer;
     padding-bottom: 3px;
 }
+
 #tobuttons {
     background: url(../images/to_buttons.png);
     width: 24px;
@@ -273,22 +275,26 @@ textarea
 label {
     display: inline;
 }
+
 label[for=massStatusReduced],label[for=sysTypeImportant] {
     font-weight: bold;
     color: #fffc00;
 }
+
 label[for=massStatusNormal], label[for=sysTypeRegular] {
     font-weight: bold;
     color: #00ff00;
 }
+
 label[for=massStatusCritical], label[for=sysTypeDangerous] {
     font-weight: bold;
     color: #ff0000;
 }
+
 #legendDiv {
-    margin-left: 24px;
     display: none;
 }
+
 #legendDiv ul.inline {
     display: inline;
 }

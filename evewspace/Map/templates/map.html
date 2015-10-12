@@ -29,41 +29,18 @@
                 scale({{user.get_settings.MAP_SCALING_FACTOR}});
                 });
     </script>
+    {% load sitetracker %}
+    {% sitetracker_scripts %}
 {% endblock %}
 {% block contentheader %}
 <div id="scrollmenu">
 <div id="backtotop" onclick="window.location.href = '#';"></div>
 <div id="tobuttons" onclick="window.location.href = '#sysInfoDiv';"></div>
 </div>
-<div class="btn-toolbar">
-    <button class="btn btn-mini" onclick="RefreshMap();"><i class="icon-refresh"></i> Refresh</button>
-    <button id="btnRefreshToggle" class="btn btn-mini btn-info" onclick="ToggleAutoRefresh();">Auto Refresh: <span></span></button>
-    {% if is_igb %}
-    <button id="btnSilentAdd" class="btn btn-mini btn-info" onclick="ToggleSilentAdd();">Silent IGB Mapping: <span></span></button>
-    <button id="btnKspaceIGB" class="btn btn-mini btn-info" onclick="ToggleKspaceMapping();">Map K-Space Connections: <span></span></button>
-    {% endif %}
-    <button id="btnPilotList" class="btn btn-mini btn-info" onclick="TogglePilotList();">Pilot List: <span></span></button>
-    <button id="btnExportMap" class="btn btn-mini btn-info" onclick="GetExportMap();">Export</button>
-    <button id="btnZen" class="btn btn-mini btn-info" onclick="ToggleZen()">Zen: <span></span></button>
-    <button id="btnLegend" class="btn btn-mini btn-info" onclick="$('#legendDiv').toggle()">Legend</button>
-    <span style="margin-right: 5px; margin-left: 5px;"></span>
-    <input id="scaleSlider" type="text" class="slider" value="" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="{{user.get_settings.MAP_SCALING_FACTOR}}" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
-</div>
-<div id="legendDiv">
-    <em>Legend:</em>&nbsp;
-    <ul class="inline">
-        <li><img src="{{STATIC_URL}}images/pvp.png" height="32" width="32"/>  PVP Activity </li>
-        <li> <img src="{{STATIC_URL}}images/carebears.png" height="32" width="32"/>  NPC Kills </li>
-        <li> <img src="{{STATIC_URL}}images/mylocation.png" height="32" width="32"/>  You are here! </li>
-    {% if perms.SiteTracker.can_sitetracker %}
-        <li><img src="{{STATIC_URL}}images/farm.png" height="32" width="32"/>  SiteTracker Up! </li>
-    {% endif %}
-        <li><img src="{{STATIC_URL}}images/scan.png" height="32" width="32"/>  Unscanned (last 24h) </li>
-        <li><img src="{{STATIC_URL}}images/isis_scan.png"/>  Partially scanned</li>
-    </ul>
-</div>
+{% include "map_toolbar.html" %}
 <div id="mapDiv" class="mapDiv"></div>
 <div id="systemTooltipHolder"></div>
+{% include "map_legend.html" %}
 <div id="logDiv" class="logDiv">
 </div>
 <div id="wormholeTooltipHolder" style="">
