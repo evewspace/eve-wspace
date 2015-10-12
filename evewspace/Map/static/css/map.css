@@ -22,7 +22,7 @@
 #sysTabHolder
 {
     width: 600px;
-    padding-top: 5px;
+    padding: 10px;
 }
 .sysDetailsFooter
 {
@@ -121,6 +121,7 @@
 {
     text-align: left;
     white-space: nowrap;
+    margin-top: 10px;
 }
 .sysSigsList
 {
@@ -219,9 +220,7 @@ textarea
   top: 21px;
   content: '';
 }
-#sysInfoDiv {
-    margin-left: 15px;
-}
+
 .sysInfoCombinedDiv h4 {
     clear: both;
     display: block;
@@ -288,6 +287,7 @@ label[for=massStatusCritical], label[for=sysTypeDangerous] {
 }
 #legendDiv {
     margin-left: 24px;
+    display: none;
 }
 #legendDiv ul.inline {
     display: inline;
@@ -328,14 +328,44 @@ ul#moveDropdown li {
     cursor: pointer;
 }
 
+.sysSigsTable tr:hover {
+    background-color: #2B3039;
+}
+
 #bulkSigForm {
-  margin-bottom: 10px;
+    display: inline-block;
+    margin-bottom: 8px;
 }
+
 #bulkSigForm textarea {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
+
 #pasteField {
-    width: 350px;
     font-size: 12px;
     line-height: 12px;
+    width: 200px;
+    height: 2em;
 }
+
+#sysInfoTab {
+    margin-bottom: 3px;
+}
+
+#sigAddForm, #sigEditForm {
+    margin-bottom: 3px;
+}
+
+.sysInfoSysname {
+    float: left;
+    font-size: 12pt;
+    display: inline;
+    margin: 0px 7px 0px 3px;
+    line-height: 34px;
+    color: white;
+}
+
+.content {
+  padding-top: 0;
+}
+

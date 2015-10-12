@@ -205,6 +205,10 @@ function ToggleSilentAdd() {
     }
 }
 
+function ToggleLegend() {
+    $("#legendDiv").toggle();
+}
+
 function ToggleKspaceMapping() {
     if (kspaceIGBMapping === false) {
         kspaceIGBMapping = true;

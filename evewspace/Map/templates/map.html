@@ -45,11 +45,10 @@
     <button id="btnPilotList" class="btn btn-mini btn-info" onclick="TogglePilotList();">Pilot List: <span></span></button>
     <button id="btnExportMap" class="btn btn-mini btn-info" onclick="GetExportMap();">Export</button>
     <button id="btnZen" class="btn btn-mini btn-info" onclick="ToggleZen()">Zen: <span></span></button>
+    <button id="btnLegend" class="btn btn-mini btn-info" onclick="$('#legendDiv').toggle()">Legend</button>
     <span style="margin-right: 5px; margin-left: 5px;"></span>
     <input id="scaleSlider" type="text" class="slider" value="" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="{{user.get_settings.MAP_SCALING_FACTOR}}" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
 </div>
-<div id="mapDiv" class="mapDiv"></div>
-<div id="systemTooltipHolder"></div>
 <div id="legendDiv">
     <em>Legend:</em>&nbsp;
     <ul class="inline">
@@ -63,6 +62,8 @@
         <li><img src="{{STATIC_URL}}images/isis_scan.png"/>  Partially scanned</li>
     </ul>
 </div>
+<div id="mapDiv" class="mapDiv"></div>
+<div id="systemTooltipHolder"></div>
 <div id="logDiv" class="logDiv">
 </div>
 <div id="wormholeTooltipHolder" style="">
