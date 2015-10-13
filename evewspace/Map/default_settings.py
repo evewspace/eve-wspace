@@ -31,6 +31,7 @@ defaults = [
     ("MAP_KSPACE_MAPPING", "0"),
     ("MAP_SILENT_MAPPING", "0"),
     ("MAP_RENDER_COLLAPSED", "0"),
+    ("MAP_AUTODELETE_SIGS", "1"),
 ]
 
 

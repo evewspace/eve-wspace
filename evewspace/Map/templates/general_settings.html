@@ -27,6 +27,13 @@
                 <input type='radio' name='advlogging' value='0' {% if advlogging == '0' %}checked='checked'{% endif %} /> Off
             </td>
         </tr>
+        <tr>
+            <td>Autodelete old signatures:</td>
+            <td> 
+                <input id='autodelsigs' type='radio' name='autodelsigs' value='1' {% if autodelsigs == '1' %}checked='checked'{% endif %} /> On &nbsp;
+                <input type='radio' name='autodelsigs' value='0' {% if autodelsigs == '0' %}checked='checked'{% endif %} /> Off
+            </td>
+        </tr>
     </table>
     <br />
     <input type="submit" class="btn btn-primary" value="Save Changes">
