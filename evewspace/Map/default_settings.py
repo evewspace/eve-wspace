@@ -32,6 +32,7 @@ defaults = [
     ("MAP_SILENT_MAPPING", "0"),
     ("MAP_RENDER_COLLAPSED", "0"),
     ("MAP_AUTODELETE_SIGS", "1"),
+    ("MAP_AUTODELETE_DAYS", "14"),
 ]
 
 

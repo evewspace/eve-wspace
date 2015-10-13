@@ -1007,6 +1007,7 @@ def general_settings(request):
     escalation_burn = get_config("MAP_ESCALATION_BURN", None)
     advanced_logging = get_config("MAP_ADVANCED_LOGGING", None)
     autodelete_sigs = get_config("MAP_AUTODELETE_SIGS", None)
+    autodelete_days = get_config("MAP_AUTODELETE_DAYS", None)
     if request.method == "POST":
         scan_threshold.value = int(request.POST['scanwarn'])
         interest_time.value = int(request.POST['interesttimeout'])
@@ -1015,6 +1016,7 @@ def general_settings(request):
         escalation_burn.value = int(request.POST['escdowntimes'])
         advanced_logging.value = int(request.POST['advlogging'])
         autodelete_sigs.value = int(request.POST['autodelsigs'])
+        autodelete_days.value = int(request.POST['autodeldays'])
         scan_threshold.save()
         interest_time.save()
         pvp_threshold.save()
@@ -1022,6 +1024,7 @@ def general_settings(request):
         escalation_burn.save()
         advanced_logging.save()
         autodelete_sigs.save()
+        autodelete_days.save()
         return HttpResponse()
     return TemplateResponse(
         request, 'general_settings.html',
@@ -1031,7 +1034,8 @@ def general_settings(request):
          'interesttimeout': interest_time.value,
          'escdowntimes': escalation_burn.value,
          'advlogging': advanced_logging.value,
-         'autodelsigs': autodelete_sigs.value}
+         'autodelsigs': autodelete_sigs.value,
+         'autodeldays': autodelete_days.value}
     )
 
 
