@@ -46,5 +46,6 @@ urlpatterns = patterns('SiteTracker.views',
         url(r'fleet/leaveall/$', 'leave_fleet'),
         url(r'fleet/$', 'refresh_fleets'),
         url(r'fleet/(?P<fleetID>\d+)/', include(fleetpatterns)),
+        url(r'status/$', 'st_status'),
         url(r'$', 'status_bar'),
         )

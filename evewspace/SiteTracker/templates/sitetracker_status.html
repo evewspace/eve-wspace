@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}SiteTracker Status{% endblock %}
+
+{% block content %}
+{% load sitetracker %}
+            {% load sitetracker %}
+            {% if perms.SiteTracker.can_sitetracker %}
+            <div id="stOuterContainer" class="row">
+            <div id="stPlaceholderDiv" class="well well-small span9">
+{% st_status_bar user %}
+            </div>
+            </div>
+            {% endif %}
+{% endblock %}

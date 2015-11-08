@@ -205,6 +205,10 @@ function ToggleSilentAdd() {
     }
 }
 
+function ToggleLegend() {
+    $("#legendDiv").toggle();
+}
+
 function ToggleKspaceMapping() {
     if (kspaceIGBMapping === false) {
         kspaceIGBMapping = true;
@@ -996,7 +1000,7 @@ function InitializeRaphael() {
 
 function GetSystemX(system) {
     if (system) {
-        var startX = s(70);
+        var startX = s(50);
         return startX + indentX * system.LevelX;
     } else {
         alert("GetSystemX: System is null or undefined");

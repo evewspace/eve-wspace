@@ -268,3 +268,8 @@ def refresh_boss_member(request, fleetID, memberID):
     member = get_object_or_404(User, pk=memberID)
     return TemplateResponse(request, "st_boss_member_refresh.html",
             {'member': fleet.members.filter(user=member).latest('jointime')})
+
+@permission_required('SiteTracker.can_sitetracker')
+def st_status(request):
+    """Shows sitetracker status overview"""
+    return TemplateResponse(request, "sitetracker_status.html")
