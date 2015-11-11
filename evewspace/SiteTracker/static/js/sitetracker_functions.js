@@ -1,7 +1,5 @@
 var stRefreshTimerID = null;
-$(document).ready(function(){
-    ReloadSTBar();
-});
+
 function STCreateFleet(sysID){
     $.ajax({
         type: "POST",
