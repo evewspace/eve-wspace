@@ -683,7 +683,7 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
                                      'system': map_system,
                                      'sig': signature})
     form = SignatureForm()
-    if sig_id is None or action == 'Updated':
+    if sig_id is None or action == 'Updated' or action == 'Scanned':
         return TemplateResponse(request, "add_sig_form.html",
                                 {'form': form, 'system': map_system})
     else:

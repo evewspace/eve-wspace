@@ -5,15 +5,15 @@
             {% if field.errors %}
             <br /><span class="label label-warning">{{field.errors}}</span> <br />
             {% endif %}
-            {{field.label_tag}} {{field}} &nbsp
+            {{field.label_tag}} {{field}} &nbsp;
         {% endfor %}
         <input class="btn btn-primary" type="submit" value="Add Sig" />
     </form>
     <script type="text/javascript">
         $("#sigAddForm").submit(function(e){
-                    e.preventDefault();
-                    AddSignature({{system.pk}});
-                    return false;
-                    });
+            e.preventDefault();
+            AddSignature({{system.pk}});
+            return false;
+        });
     </script>
 </div>
