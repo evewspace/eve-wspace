@@ -19,10 +19,10 @@
     <div class="sysClassSpan">
         {% if system.is_wspace %}
         <div class="span2">
-            <strong>Class: {{system.sysclass}}</strong>
+            <strong>Class: <span id="sysClass">{{system.sysclass}}</span></strong>
         </div>
         <div class="span2">
-            <strong>Effect: {{system.effect}}</strong>
+            <strong>Effect: <span id="sysEffect">{{system.effect}}</span></strong>
         </div>
         <div class="span2">
             <strong>Probable Statics:
