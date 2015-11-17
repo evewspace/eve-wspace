@@ -1,6 +1,7 @@
 {% load humanize %}
 <table class="table table-condensed sysSigsTable" cellspacing="0">
     <tr>
+    <th>#</th>
     <th>Actions</th>
     <th>Sig ID</th>
     <th>Type</th>
@@ -11,6 +12,7 @@
     {% for sig in system.system.signatures.all %}
     <tr {% if sig.owned_by %}class="success"{% elif not sig.updated %} class="sig-not-updated"{% endif %}
         title="{% if not sig.updated %}Not yet scanned!{% else %}Scanned {{sig.modified_time|naturaltime}} by {{sig.modified_by}}.{% endif %}">
+        <td>{{ forloop.counter }}</td>
         <td>
             <i class="icon-pencil" title="Edit" onclick="GetEditSignatureBox({{system.pk}}, {{sig.pk}}, {{system.pk}});"></i> &nbsp;
             <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> &nbsp; 
@@ -37,7 +39,7 @@
                                 MarkCleared({{sig.pk}}, {{system.pk}});
                                 } 
                                 {% endif %}
-                        });
+                        })
             </script>
             {% elif sig.sigtype.sleeprsite %}
             <i class="icon-screenshot" onclick="MarkCleared({{sig.pk}}, {{system.pk}});" title="NPCs cleared at {{sig.ratscleared|date:'Y-m-d H:i'}}"></i> 
