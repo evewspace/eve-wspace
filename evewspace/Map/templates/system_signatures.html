@@ -39,7 +39,7 @@
                                 MarkCleared({{sig.pk}}, {{system.pk}});
                                 } 
                                 {% endif %}
-                        })
+                        });
             </script>
             {% elif sig.sigtype.sleeprsite %}
             <i class="icon-screenshot" onclick="MarkCleared({{sig.pk}}, {{system.pk}});" title="NPCs cleared at {{sig.ratscleared|date:'Y-m-d H:i'}}"></i> 
