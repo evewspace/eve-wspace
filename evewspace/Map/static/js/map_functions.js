@@ -304,7 +304,7 @@ function setEffectTip() {
         } else if (effect == "Pulsar") {
             tip = "Boosts Shield HP, NOS/neut drain amount; penalizes armor resists, capacitor recharge, signature radius";
             effectcolor = effectColorPulsar; 
-        } else if (effect == "Wolf Rayet") {
+        } else if (effect == "Wolf-Rayet Star") {
             tip = "Boosts Armor HP, small weapon damage, signature radius; penalizes shield resists";
             effectcolor = effectColorWolfRayet; 
         } else if (effect == "Black Hole") {
