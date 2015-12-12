@@ -21,7 +21,8 @@ class SlackAlertMethod(AlertMethodBase):
                 'username': "PingBOT",
                 'attachments':[{'fallback': "New alert!",
                     'fields':[{'title': header, 'value': message}]}]})}
-            requests.post(destination, data=payload)
+            r = requests.post(destination, data=payload)
+            return {'status_code': r.status_code, 'text': r.text}
 
     def exists(self, group):
         """
