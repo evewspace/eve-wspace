@@ -14,13 +14,19 @@ class SlackAlertMethod(AlertMethodBase):
         subdomain = get_config("SLACK_SUBDOMAIN", None).value
 
         if self.exists(sub_group):
-            header = '%s - %s' % (from_user.username, subject)
             channel = SlackChannel.objects.get(group=sub_group)
             destination = "https://%s.slack.com/services/hooks/incoming-webhook?token=%s" % (subdomain, channel.token)
             payload = {'payload':json.dumps({'channel': channel.channel,
-                'username': "PingBOT",
-                'attachments':[{'fallback': "New alert!",
-                    'fields':[{'title': header, 'value': message}]}]})}
+                'username': "EVE W-Space",
+                'attachments':[{
+                    'pretext': 'Notifying <!channel> for new ping from <@%s>' % (from_user.username,),
+                    'fallback': "EWS-PING: %s - %s" % (subject, message),
+                    'fields':[{
+                        'title': subject,
+                        'value': message
+                    }]
+                }]
+            })}
             r = requests.post(destination, data=payload)
             return {'status_code': r.status_code, 'text': r.text}
 
