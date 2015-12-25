@@ -1,15 +1,10 @@
 var stRefreshTimerID = null;
-$(document).ready(function(){
-    ReloadSTBar();
-});
+
 function STCreateFleet(sysID){
     $.ajax({
         type: "POST",
         data: 'sysID=' + sysID,
-        url: "/sitetracker/fleet/new/",
-        success: function(){
-            ReloadSTBar();
-        }
+        url: "/sitetracker/fleet/new/"
     });
 }
 

@@ -3,10 +3,7 @@ BODY
     background-color: #FFFFFF;
 }
 /* Base Div Settings */
-.header
-{
-	padding: 20px;
-}
+.header {}
 
 .navdiv
 {
@@ -17,13 +14,15 @@ BODY
 
 .contenthead
 {
-	padding: 10px;
+	padding: 0;
+  padding-left: 30px;
 }
 
 .content
 {
 	clear: left;
-	padding: 20px;
+	padding: 0;
+  padding-left: 30px;
 }
 
 .footer

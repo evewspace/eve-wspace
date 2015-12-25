@@ -31,6 +31,14 @@ def get_st_context(user):
     return {'myfleets': myfleets, 'availfleets': availfleets,
             'fleetcount': fleetcount, 'user': user}
 
+@register.inclusion_tag("st_scripts.html")
+def sitetracker_scripts():
+    """
+    Includes sitetracker scripts.
+
+    Useful for creating sitetracker fleets from other modules for example.
+    """
+    return {}
 
 @register.inclusion_tag("st_status_bar.html", takes_context=True)
 def st_status_bar(context, refresh=False):
@@ -92,3 +100,9 @@ def st_fleet_details_boss(fleet, user):
     Details of a sitetracker fleet when we are the boss.
     """
     return {'fleet': fleet, 'site_types': SiteType.objects.all(), 'user': user}
+
+@register.filter("st_fleets_available")
+def st_fleets_available(user):
+    st_context = get_st_context(user)
+    return st_context['fleetcount'] > 0
+

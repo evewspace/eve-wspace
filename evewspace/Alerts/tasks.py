@@ -35,7 +35,8 @@ def send_alert(from_user, sub_group, message, subject):
         for user in User.objects.filter(is_active=True):
             if user.has_perm('Alerts.can_alert'):
                 to_list.append(user)
+        results = {}
         for method in method_registry.registry:
-            method_registry.registry[method]().send_alert(to_list, subject, message,
-                    from_user, sub_group)
-        return method_registry.registry
+            results[method] = method_registry.registry[method]().send_alert(
+                    to_list, subject, message, from_user, sub_group)
+        return results

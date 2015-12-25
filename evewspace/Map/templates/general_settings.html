@@ -1,4 +1,4 @@
-<form id="mapGeneralSettingsForm" action="/map/settings/general/" method="post">
+<form id="mapGeneralSettingsForm" class="settingsForm" action="/map/settings/general/" method="post">
     <table>
         <tr>
             <td>Last Scanned Warning Threshold (hours):</td>
@@ -26,6 +26,17 @@
                 <input id='advlogging' type='radio' name='advlogging' value='1' {% if advlogging == '1' %}checked='checked'{% endif %} /> On &nbsp;
                 <input type='radio' name='advlogging' value='0' {% if advlogging == '0' %}checked='checked'{% endif %} /> Off
             </td>
+        </tr>
+        <tr>
+            <td>Autodelete old signatures:</td>
+            <td> 
+                <input id='autodelsigs' type='radio' name='autodelsigs' value='1' {% if autodelsigs == '1' %}checked='checked'{% endif %} /> On &nbsp;
+                <input type='radio' name='autodelsigs' value='0' {% if autodelsigs == '0' %}checked='checked'{% endif %} /> Off
+            </td>
+        </tr>
+        <tr>
+            <td>Autodelete Threshold (days):</td>
+            <td><input type="text" class="input-mini" name="autodeldays" value="{{autodeldays}}"></td>
         </tr>
     </table>
     <br />

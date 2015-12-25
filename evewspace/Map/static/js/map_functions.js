@@ -205,6 +205,10 @@ function ToggleSilentAdd() {
     }
 }
 
+function ToggleLegend() {
+    $("#legendDiv").toggle();
+}
+
 function ToggleKspaceMapping() {
     if (kspaceIGBMapping === false) {
         kspaceIGBMapping = true;
@@ -275,10 +279,43 @@ function DisplaySystemDetails(msID, sysID) {
                 BulkImport(msID);
                 e.preventDefault();
             });
+            setEffectTip();
             focusMS = msID;
             StartDrawing();
         }
     });
+}
+
+function setEffectTip() {
+    var effect = $('#sysEffect').text();
+    if  (effect) {
+        //var cls = $('#sysClass').text();
+        var tip = "";
+        var effectcolor = "#aaaaaa"; 
+        if (effect == "Cataclysmic Variable") {
+            tip = "Boosts remote repair, shield transfer, capacitor capacity/recharge; penalizes local armor repair, shield boost, and remote capacitor";
+            effectcolor = effectColorCataclysmic; 
+        } else if (effect == "Magnetar") {
+            tip = "Boosts damage, missile radius; penalizes drone tracking, targeting range, tracking speed, target painter";
+            effectcolor = effectColorMagnetar; 
+        } else if (effect == "Red Giant") {
+            tip = "Boosts overload bonus, smart bomb range/damage, bomb damage; penalizes overload heat damage";
+            effectcolor = effectColorRedGiant; 
+        } else if (effect == "Pulsar") {
+            tip = "Boosts Shield HP, NOS/neut drain amount; penalizes armor resists, capacitor recharge, signature radius";
+            effectcolor = effectColorPulsar; 
+        } else if (effect == "Wolf-Rayet Star") {
+            tip = "Boosts Armor HP, small weapon damage, signature radius; penalizes shield resists";
+            effectcolor = effectColorWolfRayet; 
+        } else if (effect == "Black Hole") {
+            tip = "Boosts missile (explosion) velocity, ship velocity, targeting range; penalizes statis webifier, inertia";
+            effectcolor = effectColorBlackHole; 
+        } else {
+            tip = "No special effect";
+        }
+        $('#sysEffect').attr('title',tip);
+        $('#sysEffect').css('color',effectcolor);
+    }
 }
 
 function GetPOSList(msID) {
@@ -996,7 +1033,7 @@ function InitializeRaphael() {
 
 function GetSystemX(system) {
     if (system) {
-        var startX = s(70);
+        var startX = s(50);
         return startX + indentX * system.LevelX;
     } else {
         alert("GetSystemX: System is null or undefined");
