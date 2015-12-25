@@ -131,7 +131,7 @@ STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Change the default login behavior
-LOGIN_URL = '/account/login'
+LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL ='/'
 
 # Additional locations of static files
@@ -164,6 +164,7 @@ MIDDLEWARE_CLASSES = (
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
+        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
         'eveigb.middleware.IGBMiddleware',
 )
 
@@ -197,7 +198,7 @@ INSTALLED_APPS = (
         'eveigb',
         'search',
         'djcelery',
-        'south',
+        'Recruitment'
         # Uncomment the next line to enable admin documentation:
         # 'django.contrib.admindocs',
 )

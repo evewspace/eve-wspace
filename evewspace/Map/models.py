@@ -1046,6 +1046,7 @@ class MapForm(ModelForm):
 
     class Meta:
         model = Map
+        fields = ('name','root','truncate_allowed','explicitperms')
 
 
 class SignatureForm(ModelForm):

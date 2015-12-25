@@ -16,7 +16,7 @@ import json
 import csv
 
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.http import Http404, HttpResponseRedirect, HttpResponse
+from django.http import Http404, HttpResponseRedirect, HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
@@ -82,8 +82,7 @@ def map_checkin(request, map_id):
     # AJAX requests should post a JSON datetime called loadtime
     # back that we use to get recent logs.
     if 'loadtime' not in request.POST:
-        return HttpResponse(json.dumps({'error': "No loadtime"}),
-                            mimetype="application/json")
+        return JsonResponse(json.dumps({'error': "No loadtime"}), safe=False)
     time_string = request.POST['loadtime']
 
     load_time = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S.%f")
@@ -96,11 +95,11 @@ def map_checkin(request, map_id):
     log_list = MapLog.objects.filter(timestamp__gt=load_time,
                                      visible=True,
                                      map=current_map)
-
     log_string = render_to_string('log_div.html', {'logs': log_list})
+     
     json_values.update({'logs': log_string})
 
-    return HttpResponse(json.dumps(json_values), mimetype="application/json")
+    return JsonResponse(json.dumps(json_values), safe=False) 
 
 
 @login_required
@@ -461,7 +460,7 @@ def set_importance(request, map_id, ms_id):
     """
     if request.is_ajax():
         map_system = get_object_or_404(MapSystem, pk=ms_id)
-        imp = int(request.REQUEST.get('importance', 0))
+        imp = int(request.POST.get('importance', 0))
         if 0 <= imp <= 2:
             map_system.system.importance = imp
             map_system.system.save()

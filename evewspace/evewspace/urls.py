@@ -41,4 +41,5 @@ urlpatterns = patterns('',
         url(r'^sitetracker/', include('SiteTracker.urls')),
         url(r'^alerts/', include('Alerts.urls')),
         url(r'^api/', include('API.urls')),
+        url(r'^recruitment/', include('Recruitment.urls')),
 )

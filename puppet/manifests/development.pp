@@ -84,7 +84,7 @@ exec {'apt-get update':
 exec {'create-db':
         unless => "/usr/bin/mysql -uroot  djangotest",
 	    cwd => "/vagrant/puppet/scripts",
-        command => "/usr/bin/mysql -e \"create database djangotest character set utf8;\" && /vagrant/puppet/scripts/django_load_db.sh",
+        command => "/usr/bin/mysql -uroot -e  \"create database djangotest character set utf8;\" && /vagrant/puppet/scripts/django_load_db.sh",
 	timeout => 0,
         require => [ Service["mysql"], Package['mysql-server'], Exec['requirements'], Package['bzip2'], Package['memcached'], Service['rabbitmq-server'], Package['curl']]
 	}

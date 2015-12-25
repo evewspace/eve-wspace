@@ -176,6 +176,7 @@ class EWSUserCreationForm(UserCreationForm):
 class EWSUserChangeForm(UserChangeForm):
     class Meta:
         model = EWSUser
+        fields = ('username','email','password','is_active')
 
 
 class RegistrationForm(EWSUserCreationForm):
