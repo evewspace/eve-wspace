@@ -198,7 +198,6 @@ INSTALLED_APPS = (
         'eveigb',
         'search',
         'djcelery',
-        'Recruitment'
         # Uncomment the next line to enable admin documentation:
         # 'django.contrib.admindocs',
 )
