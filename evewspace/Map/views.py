@@ -695,19 +695,21 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
 @login_required()
 @require_map_permission(permission=1)
 @cache_page(1)
-def get_signature_list(request, map_id, ms_id):
+def get_signature_list(request, map_id, ms_id, sys_id):
     """
     Determines the proper escalationThreshold time and renders
     system_signatures.html
     """
     if not request.is_ajax():
         raise PermissionDenied
-    system = get_object_or_404(MapSystem, pk=ms_id)
+    signatures = Signature.objects.select_related('sigtype','owned_by','modified_by').filter(system_id=sys_id).all()
     escalation_downtimes = int(get_config("MAP_ESCALATION_BURN",
                                           request.user).value)
     return TemplateResponse(request, "system_signatures.html",
-                            {'system': system,
-                             'downtimes': escalation_downtimes})
+                            {'signatures': signatures,
+                             'downtimes': escalation_downtimes,
+                             'sysID': sys_id,
+                             'msID': ms_id})
 
 
 # noinspection PyUnusedLocal
