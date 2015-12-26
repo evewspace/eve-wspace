@@ -9,21 +9,21 @@
     <th title="Activated / Rats">Act.</th>
     <th title="Capital Escalation Tracking">Escl.</th>
     </tr>
-    {% for sig in system.system.signatures.all %}
+    {% for sig in signatures %}
     <tr {% if sig.owned_by %}class="success"{% elif not sig.updated %} class="sig-not-updated"{% endif %}
         title="{% if not sig.updated %}Not yet scanned!{% else %}Scanned {{sig.modified_time|naturaltime}} by {{sig.modified_by}}.{% endif %}">
         <td>{{ forloop.counter }}</td>
         <td>
-            <i class="icon-pencil" title="Edit" onclick="GetEditSignatureBox({{system.pk}}, {{sig.pk}}, {{system.pk}});"></i> &nbsp;
-            <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{system.pk}});"></i> &nbsp; 
+            <i class="icon-pencil" title="Edit" onclick="GetEditSignatureBox({{msID}}, {{sig.pk}});"></i> &nbsp;
+            <i class="icon-ban-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{msID}});"></i> &nbsp; 
             {% if sig.owned_by %}
-            <i class="icon-lock" title="Owned by {{sig.owned_by.username}}" onclick="OwnSignature({{system.pk}}, {{sig.pk}});"></i>
+            <i class="icon-lock" title="Owned by {{sig.owned_by}}" onclick="OwnSignature({{msID}}, {{sig.pk}});"></i>
             {% else %}
-            <i class="icon-star-empty" title="Not Owned (Click to Own)" onclick="OwnSignature({{system.pk}}, {{sig.pk}});"></i>
+            <i class="icon-star-empty" title="Not Owned (Click to Own)" onclick="OwnSignature({{msID}}, {{sig.pk}});"></i>
             {% endif %}
         </td>
             <td><span class="signatureID sig{{sig.sigtype.shortname}}">{{sig.sigid}}</span></td>
-            <td><span class="signatureType sig{{sig.sigtype.shortname}}" onclick="GetSiteSpawns({{system.pk}}, {{sig.pk}});" title="{{sig.sigtype.longname}}" >{{sig.sigtype.shortname}}</span></td>
+            <td><span class="signatureType sig{{sig.sigtype.shortname}}" onclick="GetSiteSpawns({{msID}}, {{sig.pk}});" title="{{sig.sigtype.longname}}" >{{sig.sigtype.shortname}}</span></td>
             <td><span class="signatureInfo">{{sig.info}}</span></td>
             <td>
             {% if sig.activated %}
@@ -32,32 +32,32 @@
             <script type="text/javascript">
                 $('#icn{{sig.pk}}Activated').click(function(e){
                             if (e.ctrlKey){
-                                MarkActivated({{sig.pk}}, {{system.pk}});
+                                MarkActivated({{sig.pk}}, {{msID}});
                                 }
                                 {% if sig.sigtype.sleeprsite %}
                                 else{
-                                MarkCleared({{sig.pk}}, {{system.pk}});
+                                MarkCleared({{sig.pk}}, {{msID}});
                                 } 
                                 {% endif %}
                         });
             </script>
             {% elif sig.sigtype.sleeprsite %}
-            <i class="icon-screenshot" onclick="MarkCleared({{sig.pk}}, {{system.pk}});" title="NPCs cleared at {{sig.ratscleared|date:'Y-m-d H:i'}}"></i> 
+            <i class="icon-screenshot" onclick="MarkCleared({{sig.pk}}, {{msID}});" title="NPCs cleared at {{sig.ratscleared|date:'Y-m-d H:i'}}"></i> 
             {% endif %}
             {% else %}
-            <i class="icon-off" onclick="MarkActivated({{sig.pk}}, {{system.pk}});" title="Not activated."></i>
+            <i class="icon-off" onclick="MarkActivated({{sig.pk}}, {{msID}});" title="Not activated."></i>
             {% endif %}
             </td>
             <td>
             {% if sig.sigtype.escalatable and sig.system.sysclass > 4 and sig.system.sysclass < 7 %}
                 {% if not sig.lastescalated %}
                     {% if sig.downtimes > downtimes %}
-                    <i class="icon-fire" onlick="MarkEscalated({{sig.pk}}, {{system.pk}});" title="Site will despawn at DT."></i>
+                    <i class="icon-fire" onlick="MarkEscalated({{sig.pk}}, {{msID}});" title="Site will despawn at DT."></i>
                     {% else %}
-                    <i class="icon-fullscreen" onclick="MarkEscalated({{sig.pk}}, {{system.pk}});" title="Clear escalation only."></i>
+                    <i class="icon-fullscreen" onclick="MarkEscalated({{sig.pk}}, {{msID}});" title="Clear escalation only."></i>
                     {% endif %}        
                 {% else %}    
-                <i class="icon-ok" onclick="MarkEscalated({{sig.pk}}, {{system.pk}});" title="Site escalated today."></i>
+                <i class="icon-ok" onclick="MarkEscalated({{sig.pk}}, {{msID}});" title="Site escalated today."></i>
                 {% endif %}    
                 {% endif %}
             </td>
