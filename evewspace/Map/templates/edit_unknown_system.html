@@ -1,0 +1,21 @@
+<div id="editSystemDialog">
+    <div class="modal-body" style="height: 300px">
+    <form id="editSystemForm" class="editSystemForm" method="post" action="system/{{system.pk}}/edit/">
+        {% csrf_token %}
+        <h4>System name{% if system.friendlyname %} for {{system.friendlyname}} {% endif %}:</h4> 
+        <input type="text" id="sysNameBox" class="sysAddInput systemAuto" name="systemName" style="width: 200px" value="">
+    </form>
+    <input type="submit" style="display: none;">
+    <a href="#" class="btn btn-primary" id="editUnknownSystem">Update</a>
+</div>
+    <script type="text/javascript">
+        $('#editSystemForm').submit(function(e){
+            e.preventDefault();
+            EditSystem({{system.pk}}, 0);
+            return false;
+            });
+        $('#editUnknownSystem').click(function(e){
+            EditSystem({{system.pk}}, 0);
+            });
+    </script>
+</div>

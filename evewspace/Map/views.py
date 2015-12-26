@@ -254,9 +254,24 @@ def add_system(request, map_id):
         # Prepare data
         current_map = Map.objects.get(pk=map_id)
         top_ms = MapSystem.objects.get(pk=request.POST.get('topMsID'))
-        bottom_sys = System.objects.get(
-            name=request.POST.get('bottomSystem')
-        )
+        if request.POST.get('bottomSystem') == "Unknown":
+            bottom_sys, created = System.objects.get_or_create(
+                id=99999999, defaults={"name":"Unknown",
+                "id": int(99999999), 
+                "constellation_id": int(10000001), 
+                "region_id": int(20000001), 
+                "x": float(0), 
+                "y": float(0), 
+                "z": float(0), 
+                "security": float(0.0),
+                "sysclass": int(99)
+                
+                }
+            )
+        else:
+            bottom_sys = System.objects.get(
+                name=request.POST.get('bottomSystem')
+            )
         top_type = WormholeType.objects.get(
             name=request.POST.get('topType')
         )
@@ -329,6 +344,10 @@ def system_details(request, map_id, ms_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
+    system = get_object_or_404(MapSystem, pk=ms_id)
+    if system.system.sysclass == 99:
+        template = 'edit_unknown_system.html'
+        return render(request, template, {'ms_id': ms_id, 'system': system})
     template = 'system_details.html'
     if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
         template = 'system_details_combined.html'
@@ -812,11 +831,17 @@ def edit_system(request, map_id, ms_id):
                                  'occupied': occupied, 'info': info})
 
     if request.method == 'POST':
-        map_system.friendlyname = request.POST.get('friendlyName', '')
-        map_system.system.info = request.POST.get('info', '')
-        map_system.system.occupied = request.POST.get('occupied', '')
-        map_system.system.importance = request.POST.get('importance', '0')
-        map_system.system.save()
+        if map_system.system.sysclass == 99:
+           sysname = request.POST.get('systemName')
+           system = System.objects.get(name= sysname)
+           if system: 
+               map_system.system = system
+        else:
+            map_system.friendlyname = request.POST.get('friendlyName', '')
+            map_system.system.info = request.POST.get('info', '')
+            map_system.system.occupied = request.POST.get('occupied', '')
+            map_system.system.importance = request.POST.get('importance', '0')
+            map_system.system.save()
         map_system.save()
         map_system.map.add_log(request.user, "Edited System: %s (%s)" %
                                (map_system.system.name,

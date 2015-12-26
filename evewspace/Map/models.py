@@ -98,7 +98,7 @@ class System(SystemData):
     """
     sysclass_choices = ((1, "C1"), (2, "C2"), (3, "C3"), (4, "C4"), (5, "C5"),
                         (6, "C6"), (7, "High Sec"), (8, "Low Sec"),
-                        (9, "Null Sec"))
+                        (9, "Null Sec"), (99, "Unknown"))
     sysclass = models.IntegerField(choices=sysclass_choices)
     importance_choices = ((0, "Regular"),
                           (1, "Dangerous System"),
@@ -130,7 +130,7 @@ class System(SystemData):
             return True
 
     def is_wspace(self):
-        if self.sysclass not in range(7, 12):
+        if self.sysclass not in range(7, 12) and self.sysclass in range (1,98) :
             return True
 
     def is_rhea_space(self):
@@ -145,6 +145,8 @@ class System(SystemData):
 
     def save(self, *args, **kwargs):
         self.updated = datetime.now(pytz.utc)
+        if self.lastscanned is None:
+            self.lastscanned = datetime.now(pytz.utc)
         if self.lastscanned < datetime.now(pytz.utc) - timedelta(days=3):
             self.lastscanned = datetime.now(pytz.utc)
         if not self.first_visited:
@@ -981,7 +983,7 @@ class MapLog(models.Model):
     """
     map = models.ForeignKey(Map, related_name="logentries")
     user = models.ForeignKey(User, related_name="maplogs")
-    timestamp = models.DateTimeField(auto_now_add=True,db_index=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=255)
     # Visible logs are pushed to clients as they ocurr
     # (e.g. system added to map)
