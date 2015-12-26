@@ -983,7 +983,7 @@ class MapLog(models.Model):
     """
     map = models.ForeignKey(Map, related_name="logentries")
     user = models.ForeignKey(User, related_name="maplogs")
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True,db_index=True)
     action = models.CharField(max_length=255)
     # Visible logs are pushed to clients as they ocurr
     # (e.g. system added to map)
