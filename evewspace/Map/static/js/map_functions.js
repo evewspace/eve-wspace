@@ -90,6 +90,7 @@ var autoRefreshInterval = 15000; // Interval in milliseconds
 var silentSystem = false; // Are systems added automatically without a pop-up?
 var kspaceIGBMapping = false; // Do we map K<>K connections from the IGB?
 var zenMode = false;
+var activeSysID;
 
 function s(n) { //apply scaling factor, short function name so it's quick to type
     return Math.ceil(n * scalingFactor)
@@ -261,6 +262,7 @@ function DisplaySystemDetails(msID, sysID) {
         type: "GET",
         url: address,
         success: function (data) {
+	        activeSysID = sysID
             $('#sysInfoDiv').empty().html(data);
             LoadSignatures(msID, true);
             $.ajax({
@@ -685,7 +687,7 @@ function AddSignature(msID) {
 }
 
 function LoadSignatures(msID, startTimer) {
-    var address = "system/" + msID + "/signatures/";
+    var address = "system/" + msID + "/signatures/list/" + activeSysID;
     $.ajax({
         url: address,
         type: "GET",
