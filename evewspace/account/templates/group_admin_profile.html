@@ -12,20 +12,20 @@
     {% endfor %}
 </div>
 {% endif %}
-<form id="groupSettingsForm" class="form-horizontal" action="/account/admin/group/{{group.pk}}/" method="POST">
+<form id="groupSettingsForm" class="form-horizontal form-group" action="/account/admin/group/{{group.pk}}/" method="POST">
     {% csrf_token %}
     {% if group.profile.visible %}
     <div class="control-group">
         <label class="control-label" for="usernameInput">Group Name:</label>
         <div class="controls">
-            <input type="text" class="input-medium" name="group_name" value="{{group.name}}" id="groupnameInput">
+            <input type="text" class="input-sm form-control" name="group_name" value="{{group.name}}" id="groupnameInput">
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="newRegcode">Registration Code:</label>
         <div class="controls">
-            <input type="text" id="newRegcode" class="input-medium" name="new_regcode" value="{% if group.profile.regcode %}{{group.profile.regcode}}{% endif %}">
-            <button class="btn btn-info" onclick="SetRandomRegcode();">Randomize</button>
+            <input type="text" id="newRegcode" class="input-sm form-control input-margin" name="new_regcode" value="{% if group.profile.regcode %}{{group.profile.regcode}}{% endif %}">
+            <button class="btn btn-primary btn-sm" onclick="SetRandomRegcode();">Randomize</button>
             <div>
                 <span id="randomRegcodeSpan" style="display:none;" class="label label-info"></span>
             </div>
@@ -34,10 +34,10 @@
     <div class="control-group">
         <label class="control-label" for="deleteGroupButton">Group Actions:</label>
         <div class="controls">
-            <button class="btn btn-success" onclick="SaveGroup({{group.pk}});" id="saveGroupButton">Save Group</button>
-            <button class="btn btn-danger" id="deleteGroupButton">Delete Group</button>
-            <button class="btn btn-danger" style="display: none;" id="reallyDeleteGroup">Really Delete</button>
-            <button class="btn btn-danger" style="display: none;" id="reallyReallyDeleteGroup" onclick="DeleteGroup({{group.pk}});">Really Really Delete</button>
+            <button class="btn btn-sm btn-success" onclick="SaveGroup({{group.pk}});" id="saveGroupButton">Save Group</button>
+            <button class="btn btn-sm btn-danger" id="deleteGroupButton">Delete Group</button>
+            <button class="btn btn-sm btn-warning" style="display: none;" id="reallyDeleteGroup">Really Delete</button>
+            <button class="btn btn-sm btn-danger" style="display: none;" id="reallyReallyDeleteGroup" onclick="DeleteGroup({{group.pk}});">Really Really Delete</button>
         </div>
     </div>
      {% else %}
@@ -47,8 +47,8 @@
    <div class="control-group">
         <label class="control-label" for="disableGroupUsers">Global Member Actions (<b>CHECK MEMBER LIST BEFORE USING</b>):</label>
         <div class="controls">    
-            <button class="btn btn-danger" id="disableGroupUsers" onclick="DisableGroupUsers({{group.pk}});">Disable Member Accounts</button>
-            <button class="btn btn-danger" id="enableGroupUsers" onclick="EnableGroupUsers({{group.pk}});">Enable Member Accounts</button>
+            <button class="btn btn-danger btn-xs" id="disableGroupUsers" onclick="DisableGroupUsers({{group.pk}});">Disable Member Accounts</button>
+            <button class="btn btn-danger btn-xs" id="enableGroupUsers" onclick="EnableGroupUsers({{group.pk}});">Enable Member Accounts</button>
         </div>
     </div>
 </form>

@@ -107,10 +107,7 @@ $(document).ready(function () {
 
     $('#mapDiv').html(ajax_image);
     scale(scalingFactor);
-
-    $('.slider').slider().on('slide', function (ev) {
-        scale(ev.value);
-    });
+    
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
 
     if (autoRefresh === true) {
@@ -161,10 +158,10 @@ $(document).ready(function () {
 function processAjax(data) {
     if (data.dialogHTML) {
         if (data.dialogHTML !== 'silent') {
+            recreateModalHolder();
             var modalHolder = $('#modalHolder');
-            modalHolder.empty();
             modalHolder.html(data.dialogHTML);
-            modalHolder.modal('show');
+            modalHolder.parent().show();
         } else {
             RefreshMap();
         }
@@ -365,7 +362,7 @@ function GetExportMap(mapID) {
         success: function (data) {
             var modalHolder = $('#modalHolder');
             modalHolder.html(data);
-            modalHolder.modal('show');
+            modalHolder.parent().show();
         },
         error: function (error) {
             alert('Could not get the export dialog:\n\n' + error.responseText);
@@ -487,10 +484,11 @@ function GetAddPOSDialog(msID) {
         url: address,
         type: "GET",
         success: function (data) {
+	        recreateModalHolder();
             var modalHolder = $('#modalHolder');
-            modalHolder.empty();
+            
             modalHolder.html(data);
-            modalHolder.modal('show');
+            modalHolder.parent().show();
         }
     });
 }
@@ -501,10 +499,11 @@ function GetSiteSpawns(msID, sigID) {
         url: address,
         type: "GET",
         success: function (data) {
+	        recreateModalHolder();
             var modalHolder = $('#modalHolder');
-            modalHolder.empty();
+            
             modalHolder.html(data);
-            modalHolder.modal('show');
+            modalHolder.parent().show();
         }
     });
 }
@@ -523,7 +522,7 @@ function AddPOS(msID) {
         data: $('#addPOSForm').serialize(),
         success: function (data) {
             GetPOSList(msID);
-            $('#modalHolder').modal('hide');
+            $('#modalHolder').show();
             btnAddPOS.html('Add POS');
             btnAddPOS.removeClass('disabled');
         },
@@ -553,10 +552,11 @@ function GetEditPOSDialog(posID, msID) {
         url: address,
         type: "GET",
         success: function (data) {
+	        recreateModalHolder();
             var modalHolder = $('#modalHolder');
-            modalHolder.empty();
+            
             modalHolder.html(data);
-            modalHolder.modal('show');
+            modalHolder.parent().show();
         }
     });
 }
@@ -573,7 +573,7 @@ function EditPOS(posID, msID) {
         data: $('#editPOSForm').serialize(),
         success: function (data) {
             GetPOSList(msID);
-            $('#modalHolder').modal('hide');
+            $('#modalHolder').parent().hide();
             btnEditPOS.html('Save POS');
             btnEditPOS.removeClass('disabled');
         },
@@ -761,10 +761,11 @@ function GetAddSystemDialog(msID) {
         url: address,
         type: "GET",
         success: function (data) {
+	        recreateModalHolder();
             var modalHolder = $('#modalHolder');
-            modalHolder.empty();
+            
             modalHolder.html(data);
-            modalHolder.modal('show');
+            modalHolder.parent().show();
         }
     });
 }
@@ -806,10 +807,11 @@ function GetBulkImport(msID) {
         url: address,
         type: "GET",
         success: function (data) {
+	        recreateModalHolder();
             var modalHolder = $('#modalHolder');
-            modalHolder.empty();
+            
             modalHolder.html(data);
-            modalHolder.modal('show');
+            modalHolder.parent().show();
         }
     });
 }
@@ -820,10 +822,11 @@ function GetEditWormholeDialog(whID) {
         url: address,
         type: "GET",
         success: function (data) {
+	        recreateModalHolder();
             var modalHolder = $('#modalHolder');
-            modalHolder.empty();
+            
             modalHolder.html(data);
-            modalHolder.modal('show');
+            modalHolder.parent().show();
         }
     });
 
@@ -847,10 +850,11 @@ function GetEditSystemDialog(msID) {
         url: address,
         type: "GET",
         success: function (data) {
+	        recreateModalHolder();
             var modalHolder = $('#modalHolder');
-            modalHolder.empty();
+            
             modalHolder.html(data);
-            modalHolder.modal('show');
+            modalHolder.parent().show();
         }
     });
 }

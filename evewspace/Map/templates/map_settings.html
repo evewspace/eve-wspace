@@ -1,14 +1,14 @@
-<div class="accordion" id="map_accordion">
+<div id="map_accordion">
     {% load static %}
     {% load mapconfig %}
-    <div class="accordion-group">
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#mapGeneral">
+    <div class="panel panel-default" style="width: 700px">
+        <div class="panel-heading">
+            <a class="panel-toggle" data-toggle="collapse" data-target="#mapGeneral" href="#mapGeneral">
                 General Settings
             </a>
         </div>
-        <div id="mapGeneral" class="accordion-body collapse">
-            <div class="accordion-inner">
+        <div id="mapGeneral" class="panel-body collapse">
+            <div class="panel-inner">
                 <p class="text-info">
                     These settings affect the behavior of all maps.
                 </p>
@@ -16,13 +16,15 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#Destinations">
+    </div>
+    <div class="panel panel-default" style="width: 700px">
+        <div class="panel-heading">
+            <a class="panel-toggle" data-toggle="collapse" data-target="#Destinations" href="#Destinations">
                 Global Destinations
             </a>
         </div>
-        <div id="Destinations" class="accordion-body collapse">
-            <div class="accordion-inner">
+        <div id="Destinations" class="panel-body collapse">
+            <div class="panel-inner">
                 <p class="text-info">
                     The distance to these systems (jumps and LY) appear in the details for all K-Space systems.
                 </p>
@@ -30,13 +32,15 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#Permissions">
+    </div>
+    <div class="panel panel-default" style="width: 700px">
+        <div class="panel-heading">
+            <a class="panel-toggle" data-toggle="collapse" data-target="#Permissions" href="#Permissions">
                 Global Permissions
             </a>
         </div>
-        <div id="Permissions" class="accordion-body collapse">
-            <div class="accordion-inner">
+        <div id="Permissions" class="panel-body collapse">
+            <div class="panel-inner">
                 <p class="text-info">
                     These permissions affect access across all maps.
                 </p>
@@ -44,13 +48,15 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#GlobalDisplay">
+    </div>
+    <div class="panel panel-default" style="width: 700px">
+        <div class="panel-heading">
+            <a class="panel-toggle" data-toggle="collapse" data-target="#GlobalDisplay" href="#GlobalDisplay">
                 Display Settings
             </a>
         </div>
-        <div id="GlobalDisplay" class="accordion-body collapse">
-            <div class="accordion-inner">
+        <div id="GlobalDisplay" class="panel-body collapse">
+            <div class="panel-inner">
                 <p class="text-info">
                     These settings will be the default for all users who have not explicitly set them in their profile.
                 </p>
@@ -58,21 +64,22 @@
                 </div>
             </div>
         </div>
-
-        {% for m in maps %}
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#map_accordion" href="#map{{m.pk}}Settings">
+    </div>
+    {% for m in maps %}
+    <div class="panel panel-default" style="width: 700px">
+        <div class="panel-heading">
+            <a class="panel-toggle" data-toggle="collapse" data-target="#map{{m.pk}}Settings" href="#map{{m.pk}}Settings">
                 Map: {{m.name}}
             </a>
         </div>
-        <div id="map{{m.pk}}Settings" class="accordion-body collapse">
-            <div class="accordion-inner">
+        <div id="map{{m.pk}}Settings" class="panel-body collapse">
+            <div class="panel-inner">
                 <div id="map{{m.pk}}Div">
                     {% map_settings m %}
                 </div>
             </div>
         </div>
-        {% endfor %}
-    </div>    
+    </div>
+    {% endfor %}
 </div>
 <script type="text/javascript" src="{{STATIC_URL}}js/map_settings.js"></script>

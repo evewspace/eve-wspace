@@ -2,43 +2,42 @@
     <h3>Create User</h3>
 </div>
 <div class='modal-body'>
-    <div style='display: none;' id='createUserError' class=''></div>
-    <h4>User Details</h4>
-    <form class='form-horizontal' id='createUserForm' action="/account/admin/user/new/" method="POST">
-        <div class='control-group'>
-            <label class='control-label' for='usernameInput'>Username:</label>
-            <div class='controls'>
-                <input id='usernameInput' type='text' name='username'>
+    <div style='display: none;' id='createUserError'></div>
+    <form class='form-horizontal form-group' id='createUserForm' action="/account/admin/user/new/" method="POST">
+        <div class='row'>
+        	<div class="col-md-4 input-margin">
+            	<label class='control-label' for='usernameInput'>Username:</label>
             </div>
-        </div>
-        <div class='control-group'>
-            <label class='control-label' for='emailInput'>Email (Optional):</label>
-            <div class='controls'>
-                <input id='emailInput' type='text' name='email'>
+            <div class="col-md-8 input-margin">
+                <input class='form-control input-sm' id='usernameInput' type='text' name='username'>
             </div>
-        </div>
-        <div class="control-group">
-
-            <label class="control-label" for="emailPassword">Email New Password</label>
-        <div class="controls">
-            <input type="checkbox" id="emailPassword" name="email_password">
+            <div class="col-md-4 input-margin">
+            	<label class='control-label' for='emailInput'>Email (Optional):</label>
             </div>
-        </div>
-        <br />
-        <div class='control-group'>
-            <label class='control-label' for='newPassword'>Password:</label>
-            <div class='controls'>
-                <input id='newPassword' type='password' name='password1'>
+            <div class='col-md-8 input-margin'>
+                <input class='form-control input-sm' id='emailInput' type='text' name='email'>
             </div>
-        </div>
-        <div class='control-group'>
-            <label class='control-label' for='passwordConfirm'>Verify Password:</label>
-            <div class='controls'>
-                <input id='passwordConfirm' type='password' name='password2'>
+			<div class="col-md-4 input-margin">
+            	<label class="control-label" for="emailPassword">Email New Password</label>
+            </div>
+            <div class="col-md-8 input-margin">
+            	<input class='form-control' style="text-align: left" type="checkbox" id="emailPassword" name="email_password">
+            </div>
+            <div class="col-md-4 input-margin">
+            	<label class='control-label' for='newPassword'>Password:</label>
+            </div>
+            <div class="col-md-8 input-margin">
+                <input class='form-control input-sm' id='newPassword' type='password' name='password1'>
+            </div>
+            <div class="col-md-4 input-margin">
+            	<label class='control-label' for='passwordConfirm'>Verify Password:</label>
+            </div>
+            <div class="col-md-8 input-margin">
+                <input class='form-control input-sm' id='passwordConfirm' type='password' name='password2'>
                 <br />
                 <span id='randomPasswordSpan' class='label label-info' style='display: none;'></span>
                 <br />
-                <button class='btn btn-success' id='randomPassword'>Randomize Password</button>
+                <button class='btn btn-success btn-sm' id='randomPassword'>Randomize Password</button>
             </div>
         </div>
     </form>

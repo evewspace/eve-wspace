@@ -3,9 +3,10 @@ function GetSendPingDialog(){
         url: "/alerts/send/",
         type: "GET",
         success: function(data){
-            $('#modalHolder').empty();
-            $('#modalHolder').html(data);
-            $('#modalHolder').modal('show');
+            recreateModalHolder();
+            var modalHolder = $('#modalHolder');
+            modalHolder.html(data);
+            modalHolder.parent().show();
         }
     });
 }
@@ -15,9 +16,10 @@ function GetEditSubscriptionsDialog(){
         url: "/alerts/subscriptions/",
         type: "GET",
         success: function(data){
-            $('#modalHolder').empty();
-            $('#modalHolder').html(data);
-            $('#modalHolder').modal('show');
+            recreateModalHolder();
+            var modalHolder = $('#modalHolder');
+            modalHolder.html(data);
+            modalHolder.parent().show();
         }
     });
 }
@@ -28,7 +30,7 @@ function SendAlert(){
         type: "POST",
         data: $("#sendPingForm").serialize(),
         success: function(data){
-            $('#modalHolder').empty().modal('hide');
+            $('#modalHolder').empty().parent().hide();
         }
     });
 }
@@ -39,7 +41,7 @@ function EditAlertSubscriptions(){
         type: "POST",
         data: $("#editAlertSubsForm").serialize(),
         success: function(data){
-            $('#modalHolder').empty().modal('hide');
+            $('#modalHolder').empty().parent().hide();
         }
     });
 }

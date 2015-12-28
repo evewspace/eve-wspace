@@ -1,45 +1,75 @@
 {% extends "base.html" %}
 {% block title %} Eve W-Space: Home {% endblock %}
-{% block head %}
-<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/home.css" />
-{% endblock %}
 {% block contentheader %} <h3> Welcome, {{user.username}}!</h3> {% endblock %}
 {% block content%} 
-<p class="label label-success">Welcome to Eve-Wspace! This alpha test is primarily for mapping functions. This home page is under construction.</p>
 <div id="homeRow1" class="row">
-<div class="span6 well well-small">
-	{% load posstatus %}
-	<h3 data-toggle="collapse" data-target="#myPosCollapse">My POSes:</h3>
-	<div id="myPosCollapse" class="collapse in">
-		{% myposstatus user %}
+	<div class="col-md-6">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="panel panel-default">
+					{% load posstatus %}
+					<div class="panel-heading">
+						<h4 data-toggle="collapse" data-target="#myPosCollapse">My POSes:</h3>
+					</div>
+					<div id="myPosCollapse" class="collapse in panel-body">
+						{% myposstatus user %}
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 data-toggle="collapse" data-target="#corpPosCollapse">Corp POSes:</h3>
+					</div>
+					<div id="corpPosCollapse" class="collapse panel-body"">
+						{% corpposstatus user %}
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<h3 data-toggle="collapse" data-target="#corpPosCollapse">Corp POSes:</h3>
-	<div id="corpPosCollapse" class="collapse">
-		{% corpposstatus user %}
+	<div class="col-md-6">
+		<div class="row">
+			<div class="col-md-12">
+			    <div class="panel panel-default">
+				{% load apicalendar %}
+			        <div class="panel-heading">
+			        	<h4 data-toggle="collapse" data-target="#calendarCollapse"><i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i>Calendar:</h3>
+			        </div>
+				    <div id="calendarCollapse" class="collapse">
+				    	<div class="panel-body">
+					    {% upcomingevents user %}
+					    </div>
+				    </div>
+			   </div>
+			</div>
+			<div class="col-md-12">
+			    {% load reddittags %}
+			    <div class="panel panel-default">
+				    <div id="redditBox" class="panel-heading">
+				        <h4 data-toggle="collapse" data-target="#redditCollapse"><i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="28px" width="75px" src="{{STATIC_URL}}images/evereddit.png" /> Top 25 </h3>
+				    </div>
+				    <div id="redditCollapse" class="collapse">
+				      	<div class="panel-body">
+				           	{% reddit_list %}
+				        </div>
+				    </div>
+				 </div>
+			</div>
+			<div class="col-md-12">
+				<div class="panel panel-default">
+				    {% load newsfeeds %}
+				    <div id="newsBox" class="panel-heading">
+				        <h4 data-toggle="collapse" data-target="#newsCollapse"><i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="28px" width="28px" src="{{STATIC_URL}}images/rss.png" /> Feeds </h3>
+				    </div>
+				    <div id="newsCollapse" class="collapse">
+				      	<div class="panel-body">
+				           	{% feeds %}
+				        </div>
+				    </div>
+	    		</div>
+	    	</div>
+	    </div>
 	</div>
-</div>
-<div class="span6  well well-small">
-	{% load apicalendar %}
-    <h3 data-toggle="collapse" data-target="#calendarCollapse"><i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i>Calendar:</h3>
-	<div id="calendarCollapse" class="collapse">
-		{% upcomingevents user %}
-	</div>
-   </div>
-</div>
-<div id="homeRow2" class="row">
-    {% load reddittags %}
-    <div id="redditBox" class="well well-small span6">
-        <h3 data-toggle="collapse" data-target="#redditCollapse"><i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="28px" width="75px" src="{{STATIC_URL}}images/evereddit.png" /> Top 25 </h3>
-        <div id="redditCollapse" class="collapse">
-            {% reddit_list %}
-        </div>
-    </div>
-    {% load newsfeeds %}
-    <div id="newsBox" class="well well-small span6">
-        <h3 data-toggle="collapse" data-target="#newsCollapse"><i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="28px" width="28px" src="{{STATIC_URL}}images/rss.png" /> Feeds </h3>
-        <div id="newsCollapse" class="collapse">
-            {% feeds %}
-        </div>
-    </div>
 </div>
 {%endblock%}

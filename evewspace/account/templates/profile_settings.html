@@ -1,16 +1,12 @@
-<div class="accordion" id="profile_accordion">
 {% for key, value in profile_registry.items %}
-<div class="accordion-group">
-<div class="accordion-heading">
-    <a class="accordion-toggle" data-toggle="collapse" data-parent="#profile_accordion" href="#{{key|slugify}}">
+<div class="panel-default panel" style="width: 700px">
+<div class="panel-heading">
+    <a data-toggle="collapse" data-parent="#{{key|slugify}}" href="#{{key|slugify}}">
         {{key}}
     </a>
 </div>
-<div id="{{key|slugify}}" class="accordion-body collapse">
-    <div class="accordion-inner">
-        {% include value.0 %}
-    </div>
+<div id="{{key|slugify}}" class="panel-body collapse">
+    {% include value.0 %}
 </div>
 </div>
 {% endfor %}
-</div>

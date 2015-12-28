@@ -11,7 +11,7 @@
     opacity: 0.5;
     filter: alpha(opacity = 50);
 }
-.systemPanelHeader
+.center_text
 {
     text-align:center;
 }
@@ -21,7 +21,7 @@
 }
 #sysTabHolder
 {
-    width: 600px;
+    width: 700px;
     padding: 10px;
 }
 .sysDetailsFooter
@@ -35,7 +35,7 @@
 }
 .wormholeTooltip
 {
-    width: 200px;
+    width: 250px;
     display: none;
 }
 .systemStatsList {
@@ -101,7 +101,6 @@
 .infoText
 {
     text-align: left;
-    width: 100%;
     white-space: pre-wrap;       /* css-3 */
     white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
     white-space: -pre-wrap;      /* Opera 4-6 */
@@ -194,7 +193,6 @@ textarea
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   position: relative;
   z-index: 3;
-  width: auto;
 }
 
 /* arrows - :before and :after */
@@ -374,4 +372,3 @@ ul#moveDropdown li {
 .content {
   padding-top: 0;
 }
-

@@ -1,18 +1,17 @@
 <li id="pos{{pos.pk}}" class="posListItem">
-{% if perms.POS.change_pos %}
-<i class="icon-pencil" onclick="GetEditPOSDialog({{pos.pk}}, {{mapsystem.pk}});" title="Edit POS"></i>
-{% endif %}
-{% if perms.POS.delete_pos %}
-<i class="icon-ban-circle" onclick="DeletePOS({{pos.pk}}, {{mapsystem.pk}});" title="Delete POS"></i>
-{% endif %}
-
-<div class="poslist_header" data-toggle="collapse" data-target="#pos{{pos.pk}}Details" style="position:relative">
-        <i class="icon-chevron-down" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="48" width="48" src="http://image.eveonline.com/Render/{{pos.towertype.pk}}_128.png"></img>
+	<div class="poslist_header" style="position:relative; text-align: left;">
+        <i class="glyphicon glyphicon-chevron-down" data-toggle="collapse" data-target="#pos{{pos.pk}}Details" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="48" width="48" src="http://image.eveonline.com/Render/{{pos.towertype.pk}}_128.png"></img>
         <span class="planetlabel">Planet: </span>
         <span class="planetno"><strong>{{pos.planet}}</strong></span>
 		<span class="moonlabel">Moon: </span>
         <span class="moonno"><strong>{{pos.moon}}<strong></span>&nbsp
         <span class="posname"><strong>{{pos.posname}}</strong></span>&nbsp &nbsp
+        {% if perms.POS.change_pos %}
+			<i class="glyphicon glyphicon-pencil" onclick="GetEditPOSDialog({{pos.pk}}, {{mapsystem.pk}});" title="Edit POS"></i>&nbsp;
+		{% endif %}
+		{% if perms.POS.delete_pos %}
+			<i class="glyphicon glyphicon-ban-circle" onclick="DeletePOS({{pos.pk}}, {{mapsystem.pk}});" title="Delete POS"></i>
+		{% endif %}
         <br />
         <div class="posSummary">
             <span class="postype"><strong>{{pos.towertype.name}}</strong></span><br />
@@ -26,7 +25,7 @@
                 <span class="label label-info">Status: ONLINING</span>
             {% endif %}
             {% if pos.status == 3 %}
-                <span class="label label-important">Status: REINFORCED  Comes Out: {{pos.rftime|date:"Y-m-d H:i"}}</span>
+                <span class="label label-danger">Status: REINFORCED  Comes Out: {{pos.rftime|date:"Y-m-d H:i"}}</span>
             {% endif %}
             {% if pos.status == 4 %}
                 <span class="label label-success">Status: ONLINE</span>
@@ -52,9 +51,9 @@
             {% endif %}
         </div>
 	</div>
-    <div id="pos{{pos.pk}}Details" class="poslist_main collapse">
+    <div id="pos{{pos.pk}}Details" class="poslist_main collapse" style="text-align: left;">
         <div class="poslist_info">
-            <h5>Owner: </h5>
+            <h5 style="text-align: left;">Owner: </h5>
             <img src="http://image.eveonline.com/Corporation/{{pos.corporation.id}}_32.png" ></img> &nbsp
             {% if pos.corporation.alliance %}
             <img src="http://image.eveonline.com/Alliance/{{pos.corporation.alliance.id}}_32.png"></img>
@@ -69,7 +68,7 @@
             <span class="poslist_ticker">[{{pos.corporation.alliance.shortname}}]</span><br />
             {% endif %}
             <span class="poslist_posname">Name: {{pos.posname}}</span> <br />
-            <h5>Full Fitting: </h5>
+            <br /><h5 style="text-align: left;">Full Fitting: </h5>
             <span class="poslist_fitting">{{pos.fitting|linebreaksbr}}</span> <br />
 		</div>
 	</div>

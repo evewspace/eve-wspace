@@ -2,17 +2,20 @@
     <h3>Create Group</h3>
 </div>
 <div class="modal-body">
-    <form class="form-horizontal" id="createGroupForm" action="/account/admin/group/new/" method="POST">
+    <form class="form-horizontal form-group" id="createGroupForm" action="/account/admin/group/new/" method="POST">
         <div class="control-group">
-            <label class="control-label" for="groupnameInput">Group Name:</label>
-            <div class="controls">
-                <input type="text" class="input-medium" name="group_name" id="groupnameInput">
+        	<div class="col-md-6 input-margin">
+            	<label class="control-label" for="groupnameInput">Group Name:</label>
             </div>
-        </div>
-        <div class="control-group">
-            <label class="control-label" for="regcodeInput">Registration Code (<b>Leave blank to disable registration</b>)</label>
-            <div class="controls">
-                <input type="text" name="regcode" id="regcodeInput">
+            <div class="col-md-6 input-margin">
+                <input type="text" class="form-control input-sm" name="group_name" id="groupnameInput">
+            </div>
+            <div class="col-md-6 input-margin">
+            	<label class="control-label" for="regcodeInput">Registration Code</label>
+            	<h6 style="margin-top: -5px">Leave blank to disable registration</h6>
+            </div>
+            <div class="col-md-6 input-margin">
+                <input type="text" class="form-control input-sm" name="regcode" id="regcodeInput">
             </div>
         </div>
     </form>
@@ -25,6 +28,6 @@
     </script>
 </div>
 <div class='modal-footer'>
-    <button class="btn btn-info" onclick="CreateGroup();">Create</button>
-    <button class="btn" onclick="$('#modalHolder').modal('hide'); return false;">Close</button>
+    <button class="btn btn-info btn-sm" onclick="CreateGroup();">Create</button>
+    <button class="btn btn-danger btn-sm" onclick="$('#modalHolder').parent().hide(); return false;">Close</button>
 </div>

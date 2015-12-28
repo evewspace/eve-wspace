@@ -6,9 +6,9 @@
 
 <div class='well'>
     <p id='importError' {% if not error %}style='display: none;' {% endif %} class='alert alert-error'>{{error}}</p>
-    <form id='mapImportForm' class='form' action='/map/import/' method='POST'>
+    <form id='mapImportForm form-group' class='form' action='/map/import/' method='POST'>
         {% csrf_token %}
-        <textarea name='yaml_string'rows='20' style='width: 50%' autofocus></textarea>
+        <textarea name='yaml_string'rows='20' style='width: 50%' class="form-control" autofocus></textarea>
         <br /><br />
         <button id='btnImport' class='btn btn-default'>Import</button>
     </form>

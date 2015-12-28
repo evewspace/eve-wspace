@@ -69,7 +69,7 @@ function SaveProfDisplaySettings(){
         url: "/map/settings/user-display/",
         success: function(data){
             $("#mapDisplayHolder").html(data);
-            $('.slider').slider();
+            $(".slider").slider();
         },
         error: function(){
             alert("Invalid values, please make sure only integers are used.");

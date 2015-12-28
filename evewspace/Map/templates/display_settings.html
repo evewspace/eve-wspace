@@ -5,79 +5,64 @@
             <h5>Display Settings Saved</h5>
         </div>
     {% endif %}
-    <div class='control-group'>
-        <label class='control-label' for="zenMode">Zen Mode:</label>
-        <div class='controls'>
+    <div class='form-group'>
+        <label class='control-label col-md-5' for="zenMode">Zen Mode:</label>
+        <div class='col-md-7'>
             <input id='zenMode' type='radio' name='zen_mode' value='1' {% if zen_mode == '1' %}checked='checked'{% endif %} /> On &nbsp;
             <input type='radio' name='zen_mode' value='0' {% if zen_mode == '0' %}checked='checked'{% endif %} /> Off
         </div>
     </div>
-    <div class='control-group'>
-        <label class='control-label' for="pilotList">Pilot List on Map:</label>
-        <div class='controls'>
+    <div class='form-group'>
+        <label class='control-label col-md-5' for="pilotList">Pilot List on Map:</label>
+        <div class='col-md-7'>
             <input id='pilotList' type='radio' name='pilot_list' value='1' {% if pilot_list == '1' %}checked='checked'{% endif %} /> On &nbsp;
             <input type='radio' name='pilot_list' value='0' {% if pilot_list == '0' %}checked='checked'{% endif %} /> Off
         </div>
     </div>
-    <div class='control-group'>
-        <label class='control-label' for="detailsCombined">System Details View:</label>
-        <div class='controls'>
-            <input id='detailsCombined' type='radio' name='details_combined' value='0' {% if details_combined == '0' %}checked='checked'{% endif %} /> Tabbed &nbsp;
-            <input type='radio' name='details_combined' value='1' {% if details_combined == '1' %}checked='checked'{% endif %} /> Combined
-        </div>
-    </div>
-    <div class='control-group'>
-        <label class='control-label' for="renderTags">Render WH Tags:</label>
-        <div class='controls'>
+    <div class='form-group'>
+        <label class='control-label col-md-5' for="renderTags">Render WH Tags:</label>
+        <div class='col-md-7'>
             <input id='renderTags' type='radio' name='render_tags' value='1' {% if render_tags == '1' %}checked='checked'{% endif %} /> On &nbsp;
             <input type='radio' name='render_tags' value='0' {% if render_tags == '0' %}checked='checked'{% endif %} /> Off
         </div>
     </div>
-    {% if not context_user %}
-    <div class='control-group'>
-        <label class='control-label' for="scalingFactor">Scaling Factor:</label>
-        <div class='controls'>
-            <input id='scalingFactor' name='scaling_factor' type="text" class="slider" value="{% if scaling_factor|length > 0 %}{{scaling_factor}}{% else %}1{% endif %}" data-slider-min=".1" data-slider-max="2" data-slider-step=".1" data-slider-value="{{scaling_factor}}" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show">
-        </div>
-    </div>
-    {% endif %}
-    <div class='control-group'>
-        <label class='control-label' for="highlightActive">Highlight Active Pilots:</label>
-        <div class='controls'>
+    <div class='form-group'>
+        <label class='control-label col-md-5' for="highlightActive">Highlight Active Pilots:</label>
+        <div class='col-md-7'>
             <input id='highlightActive' type='radio' name='highlight_active' value='1' {% if highlight_active == '1' %}checked='checked'{% endif %} /> On &nbsp;
             <input type='radio' name='highlight_active' value='0' {% if highlight_active == '0' %}checked='checked'{% endif %} /> Off
         </div>
     </div>
-    <div class='control-group'>
-        <label class='control-label' for="autoRefresh">Auto Refresh:</label>
-        <div class='controls'>
+    <div class='form-group'>
+        <label class='control-label col-md-5' for="autoRefresh">Auto Refresh:</label>
+        <div class='col-md-7'>
             <input id='autoRefresh' type='radio' name='auto_refresh' value='1' {% if auto_refresh == '1' %}checked='checked'{% endif %} /> On &nbsp;
             <input type='radio' name='auto_refresh' value='0' {% if auto_refresh == '0' %}checked='checked'{% endif %} /> Off
         </div>
     </div>
-    <div class='control-group'>
-        <label class='control-label' for="kspaceMapping">Map K-Space Connections:</label>
-        <div class='controls'>
+    <div class='form-group'>
+        <label class='control-label col-md-5' for="kspaceMapping">Map K-Space Connections:</label>
+        <div class='col-md-7'>
             <input id='kspaceMapping' type='radio' name='kspace_mapping' value='1' {% if kspace_mapping == '1' %}checked='checked'{% endif %} /> Yes &nbsp;
             <input type='radio' name='kspace_mapping' value='0' {% if kspace_mapping == '0' %}checked='checked'{% endif %} /> No
         </div>
     </div>
-    <div class='control-group'>
-        <label class='control-label' for="silentMapping">Silently Map Connections:</label>
-        <div class='controls'>
+    <div class='form-group'>
+        <label class='control-label col-md-5' for="silentMapping">Silently Map Connections:</label>
+        <div class='col-md-7'>
             <input id='silentMapping' type='radio' name='silent_mapping' value='1' {% if silent_mapping == '1' %}checked='checked'{% endif %} /> Yes &nbsp;
             <input type='radio' name='silent_mapping' value='0' {% if silent_mapping == '0' %}checked='checked'{% endif %} /> No
         </div>
     </div>
-    <div class='control-group'>
-        <label class='control-label' for="renderCollapsed">Show Collapsed Connections:</label>
-        <div class='controls'>
+    <div class='form-group'>
+        <label class='control-label col-md-5' for="renderCollapsed">Show Collapsed Connections:</label>
+        <div class='col-md-7'>
             <input id='renderCollapsed' type='radio' name='render_collapsed' value='1' {% if render_collapsed == '1' %}checked='checked'{% endif %} /> Yes &nbsp;
             <input type='radio' name='render_collapsed' value='0' {% if render_collapsed == '0' %}checked='checked'{% endif %} /> No
         </div>
     </div>
 
-    <input type="submit" class="btn btn-primary" value="Save Display Settings">
+    <input type="submit" class="btn btn-primary btn-sm" value="Save Display Settings">
 </form>
 <script type="text/javascript">
     {% if context_user %}

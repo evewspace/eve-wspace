@@ -1059,7 +1059,7 @@ class SignatureForm(ModelForm):
     """
     sigid = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'input-mini'}),
-        label="ID:")
+        label="ID:",)
 
     sigtype = forms.ModelChoiceField(
         queryset=SignatureType.objects.all(),
@@ -1069,9 +1069,11 @@ class SignatureForm(ModelForm):
     info = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'input-medium'}),
         label="Info:",
-        required=False)
+        required=False,)
 
-    sigtype.widget.attrs['class'] = 'input-small'
+    sigtype.widget.attrs['class'] = 'form-control input-sm'
+    info.widget.attrs['class'] = 'form-control input-sm'
+    sigid.widget.attrs['class'] = 'form-control input-sm'
 
     class Meta:
         model = Signature

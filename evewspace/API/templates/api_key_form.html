@@ -1,9 +1,9 @@
-<form class="form-inline" id="api{% if member %}Admin{% endif %}KeyForm" action="/api/key/" method="POST">
+<form class="form-inline form-group" id="api{% if member %}Admin{% endif %}KeyForm" action="/api/key/" method="POST">
     {% csrf_token %}
     <input type="hidden" name="user_id" value="{% if member %}{{member.pk}}{% else %}{{user.pk}}{% endif %}">
-    Key ID: <input type="text" class="input-small" value="{{key.keyid}}" name="key_id"></input>
-    vCode: <input type="text" class="input" name="vcode" value="{{key.vcode}}"></input>
-    <input id="api{% if member %}Admin{% endif %}KeySubmit" type="submit" class="btn btn-success" value="Submit"></input>
+    Key ID: <input type="text" class="input-sm form-control" value="{{key.keyid}}" name="key_id"></input>
+    &nbsp;vCode: <input type="text" class="input-sm form-control" name="vcode" value="{{key.vcode}}"></input>
+    <input id="api{% if member %}Admin{% endif %}KeySubmit" type="submit" class="btn btn-success btn-sm" value="Submit"></input>
 </form>
 <script type="text/javascript">
     $('#api{% if member%}Admin{% endif %}KeyForm').submit(function(e){

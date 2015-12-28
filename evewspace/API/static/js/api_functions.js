@@ -18,7 +18,9 @@ function GetAPIKeyDialog(){
         url: '/api/key/',
         type: 'GET',
         success: function(data){
-            $('#modalHolder').empty().html(data).modal('show');
+	        recreateModalHolder();
+            $('#modalHolder').html(data);
+            $('#modalHolder').parent().show();
             GetNewAPIKeyForm();
         }
     });
@@ -29,7 +31,9 @@ function GetCorpAPIKeyDialog(){
         url: '/api/corp_key/',
         type: 'GET',
         success: function(data){
-            $('#modalHolder').empty().html(data).modal('show');
+            recreateModalHolder();
+            $('#modalHolder').html(data);
+            $('#modalHolder').parent().show();
             GetNewCorpAPIKeyForm();
         }
     });

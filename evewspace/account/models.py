@@ -183,6 +183,13 @@ class RegistrationForm(EWSUserCreationForm):
     """Extends the django registration form to add fields."""
     username = forms.CharField(max_length=30, label="Username")
     email = forms.EmailField(required=False, label="E-Mail Address (Optional)")
+    password1 = forms.CharField(widget=forms.PasswordInput, label="Password:")
     password2 = forms.CharField(widget=forms.PasswordInput, label="Confirm Password:")
     regcode = forms.CharField(max_length=64, label="Registration Code")
+    
+    email.widget.attrs['class'] = 'form-control input-sm'
+    username.widget.attrs['class'] = 'form-control input-sm'
+    password1.widget.attrs['class'] = 'form-control input-sm'
+    password2.widget.attrs['class'] = 'form-control input-sm'
+    regcode.widget.attrs['class'] = 'form-control input-sm'
 

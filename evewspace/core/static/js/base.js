@@ -14,6 +14,11 @@
 //   limitations under the License.
 
 //AJAX Setup to work with Django CSFR Middleware
+
+var draggable_x = 100
+var draggable_y = 100
+var dragged = 0
+
 $.ajaxSetup({
     beforeSend: function(xhr, settings) {
         function getCookie(name) {
@@ -99,3 +104,35 @@ $(document).on("focus", ".towerAuto", function(){
             }
        });
 });
+
+function makeModalHolderDraggable() {
+	$("#response-container").draggable({
+    stop:function(event,ui) {
+        var wrapper = $("#wrapper").offset();
+        var borderLeft = parseInt($("#wrapper").css("border-left-width"),10);
+        var borderTop = parseInt($("#wrapper").css("border-top-width"),10);
+        var pos = ui.helper.offset();
+        draggable_x = (pos.left - wrapper.left - borderLeft);
+        draggable_y = (pos.top - wrapper.top - borderTop - 65);
+        dragged = 1
+        html = $( "#modalHolder" ).html();
+        recreateModalHolder();
+        $( "#modalHolder" ).append( html );
+    }
+	});
+};
+
+function recreateModalHolder (){
+	if (dragged == 1){
+		$( "#response-container" ).remove();
+		div = "<div id='response-container' class='draggable-response-container'>"+
+					"<div id='cancelHolder'><i class='glyphicon glyphicon-remove' onclick='$("+'"#modalHolder"'+").parent().hide();\'></i></div>"+
+					"<div id='modalHolder' style='height: 100%; width: 100%;'></div>"+
+				"</div>";
+		$( ".container" ).append( div );
+		
+		$("#response-container").css({top: draggable_y, left: draggable_x, width: '600px', position:'absolute'});
+		$("#response-container").show();
+	}
+	makeModalHolderDraggable();
+}

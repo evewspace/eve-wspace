@@ -26,6 +26,7 @@ from django.contrib.auth.models import Permission
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.views.decorators.cache import cache_page
+from django.views.decorators.csrf import csrf_exempt
 from Map.models import *
 from Map import utils, signals
 from core.utils import get_config
@@ -74,7 +75,10 @@ def get_map(request, map_id):
 
 @login_required
 @require_map_permission(permission=1)
+@csrf_exempt
 def map_checkin(request, map_id):
+    if not request.is_ajax():
+        raise PermissionDenied
     # Initialize json return dict
     json_values = {}
     current_map = get_object_or_404(Map, pk=map_id)

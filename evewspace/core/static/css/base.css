@@ -1,55 +1,33 @@
-BODY
-{
-    background-color: #FFFFFF;
-}
-/* Base Div Settings */
-.header {}
+.draggable-response-container {
+    background-color: #464545;
+    border: 1px solid #fff;
+    border-radius: 5px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    margin-top: 63px;
+    margin-right: 2px;
+    display: none;
+    padding-bottom: 10px;
+    width: 600px
 
-.navdiv
-{
-	float:left;
-	width: 100%;
-	padding: 0px 0px 10px 0px;
-}
-
-.contenthead
-{
-	padding: 0;
-  padding-left: 30px;
 }
 
-.content
-{
-	clear: left;
-	padding: 0;
-  padding-left: 30px;
+#cancelHolder {
+	margin-left: 578px;
 }
 
-.footer
-{
-	text-align: center;
-	padding: 20px;
-	height: 1%;
-}
-.feedbackPanel
-{
-    margin-left: 400px;
-}
-.copyrightNotice
-{
-    font-size: 8pt;
-}
-body .modal
-{
-    width: 580px;
-    margin-left: -270px;
-}
-.stStatusHeader
-{
-    text-align: left;
-}
-.stFleetListing
-{
-    text-align: left;
+.panel-textbox {
+	width: 94%; 
+	margin-left: 3%; 
+	padding: 5px;
+	border-radius: 5px;
 }
 
+.input-margin {
+    margin-bottom: 5px;
+}
+
+.glyphicon {
+	cursor: pointer;	
+}
