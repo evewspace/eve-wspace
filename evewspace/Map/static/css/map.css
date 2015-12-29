@@ -11,10 +11,6 @@
     opacity: 0.5;
     filter: alpha(opacity = 50);
 }
-.center_text
-{
-    text-align:center;
-}
 .footer
 {
     margin-bottom: 150px;

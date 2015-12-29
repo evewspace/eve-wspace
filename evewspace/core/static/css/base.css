@@ -31,3 +31,12 @@
 .glyphicon {
 	cursor: pointer;	
 }
+
+.copyrightNotice {
+    font-size: 8pt;
+}
+
+.center_text
+{
+    text-align:center;
+}
