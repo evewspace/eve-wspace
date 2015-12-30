@@ -72,13 +72,9 @@ def get_map(request, map_id):
         template = 'map_combined.html'
     return TemplateResponse(request, template, context)
 
-
 @login_required
 @require_map_permission(permission=1)
-@csrf_exempt
 def map_checkin(request, map_id):
-    if not request.is_ajax():
-        raise PermissionDenied
     # Initialize json return dict
     json_values = {}
     current_map = get_object_or_404(Map, pk=map_id)
@@ -86,7 +82,8 @@ def map_checkin(request, map_id):
     # AJAX requests should post a JSON datetime called loadtime
     # back that we use to get recent logs.
     if 'loadtime' not in request.POST:
-        return JsonResponse(json.dumps({'error': "No loadtime"}), safe=False)
+        return HttpResponse(json.dumps({'error': "No loadtime"}),
+                            content_type="application/json")
     time_string = request.POST['loadtime']
 
     load_time = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S.%f")
@@ -99,11 +96,11 @@ def map_checkin(request, map_id):
     log_list = MapLog.objects.filter(timestamp__gt=load_time,
                                      visible=True,
                                      map=current_map)
+
     log_string = render_to_string('log_div.html', {'logs': log_list})
-     
     json_values.update({'logs': log_string})
 
-    return JsonResponse(json.dumps(json_values), safe=False) 
+    return HttpResponse(json.dumps(json_values), content_type="application/json")
 
 
 @login_required
