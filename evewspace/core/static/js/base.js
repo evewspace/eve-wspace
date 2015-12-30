@@ -117,7 +117,6 @@ function makeModalHolderDraggable() {
 	        dragged = 1
 	        html = $( "#modalHolder" ).html();
 	        form_values = buildRequestStringData(" #response-container ");
-	        console.log(form_values);
 	        recreateModalHolder();
 	        $( "#modalHolder" ).append( html );
 	        $.each(form_values, function(key, value) {
@@ -174,7 +173,8 @@ function buildRequestStringData(div_id) {
 	    text_val = text_val.replace(/\n/g, "\\n")
 					        .replace(/\r/g, "\\r")
 					        .replace(/\t/g, "\\t")
-					        .replace(/\f/g, "\\f");
+					        .replace(/\f/g, "\\f")
+					        .replace(/"/g, '\\"');
         requestString += ('{"name": "' + $(textareas[i]).attr('name') +'", "val":"' + text_val +'"},');
     }
     requestString = requestString.substring(0, requestString.length - 1);
