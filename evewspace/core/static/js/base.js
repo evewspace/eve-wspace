@@ -107,18 +107,32 @@ $(document).on("focus", ".towerAuto", function(){
 
 function makeModalHolderDraggable() {
 	$("#response-container").draggable({
-    stop:function(event,ui) {
-        var wrapper = $("#wrapper").offset();
-        var borderLeft = parseInt($("#wrapper").css("border-left-width"),10);
-        var borderTop = parseInt($("#wrapper").css("border-top-width"),10);
-        var pos = ui.helper.offset();
-        draggable_x = (pos.left - wrapper.left - borderLeft);
-        draggable_y = (pos.top - wrapper.top - borderTop - 65);
-        dragged = 1
-        html = $( "#modalHolder" ).html();
-        recreateModalHolder();
-        $( "#modalHolder" ).append( html );
-    }
+        stop:function(event,ui) {
+	        var wrapper = $("#wrapper").offset();
+	        var borderLeft = parseInt($("#wrapper").css("border-left-width"),10);
+	        var borderTop = parseInt($("#wrapper").css("border-top-width"),10);
+	        var pos = ui.helper.offset();
+	        draggable_x = (pos.left - wrapper.left - borderLeft);
+	        draggable_y = (pos.top - wrapper.top - borderTop - 65);
+	        dragged = 1
+	        html = $( "#modalHolder" ).html();
+	        form_values = buildRequestStringData(" #response-container ");
+	        console.log(form_values);
+	        recreateModalHolder();
+	        $( "#modalHolder" ).append( html );
+	        $.each(form_values, function(key, value) {
+		        if($('[name="'+value["name"]+'"]').attr('type') !== 'checkbox' && $('[name="'+value["name"]+'"]').attr('type') !== 'radio'){
+					$('[name="'+value["name"]+'"]').val(value["val"]);
+				}
+				else if ($('[name="'+value["name"]+'"]').attr('type') == 'checkbox')
+				{
+					$('[name="'+value["name"]+'"]').prop('checked', true);
+				}
+				else {
+					$('[name="'+value["name"]+'"][value="'+value["val"]+'"').prop('checked', true);
+				}
+        	});
+    	}
 	});
 };
 
@@ -135,4 +149,35 @@ function recreateModalHolder (){
 		$("#response-container").show();
 	}
 	makeModalHolderDraggable();
+}
+
+
+function buildRequestStringData(div_id) {
+    var requestString = "[";
+    selects = $(div_id).find('select');
+    inputs = $(div_id).find('input');
+    textareas = $(div_id).find('textarea');
+    for (var i = 0; i < selects.length; i++) {
+        requestString += ('{"name": "' + $(selects[i]).attr('name') +'", "val":"' +$(selects[i]).val() + '"},');
+    }
+    for (var i = 0; i < inputs.length; i++) {
+        if ($(inputs[i]).attr('type') !== 'checkbox' && $(inputs[i]).attr('type') !== 'radio') {
+            requestString += ('{"name": "' + $(inputs[i]).attr('name') +'", "val":"' + $(inputs[i]).val() +'"},');
+        } else {
+            if ($(inputs[i]).is(':checked')) {
+                requestString += ('{"name": "' + $(inputs[i]).attr('name') +'", "val":"' + $(inputs[i]).val() +'"},');
+            }
+        }
+    }
+    for (var i = 0; i < textareas.length; i++) {
+	    text_val = $(textareas[i]).val();
+	    text_val = text_val.replace(/\n/g, "\\n")
+					        .replace(/\r/g, "\\r")
+					        .replace(/\t/g, "\\t")
+					        .replace(/\f/g, "\\f");
+        requestString += ('{"name": "' + $(textareas[i]).attr('name') +'", "val":"' + text_val +'"},');
+    }
+    requestString = requestString.substring(0, requestString.length - 1);
+    requestString += "]";
+    return $.parseJSON(requestString);
 }
