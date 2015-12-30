@@ -350,8 +350,9 @@ def system_details(request, map_id, ms_id):
         raise PermissionDenied
     system = get_object_or_404(MapSystem, pk=ms_id)
     if system.system.sysclass == 99:
+        wormhole = get_object_or_404(Wormhole, bottom=ms_id)
         template = 'edit_unknown_system.html'
-        return render(request, template, {'ms_id': ms_id, 'system': system})
+        return render(request, template, {'ms_id': ms_id, 'system': system, 'wormhole': wormhole})
     template = 'system_details.html'
     if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
         template = 'system_details_combined.html'
@@ -836,10 +837,26 @@ def edit_system(request, map_id, ms_id):
 
     if request.method == 'POST':
         if map_system.system.sysclass == 99:
-           sysname = request.POST.get('systemName')
-           system = System.objects.get(name= sysname)
-           if system: 
-               map_system.system = system
+            sysname = request.POST.get('systemName')
+            system = System.objects.get(name= sysname)
+            wormhole = get_object_or_404(Wormhole, bottom=ms_id)
+                
+            wormhole.mass_status = int(request.POST.get('massStatus', 0))
+            wormhole.time_status = int(request.POST.get('timeStatus', 0))
+            wormhole.top_type = get_object_or_404(
+                WormholeType,
+                name=request.POST.get('topType', 'K162')
+            )
+            wormhole.bottom_type = get_object_or_404(
+                WormholeType,
+                name=request.POST.get('bottomType', 'K162')
+            )
+            wormhole.top_bubbled = request.POST.get('topBubbled', '1') == '1'
+            wormhole.bottom_bubbled = request.POST.get('bottomBubbled', '1') == '1'
+            wormhole.save()
+            
+            if system: 
+                map_system.system = system
         else:
             map_system.friendlyname = request.POST.get('friendlyName', '')
             map_system.system.info = request.POST.get('info', '')
