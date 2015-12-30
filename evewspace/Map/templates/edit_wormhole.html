@@ -26,7 +26,7 @@
         	</div>
         	<div style="padding-top: 30px" class="col-md-6 input-margin">
 		        Type: &nbsp;
-		        <input type="text" id="topType" class="editWormholeInput wormholeAuto" name="topType" value="{{wormhole.top_type.name}}">
+		        <input type="text" id="topType" class="editWormholeInput wormholeAuto input-sm form-control" name="topType" value="{{wormhole.top_type.name}}">
 		        <br />
 		        Bubbled: &nbsp; <input type="radio" class="editWormholeInput" name="topBubbled" value="0" {% if not wormhole.top_bubbled %} checked="checked" {% endif %}> No &nbsp;
 		        <input type="radio" class="editWormholeInput" name="topBubbled" value="1" {% if wormhole.top_bubbled %} checked="checked" {% endif %}> Yes
@@ -36,7 +36,7 @@
         	</div>
         	<div style="padding-top: 30px" class="col-md-6 input-margin">
 		        Type: &nbsp;
-		        <input type="text" id="bottomType" class="editWormholeInput wormholeAuto" name="bottomType" value="{{wormhole.bottom_type.name}}">
+		        <input type="text" id="bottomType" class="editWormholeInput wormholeAuto input-sm form-control" name="bottomType" value="{{wormhole.bottom_type.name}}">
 		        <br />
 		        Bubbled: &nbsp; <input type="radio" class="editWormholeInput" name="bottomBubbled" value="0" {% if not wormhole.bottom_bubbled %} checked="checked" {% endif %}> No &nbsp;
 		         <input type="radio" class="editWormholeInput" name="bottomBubbled" value="1" {% if wormhole.bottom_bubbled %} checked="checked" {% endif %}> Yes
