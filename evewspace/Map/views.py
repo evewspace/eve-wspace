@@ -347,6 +347,10 @@ def system_details(request, map_id, ms_id):
         raise PermissionDenied
     system = get_object_or_404(MapSystem, pk=ms_id)
     if system.system.sysclass == 99:
+        if request.is_igb_trusted:
+            current_system = System.objects.get(name=request.eve_systemname)
+        else:
+            current_system = ""
         wormhole = get_object_or_404(Wormhole, bottom=ms_id)
         template = 'edit_unknown_system.html'
         return render(request, template, {'ms_id': ms_id, 'system': system, 'wormhole': wormhole})
