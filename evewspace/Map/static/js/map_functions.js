@@ -785,6 +785,24 @@ function AddSystem() {
     });
 }
 
+function AddSystemFromSig(nr) {
+    var address = "system/new/";
+    var input = $('#sysAddFromSigForm' + nr).serialize();
+    $.ajax({
+        type: "POST",
+        url: address,
+        data: input,
+        success: function (data) {
+            setTimeout(function () {
+                RefreshMap();
+            }, 500);
+        },
+        error: function(e) {
+    		console.log(e);
+  		},
+    });
+}
+
 function BulkImport(msID) {
     var address = "system/" + msID + "/signatures/bulkadd/";
     $.ajax({

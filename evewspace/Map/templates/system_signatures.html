@@ -14,12 +14,27 @@
         title="{% if not sig.updated %}Not yet scanned!{% else %}Scanned {{sig.modified_time|naturaltime}} by {{sig.modified_by}}.{% endif %}">
         <td>{{ forloop.counter }}</td>
         <td>
-            <i class="glyphicon glyphicon-pencil" title="Edit" onclick="GetEditSignatureBox({{msID}}, {{sig.pk}});"></i> &nbsp;
-            <i class="glyphicon glyphicon-remove-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{msID}});"></i> &nbsp; 
+            <i class="glyphicon glyphicon-pencil" title="Edit" onclick="GetEditSignatureBox({{msID}}, {{sig.pk}});"></i>&nbsp;
+            <i class="glyphicon glyphicon-remove-circle" title="Delete" onclick="DeleteSignature({{sig.pk}}, {{msID}});"></i>&nbsp; 
             {% if sig.owned_by %}
-            <i class="glyphicon glyphicon-lock" title="Owned by {{sig.owned_by}}" onclick="OwnSignature({{msID}}, {{sig.pk}});"></i>
+            <i class="glyphicon glyphicon-lock" title="Owned by {{sig.owned_by}}" onclick="OwnSignature({{msID}}, {{sig.pk}});"></i>&nbsp; 
             {% else %}
-            <i class="glyphicon glyphicon-star-empty" title="Not Owned (Click to Own)" onclick="OwnSignature({{msID}}, {{sig.pk}});"></i>
+            <i class="glyphicon glyphicon-star-empty" title="Not Owned (Click to Own)" onclick="OwnSignature({{msID}}, {{sig.pk}});"></i>&nbsp; 
+            {% endif %}
+            {% if sig.sigtype.shortname == "WH" %}
+            <i class="glyphicon glyphicon-plus" title="Add System" onclick="AddSystemFromSig({{forloop.counter}});"></i>
+            <form id="sysAddFromSigForm{{forloop.counter}}">
+            {% csrf_token %}
+            <input type="hidden" class="sysAddInput" name="topMsID" value="{{msID}}">
+            <input type="hidden" name="bottomSystem" id="sysNameBox" value ="Unknown" />
+            <input type="hidden" name="friendlyName" id="friendlyNameBox" value="{{sig.info}}">
+            <input type="hidden" id="timeStatusAnchor" name="timeStatus" value="0">
+            <input type="hidden" id="massStatusAnchor" name="massStatus" value="0">
+            <input type="hidden" id="topTypeInput" name="topType" value="K162" />
+            <input type="hidden" class="sysAddInput" name="topBubbled" id="topBubbledCheckbox" value="0">
+            <input type="hidden" id="bottomTypeInput" name="bottomType" value="K162" />
+            <input type="hidden" id="bottomBubbledCheckbox" name="bottomBubbled" value="0">
+            </form>
             {% endif %}
         </td>
             <td><span class="signatureID sig{{sig.sigtype.shortname}}">{{sig.sigid}}</span></td>
