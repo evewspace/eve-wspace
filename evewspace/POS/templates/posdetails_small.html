@@ -1,6 +1,6 @@
 <li id="pos{{pos.pk}}" class="posListItem">
 	<div class="poslist_header" style="position:relative; text-align: left;">
-        <i class="glyphicon glyphicon-chevron-down" data-toggle="collapse" data-target="#pos{{pos.pk}}Details" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="48" width="48" src="http://image.eveonline.com/Render/{{pos.towertype.pk}}_128.png"></img>
+        <i class="glyphicon glyphicon-chevron-down" data-toggle="collapse" data-target="#pos{{pos.pk}}Details" style="cursor: pointer;" title="Click to expand / collapse"></i> <img height="48" width="48" src="https://image.eveonline.com/Render/{{pos.towertype.pk}}_128.png"></img>
         <span class="planetlabel">Planet: </span>
         <span class="planetno"><strong>{{pos.planet}}</strong></span>
 		<span class="moonlabel">Moon: </span>
@@ -54,9 +54,9 @@
     <div id="pos{{pos.pk}}Details" class="poslist_main collapse" style="text-align: left;">
         <div class="poslist_info">
             <h5 style="text-align: left;">Owner: </h5>
-            <img src="http://image.eveonline.com/Corporation/{{pos.corporation.id}}_32.png" ></img> &nbsp
+            <img src="https://image.eveonline.com/Corporation/{{pos.corporation.id}}_32.png" ></img> &nbsp
             {% if pos.corporation.alliance %}
-            <img src="http://image.eveonline.com/Alliance/{{pos.corporation.alliance.id}}_32.png"></img>
+            <img src="https://image.eveonline.com/Alliance/{{pos.corporation.alliance.id}}_32.png"></img>
             {% endif %}
             <br />
             <span class="poslist_corplabel">Corp: </span>
