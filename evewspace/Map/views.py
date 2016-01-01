@@ -68,8 +68,6 @@ def get_map(request, map_id):
         'access': current_map.get_permission(request.user),
     }
     template = 'map.html'
-    if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
-        template = 'map_combined.html'
     return TemplateResponse(request, template, context)
 
 @login_required
