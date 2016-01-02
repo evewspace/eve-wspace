@@ -368,3 +368,20 @@ ul#moveDropdown li {
 .content {
   padding-top: 0;
 }
+
+#slider {
+	width: 200px;
+	float: left;
+	margin-top: 5px;
+	margin-left: 5px;	
+}
+.ui-widget-content {
+    background: #375a7f;
+    border: 0px;
+}
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active {
+    background: #ffffff;
+    border: 0px;	
+}
