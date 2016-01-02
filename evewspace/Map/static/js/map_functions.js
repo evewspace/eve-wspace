@@ -108,6 +108,16 @@ $(document).ready(function () {
     $('#mapDiv').html(ajax_image);
     scale(scalingFactor);
     
+    $( "#slider" ).slider({
+      value:1,
+      min: 0,
+      max: 2,
+      step: 0.1,
+      slide: function( event, ui ) {
+        scale(ui.value);
+      }
+    });
+    
     updateTimerID = setInterval(doMapAjaxCheckin, 5000);
 
     if (autoRefresh === true) {
