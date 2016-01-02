@@ -522,7 +522,7 @@ function AddPOS(msID) {
         data: $('#addPOSForm').serialize(),
         success: function (data) {
             GetPOSList(msID);
-            $('#modalHolder').show();
+            $('#modalHolder').parent().hide();
             btnAddPOS.html('Add POS');
             btnAddPOS.removeClass('disabled');
         },
