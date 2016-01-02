@@ -282,6 +282,11 @@ def add_system(request, map_id):
         # Add Wormhole
         bottom_ms.connect_to(top_ms, top_type, bottom_type, top_bubbled,
                              bottom_bubbled, time_status, mass_status)
+
+        # delete old signatures
+        if int(get_config("MAP_AUTODELETE_SIGS", request.user).value) == 1:
+            bottom_ms.delete_old_sigs(request.user)
+
         current_map.clear_caches()
         return HttpResponse()
     except ObjectDoesNotExist:
@@ -678,7 +683,7 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
                                      'system': map_system,
                                      'sig': signature})
     form = SignatureForm()
-    if sig_id is None or action == 'Updated':
+    if sig_id is None or action == 'Updated' or action == 'Scanned':
         return TemplateResponse(request, "add_sig_form.html",
                                 {'form': form, 'system': map_system})
     else:
@@ -1001,6 +1006,8 @@ def general_settings(request):
     interest_time = get_config("MAP_INTEREST_TIME", None)
     escalation_burn = get_config("MAP_ESCALATION_BURN", None)
     advanced_logging = get_config("MAP_ADVANCED_LOGGING", None)
+    autodelete_sigs = get_config("MAP_AUTODELETE_SIGS", None)
+    autodelete_days = get_config("MAP_AUTODELETE_DAYS", None)
     if request.method == "POST":
         scan_threshold.value = int(request.POST['scanwarn'])
         interest_time.value = int(request.POST['interesttimeout'])
@@ -1008,12 +1015,16 @@ def general_settings(request):
         npc_threshold.value = int(request.POST['npcthreshold'])
         escalation_burn.value = int(request.POST['escdowntimes'])
         advanced_logging.value = int(request.POST['advlogging'])
+        autodelete_sigs.value = int(request.POST['autodelsigs'])
+        autodelete_days.value = int(request.POST['autodeldays'])
         scan_threshold.save()
         interest_time.save()
         pvp_threshold.save()
         npc_threshold.save()
         escalation_burn.save()
         advanced_logging.save()
+        autodelete_sigs.save()
+        autodelete_days.save()
         return HttpResponse()
     return TemplateResponse(
         request, 'general_settings.html',
@@ -1022,7 +1033,9 @@ def general_settings(request):
          'scanwarn': scan_threshold.value,
          'interesttimeout': interest_time.value,
          'escdowntimes': escalation_burn.value,
-         'advlogging': advanced_logging.value}
+         'advlogging': advanced_logging.value,
+         'autodelsigs': autodelete_sigs.value,
+         'autodeldays': autodelete_days.value}
     )
 
 

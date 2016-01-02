@@ -1,5 +1,6 @@
 {% load humanize %}
 {% include 'system_menu.html' %}
+<h4 class="sysInfoSysname">{{ mapsys.system.name }}</h4>
 <ul class="nav nav-pills" id="sysInfoTab">
     <li class="active"><a href="#sysDetails" data-toggle='tab'>Details</a></li>
     <li><a href="#sigsPanel" data-toggle='tab'>Signatures ({{mapsys.system.signatures.count}})</a></li>
@@ -12,16 +13,16 @@
     <h4>{% if can_edit %}<i title="Edit Info" class="icon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %}System Details: {{mapsys.system.name}} </h4>
     {% if mapsys.friendlyname %}
     <div class="mapSysInfo">
-        <h5 class="friendlyName"> Friendly Name: <small>{{mapsys.friendlyname}}</small> </h5> 
+        <h5 class="friendlyName"> Friendly Name: <small>{{mapsys.friendlyname}}</small> </h5>
     </div>
     {% endif %}
     <div class="sysClassSpan">
         {% if system.is_wspace %}
-        <div class="span2"> 
-            <strong>Class: {{system.sysclass}}</strong>
+        <div class="span2">
+            <strong>Class: <span id="sysClass">{{system.sysclass}}</span></strong>
         </div>
         <div class="span2">
-            <strong>Effect: {{system.effect}}</strong>
+            <strong>Effect: <span id="sysEffect">{{system.effect}}</span></strong>
         </div>
         <div class="span2">
             <strong>Probable Statics:
@@ -30,7 +31,7 @@
                 {% else %}
                 <span title="Time: {{system.static1.lifetime}}H &nbsp Mass: {{system.static1.maxmass|intcomma}}kg &nbsp Jump Mass: {{system.static1.jumpmass|intcomma}}kg">
                     {{system.static1}} ({{system.static1.dest_string}})
-            </span> 
+            </span>
             {% if system.static2 %}
             <span title="Time: {{system.static2.lifetime}}H &nbsp Mass: {{system.static2.maxmass|intcomma}}kg &nbsp Jump Mass: {{system.static2.jumpmass|intcomma}}">
                 {{system.static2}} ({{system.static2.dest_string}})
@@ -40,13 +41,13 @@
         </strong>
         </div>
         {% endif %}
-        {% if system.sysclass = 7 %}
+        {% if system.sysclass == 7 %}
         High Sec
         {% endif %}
-        {% if system.sysclass = 8 %}
+        {% if system.sysclass == 8 %}
         Low Sec
         {% endif %}
-        {% if system.sysclass = 9 %}
+        {% if system.sysclass == 9 %}
         Null Sec
         {% endif %}
         {% if system.is_kspace and is_igb %}
@@ -68,11 +69,11 @@
     <div class="detailsLeft">
     {% if system.occupied or system.poses.all %}
     <div class="occupiedDiv label label-important">
-        <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|linebreaks}}</p>
+        <span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|linebreaks}}
         Towers:
         <ul>
             {% for pos in system.poses.all %}
-            <li>P:{{pos.planet}} &nbsp;M: {{pos.moon}} - {{pos.towertype.name}} - {{pos.corporation.name}} - 
+            <li>P:{{pos.planet}} &nbsp;M: {{pos.moon}} - {{pos.towertype.name}} - {{pos.corporation.name}} -
                 {% if pos.status == 0 %}
 	            <span class="label label-info">Status: UNANCHORED</span>
 	           	{% endif %}
@@ -117,26 +118,25 @@
         </div>
         {% endif %}
     </div>
-     
+
 </div>
 </div>
   <div id="sigsPanel" class="sigsPanel tab-pane">
-            <div id="sigAddPanel" class"sigAddPanel">
+            <div id="sigAddPanel" class="sigAddPanel">
                 <div style="margin-bottom: 10px; text-align: center;">
-                    <h4>Signatures: {{system.name}}</h4>
                     {% if can_edit %}
-                    <form id="bulkSigForm" class="bulkSigForm" method="post" action="system/{{mapsys.pk}}/signatures/bulkadd/">
-                        <textarea id="pasteField" rows="4" name="paste"></textarea>
-                        <a href="#" id="btnImport" class="btn"><i class="icon-download"></i> Bulk Import</a>
-                    </form>
-                    <button id="btnPurgeSigs" class="btn btn-danger">Purge Signatures</button>
-                    <button id="btnReallyPurgeSigs" class="btn btn-warning" style="display: none;"  onclick="PurgeSignatures({{mapsys.pk}});">Really Purge?</button>
+                    <button id="btnPurgeSigs" class="btn btn-danger">Purge</button>
+                    <button id="btnReallyPurgeSigs" class="btn btn-warning" style="display: none;"  onclick="PurgeSignatures({{mapsys.pk}});">Really<br/>Purge?</button>
                     <script type="text/javascript">
-                        $('#btnPurgeSigs').click(function(){
-                                $('#btnReallyPurgeSigs').show();
-                                $('#btnPurgeSigs').hide();
-                                });
+                        $('#btnPurgeSigs').click(function() {
+                            $('#btnReallyPurgeSigs').show();
+                            $('#btnPurgeSigs').hide();
+                        });
                     </script>
+                    <form id="bulkSigForm" class="bulkSigForm" method="post" action="system/{{mapsys.pk}}/signatures/bulkadd/">
+                        <textarea id="pasteField" name="paste"></textarea>
+                        <a href="#" id="btnImport" class="btn"><i class="icon-download"></i> Import</a>
+                    </form>
                     {% endif %}
 
                 </div>
@@ -167,7 +167,7 @@
             </table>
         </div>
     </div>
-        {% load poslist %}    
+        {% load poslist %}
     <div id="systemPosPanel" class="systemPosPanel tab-pane">
         <div style="text-align: center; margin-bottom: 10px;">
             <h4>Starbases: {{system.name}}</h4>
@@ -179,4 +179,3 @@
         </div>
     </div>
 </div>
-</script>

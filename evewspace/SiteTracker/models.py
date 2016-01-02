@@ -61,7 +61,7 @@ class Fleet(models.Model):
         """
         # Get the fleet member weighting variable and multiplier
         x = float(get_config("ST_SIZE_WEIGHT", None).value)
-        n = self.members.count()
+        n = self.members.filter(leavetime=None).count()
         if x > 1:
             weight_factor = x / float(n + (x - 1))
         else:
@@ -73,7 +73,7 @@ class Fleet(models.Model):
         raw_points = SiteWeight.objects.get(site_type=site_type,
                 sysclass=system.sysclass).raw_points
         site = SiteRecord(fleet=self, site_type=site_type, system=system,
-                boss=boss, fleetsize=self.members.count(),
+                boss=boss, fleetsize=self.members.filter(leavetime=None).count(),
                 raw_points=raw_points,
                 weighted_points = raw_points * weight_factor)
         site.save()
@@ -215,6 +215,16 @@ class UserSite(models.Model):
         """
         Mark the site approved.
         """
+        new_fleetsize = self.site.fleetsize + 1
+        x = float(get_config("ST_SIZE_WEIGHT", None).value)
+        n = new_fleetsize
+        if x > 1:
+            weight_factor = x / float(n + (x - 1))
+        else:
+            weight_factor = float(1)
+        self.site.fleetsize = new_fleetsize
+        self.site.weighted_points = self.site.raw_points * weight_factor
+        self.site.save()
         self.pending = False
         self.save()
 

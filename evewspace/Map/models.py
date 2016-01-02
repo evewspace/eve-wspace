@@ -608,6 +608,16 @@ class MapSystem(models.Model):
                 break
         return distance
 
+    def delete_old_sigs(self, user):
+        delete_threshold = int(get_config("MAP_AUTODELETE_DAYS", user).value)
+        for sig in self.system.signatures.all():
+            now = datetime.now(pytz.utc)
+            if (sig.sigtype and sig.sigtype.shortname == 'WH' and
+                    sig.modified_time < (now - timedelta(days=2))):
+                sig.delete(user, self)
+            elif sig.modified_time < (now - timedelta(days=delete_threshold)):
+                sig.delete(user, self)
+
 
 class Wormhole(models.Model):
     """An instance of a wormhole in a  map.

@@ -19,11 +19,11 @@
     {% endif %}
     <div class="sysClassSpan">
         {% if system.is_wspace %}
-        <div class="span2"> 
-            <strong>Class: {{system.sysclass}}</strong>
+        <div class="span2">
+            <strong>Class: <span id="sysClass">{{system.sysclass}}</span></strong>
         </div>
         <div class="span2">
-            <strong>Effect: {{system.effect}}</strong>
+            <strong>Effect: <span id="sysEffect">{{system.effect}}</span></strong>
         </div>
         <div class="span2">
             <strong>Probable Statics:
@@ -136,9 +136,9 @@
                     <button id="btnReallyPurgeSigs" class="btn btn-warning" style="display: none;"  onclick="PurgeSignatures({{mapsys.pk}});">Really Purge?</button>
                     <script type="text/javascript">
                         $('#btnPurgeSigs').click(function(){
-                                $('#btnReallyPurgeSigs').show();
-                                $('#btnPurgeSigs').hide();
-                                });
+                            $('#btnReallyPurgeSigs').show();
+                            $('#btnPurgeSigs').hide();
+                        });
                     </script>
                     {% endif %}
 
