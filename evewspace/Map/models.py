@@ -799,12 +799,11 @@ class Signature(models.Model):
         COL_DISTANCE = 5
         info = row[COL_SIG_TYPE]
         sig_type = None
-        updated = None
         action = "None"
 
         if wascreated:
             # new sig
-            updated = False
+            self.updated = False
             action = "Created"
 
         # Is there a valid signature type from pasted data - is it valid?
@@ -817,6 +816,7 @@ class Signature(models.Model):
                     row[COL_SIG_GROUP])
                 sig_type = SignatureType.objects.get(
                     longname=sig_type_name)
+                self.updated = True
             except:
                 sig_type = None
         else:
@@ -839,8 +839,6 @@ class Signature(models.Model):
                         action = "Scanned"
         if action != "None":
             self.log_sig(user, action, map_system)
-
-        self.update()
 
         # is this still necessary?
         if self.info is None:
