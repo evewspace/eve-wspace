@@ -1095,6 +1095,7 @@ def _process_user_display_settings(request, user):
     kspace_mapping = get_config('MAP_KSPACE_MAPPING', user)
     silent_mapping = get_config("MAP_SILENT_MAPPING", user)
     render_collapsed = get_config("MAP_RENDER_COLLAPSED", user)
+    scaling_factor = get_config("MAP_SCALING_FACTOR", user)
 
     # Create seperate configs for the user if they are falling back to defaults
     if not zen_mode.user:
@@ -1115,6 +1116,8 @@ def _process_user_display_settings(request, user):
         silent_mapping = ConfigEntry(name=silent_mapping.name, user=user)
     if not render_collapsed.user:
         render_collapsed = ConfigEntry(name=render_collapsed.name, user=user)
+    if not scaling_factor.user:
+        scaling_factor = ConfigEntry(name=scaling_factor.name, user=user)
     zen_mode.value = request.POST.get('zen_mode', 0)
     pilot_list.value = request.POST.get('pilot_list', 0)
     details_combined.value = request.POST.get('details_combined', 0)
@@ -1124,6 +1127,7 @@ def _process_user_display_settings(request, user):
     kspace_mapping.value = request.POST.get('kspace_mapping', 0)
     silent_mapping.value = request.POST.get('silent_mapping', 0)
     render_collapsed.value = request.POST.get('render_collapsed', 0)
+    scaling_factor.value = request.POST.get('scaling_factor', 1)
     zen_mode.save()
     pilot_list.save()
     details_combined.save()
@@ -1133,6 +1137,7 @@ def _process_user_display_settings(request, user):
     kspace_mapping.save()
     silent_mapping.save()
     render_collapsed.save()
+    scaling_factor.save()
 
     saved = True
 
@@ -1143,6 +1148,7 @@ def _process_user_display_settings(request, user):
             'pilot_list': pilot_list.value,
             'details_combined': details_combined.value,
             'render_tags': render_tags.value,
+            'scaling_factor': scaling_factor.value,
             'highlight_active': highlight_active.value,
             'auto_refresh': auto_refresh.value,
             'kspace_mapping': kspace_mapping.value,

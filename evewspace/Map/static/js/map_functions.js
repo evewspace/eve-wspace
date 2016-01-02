@@ -108,8 +108,8 @@ $(document).ready(function () {
     $('#mapDiv').html(ajax_image);
     scale(scalingFactor);
     
-    $( "#slider" ).slider({
-      value:1,
+    $( ".slider" ).slider({
+      value: scalingFactor,
       min: 0,
       max: 2,
       step: 0.1,
