@@ -74,7 +74,7 @@ function STPromoteMember(fleetID, memberID){
         url: "/sitetracker/fleet/" + fleetID + "/member/" + memberID + "/promote/",
         success: function(){
             ReloadSTBar();
-            $('#modalHolder').modal('hide');
+            $('#modalHolder').parent().hide();
         }
     });
 
@@ -96,9 +96,9 @@ function STBossPanel(fleetID){
         type: "GET",
         url: "/sitetracker/fleet/" + fleetID + "/bosspanel/",
         success: function(data){
-            $('#modalHolder').empty();
+            recreateModalHolder();
             $('#modalHolder').html(data);
-            $('#modalHolder').modal('show');
+            $('#modalHolder').parent().show();
         }
     });
 }
@@ -108,7 +108,7 @@ function STDisbandFleet(fleetID){
         type: "POST",
         url: "/sitetracker/fleet/" + fleetID + "/disband/",
         success: function(data){
-            $('#modalHolder').modal('hide');
+            $('#modalHolder').parent().hide();
             $('#modalHolder').empty();
             ReloadSTBar();
         }

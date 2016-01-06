@@ -8,7 +8,7 @@
         <div id="apiKeyFormHolder">
         </div>
 
-        <table class="table table-hover table-bordered">
+        <table class="table table-condensed table-hover table-bordered">
             <tr>
                 <th>Key ID</th>
                 <th>Access</th>
@@ -29,8 +29,8 @@
                 </td>
                 <td><span title="{{key.validation_error}}">{% if key.valid %} Yes {% else %} No {% endif %}</span></td>
                 <td>
-                    <button class="btn-small btn-danger" onclick="APIDeleteKey({{key.keyid}});">Delete</button>
-                    <button class="btn-small btn-success" onclick="APIEditKey({{key.keyid}});">Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="APIDeleteKey({{key.keyid}});">Delete</button>
+                    <button class="btn btn-sm btn-success" onclick="APIEditKey({{key.keyid}});">Edit</button>
                 </td>
             </tr>
             {% empty %}

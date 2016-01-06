@@ -81,7 +81,9 @@ class MapJSONGenerator(object):
         pvp_threshold = self.pvp_threshold
         npc_threshold = self.npc_threshold
         static_prefix = "%s" % (settings.STATIC_URL + "images/")
-
+        if system.system.sysclass == 99:
+            return static_prefix + "scan.png"
+        
         if system.system.stfleets.filter(ended__isnull=True).exists():
             return static_prefix + "farm.png"
 

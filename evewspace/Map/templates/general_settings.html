@@ -1,24 +1,24 @@
-<form id="mapGeneralSettingsForm" class="settingsForm" action="/map/settings/general/" method="post">
+<form id="mapGeneralSettingsForm" class="settingsForm form-group" action="/map/settings/general/" method="post">
     <table>
         <tr>
-            <td>Last Scanned Warning Threshold (hours):</td>
-            <td><input type="text" class="input-mini" name="scanwarn" value="{{scanwarn}}"></td>
+            <td>Last Scanned Warning Threshold (hours):&nbsp;</td>
+            <td><input type="text" class="input-sm form-control input-margin" name="scanwarn" value="{{scanwarn}}"></td>
         </tr>
         <tr>
             <td>System Interest Timeout (minutes):</td> 
-            <td><input type="text" class="input-mini" name="interesttimeout" value="{{interesttimeout}}"></td>
+            <td><input type="text" class="input-sm form-control input-margin" name="interesttimeout" value="{{interesttimeout}}"></td>
         </tr>
         <tr>
             <td>NPC Kills Threshold:</td>
-            <td> <input type="text" class="input-mini" name="npcthreshold" value="{{npcthreshold}}"></td>
+            <td> <input type="text" class="input-sm form-control input-margin" name="npcthreshold" value="{{npcthreshold}}"></td>
         </tr>
         <tr>
             <td>PVP Kills Threshold (ships + pods):</td>
-            <td> <input type="text" class="input-mini" name="pvpthreshold" value="{{pvpthreshold}}"></td>
+            <td> <input type="text" class="input-sm form-control input-margin" name="pvpthreshold" value="{{pvpthreshold}}"></td>
         </tr>
         <tr>
             <td>Downtimes before Burning Escalation:</td>
-            <td> <input type="text" class="input-mini" name="escdowntimes" value="{{escdowntimes}}"></td>
+            <td> <input type="text" class="input-sm form-control input-margin" name="escdowntimes" value="{{escdowntimes}}"></td>
         </tr>
         <tr>
             <td>Advanced Logging:</td>
@@ -36,11 +36,11 @@
         </tr>
         <tr>
             <td>Autodelete Threshold (days):</td>
-            <td><input type="text" class="input-mini" name="autodeldays" value="{{autodeldays}}"></td>
+            <td><input type="text" class="input-sm form-control input-margin" name="autodeldays" value="{{autodeldays}}"></td>
         </tr>
     </table>
     <br />
-    <input type="submit" class="btn btn-primary" value="Save Changes">
+    <input type="submit" class="btn btn-primary btn-sm" value="Save Changes">
 </form>
 <script type="text/javascript">
     $('#mapGeneralSettingsForm').submit(function(e){

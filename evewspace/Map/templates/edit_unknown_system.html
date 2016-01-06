@@ -1,0 +1,74 @@
+<div id="editSystemDialog">
+    <div class="modal-body" style="width: 600px">
+        <form id="editSystemForm" class="editSystemForm form-horizontal" method="post" action="system/{{system.pk}}/edit/">
+            {% csrf_token %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="form-group">
+                        <div class="col-md-6 input-margin">
+                            <h4>System name{% if system.friendlyname %} for {{system.friendlyname}} {% endif %}:</h4>
+                        </div>
+                        <div class="col-md-6 input-margin">
+                            <input type="text" id="sysNameBox" class="sysAddInput systemAuto form-control input-sm" name="systemName" value="{{current_system.name}}">
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-md-6 input-margin">
+                            Time Status: &nbsp;
+                        </div>
+                        <div class="col-md-6 input-margin">
+                            <label for="timeStatusNormal"><input id="timeStatusNormal" type="radio" class="editWormholeInput" name="timeStatus" value="0" {% if wormhole.time_status == 0 %} checked="checked" {% endif %}> Normal</label> <br />
+                            <label for="timeStatusEol"><input id="timeStatusEol" type="radio" class="editWormholeInput" name="timeStatus" value="1" {% if wormhole.time_status == 1 %} checked="checked" {% endif %}> End of Life</label>
+                        </div>
+                        <div class="col-md-6 input-margin">
+                            Mass Status: &nbsp;
+                        </div>
+                        <div class="col-md-6 input-margin">
+                            <label for="massStatusNormal"><input id="massStatusNormal" type="radio" class="editWormholeInput" name="massStatus" value="0" {% if wormhole.mass_status == 0 %} checked="checked" {% endif %}> Normal</label> <br />
+                            <label for="massStatusReduced"><input id="massStatusReduced" type="radio" class="editWormholeInput" name="massStatus" value="1" {% if wormhole.mass_status == 1 %} checked="checked" {% endif %}> First Shrink</label> <br />
+                            <label for="massStatusCritical"><input id="massStatusCritical" type="radio" class="editWormholeInput" name="massStatus" value="2" {% if wormhole.mass_status == 2 %} checked="checked" {% endif %}> Critical</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6 input-margin">
+                            Wormhole in: {{wormhole.top.system.name}}
+                        </div>
+                        <div class="col-md-6 input-margin">
+                            Type: &nbsp;
+                            <input type="text" id="topType" class="editWormholeInput wormholeAuto input-sm form-control" name="topType" value="{{wormhole.top_type.name}}">
+                            <br />
+                            Bubbled: &nbsp; <input type="radio" class="editWormholeInput" name="topBubbled" value="0" {% if not wormhole.top_bubbled %} checked="checked" {% endif %}> No &nbsp;
+                            <input type="radio" class="editWormholeInput" name="topBubbled" value="1" {% if wormhole.top_bubbled %} checked="checked" {% endif %}> Yes
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-6 input-margin">
+                            Wormhole in: {{wormhole.bottom.system.name}}
+                        </div>
+                        <div class="col-md-6 input-margin">
+                            Type: &nbsp;
+                            <input type="text" id="bottomType" class="editWormholeInput wormholeAuto input-sm form-control" name="bottomType" value="{{wormhole.bottom_type.name}}">
+                            <br />
+                            Bubbled: &nbsp; <input type="radio" class="editWormholeInput" name="bottomBubbled" value="0" {% if not wormhole.bottom_bubbled %} checked="checked" {% endif %}> No &nbsp;
+                            <input type="radio" class="editWormholeInput" name="bottomBubbled" value="1" {% if wormhole.bottom_bubbled %} checked="checked" {% endif %}> Yes
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <input type="submit" style="display: none;">
+        <a href="#" class="btn btn-primary" id="editUnknownSystem">Update</a>
+    </div>
+    <script type="text/javascript">
+      $('#editSystemForm').submit(function(e){
+        e.preventDefault();
+        EditSystem({{system.pk}}, 0);
+        return false;
+        });
+      $('#editUnknownSystem').click(function(e){
+        EditSystem({{system.pk}}, 0);
+        });
+    </script>
+</div>

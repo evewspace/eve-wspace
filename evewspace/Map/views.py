@@ -16,7 +16,7 @@ import json
 import csv
 
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
-from django.http import Http404, HttpResponseRedirect, HttpResponse
+from django.http import Http404, HttpResponseRedirect, HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
@@ -26,6 +26,7 @@ from django.contrib.auth.models import Permission
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.views.decorators.cache import cache_page
+from django.views.decorators.csrf import csrf_exempt
 from Map.models import *
 from Map import utils, signals
 from core.utils import get_config
@@ -67,10 +68,7 @@ def get_map(request, map_id):
         'access': current_map.get_permission(request.user),
     }
     template = 'map.html'
-    if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
-        template = 'map_combined.html'
     return TemplateResponse(request, template, context)
-
 
 @login_required
 @require_map_permission(permission=1)
@@ -83,7 +81,7 @@ def map_checkin(request, map_id):
     # back that we use to get recent logs.
     if 'loadtime' not in request.POST:
         return HttpResponse(json.dumps({'error': "No loadtime"}),
-                            mimetype="application/json")
+                            content_type="application/json")
     time_string = request.POST['loadtime']
 
     load_time = datetime.strptime(time_string, "%Y-%m-%d %H:%M:%S.%f")
@@ -100,7 +98,7 @@ def map_checkin(request, map_id):
     log_string = render_to_string('log_div.html', {'logs': log_list})
     json_values.update({'logs': log_string})
 
-    return HttpResponse(json.dumps(json_values), mimetype="application/json")
+    return HttpResponse(json.dumps(json_values), content_type="application/json")
 
 
 @login_required
@@ -255,9 +253,24 @@ def add_system(request, map_id):
         # Prepare data
         current_map = Map.objects.get(pk=map_id)
         top_ms = MapSystem.objects.get(pk=request.POST.get('topMsID'))
-        bottom_sys = System.objects.get(
-            name=request.POST.get('bottomSystem')
-        )
+        if request.POST.get('bottomSystem') == "Unknown":
+            bottom_sys, created = System.objects.get_or_create(
+                id=99999999, defaults={"name":"Unknown",
+                "id": int(99999999), 
+                "constellation_id": int(10000001), 
+                "region_id": int(20000001), 
+                "x": float(0), 
+                "y": float(0), 
+                "z": float(0), 
+                "security": float(0.0),
+                "sysclass": int(99)
+                
+                }
+            )
+        else:
+            bottom_sys = System.objects.get(
+                name=request.POST.get('bottomSystem')
+            )
         top_type = WormholeType.objects.get(
             name=request.POST.get('topType')
         )
@@ -330,6 +343,15 @@ def system_details(request, map_id, ms_id):
     """
     if not request.is_ajax():
         raise PermissionDenied
+    system = get_object_or_404(MapSystem, pk=ms_id)
+    if system.system.sysclass == 99:
+        if request.is_igb_trusted:
+            current_system = System.objects.get(name=request.eve_systemname)
+        else:
+            current_system = ""
+        wormhole = get_object_or_404(Wormhole, bottom=ms_id)
+        template = 'edit_unknown_system.html'
+        return render(request, template, {'ms_id': ms_id, 'system': system, 'wormhole': wormhole})
     template = 'system_details.html'
     if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
         template = 'system_details_combined.html'
@@ -461,7 +483,7 @@ def set_importance(request, map_id, ms_id):
     """
     if request.is_ajax():
         map_system = get_object_or_404(MapSystem, pk=ms_id)
-        imp = int(request.REQUEST.get('importance', 0))
+        imp = int(request.POST.get('importance', 0))
         if 0 <= imp <= 2:
             map_system.system.importance = imp
             map_system.system.save()
@@ -696,19 +718,21 @@ def edit_signature(request, map_id, ms_id, sig_id=None):
 @login_required()
 @require_map_permission(permission=1)
 @cache_page(1)
-def get_signature_list(request, map_id, ms_id):
+def get_signature_list(request, map_id, ms_id, sys_id):
     """
     Determines the proper escalationThreshold time and renders
     system_signatures.html
     """
     if not request.is_ajax():
         raise PermissionDenied
-    system = get_object_or_404(MapSystem, pk=ms_id)
+    signatures = Signature.objects.select_related('sigtype','owned_by','modified_by').filter(system_id=sys_id).all()
     escalation_downtimes = int(get_config("MAP_ESCALATION_BURN",
                                           request.user).value)
     return TemplateResponse(request, "system_signatures.html",
-                            {'system': system,
-                             'downtimes': escalation_downtimes})
+                            {'signatures': signatures,
+                             'downtimes': escalation_downtimes,
+                             'sysID': sys_id,
+                             'msID': ms_id})
 
 
 # noinspection PyUnusedLocal
@@ -811,11 +835,33 @@ def edit_system(request, map_id, ms_id):
                                  'occupied': occupied, 'info': info})
 
     if request.method == 'POST':
-        map_system.friendlyname = request.POST.get('friendlyName', '')
-        map_system.system.info = request.POST.get('info', '')
-        map_system.system.occupied = request.POST.get('occupied', '')
-        map_system.system.importance = request.POST.get('importance', '0')
-        map_system.system.save()
+        if map_system.system.sysclass == 99:
+            sysname = request.POST.get('systemName')
+            system = System.objects.get(name= sysname)
+            wormhole = get_object_or_404(Wormhole, bottom=ms_id)
+                
+            wormhole.mass_status = int(request.POST.get('massStatus', 0))
+            wormhole.time_status = int(request.POST.get('timeStatus', 0))
+            wormhole.top_type = get_object_or_404(
+                WormholeType,
+                name=request.POST.get('topType', 'K162')
+            )
+            wormhole.bottom_type = get_object_or_404(
+                WormholeType,
+                name=request.POST.get('bottomType', 'K162')
+            )
+            wormhole.top_bubbled = request.POST.get('topBubbled', '1') == '1'
+            wormhole.bottom_bubbled = request.POST.get('bottomBubbled', '1') == '1'
+            wormhole.save()
+            
+            if system: 
+                map_system.system = system
+        else:
+            map_system.friendlyname = request.POST.get('friendlyName', '')
+            map_system.system.info = request.POST.get('info', '')
+            map_system.system.occupied = request.POST.get('occupied', '')
+            map_system.system.importance = request.POST.get('importance', '0')
+            map_system.system.save()
         map_system.save()
         map_system.map.add_log(request.user, "Edited System: %s (%s)" %
                                (map_system.system.name,
@@ -1049,6 +1095,7 @@ def _process_user_display_settings(request, user):
     kspace_mapping = get_config('MAP_KSPACE_MAPPING', user)
     silent_mapping = get_config("MAP_SILENT_MAPPING", user)
     render_collapsed = get_config("MAP_RENDER_COLLAPSED", user)
+    scaling_factor = get_config("MAP_SCALING_FACTOR", user)
 
     # Create seperate configs for the user if they are falling back to defaults
     if not zen_mode.user:
@@ -1069,6 +1116,8 @@ def _process_user_display_settings(request, user):
         silent_mapping = ConfigEntry(name=silent_mapping.name, user=user)
     if not render_collapsed.user:
         render_collapsed = ConfigEntry(name=render_collapsed.name, user=user)
+    if not scaling_factor.user:
+        scaling_factor = ConfigEntry(name=scaling_factor.name, user=user)
     zen_mode.value = request.POST.get('zen_mode', 0)
     pilot_list.value = request.POST.get('pilot_list', 0)
     details_combined.value = request.POST.get('details_combined', 0)
@@ -1078,6 +1127,7 @@ def _process_user_display_settings(request, user):
     kspace_mapping.value = request.POST.get('kspace_mapping', 0)
     silent_mapping.value = request.POST.get('silent_mapping', 0)
     render_collapsed.value = request.POST.get('render_collapsed', 0)
+    scaling_factor.value = request.POST.get('scaling_factor', 1)
     zen_mode.save()
     pilot_list.save()
     details_combined.save()
@@ -1087,6 +1137,7 @@ def _process_user_display_settings(request, user):
     kspace_mapping.save()
     silent_mapping.save()
     render_collapsed.save()
+    scaling_factor.save()
 
     saved = True
 
@@ -1097,6 +1148,7 @@ def _process_user_display_settings(request, user):
             'pilot_list': pilot_list.value,
             'details_combined': details_combined.value,
             'render_tags': render_tags.value,
+            'scaling_factor': scaling_factor.value,
             'highlight_active': highlight_active.value,
             'auto_refresh': auto_refresh.value,
             'kspace_mapping': kspace_mapping.value,

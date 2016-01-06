@@ -26,7 +26,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
+import pytz
+import datetime
+import time
 # Create your views here.
 
 User = get_user_model()
@@ -161,7 +164,11 @@ def new_user(request):
         user.set_password(password1)
         user.is_active = True
         user.save()
-        if user.email:
+        if request.POST.get('email_password', None):
+            send_pass = True
+        else:
+            send_pass = False
+        if user.email and send_pass:
             message = EmailMessage(
                     subject="Password Reset",
                     body=render_to_string(
@@ -229,7 +236,7 @@ def profile_admin(request, user_id):
                 send_pass = True
             else:
                 send_pass = False
-            if user.email:
+            if user.email and send_pass:
                 message = EmailMessage(
                         subject="Password Reset",
                         body=render_to_string(

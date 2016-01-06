@@ -3,29 +3,25 @@
         <h4>Send Alert</h4>
     </div>
     <div class="modal-body">
-        <form id="sendPingForm" method="POST" action="/alerts/send/">
-            <div class="row span6">
-                <div class="span2">
+        <form id="sendPingForm" class="form-group" method="POST" action="/alerts/send/">
+            <div class="control-group">
+                <div class="col-md-4 input-margin">
                     Subject: 
                 </div>
-                <div class="span3">
-                    <input type="text" class="input input-med" name="alert_subject" />
+                <div class="col-md-8 input-margin">
+                    <input type="text" class="form-control" name="alert_subject" />
                 </div>
-            </div>
-            <div class="row span6">
-                <div class="span2">
+                <div class="col-md-4 input-margin">
                     Message: 
                 </div>
-                <div class="span3">
-                    <textarea name="alert_message"></textarea>
+                <div class="col-md-8 input-margin">
+                    <textarea name="alert_message" class="form-control"></textarea>
                 </div>
-            </div>
-            <div class="row span6">
-                <div class="span2">
+                <div class="col-md-4 input-margin">
                     Group: 
                 </div>
-                <div class="span3">
-                    <select name="alert_group">
+                <div class="col-md-8 input-margin">
+                    <select name="alert_group" class="form-control" style="width: 250px;">
                         {% for group in alert_groups %}
                         <option value="{{group.pk}}">{{group.name}}</option>
                         {% empty %}
@@ -37,7 +33,7 @@
         </form>
     </div>
     <div class="modal-footer">
-        <button class="btn" onclick="$('#modalHolder').modal('hide').empty();">Cancel</button>
+        <button class="btn btn-danger" onclick="$('#modalHolder').empty().parent().hide();">Cancel</button>
         <button class="btn btn-primary" onclick="SendAlert();">Send</button>
     </div>
     <script type="text/javascript">

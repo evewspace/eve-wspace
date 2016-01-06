@@ -1,6 +1,6 @@
 <form id="globalPermForm" action="/map/settings/permissions/" method="POST">
     {% csrf_token %}
-    <table class="globalPermTable" cellpadding="10">
+    <table class="table table-condensed globalPermTable" cellpadding="10">
         <tr>
             <th>Group</th>
             <th>Unrestricted</th>
@@ -30,7 +30,7 @@
         {% endfor %}
     </table>
     <br />
-    <input type="submit" class="btn btn-primary" value="Save Permissions">
+    <input type="submit" class="btn btn-sm btn-primary" value="Save Permissions">
 </form>
 <script type="text/javascript">
     $('#globalPermForm').submit(function(e){

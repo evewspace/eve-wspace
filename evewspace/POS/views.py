@@ -14,6 +14,7 @@
 #   limitations under the License.
 from datetime import datetime, timedelta
 import re
+import pytz
 
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
@@ -219,7 +220,7 @@ def add_pos(request, msID):
                 return HttpResponse(e, status=404)
 
         else:
-            tower = get_object_or_404(Type, name=request.POST['tower'])
+            tower = get_object_or_404(Type, name=request.POST['tower'], marketgroup__isnull=False)
             pos = POS(system=system, planet=int(request.POST['planet']),
                       moon=int(request.POST['moon']),
                       towertype=tower,

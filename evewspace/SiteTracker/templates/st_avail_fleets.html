@@ -3,7 +3,7 @@
     {% elif not availfleets|length %}
     <p class="label label-info">You are in all available fleets.</p>
     {% else %}
-    <table class="stAvailFleetTable table">
+    <table class="table table-condensed table-hover">
         <tr>
             <th>System:</th>
             <th>Boss:</th>
@@ -26,7 +26,7 @@
             </td>
             <td>{{x.sites.count}}</td>
             <td>
-                <button class="btn btn-mini btn-primary" onclick="STJoinFleet({{x.pk}});">Join</button>
+                <button class="btn btn-sm btn-primary" onclick="STJoinFleet({{x.pk}});">Join</button>
             </td>
         </tr>
     {% endfor %}

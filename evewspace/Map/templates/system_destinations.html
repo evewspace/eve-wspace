@@ -1,4 +1,4 @@
-<table class="destinationTable">
+<table class="destinationTable table table-condensed table-hover">
     <tr>
         <th>System</th>
         <th>Jumps</th>
@@ -13,7 +13,7 @@
             <td>{{jumps}}</td>
             <td>{{ly}}</td>
             {% if is_igb_trusted %}
-            <td width="10%"><button class='btn btn-mini btn-info' onclick="CCPEVE.setDestination({{dest.pk}});">D</button></td>
+            <td width="10%"><button class='btn btn-mini btn-primary' onclick="CCPEVE.setDestination({{dest.pk}});">D</button></td>
             {% endif %}
         </tr>
     {% endfor %}

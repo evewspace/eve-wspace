@@ -7,9 +7,9 @@
     </td>
     <td>{{fleet.active_members|length}}</td>
     <td>
-        <button class="btn btn-mini" onclick="STLeaveFleet({{fleet.pk}});">Leave</button>
+        <button class="btn btn-xs btn-danger" onclick="STLeaveFleet({{fleet.pk}});">Leave</button>
     </td>
     <td>
-        <button class="btn btn-mini" onclick="STPromoteMember({{fleet.pk}}, {{user.pk}});">Take Boss</button>
+        <button class="btn btn-xs btn-primary" onclick="STPromoteMember({{fleet.pk}}, {{user.pk}});">Take Boss</button>
     </td>
 </tr>

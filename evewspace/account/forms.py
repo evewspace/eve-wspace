@@ -10,6 +10,11 @@ class EditProfileForm(forms.Form):
     password = forms.CharField(required=False, widget=forms.PasswordInput, label="Current Password")
     password1 = forms.CharField(required=False, widget=forms.PasswordInput, label="New Password")
     password2 = forms.CharField(required=False, widget=forms.PasswordInput, label="Repeat New Password")
+    
+    email.widget.attrs['class'] = 'form-control input-sm'
+    password.widget.attrs['class'] = 'form-control input-sm'
+    password1.widget.attrs['class'] = 'form-control input-sm'
+    password2.widget.attrs['class'] = 'form-control input-sm'
 
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')

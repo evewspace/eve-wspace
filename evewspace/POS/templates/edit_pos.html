@@ -1,43 +1,101 @@
 <div title="Edit Starbase" id="editPOSDialog" class="addPOSDialog">
     <div class="modal-header">
         <div class="row">
-            <div class="span6">
+            <div class="col-md-12">
                 <h4>Edit POS</h4>
             </div>
-            <div class="span3 offset2">
-                <a href="#" class="btn" onclick="$('#modalHolder').modal('hide');">Cancel</a>
-                <a href="#" class="btn btn-primary" id="btnEditPOS">Save POS</a>
-           </div>
+            
         </div>
     </div>
     <div class="modal-body">
-         <div class="alert alert-error" id="pos_message" style="display: none;">
+         <div class="alert bg-danger" id="pos_message" style="display: none;">
             <p id="pos_error"></p>
-         </div>
-   <form id="editPOSForm" action="/pos/{{mapsystem.pk}}/{{pos.id}}/edit/" method="POST">
-        {% csrf_token %}
-        Full Corp Name: <input id="corpBox" class="corpAuto" value="{{pos.corporation.name}}" name="corp" type="text" > <br />
-        <span class="label label-warning" id="digiterror">Please enter digits only for planet and moon. </span><br /><br />
-        Planet: <input name="planet" value="{{pos.planet}}" class="input-mini" type="text"> 
-        Moon: <input name="moon" value="{{pos.moon}}"class="input-mini" type="text"> <br />
-        Tower Name: <input name="name" value="{{pos.posname}}" type="text"> <br />
-        Tower Type: <input id="towertype" class="towerAuto" value="{{pos.towertype.name}}" name="tower" type="text"> <br />
-        Status: <br />
-        <input type="radio" onclick="Test(this);" name="status" value="0" {% if pos.status == 0 %}checked="checked" {% endif %}> &nbsp Unanchored<br />
-        <input type="radio" name="status" onclick="Test(this);" value="1"{% if pos.status == 1 %}checked="checked" {% endif %}> &nbsp Anchored <br />
-        <input type="radio" name="status" onclick="Test(this);" value="2"{% if pos.status == 2 %}checked="checked" {% endif %}> &nbsp Onlining<br />
-        <input type="radio" name="status" onclick="Test(this);" value="3"{% if pos.status == 3 %}checked="checked" {% endif %}> &nbsp Reinforced<br />
-        <input type="radio" name="status" value="4" onclick="Test(this);" {% if pos.status == 4 %}checked="checked" {% endif %}> &nbsp Online <br />
-        <br />
-        <div id="rftime" class="rftimerdiv" style="display: none">
-            RF Timer: Days: <input name="rfdays" class="input-mini" type="text">
-            Hours: <input name="rfhours" class="input-mini" type="text">
-            Minutes: <input name="rfminutes" class="input-mini" type="text">
         </div>
-        Fitting: <br />
-        <textarea  rows="10" name="fitting">{{fitting}}</textarea><br />
-        Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1"> <br />
-    </form>
+        <div class="row">
+   			<form id="editPOSForm" class="form-group" action="/pos/{{mapsystem.pk}}/{{pos.id}}/edit/" method="POST">
+        	{% csrf_token %}
+        	<div class="col-md-3">
+        			Full Corp Name: 
+        		</div>
+        	<div class="col-md-9">
+        		<input id="corpBox" class="corpAuto form-control input-sm" value="{{pos.corporation.name}}" name="corp" type="text" >
+        	</div>
+        	<div class="col-md-12 input-margin">
+        		<span class="label label-warning" id="digiterror">Please enter digits only for planet and moon. </span>
+        	</div>
+        	<div class="col-md-3 input-margin">
+          		Planet:
+          	</div>
+          	<div class="col-md-3 input-margin"> 
+        		<input name="planet" value="{{pos.planet}}" class="input-sm form-control" type="text"> 
+        	</div>
+        	<div class="col-md-3 input-margin">
+          		Moon: 
+          	</div>
+          	<div class="col-md-3 input-margin"> 
+        		<input name="moon" value="{{pos.moon}}" class="input-sm form-control" type="text"> 
+        	</div>
+        	<div class="col-md-3 input-margin"> 
+          		Tower Name: 
+          	</div>
+          	<div class="col-md-3 input-margin"> 
+          		<input name="name" value="{{pos.posname}}" class="input-sm form-control" type="text">
+          	</div>
+          	<div class="col-md-3 input-margin"> 
+          		Tower Type: 
+          	</div>
+          	<div class="col-md-3 input-margin">
+        		<input id="towertype" class="towerAuto input-sm form-control" value="{{pos.towertype.name}}" name="tower" type="text">
+        	</div>
+        	<div class="col-md-3 input-margin">
+        		Status: 
+        	</div>
+        	<div class="col-md-9 input-margin">
+		        <input type="radio" onclick="Test(this);" name="status" value="0" {% if pos.status == 0 %}checked="checked" {% endif %}> &nbsp Unanchored<br />
+		        <input type="radio" name="status" onclick="Test(this);" value="1"{% if pos.status == 1 %}checked="checked" {% endif %}> &nbsp Anchored <br />
+		        <input type="radio" name="status" onclick="Test(this);" value="2"{% if pos.status == 2 %}checked="checked" {% endif %}> &nbsp Onlining<br />
+		        <input type="radio" name="status" onclick="Test(this);" value="3"{% if pos.status == 3 %}checked="checked" {% endif %}> &nbsp Reinforced<br />
+		        <input type="radio" name="status" value="4" onclick="Test(this);" {% if pos.status == 4 %}checked="checked" {% endif %}> &nbsp Online <br />
+			</div>
+        	<div id="rftime" class="rftimerdiv" style="display: none">
+			     	<div class="col-md-2 input-margin">
+			          	RF Timer:
+			        </div> 
+			        <div class="col-md-1 input-margin">
+			          	D:
+			        </div>
+			        <div class="col-md-2 input-margin">
+			          	<input name="rfdays" class="input-sm form-control" type="text">
+			        </div>
+			        <div class="col-md-1 input-margin">
+			          	H: 
+			        </div>
+			        <div class="col-md-2 input-margin">
+			          	<input name="rfhours" class="input-sm form-control" type="text">
+			        </div>
+			        <div class="col-md-1 input-margin">
+			           	M: 
+			        </div>
+			        <div class="col-md-2 input-margin">
+			          	<input name="rfminutes" class="input-sm form-control" type="text">
+			        </div>
+			    </div>
+			    <div class="col-md-12 input-margin">
+			        Fitting:
+			    </div>
+        		<div class="col-md-12 input-margin">
+        			<textarea cols=40 rows=7 class="form-control" name="fitting">{{fitting}}</textarea>
+        		</div>
+		        <div class="manual-fields">
+        			<div class="col-md-12 input-margin">
+          				Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1">
+          			</div>
+        		</div>
+		    </form>
+    	<div class="col-md-12">
+                <a href="#" class="btn btn-danger btn-sm input-margin" onclick="$('#modalHolder').parent().hide();">Close</a>
+                <a href="#" class="btn btn-primary btn-sm input-margin" id="btnEditPOS">Save POS</a>
+        </div>
     </div>
     <div class="modal-footer">
     </div>

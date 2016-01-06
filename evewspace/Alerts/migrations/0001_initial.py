@@ -1,111 +1,42 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'SubscriptionGroup'
-        db.create_table('Alerts_subscriptiongroup', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=64)),
-            ('desc', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('special', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('Alerts', ['SubscriptionGroup'])
+    dependencies = [
+        ('auth', '0006_require_contenttypes_0002'),
+    ]
 
-        # Adding model 'Subscription'
-        db.create_table('Alerts_subscription', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['Alerts.SubscriptionGroup'])),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='alert_groups', to=orm['auth.User'])),
-        ))
-        db.send_create_signal('Alerts', ['Subscription'])
-
-        # Adding model 'SubscriptionGroupPermission'
-        db.create_table('Alerts_subscriptiongrouppermission', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user_group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='alert_groups', to=orm['auth.Group'])),
-            ('sub_group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='group_permissions', to=orm['Alerts.SubscriptionGroup'])),
-            ('can_broadcast', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('can_join', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('Alerts', ['SubscriptionGroupPermission'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'SubscriptionGroup'
-        db.delete_table('Alerts_subscriptiongroup')
-
-        # Deleting model 'Subscription'
-        db.delete_table('Alerts_subscription')
-
-        # Deleting model 'SubscriptionGroupPermission'
-        db.delete_table('Alerts_subscriptiongrouppermission')
-
-
-    models = {
-        'Alerts.subscription': {
-            'Meta': {'object_name': 'Subscription'},
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['Alerts.SubscriptionGroup']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'alert_groups'", 'to': "orm['auth.User']"})
-        },
-        'Alerts.subscriptiongroup': {
-            'Meta': {'object_name': 'SubscriptionGroup'},
-            'desc': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'members': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'through': "orm['Alerts.Subscription']", 'symmetrical': 'False'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '64'}),
-            'special': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'Alerts.subscriptiongrouppermission': {
-            'Meta': {'object_name': 'SubscriptionGroupPermission'},
-            'can_broadcast': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'can_join': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'sub_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'group_permissions'", 'to': "orm['Alerts.SubscriptionGroup']"}),
-            'user_group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'alert_groups'", 'to': "orm['auth.Group']"})
-        },
-        'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'auth.permission': {
-            'Meta': {'ordering': "('content_type__app_label', 'content_type__model', 'codename')", 'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        }
-    }
-
-    complete_apps = ['Alerts']
+    operations = [
+        migrations.CreateModel(
+            name='Subscription',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='SubscriptionGroup',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(unique=True, max_length=64)),
+                ('desc', models.CharField(max_length=200)),
+                ('special', models.BooleanField(default=False)),
+            ],
+            options={
+                'permissions': (('can_alert', 'Use the alerts system.'), ('alert_admin', 'Modify alert groups and rosters.'), ('can_ping_special', 'Ping alert groups tagged special.')),
+            },
+        ),
+        migrations.CreateModel(
+            name='SubscriptionGroupPermission',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('can_broadcast', models.BooleanField(default=False)),
+                ('can_join', models.BooleanField(default=False)),
+                ('sub_group', models.ForeignKey(related_name='group_permissions', to='Alerts.SubscriptionGroup')),
+                ('user_group', models.ForeignKey(related_name='alert_groups', to='auth.Group')),
+            ],
+        ),
+    ]

@@ -5,8 +5,8 @@
     </div>
     <div class="modal-body">
         <h6>What pings would you like to get and where should they go?</h6>
-        <form id="editAlertSubsForm" action="/alerts/subscriptions/" method="POST">
-            <table class="table">
+        <form id="editAlertSubsForm" action="/alerts/subscriptions/" class="form-group" method="POST">
+            <table class="table table-condensed table-hover">
                 <tr>
                     <th>Group</th>
                     {% for method in user_methods %}
@@ -29,7 +29,7 @@
         </form>
     </div>
     <div class="modal-footer">
-        <button class="btn" onclick="$('#modalHolder').modal('hide').empty();">Cancel</button>
+        <button class="btn btn-danger" onclick="$('#modalHolder').empty().parent().hide();">Cancel</button>
         <button class="btn btn-primary" onclick="EditAlertSubscriptions();">Save</button>
     </div>
     <script type="text/javacript">

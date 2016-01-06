@@ -4,7 +4,7 @@
             {% if member.pending_sites %}
             <br /><br />
             <span class="label label-inverse">Pending Sites</span>
-            <table class="table table-compact">
+            <table class="table table-condensed" style="background-color: #464545">
                 <tr>
                     <th>Time</th>
                     <th>Type</th>
@@ -14,9 +14,9 @@
             {% for site in member.pending_sites %}
                 <tr>
                     <td>{{site.timestamp|date:"H:i"}}</td>  
-                    <td>{{site.site_type.short_name}}</td>
-                    <td><button class="btn btn-mini btn-primary" onclick="STClaimSite({{member.fleet.pk}}, {{site.pk}}, {{member.user.pk}}); setTimeout(function(){ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});}, 100);">Approve</button></td>
-                    <td><button class="btn btn-mini" onclick="STUnclaimSite({{member.fleet.pk}}, {{site.pk}}, {{member.user.pk}}); setTimeout(function(){ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});}, 100);">Deny</button></td>
+                    <td>{{site.site_type.shortname}}</td>
+                    <td><button class="btn btn-xs btn-primary" onclick="STClaimSite({{member.fleet.pk}}, {{site.pk}}, {{member.user.pk}}); setTimeout(function(){ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});}, 100);">Approve</button></td>
+                    <td><button class="btn btn-xs btn-danger" onclick="STUnclaimSite({{member.fleet.pk}}, {{site.pk}}, {{member.user.pk}}); setTimeout(function(){ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});}, 100);">Deny</button></td>
                 </tr>
             {% endfor %}
             </table>

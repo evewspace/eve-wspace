@@ -1,5 +1,5 @@
 {% load account_tags %}
-<div class="GroupUsersContainer">
+<div class="GroupUsersContainer" style="max-height: 700px; overflow:auto;">
     <br /><br />
     <table class="table table-hover">
         <tr>
@@ -11,7 +11,7 @@
         <tr>
             <td>{{member.username}}</td>
             <td>{% if member.is_active %}Yes{% else %}No{% endif %}</td>
-            <td><button class="btn btn-small btn-danger" onclick="RemoveGroupUser({{group.pk}}, {{member.pk}});$(this).parent().parent().hide()">Remove</button></td>
+            <td><button class="btn btn-xs btn-danger" onclick="RemoveGroupUser({{group.pk}}, {{member.pk}});$(this).parent().parent().hide()">Remove</button></td>
         </tr>
         {% endfor %}
     </table>
