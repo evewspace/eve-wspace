@@ -59,9 +59,15 @@
             </div>
         </form>
         <input type="submit" style="display: none;">
-        <a href="#" class="btn btn-primary" id="editUnknownSystem">Update</a>
+        <button id="editUnknownSystem" class="btn btn-primary">Update</button> 
+        <button id="btnDeleteWH" class="btn btn-danger"><i class="glyphicon glyphicon-remove-circle"></i> Delete</button>
+	    <button id="btnReallyDeleteWH" class="btn btn-warning" style="display: none;" onclick="DeleteSystem({{system.pk}});"><i class="glyphicon glyphicon-remove-circle"></i> Really Delete?</button>        	    	
     </div>
     <script type="text/javascript">
+      $('#btnDeleteWH').click(function() {
+	    $('#btnReallyDeleteWH').show();
+	    $('#btnDeleteWH').hide();
+	  });
       $('#editSystemForm').submit(function(e){
         e.preventDefault();
         EditSystem({{system.pk}}, 0);
