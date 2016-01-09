@@ -353,8 +353,6 @@ def system_details(request, map_id, ms_id):
         template = 'edit_unknown_system.html'
         return render(request, template, {'ms_id': ms_id, 'system': system, 'wormhole': wormhole})
     template = 'system_details.html'
-    if request.user.get_settings()['MAP_DETAILS_COMBINED'] == '1':
-        template = 'system_details_combined.html'
     return render(request, template,
                   get_system_context(ms_id, request.user))
 
