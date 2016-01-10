@@ -35,7 +35,7 @@
             </div>
             <div class="col-md-9 checkbox">
             	<label>
-                	<input class="form-control" type="checkbox" {% if group in member.groups.all %}checked="checked"{% endif %} name="group_{{group.pk}}" id="group{{group.pk}}Active">
+                	<input type="checkbox" {% if group in member.groups.all %}checked="checked"{% endif %} name="group_{{group.pk}}" id="group{{group.pk}}Active">
                 </label>
             </div>
         </div>
