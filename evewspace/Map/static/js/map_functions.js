@@ -697,7 +697,7 @@ function AddSignature(msID) {
 }
 
 function LoadSignatures(msID, startTimer) {
-    var address = "system/" + msID + "/signatures/list/" + activeSysID;
+    var address = "system/" + msID + "/signatures/list/" + activeSysID + "/";
     $.ajax({
         url: address,
         type: "GET",
