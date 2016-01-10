@@ -33,14 +33,16 @@
         	<div class="col-md-3">
             	<label class="control-label" for="#group{{group.pk}}Active">{{group.name}}</label>
             </div>
-            <div class="col-md-9">
-                <input class="form-control" type="checkbox" {% if group in member.groups.all %}checked="checked"{% endif %} name="group_{{group.pk}}" id="group{{group.pk}}Active">
+            <div class="col-md-9 checkbox">
+            	<label>
+                	<input class="form-control" type="checkbox" {% if group in member.groups.all %}checked="checked"{% endif %} name="group_{{group.pk}}" id="group{{group.pk}}Active">
+                </label>
             </div>
         </div>
         {% empty %}
         <span class="label">No Groups</span>
         {% endfor %}
-        <button class="btn btn-success btn-sm" onclick="SaveUserGroups({{member.pk}});">Save groups</button>
+        <button class="btn btn-success btn-sm" style="margin-top: 30px" onclick="SaveUserGroups({{member.pk}});">Save groups</button>
     </form>
 </div>
 <script type="text/javascript">
