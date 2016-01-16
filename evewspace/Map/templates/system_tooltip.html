@@ -54,12 +54,12 @@
     {% if mapsys.system.is_kspace %}
      <div class="statsText"> NPC: {{mapsys.system.npckills}} Ship: {{mapsys.system.shipkills}} Pod: {{mapsys.system.podkills}} Jumps: {{mapsys.system.get_spec.jumps}}</div>
      {% endif %}
-     <div class="statusText bg-success"> SIG: {{mapsys.system.signatures.count}} POS: {{mapsys.system.poses.count}} Pilots: {{mapsys.system.pilot_list|length}}</div><br />
+     <div class="statusText bg-success">SIG: {{mapsys.system.signatures.count}} POS: {{mapsys.system.poses.count}} Pilots: {{mapsys.system.pilot_list|length}}</div><br />
     {% if mapsys.system.occupied %}
-    <div class="occupiedTooltip bg-danger"> Occupied: <br /> {{mapsys.system.occupied|linebreaksbr}}</div>
+    <div class="occupiedTooltip bg-danger">Occupied: <br />{{mapsys.system.occupied|linebreaksbr}}</div>
     {% endif %}
     {% if mapsys.system.info %}
-    <div class="infoTooltip bg-info"> Info: <br /> {{mapsys.system.info|linebreaksbr}} </div>
+    <div class="infoTooltip bg-info">Info: <br />{{mapsys.system.info|linebreaksbr}} </div>
     {% endif %}
 </div>
 {% if mapsys.system.pilot_list %}
