@@ -1,173 +1,50 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import django.utils.timezone
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'PlayTime'
-        db.create_table('account_playtime', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('fromtime', self.gf('django.db.models.fields.TimeField')()),
-            ('totime', self.gf('django.db.models.fields.TimeField')()),
-        ))
-        db.send_create_signal('account', ['PlayTime'])
+    dependencies = [
+        ('auth', '0006_require_contenttypes_0002'),
+        ('Map', '0001_initial'),
+    ]
 
-        # Adding model 'UserProfile'
-        db.create_table('account_userprofile', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], unique=True)),
-            ('jabberid', self.gf('django.db.models.fields.EmailField')(max_length=75, null=True, blank=True)),
-            ('defaultmap', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='defaultusers', null=True, to=orm['Map.Map'])),
-            ('currentsystem', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='activepilots', null=True, to=orm['Map.System'])),
-            ('lastactive', self.gf('django.db.models.fields.DateTimeField')()),
-        ))
-        db.send_create_signal('account', ['UserProfile'])
-
-        # Adding M2M table for field playtimes on 'UserProfile'
-        db.create_table('account_userprofile_playtimes', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('userprofile', models.ForeignKey(orm['account.userprofile'], null=False)),
-            ('playtime', models.ForeignKey(orm['account.playtime'], null=False))
-        ))
-        db.create_unique('account_userprofile_playtimes', ['userprofile_id', 'playtime_id'])
-
-        # Adding model 'GroupProfile'
-        db.create_table('account_groupprofile', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(related_name='profile', unique=True, to=orm['auth.Group'])),
-            ('description', self.gf('django.db.models.fields.CharField')(max_length=200, null=True, blank=True)),
-            ('regcode', self.gf('django.db.models.fields.CharField')(max_length=64, null=True, blank=True)),
-        ))
-        db.send_create_signal('account', ['GroupProfile'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'PlayTime'
-        db.delete_table('account_playtime')
-
-        # Deleting model 'UserProfile'
-        db.delete_table('account_userprofile')
-
-        # Removing M2M table for field playtimes on 'UserProfile'
-        db.delete_table('account_userprofile_playtimes')
-
-        # Deleting model 'GroupProfile'
-        db.delete_table('account_groupprofile')
-
-
-    models = {
-        'Map.map': {
-            'Meta': {'object_name': 'Map'},
-            'explicitperms': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '100'}),
-            'root': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'root'", 'to': "orm['Map.System']"})
-        },
-        'Map.system': {
-            'Meta': {'object_name': 'System', '_ormbases': ['core.SystemData']},
-            'first_visited': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'info': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'last_visited': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'lastscanned': ('django.db.models.fields.DateTimeField', [], {}),
-            'npckills': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'occupied': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'podkills': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'shipkills': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'sysclass': ('django.db.models.fields.IntegerField', [], {}),
-            'systemdata_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['core.SystemData']", 'unique': 'True', 'primary_key': 'True'}),
-            'updated': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
-        },
-        'account.groupprofile': {
-            'Meta': {'object_name': 'GroupProfile'},
-            'description': ('django.db.models.fields.CharField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'profile'", 'unique': 'True', 'to': "orm['auth.Group']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'regcode': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'})
-        },
-        'account.playtime': {
-            'Meta': {'object_name': 'PlayTime'},
-            'fromtime': ('django.db.models.fields.TimeField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'totime': ('django.db.models.fields.TimeField', [], {})
-        },
-        'account.userprofile': {
-            'Meta': {'object_name': 'UserProfile'},
-            'currentsystem': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'activepilots'", 'null': 'True', 'to': "orm['Map.System']"}),
-            'defaultmap': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'defaultusers'", 'null': 'True', 'to': "orm['Map.Map']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'jabberid': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'null': 'True', 'blank': 'True'}),
-            'lastactive': ('django.db.models.fields.DateTimeField', [], {}),
-            'playtimes': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['account.PlayTime']", 'symmetrical': 'False'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
-        },
-        'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'auth.permission': {
-            'Meta': {'ordering': "('content_type__app_label', 'content_type__model', 'codename')", 'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'core.constellation': {
-            'Meta': {'object_name': 'Constellation', 'db_table': "'mapConstellations'", 'managed': 'False'},
-            'id': ('django.db.models.fields.IntegerField', [], {'primary_key': 'True', 'db_column': "'constellationID'"}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100', 'db_column': "'constellationName'"}),
-            'region': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'constellations'", 'db_column': "'regionID'", 'to': "orm['core.Region']"}),
-            'x': ('django.db.models.fields.FloatField', [], {}),
-            'y': ('django.db.models.fields.FloatField', [], {}),
-            'z': ('django.db.models.fields.FloatField', [], {})
-        },
-        'core.region': {
-            'Meta': {'object_name': 'Region', 'db_table': "'mapRegions'", 'managed': 'False'},
-            'id': ('django.db.models.fields.IntegerField', [], {'primary_key': 'True', 'db_column': "'regionID'"}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100', 'db_column': "'regionName'"}),
-            'x': ('django.db.models.fields.FloatField', [], {}),
-            'y': ('django.db.models.fields.FloatField', [], {}),
-            'z': ('django.db.models.fields.FloatField', [], {})
-        },
-        'core.systemdata': {
-            'Meta': {'object_name': 'SystemData', 'db_table': "'mapSolarSystems'", 'managed': 'False'},
-            'constellation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'systems'", 'db_column': "'constellationID'", 'to': "orm['core.Constellation']"}),
-            'id': ('django.db.models.fields.IntegerField', [], {'primary_key': 'True', 'db_column': "'solarSystemID'"}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100', 'db_column': "'solarSystemName'"}),
-            'region': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'systems'", 'db_column': "'regionID'", 'to': "orm['core.Region']"}),
-            'security': ('django.db.models.fields.FloatField', [], {}),
-            'x': ('django.db.models.fields.FloatField', [], {}),
-            'y': ('django.db.models.fields.FloatField', [], {}),
-            'z': ('django.db.models.fields.FloatField', [], {})
-        }
-    }
-
-    complete_apps = ['account']
+    operations = [
+        migrations.CreateModel(
+            name='EWSUser',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('password', models.CharField(max_length=128, verbose_name='password')),
+                ('last_login', models.DateTimeField(null=True, verbose_name='last login', blank=True)),
+                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
+                ('username', models.CharField(help_text='Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters', unique=True, max_length=30, verbose_name='username')),
+                ('first_name', models.CharField(max_length=30, verbose_name='first name', blank=True)),
+                ('last_name', models.CharField(max_length=30, verbose_name='last name', blank=True)),
+                ('email', models.EmailField(max_length=254, verbose_name='email address', blank=True)),
+                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
+                ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
+                ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
+                ('defaultmap', models.ForeignKey(related_name='defaultusers', blank=True, to='Map.Map', null=True)),
+                ('groups', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Group', blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', verbose_name='groups')),
+                ('user_permissions', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Permission', blank=True, help_text='Specific permissions for this user.', verbose_name='user permissions')),
+            ],
+            options={
+                'verbose_name': 'user',
+                'verbose_name_plural': 'users',
+                'permissions': (('account_admin', 'Administer users and groups'),),
+            },
+        ),
+        migrations.CreateModel(
+            name='GroupProfile',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('description', models.CharField(max_length=200, null=True, blank=True)),
+                ('regcode', models.CharField(max_length=64, null=True, blank=True)),
+                ('visible', models.BooleanField(default=True)),
+                ('group', models.OneToOneField(related_name='profile', to='auth.Group')),
+            ],
+        ),
+    ]

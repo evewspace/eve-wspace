@@ -82,7 +82,6 @@ function SaveDisplaySettings(){
         url: "/map/settings/display/",
         success: function(data){
             $("#globalDisplayDiv").html(data);
-            $('.slider').slider();
         },
         error: function(){
             alert("Invalid values, please make sure only integers are used.");

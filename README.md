@@ -7,12 +7,12 @@ are not yet implemented past some prototype data models.
 What is it?
 -----------
 Eve W-Space is, at its core, a wormhole mapping and intel tool for the MMORPG 
-Eve Online. If you wish, it can be much more. It can be customized to fill 
-roles from simple mapping applicaiton (with all extra features disabled) to 
+EVE Online. If you wish, it can be much more. It can be customized to fill 
+roles from simple mapping application (with all extra features disabled) to 
 the centerpiece of an entire alliance services infrastructure.
 
-Eve W-Space is designed to be a single-tenant soulution hosted by a single corp 
-or alliance. A fleixble permissions system allows for easily restricting data 
+Eve W-Space is designed to be a single-tenant solution hosted by a single corp 
+or alliance. A flexible permissions system allows for easily restricting data 
 where needed.
 
 Documentation
@@ -24,8 +24,8 @@ How do I use it?
 ----------------
 Generally, Eve W-Space requires:
 
-* Django 1.6+
-* Python 2.6-2.7
+* Django 1.8
+* Python 2.7
 * Celery
 * RabbitMQ (preferred)
 * memcached (preferred)

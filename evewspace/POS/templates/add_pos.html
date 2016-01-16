@@ -1,54 +1,112 @@
 <div title="Add Starbase" id="addPOSDialog" class="addPOSDialog">
     <div class="modal-header">
         <div class="row">
-            <div class="span6">
+            <div class="col-md-12">
                 <h4>Add POS: {{system.name}}</h4>
-            </div>
-            <div class="span3 offset2">
-                <a href="#" class="btn" onclick="$('#modalHolder').modal('hide');">Cancel</a>
-                <a href="#" class="btn btn-info" id="btnAddPOS">Add POS</a>
-            </div>
+      		</div>
         </div>
-         <ul class="nav nav-pills" style="margin-bottom:0">
-            <li class="active"><a id="auto" href="#" data-toggle="tab">Auto</a></li>
-            <li><a href="#" data-toggle="tab" id="manual">Manual</a></li>
-          </ul>
+	        <ul class="nav nav-pills" style="margin-bottom:0">
+	           <li class="active"><a id="auto" href="#" data-toggle="tab">Auto</a></li>
+	           <li><a href="#" data-toggle="tab" id="manual">Manual</a></li>
+	        </ul>
+        </div>
     </div>
-    <div class="modal-body">
-        <div class="alert alert-error" id="pos_message" style="display: none;">
+    <div class="modal-body" style="min-height: 700px; margin-top: -30px;">
+        <div class="alert bg-danger" id="pos_message" style="display: none;">
             <p id="pos_error"></p>
         </div>
-      <form id="addPOSForm" action="/pos/{{system.pk}}/add" method="POST">
-        {% csrf_token %}
-        <input id="auto-field" name="auto" value="1" type="hidden">
-        Full Corp Name: <input id="corpBox" class="corpAuto" name="corp" type="text" > <br />
-        <div class="manual-fields">
-          <span class="label label-warning" id="digiterror">Please enter digits only for planet and moon. </span><br /><br />
-          Planet: <input name="planet" class="input-mini" type="text"> 
-          Moon: <input name="moon" class="input-mini" type="text"> <br />
-          Tower Name: <input name="name" type="text"> <br />
-          Tower Type: <input id="towertype" class="towerAuto" name="tower" type="text"> <br />
-        </div>
-        Status: <br /><input type="radio" onclick="Test(this);" name="status" value="0">&nbsp; Unanchored
-        <br /><input type="radio" name="status" onclick="Test(this);" value="1">&nbsp; Anchored
-        <br /><input type="radio" name="status" onclick="Test(this);" value="2">&nbsp; Onlining
-        <br /><input type="radio" name="status" onclick="Test(this);" value="3"> &nbsp; Reinforced
-        <br /><input type="radio" name="status" value="4" onclick="Test(this);" checked="checked"> &nbsp Online
-        <br />
-        <div id="rftime" class="rftimerdiv" style="display: none">
-            RF Timer:<br /> D: <input name="rfdays" class="input-mini" type="text">
-            H: <input name="rfhours" class="input-mini" type="text">
-            M: <input name="rfminutes" class="input-mini" type="text">
-        </div>
-        <br />Fitting: <br />
-        <p id="auto-help">Paste a 360° dscan (irrelevant range) with Active Overview Settings unticked, from ongrid with the POS</p>
-        <p id="manual-help">Paste a dscan showing POS modules from just this POS<p>
-        <textarea cols=40 rows=10 name="fitting"></textarea><br />
-        <div class="manual-fields">
-          Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1"> <br />
-        </div>
-      </form>
-  </div>
+        <div class="row">
+      		<form id="addPOSForm" class="form-group" action="/pos/{{system.pk}}/add" method="POST">
+        	{% csrf_token %}
+        	<input id="auto-field" name="auto" value="1" type="hidden">
+        	    <div class="col-md-3">
+        			Full Corp Name: 
+        		</div>
+        		<div class="col-md-9">
+        			<input id="corpBox" class="corpAuto input-sm form-control" name="corp" type="text" > <br />
+        		</div>
+        		<div class="manual-fields">
+          			<div class="col-md-12 input-margin">
+          				<span class="label label-warning" id="digiterror">Please enter digits only for planet and moon. </span>
+          			</div>
+          			<div class="col-md-3 input-margin">
+          				Planet:
+          			</div>
+          			<div class="col-md-3 input-margin"> 
+          				<input name="planet" class="input-sm form-control" type="text">
+          			</div>
+          			<div class="col-md-3 input-margin">
+          				Moon: 
+          			</div>
+          			<div class="col-md-3 input-margin"> 
+          				<input name="moon" class="input-sm form-control" type="text">
+          			</div>
+          			<div class="col-md-3 input-margin"> 
+          				Tower Name: 
+          			</div>
+          			<div class="col-md-3 input-margin"> 	
+          				<input name="name" class="input-sm form-control" type="text">
+          			</div>
+          			<div class="col-md-3 input-margin"> 
+          				Tower Type: 
+          			</div>
+          			<div class="col-md-3 input-margin">
+          				<input id="towertype" class="towerAuto input-sm form-control" name="tower" type="text">
+          			</div>
+        		</div>
+        		<div class="col-md-3 input-margin">
+        			Status: 
+        		</div>
+        		<div class="col-md-9 input-margin">
+        			<input type="radio" onclick="Test(this);" name="status" value="0">&nbsp; Unanchored
+        			<br /><input type="radio" name="status" onclick="Test(this);" value="1">&nbsp; Anchored
+			        <br /><input type="radio" name="status" onclick="Test(this);" value="2">&nbsp; Onlining
+			        <br /><input type="radio" name="status" onclick="Test(this);" value="3"> &nbsp; Reinforced
+			        <br /><input type="radio" name="status" value="4" onclick="Test(this);" checked="checked"> &nbsp Online
+			    </div>
+			    <div id="rftime" class="rftimerdiv" style="display: none">
+			     	<div class="col-md-2 input-margin">
+			          	RF Timer:
+			        </div> 
+			        <div class="col-md-1 input-margin">
+			          	D:
+			        </div>
+			        <div class="col-md-2 input-margin">
+			          	<input name="rfdays" class="input-sm form-control" type="text">
+			        </div>
+			        <div class="col-md-1 input-margin">
+			          	H: 
+			        </div>
+			        <div class="col-md-2 input-margin">
+			          	<input name="rfhours" class="input-sm form-control" type="text">
+			        </div>
+			        <div class="col-md-1 input-margin">
+			           	M: 
+			        </div>
+			        <div class="col-md-2 input-margin">
+			          	<input name="rfminutes" class="input-sm form-control" type="text">
+			        </div>
+			    </div>
+			    <div class="col-md-12 input-margin">
+			        Fitting: <br />
+			        <p id="auto-help">Paste a 360° dscan (irrelevant range) with Active Overview Settings unticked, from ongrid with the POS</p>
+			        <p id="manual-help">Paste a dscan showing POS modules from just this POS<p>
+        		</div>
+        		<div class="col-md-12 input-margin">
+        			<textarea cols=40 rows=7 class="form-control" name="fitting"></textarea>
+        		</div>
+        		<div class="manual-fields">
+        			<div class="col-md-12">
+          				Parse as D-Scan Paste: <input type="checkbox" name="dscan" value="1">
+          			</div>
+        		</div>
+      		</form>
+      		<div class="col-md-12">
+	      		<a href="#" class="btn btn-danger btn-sm input-margin" onclick="$('#modalHolder').parent().hide();">Close</a>
+	      		<a href="#" class="btn btn-primary btn-sm input-margin" id="btnAddPOS">Add POS</a>
+      		</div>
+  		</div>
+  	</div>
 </div>
     <div class="modal-footer">
     </div>

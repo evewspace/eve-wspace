@@ -98,7 +98,7 @@ class System(SystemData):
     """
     sysclass_choices = ((1, "C1"), (2, "C2"), (3, "C3"), (4, "C4"), (5, "C5"),
                         (6, "C6"), (7, "High Sec"), (8, "Low Sec"),
-                        (9, "Null Sec"))
+                        (9, "Null Sec"), (99, "Unknown"))
     sysclass = models.IntegerField(choices=sysclass_choices)
     importance_choices = ((0, "Regular"),
                           (1, "Dangerous System"),
@@ -130,7 +130,7 @@ class System(SystemData):
             return True
 
     def is_wspace(self):
-        if self.sysclass not in range(7, 12):
+        if self.sysclass not in range(7, 12) and self.sysclass in range (1,98) :
             return True
 
     def is_rhea_space(self):
@@ -145,6 +145,8 @@ class System(SystemData):
 
     def save(self, *args, **kwargs):
         self.updated = datetime.now(pytz.utc)
+        if self.lastscanned is None:
+            self.lastscanned = datetime.now(pytz.utc)
         if self.lastscanned < datetime.now(pytz.utc) - timedelta(days=3):
             self.lastscanned = datetime.now(pytz.utc)
         if not self.first_visited:
@@ -797,12 +799,11 @@ class Signature(models.Model):
         COL_DISTANCE = 5
         info = row[COL_SIG_TYPE]
         sig_type = None
-        updated = None
         action = "None"
 
         if wascreated:
             # new sig
-            updated = False
+            self.updated = False
             action = "Created"
 
         # Is there a valid signature type from pasted data - is it valid?
@@ -815,6 +816,7 @@ class Signature(models.Model):
                     row[COL_SIG_GROUP])
                 sig_type = SignatureType.objects.get(
                     longname=sig_type_name)
+                self.updated = True
             except:
                 sig_type = None
         else:
@@ -837,8 +839,6 @@ class Signature(models.Model):
                         action = "Scanned"
         if action != "None":
             self.log_sig(user, action, map_system)
-
-        self.update()
 
         # is this still necessary?
         if self.info is None:
@@ -981,7 +981,7 @@ class MapLog(models.Model):
     """
     map = models.ForeignKey(Map, related_name="logentries")
     user = models.ForeignKey(User, related_name="maplogs")
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True,db_index=True)
     action = models.CharField(max_length=255)
     # Visible logs are pushed to clients as they ocurr
     # (e.g. system added to map)
@@ -1046,6 +1046,7 @@ class MapForm(ModelForm):
 
     class Meta:
         model = Map
+        fields = ('name','root','truncate_allowed','explicitperms')
 
 
 class SignatureForm(ModelForm):
@@ -1056,7 +1057,7 @@ class SignatureForm(ModelForm):
     """
     sigid = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'input-mini'}),
-        label="ID:")
+        label="ID:",)
 
     sigtype = forms.ModelChoiceField(
         queryset=SignatureType.objects.all(),
@@ -1066,9 +1067,11 @@ class SignatureForm(ModelForm):
     info = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'input-medium'}),
         label="Info:",
-        required=False)
+        required=False,)
 
-    sigtype.widget.attrs['class'] = 'input-small'
+    sigtype.widget.attrs['class'] = 'form-control input-sm'
+    info.widget.attrs['class'] = 'form-control input-sm'
+    sigid.widget.attrs['class'] = 'form-control input-sm'
 
     class Meta:
         model = Signature

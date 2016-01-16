@@ -3,12 +3,12 @@
             {% for site in member.fleet.sites.all %}
             <li class="stSiteListing">
                 {% if member.user in site and site.is_pending.user %}
-                <i class="icon-question-sign" title="Credit Pending."></i>
+                <i class="glyphicon glyphicon-question-sign" title="Credit Pending."></i>
                 {% elif member.user in site %}
-                <i class="icon-ok-sign" title="Credited. Click to unclaim."
+                <i class="glyphicon glyphicon-ok-sign" title="Credited. Click to unclaim."
                     onclick="STUnclaimSite({{member.fleet.pk}}, {{site.pk}}, {{member.user.pk}}); setTimeout(function(){ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});}, 100);"></i>
                 {% else %}
-                <i class="icon-minus-sign" title="Not Credited. Click to claim."
+                <i class="glyphicon glyphicon-minus-sign" title="Not Credited. Click to claim."
                     onclick="STClaimSite({{member.fleet.pk}}, {{site.pk}}, {{member.user.pk}}); setTimeout(function(){ReloadBossFleetMember({{member.fleet.pk}}, {{member.user.pk}});}, 100);"></i>
                 {% endif %}
                  {{site.timestamp|date:"H:i"}} {{site.site_type.shortname}}

@@ -1,15 +1,15 @@
 <table class="destinationTable" cellpadding="10">
     <tr>
-        <th>Remove</th>
-        <th>System</th>
-        <th>Scope</th>
+        <th style="width: 100px">Remove </th>
+        <th style="width: 100px">System </th>
+        <th style="width: 100px">Scope </th>
     </tr>
     {% for dest in destinations %}
         <tr>
             {% if dest.user and user_context %}
-            <td><i class="icon-ban-circle" onclick="RemoveProfileDestination({{dest.pk}});"></i></td>
+            <td><i class="glyphicon glyphicon-remove-circle" onclick="RemoveProfileDestination({{dest.pk}});"></i></td>
             {% elif not dest.user and not user_context %}
-            <td><i class="icon-ban-circle" onclick="RemoveDestination({{dest.pk}});"></i></td>
+            <td><i class="glyphicon glyphicon-remove-circle" onclick="RemoveDestination({{dest.pk}});"></i></td>
             {% else %}
             <td>N/A</td>
             {% endif %}
@@ -22,10 +22,12 @@
         </tr>
     {% endfor %}
 </table>
-<form id="add{% if user_context %}Profile{% endif %}DestinationForm" method="post" action="/map/settings/{% if user_context %}user-{% endif %}destinations/new/">
+<form id="add{% if user_context %}Profile{% endif %}DestinationForm" class="form-group" method="post" action="/map/settings/{% if user_context %}user-{% endif %}destinations/new/">
     <h4>Add Destination:</h4>
-    System: <input type="text" class="systemAuto" id="sysNameBox" name="systemName"> &nbsp
-    <input type="submit" class="btn btn-primary" value="Add Destination">
+    <div class="row">
+    	<div class="col-md-6"><input type="text" class="systemAuto form-control input-sm" id="sysNameBox" name="systemName"> </div>
+    	<div class="col-md-6"><input type="submit" class="btn btn-primary btn-sm" value="Add Destination"></div>
+    </div>
 </form>
 <script type="text/javascript">
     $('#add{% if user_context %}Profile{% endif %}DestinationForm').submit(function(e){

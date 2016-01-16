@@ -41,7 +41,9 @@ function GetEditUserDialog(user_id) {
         url: "/account/admin/user/" + user_id + "/",
         type: "GET",
         success: function(data) {
-            $('#modalHolder').html(data).modal('show');
+            recreateModalHolder();
+            $('#modalHolder').html(data);
+            $('#modalHolder').parent().show();
         }
     });
 }
@@ -73,7 +75,7 @@ function DeleteUser(user_id) {
         url: "/account/admin/user/" + user_id + "/delete/",
         type: "POST",
         success: function(data){
-            $('#modalHolder').modal('hide');
+            $('#modalHolder').parent().hide();
             GetUserList(1);
         },
         error: function(error){
@@ -101,7 +103,9 @@ function GetCreateUserDialog(){
         url: '/account/admin/user/new/',
         type: 'GET',
         success: function(data){
-            $('#modalHolder').html(data).modal('show');
+            recreateModalHolder();
+            $('#modalHolder').html(data);
+            $('#modalHolder').parent().show();
         },
         error: function(error){
             alert('Could not get the create user dialog:\n\n' + error.responseText);
@@ -116,7 +120,7 @@ function CreateUser(){
         type: 'POST',
         data: $('#createUserForm').serialize(),
         success: function(data){
-            $('#modalHolder').modal('hide');
+            $('#modalHolder').parent().hide();
             GetUserList(1);
         },
         error: function(error){

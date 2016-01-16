@@ -1,198 +1,104 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'APIKey'
-        db.create_table('API_apikey', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('keyid', self.gf('django.db.models.fields.IntegerField')()),
-            ('vcode', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('valid', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('lastvalidated', self.gf('django.db.models.fields.DateTimeField')()),
-            ('proxykey', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-        ))
-        db.send_create_signal('API', ['APIKey'])
+    dependencies = [
+    ]
 
-        # Adding model 'CorpAPIKey'
-        db.create_table('API_corpapikey', (
-            ('apikey_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['API.APIKey'], unique=True, primary_key=True)),
-            ('corp', self.gf('django.db.models.fields.related.ForeignKey')(related_name='api_keys', to=orm['core.Corporation'])),
-        ))
-        db.send_create_signal('API', ['CorpAPIKey'])
-
-        # Adding model 'MemberAPIKey'
-        db.create_table('API_memberapikey', (
-            ('apikey_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['API.APIKey'], unique=True, primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='api_keys', to=orm['auth.User'])),
-        ))
-        db.send_create_signal('API', ['MemberAPIKey'])
-
-        # Adding model 'APICharacter'
-        db.create_table('API_apicharacter', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('apikey', self.gf('django.db.models.fields.related.ForeignKey')(related_name='characters', to=orm['API.APIKey'])),
-            ('charid', self.gf('django.db.models.fields.BigIntegerField')()),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('corp', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('alliance', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('lastshipname', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('lastshiptype', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('location', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('visible', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('API', ['APICharacter'])
-
-        # Adding model 'APIShipLog'
-        db.create_table('API_apishiplog', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('character', self.gf('django.db.models.fields.related.ForeignKey')(related_name='shiplogs', to=orm['API.APICharacter'])),
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')()),
-            ('shiptype', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('shipname', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('location', self.gf('django.db.models.fields.CharField')(max_length=100)),
-        ))
-        db.send_create_signal('API', ['APIShipLog'])
-
-        # Adding model 'APICachedDocument'
-        db.create_table('API_apicacheddocument', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('host', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('params', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('path', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('xml', self.gf('django.db.models.fields.TextField')()),
-            ('cacheduntil', self.gf('django.db.models.fields.DateTimeField')()),
-        ))
-        db.send_create_signal('API', ['APICachedDocument'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'APIKey'
-        db.delete_table('API_apikey')
-
-        # Deleting model 'CorpAPIKey'
-        db.delete_table('API_corpapikey')
-
-        # Deleting model 'MemberAPIKey'
-        db.delete_table('API_memberapikey')
-
-        # Deleting model 'APICharacter'
-        db.delete_table('API_apicharacter')
-
-        # Deleting model 'APIShipLog'
-        db.delete_table('API_apishiplog')
-
-        # Deleting model 'APICachedDocument'
-        db.delete_table('API_apicacheddocument')
-
-
-    models = {
-        'API.apicacheddocument': {
-            'Meta': {'object_name': 'APICachedDocument'},
-            'cacheduntil': ('django.db.models.fields.DateTimeField', [], {}),
-            'host': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'params': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'path': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'xml': ('django.db.models.fields.TextField', [], {})
-        },
-        'API.apicharacter': {
-            'Meta': {'object_name': 'APICharacter'},
-            'alliance': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'apikey': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'characters'", 'to': "orm['API.APIKey']"}),
-            'charid': ('django.db.models.fields.BigIntegerField', [], {}),
-            'corp': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'lastshipname': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'lastshiptype': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'location': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'visible': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'API.apikey': {
-            'Meta': {'object_name': 'APIKey'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'keyid': ('django.db.models.fields.IntegerField', [], {}),
-            'lastvalidated': ('django.db.models.fields.DateTimeField', [], {}),
-            'proxykey': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'valid': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'vcode': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'API.apishiplog': {
-            'Meta': {'object_name': 'APIShipLog'},
-            'character': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'shiplogs'", 'to': "orm['API.APICharacter']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'location': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'shipname': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'shiptype': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'timestamp': ('django.db.models.fields.DateTimeField', [], {})
-        },
-        'API.corpapikey': {
-            'Meta': {'object_name': 'CorpAPIKey', '_ormbases': ['API.APIKey']},
-            'apikey_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['API.APIKey']", 'unique': 'True', 'primary_key': 'True'}),
-            'corp': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'api_keys'", 'to': "orm['core.Corporation']"})
-        },
-        'API.memberapikey': {
-            'Meta': {'object_name': 'MemberAPIKey', '_ormbases': ['API.APIKey']},
-            'apikey_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['API.APIKey']", 'unique': 'True', 'primary_key': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'api_keys'", 'to': "orm['auth.User']"})
-        },
-        'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'auth.permission': {
-            'Meta': {'ordering': "('content_type__app_label', 'content_type__model', 'codename')", 'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'core.alliance': {
-            'Meta': {'object_name': 'Alliance'},
-            'executor': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'+'", 'null': 'True', 'to': "orm['core.Corporation']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'shortname': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'core.corporation': {
-            'Meta': {'object_name': 'Corporation'},
-            'alliance': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'member_corps'", 'null': 'True', 'to': "orm['core.Alliance']"}),
-            'id': ('django.db.models.fields.BigIntegerField', [], {'primary_key': 'True'}),
-            'member_count': ('django.db.models.fields.IntegerField', [], {}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'ticker': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        }
-    }
-
-    complete_apps = ['API']
+    operations = [
+        migrations.CreateModel(
+            name='APIAccessGroup',
+            fields=[
+                ('group_id', models.IntegerField(serialize=False, primary_key=True)),
+                ('group_name', models.CharField(max_length=255)),
+                ('group_description', models.TextField(null=True, blank=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='APIAccessRequirement',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='APIAccessType',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('call_type', models.IntegerField(choices=[(1, b'Character'), (2, b'Corporation')])),
+                ('call_name', models.CharField(max_length=255)),
+                ('call_description', models.TextField(null=True, blank=True)),
+                ('call_mask', models.IntegerField()),
+            ],
+        ),
+        migrations.CreateModel(
+            name='APICharacter',
+            fields=[
+                ('charid', models.BigIntegerField(serialize=False, primary_key=True)),
+                ('name', models.CharField(max_length=100, null=True, blank=True)),
+                ('corp', models.CharField(max_length=100, null=True, blank=True)),
+                ('alliance', models.CharField(max_length=100, null=True, blank=True)),
+                ('lastshipname', models.CharField(max_length=100, null=True, blank=True)),
+                ('lastshiptype', models.CharField(max_length=100, null=True, blank=True)),
+                ('location', models.CharField(max_length=100, null=True, blank=True)),
+                ('visible', models.NullBooleanField(default=False)),
+            ],
+            options={
+                'permissions': (('view_limited_data', 'View limited character API.'), ('view_full_data', 'View full character API.')),
+            },
+        ),
+        migrations.CreateModel(
+            name='APIGroupMapping',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('title_id', models.IntegerField(null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='APIKey',
+            fields=[
+                ('keyid', models.IntegerField(serialize=False, primary_key=True)),
+                ('vcode', models.CharField(max_length=100)),
+                ('valid', models.BooleanField(default=False)),
+                ('lastvalidated', models.DateTimeField()),
+                ('access_mask', models.IntegerField()),
+                ('proxykey', models.CharField(max_length=100, null=True, blank=True)),
+                ('validation_error', models.CharField(max_length=255, null=True, blank=True)),
+            ],
+            options={
+                'permissions': (('api_key_admin', 'Can see API Key section.'), ('add_keys', 'Add API keys for others.'), ('purge_keys', 'Purge API Keys.'), ('audit_keys', 'View Users with no API keys assigned.'), ('soft_key_fail', 'Nag if no valid API key.'), ('hard_key_fail', 'Revoke access if no valid API Key.')),
+            },
+        ),
+        migrations.CreateModel(
+            name='APIShipLog',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('timestamp', models.DateTimeField()),
+                ('shiptype', models.CharField(max_length=100)),
+                ('shipname', models.CharField(max_length=100)),
+                ('location', models.CharField(max_length=100)),
+                ('character', models.ForeignKey(related_name='shiplogs', to='API.APICharacter')),
+            ],
+            options={
+                'permissions': (('view_shiplogs', 'View API ship log entries.'),),
+            },
+        ),
+        migrations.CreateModel(
+            name='CorpAPIKey',
+            fields=[
+                ('apikey_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='API.APIKey')),
+                ('character_name', models.CharField(max_length=255, null=True, blank=True)),
+            ],
+            bases=('API.apikey',),
+        ),
+        migrations.CreateModel(
+            name='MemberAPIKey',
+            fields=[
+                ('apikey_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='API.APIKey')),
+            ],
+            bases=('API.apikey',),
+        ),
+    ]

@@ -32,7 +32,9 @@ function GetEditGroupDialog(user_id) {
         url: "/account/admin/group/" + user_id + "/",
         type: "GET",
         success: function(data) {
-            $('#modalHolder').html(data).modal('show');
+            recreateModalHolder();
+            $('#modalHolder').html(data);
+            $('#modalHolder').parent().show();
         }
     });
 }
@@ -68,7 +70,7 @@ function DeleteGroup(group_id) {
         url: "/account/admin/group/" + group_id + "/delete/",
         type: "POST",
         success: function(data){
-            $('#modalHolder').modal('hide');
+            $('#modalHolder').parent().hide();
             GetGroupList(1);
         },
         error: function(error){
@@ -82,7 +84,7 @@ function DisableGroupUsers(group_id) {
         url: "/account/admin/group/" + group_id + "/disableusers/",
         type: "POST",
         success: function(data){
-            $('#modalHolder').modal('hide');
+            $('#modalHolder').parent().hide();
             GetUserList(1);
         },
         error: function(error){
@@ -96,7 +98,7 @@ function EnableGroupUsers(group_id) {
         url: "/account/admin/group/" + group_id + "/enableusers/",
         type: "POST",
         success: function(data){
-            $('#modalHolder').modal('hide');
+            $('#modalHolder').parent().hide();
             GetUserList(1);
         },
         error: function(error){
@@ -110,7 +112,9 @@ function GetCreateGroupDialog() {
         url: '/account/admin/group/new/',
         type: "GET",
         success: function(data){
-            $('#modalHolder').html(data).modal('show')
+            recreateModalHolder();
+            $('#modalHolder').html(data);
+            $('#modalHolder').parent().show();
         },
         error: function(error){
             alert('Could not get the create group dialog: ' + e.responseText);
@@ -124,7 +128,7 @@ function CreateGroup() {
         type: "POST",
         data: $('#createGroupForm').serialize(),
         success: function(data){
-            $('#modalHolder').modal('hide')
+            $('#modalHolder').parent().hide();
             GetGroupList(1);
         },
         error: function(error){

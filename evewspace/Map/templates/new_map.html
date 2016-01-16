@@ -1,33 +1,33 @@
 {% extends "base.html" %}
 {% block title %}Eve W-Space: New Map{% endblock %}
 {% block content %}
-<form action="{% url 'Map.views.create_map' %}" method="post">
+<form action="{% url 'Map.views.create_map' %}" method="post" class="form-group">
     {% csrf_token %}
     {{form.non_field_errors}}
     <table>
         {{form.name_errors}}
         <tr>
-            <td><label for="id_name">Map Name:</label></td>
-            <td><input type="text" id="id_name" name="name" /></td>
+            <td style="padding-bottom: 10px"><label for="id_name">Map Name:</label></td>
+            <td style="padding-bottom: 10px"><input type="text" id="id_name" name="name" class="input-sm form-control input-margin" /></td>
         </tr>
         {{form.root_errors}}
         <tr>
-            <td><label for="id_root">Root System:</label></td>
-            <td><input type="text" id="id_root" name="root" class="systemAuto" /></td>
+            <td style="padding-bottom: 10px"><label for="id_root">Root System:</label></td>
+            <td style="padding-bottom: 10px"><input type="text" id="id_root" name="root" class="systemAuto input-sm form-control input-margin" /></td>
         </tr>
         <tr>
-            <td><label for="id_truncate_allowed">Truncate Function Enabled:</label></td>
-            <td><input type='checkbox' id='id_truncate_allowed' name='truncate_allowed' checked='checked' /></td>
+            <td style="padding-bottom: 10px"><label for="id_truncate_allowed">Truncate Function Enabled:</label></td>
+            <td style="padding-bottom: 10px"><input type='checkbox' id='id_truncate_allowed' name='truncate_allowed' checked='checked' /></td>
         </tr>
         {{form.explicitperms_errors}}
         {% if perms.Map.map_admin %}
         <tr>
-            <td><label for="id_explicitperms">Require Explicit Permissions:</label> </td>
-            <td><input type="checkbox" id="id_explicitperms" name="explicitperms" /></td>
+            <td style="padding-bottom: 10px"><label for="id_explicitperms">Require Explicit Permissions:</label> </td>
+            <td style="padding-bottom: 10px"><input type="checkbox" id="id_explicitperms" name="explicitperms" /></td>
         </tr>
         {% endif %}
     </table>
-    <input class="btn btn-primary" type="submit" value="Submit" />
+    <input class="btn btn-primary btn-sm" type="submit" value="Submit" />
 </form>
 {% endblock %}
 
