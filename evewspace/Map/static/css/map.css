@@ -385,3 +385,11 @@ ul#moveDropdown li {
   padding-top: 0;
 }
 
+#id_sigid { 
+	width: 100px;	
+}
+
+.sigAddFormDiv {
+	margin-left: 25px;	
+}
+
