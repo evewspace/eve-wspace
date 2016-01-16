@@ -26,7 +26,7 @@
 }
 .systemTooltip
 {
-    width: 300px;
+    min-width: 300px;
     display: none;
 }
 .wormholeTooltip
@@ -56,23 +56,36 @@
 }
 .occupiedTooltip
 {
-    width: 90%;
+    width: 95%;
     white-space: pre-wrap;       /* css-3 */
     white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
     white-space: -pre-wrap;      /* Opera 4-6 */
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    border-radius: 5px;
+
+}
+.statusText
+{
+    width: 95%;
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    border-radius: 5px;
 
 }
 .infoTooltip
 {
     margin-top: 10px;
-    width: 90%;
+    width: 95%;
     white-space: pre-wrap;       /* css-3 */
     white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
     white-space: -pre-wrap;      /* Opera 4-6 */
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    border-radius: 5px;
 
 }
 .occupiedText
@@ -84,6 +97,7 @@
     white-space: -pre-wrap;      /* Opera 4-6 */
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    border-radius: 5px;
 
 }
 .detailsLeft
