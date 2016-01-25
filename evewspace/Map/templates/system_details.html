@@ -57,6 +57,11 @@
 			                {{system.static2}} ({{system.static2.dest_string}})
 			            </span>
 			            {% endif %}
+                        {% if system.static3 %}
+                        <span title="Time: {{system.static3.lifetime}}H &nbsp Mass: {{system.static3.maxmass|intcomma}}kg &nbsp Jump Mass: {{system.static3.jumpmass|intcomma}}">
+                            {{system.static3}} ({{system.static3.dest_string}})
+                        </span>
+                        {% endif %}
 			            {% endif %}
 			        </strong>
 			        </div>
