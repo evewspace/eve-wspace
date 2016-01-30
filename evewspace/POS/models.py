@@ -175,7 +175,7 @@ class POS(models.Model):
         self.ewar = 0
         for row in fit:
             try:
-                item_type = Type.objects.get(name=row[1])
+                item_type = Type.objects.get(name=row[1], marketgroup__isnull=False)
             # odd bug where invalid items get into dscan
             except Type.DoesNotExist:
                 continue
@@ -183,7 +183,7 @@ class POS(models.Model):
                 # Some types have multiple records for the same name
                 # When this happens, we will return the first even though
                 # it may not actually be the POS module type.
-                item_type = Type.objects.filter(name=row[1]).all()[0]
+                item_type = Type.objects.filter(name=row[1], marketgroup__isnull=False).all()[0]
             if item_type.marketgroup:
                 group_tree = []
                 parent = item_type.marketgroup

@@ -1,10 +1,12 @@
-<form id="accountProfSettingsForm" class="form-hoizontal" action="/account/profile/" method="POST">
+<div>
+<form id="accountProfSettingsForm" class="form-group" action="/account/profile/" method="POST">
     {% csrf_token %}
     {{form.as_p}}
     <div class="form-actions">
-        <input type="submit" class="btn btn-primary" value="Save" />
+        <input type="submit" class="btn btn-sm btn-primary" value="Save" />
     </div>
 </form>
+</div>
 <script type="text/javascript">
     $('#accountProfSettingsForm').submit(function(e){
                 e.preventDefault();

@@ -6,10 +6,10 @@
         <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.js"></script>
         <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}bootstrap/js/bootstrap.js"> </script>
+        <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap3-typeahead.js"></script>
         <script type="text/javascript" src="{{STATIC_URL}}js/base.js"></script>
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css" />
         <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}bootstrap/css/bootstrap.css" />
-        <link rel="stylesheet" type="text/css" href="{{STATIC_URL}}bootstrap/css/slate.css" />
         {% if is_igb and not is_igb_trusted %}
         <script type="text/javascript">
             CCPEVE.requestTrust(window.location.protocol + '//' + window.location.host);
@@ -20,49 +20,49 @@
 	</head>
 
     <body>
+    	<div id="wrapper" style="width: 100%; height: 100%">
 	<!-- Header block is rendered before the nav bar. Contentheader is rendered after -->
 		<!-- Divs have both class and id so that base CSS can use classes and child templates can override this with id selectors -->
-		<div id="baseHeadDiv" class="header">
-			{%block header%}{%endblock%}
-		</div>
-
-        <div id="baseNavDiv" class="navbar">
-            <div class="navbar-inner">
-                <ul class="nav">
-                    <a class="brand" href="{% url 'core.views.home_view' %}">Eve W-Space</a>
-                    {% load coretags %}
-                    {% nav_entries %}
-                    {% comment %}    
-                {% include "map_nav.html" %}
-				{% include "sitetracker_nav.html" %}
-				{% include "cart_nav.html"%}
-				{% include "alerts_nav.html" %}
-				{% include "pos_nav.html"%}
-				{% include "recruitment_nav.html" %}
-				{% include "api_nav.html" %}
-                {% include "account_nav.html" %}
-                {% endcomment %}
-				{%block navigation %}{%endblock%}
-            </ul>
-        </div>
-		</div>
-
-		<div id="baseContentHeadDiv" class="contenthead">{%block contentheader %}{%endblock%}</div>
+			<div id="baseHeadDiv" class="header">
+				{%block header%}{%endblock%}
+			</div>
 	
-		<div id="baseContentDiv" class="content">
-            <div id="modalHolder" class="modal hide">
-            </div>
-            {%block content %}{%endblock%}
+	        <div id="baseNavDiv" class="navbar navbar-default">
+	            <div class="navbar-inner">
+	                <ul class="nav navbar-nav">
+	                    <li><a class="brand" href="{% url 'core.views.home_view' %}">Eve W-Space</a></li>
+	                    {% load coretags %}
+	                    {% nav_entries %}
+	                    {% comment %}    
+	                {% include "map_nav.html" %}
+					{% include "sitetracker_nav.html" %}
+					{% include "cart_nav.html"%}
+					{% include "alerts_nav.html" %}
+					{% include "pos_nav.html"%}
+					{% include "recruitment_nav.html" %}
+					{% include "api_nav.html" %}
+	                {% include "account_nav.html" %}
+	                {% endcomment %}
+					{%block navigation %}{%endblock%}
+	            	</ul>
+	        	</div>
+			</div>
+			<div class="container" style="width: 100%; padding: 0 15px;">
+				<div id="baseContentHeadDiv" class="contenthead">{%block contentheader %}{%endblock%}</div>
+			
+				<div id="baseContentDiv" class="content">
+		            {%block content %}{%endblock%}
+				</div>
+		        {% feedback_panel %}
+				<div id="baseFooterDiv" class="footer">
+		            {%block footer %}{%endblock%}
+				</div>
+				<div id="response-container" class="draggable-response-container">
+					<div id="cancelHolder"><i class="glyphicon glyphicon-remove" onclick="$('#modalHolder').parent().hide();"></i></div>
+					<div id="modalHolder" style="height: 100%; width: 100%;"></div>
+				</div>
+			</div>
 		</div>
-        {% feedback_panel %}
-		<div id="baseFooterDiv" class="footer">
-            {%block footer %}{%endblock%}
-            <div class="copyrightNotice">
-            EVE Online and the EVE logo are the registered trademarks of CCP hf. All rights are reserved worldwide. All other trademarks are the property of their respective owners. EVE Online, the EVE logo, EVE and all associated logos and designs are the intellectual property of CCP hf. All artwork, screenshots, characters, vehicles, storylines, world facts or other recognizable features of the intellectual property relating to these trademarks are likewise the intellectual property of
-            CCP hf. CCP hf. has granted permission to Eve W-Space to use EVE Online and all associated logos and designs for promotional and information purposes on its website but does not endorse, and is not in any way affiliated with, Eve W-Space. CCP is in no way responsible for the content on or functioning of this website, nor can it be liable for any damage arising from the use of this website.
-            </div>
-		</div>
-
 	</body>
 
 </html>

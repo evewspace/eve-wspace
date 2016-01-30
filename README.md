@@ -24,8 +24,8 @@ How do I use it?
 ----------------
 Generally, Eve W-Space requires:
 
-* Django 1.6+
-* Python 2.6-2.7
+* Django 1.8
+* Python 2.7
 * Celery
 * RabbitMQ (preferred)
 * memcached (preferred)

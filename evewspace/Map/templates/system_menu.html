@@ -1,99 +1,54 @@
-<div id="sysMenu" class="sysMenuDiv">
-<div class="btn-group btn-group">
-    {% if is_igb and mapsys.system.is_kspace %}
-    <div id="autopilotButton" class="btn-group dropdown">
-        <a class="btn btn-small dropdown-toggle" data-toggle="dropdown">
-            Autopilot
-            <span class="caret"></span>
-        </a>
-        <ul is="autopilotDropdown" class="dropdown-menu" role="menu">
-            <li><a href="#" onclick="CCPEVE.setDestination({{mapsys.system.pk}});">Set Destination</a></li>
-            <li><a href="#" onclick="CCPEVE.addWaypoint({{mapsys.system.pk}});">Add Waypoint</a></li>
-        </ul>
-    </div>
-    {% endif %}
-    {% if can_edit %}
-        {% if mapsys.parent_wormhole.collapsed and mapsys.parent_wormhole %}
-        <a class="btn btn-small" onclick="ResurrectSystem({{mapsys.pk}});">Resurrect System</a>
-        {% elif mapsys.parent_wormhole %}
-        <a class="btn btn-small" onclick="CollapseSystem({{mapsys.pk}});">Collapse System</a>
-        {% endif %}
-    {% endif %}
-    {% if not is_igb %}
-    <a class="btn btn-small" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a>
-    {% endif %}
-    {% if can_edit %}
-    <a class="btn btn-small" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a>
-    {% endif %}
-    {% if can_edit and mapsys.has_siblings %}
-    <div id="moveButton" class="btn-group dropdown">
-        <a class="btn btn-small dropdown-toggle" data-toggle="dropdown">
-            Move <span class="caret"></span>
-        </a>
-        <ul id="moveDropdown" class="dropdown-menu" role="menu">
-            <li><a onclick="MoveSystem({{mapsys.pk}}, 'up');">Up</a></li>
-            <li><a onclick="MoveSystem({{mapsys.pk}}, 'down');">Down</a></li>
-        </ul>
-    </div>
-    {% endif %}
-    {% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
-    <a class="btn btn-small" onclick="STCreateFleet({{mapsys.system.pk}});">ST Fleet Here</a>
-    {% endif %}
-    <div id="intelButton" class="btn-group dropdown">
-        <a class="btn  btn-small dropdown-toggle" data-toggle="dropdown">
-            Intel
-            <span class="caret"></span>
-        </a>
-        <ul id="intelDropdown" class="dropdown-menu" role="menu">
-        <li><a href="https://eveeye.com/?system={{system.name}}" target="_blank">EveEye</a></li>
-        <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
-        {% if system.is_kspace < 7 %}
-        <li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
-        {% else %}
-        <li><a href="http://evemaps.dotlan.net/map/{{system.region.name.split|join:"_"}}/{{system.name.split|join:"_"}}" target="_blank">Dotlan</a></li>
-        {% endif %}
-        <li><a href="http://zkillboard.com/system/{{system.pk}}" target="_blank">zKillboard</a></li>
-        {% if system.is_wspace < 7 %}
-        <li><a href="http://wh.pasta.gg/{{system.name}}" target="_blank">Wormhol.es</a></li>
-        {% endif %}
-        {% if system.id == 31000005 %}
-        <li><a href="http://eve-scout.com/" target="_blank">EveScout</a></li>
-        {% endif %}
-
-    </ul>
-</div>
-    {% if can_edit %}
-            {% if isinterest %}
-            <a class="btn btn-small" onclick="RemoveInterest({{mapsys.pk}});" >Remove Interest </a>
-            {% else %}
-            <a class="btn btn-small" onclick="SetInterest({{mapsys.pk}});" >Set Interest</a>
+	    <a href="#systemOptions" data-toggle='dropdown' class='dropdown-toggle'>Options <b class="caret"></b></a>
+        <ul class="dropdown-menu" role="menu">
+            {% if is_igb and mapsys.system.is_kspace %}
+	            <li><a href="#systemOptions" onclick="CCPEVE.setDestination({{mapsys.system.pk}});">Set Destination</a></li>
+	            <li><a href="#systemOptions" onclick="CCPEVE.addWaypoint({{mapsys.system.pk}});">Add Waypoint</a></li>
+	            <li class="divider"></li>            
             {% endif %}
-            {% if mapsys.system.importance != 1 %}
-            <a class="btn btn-small" onclick="SetImportance({{mapsys.pk}}, {{mapsys.system.pk}}, 1);">Set Danger</a>
-            {% else %}
-            <a class="btn btn-small" onclick="SetImportance({{mapsys.pk}}, {{mapsys.system.pk}}, 0);">Unset Danger</a>
-            {% endif %}
-            <a class="btn btn-small" onclick="MarkScanned({{mapsys.pk}}, false, {{mapsys.system.pk}});">Mark Scanned</a>
-        <div id="deleteButton" class="btn-group dropdown">
-            <a class="btn btn-small dropdown-toggle" data-toggle="dropdown">
-                Delete
-            </a>
-            <ul id="deleteDropdown" class="dropdown-menu" role="menu">
-                <li><a onclick="DeleteSystem({{mapsys.pk}});")>I'm sure!</a></li>
-                <li><a class="dropdown-toggle" data-toggle="dropdown")>Just Kidding!</a></li>
-            </ul>
-        </div>
-        {% if mapsys.map.truncate_allowed %}
-         <div id="truncateButton" class="btn-group dropdown">
-            <a class="btn btn-small btn-danger dropdown-toggle" data-toggle="dropdown">
-                Truncate Chain
-            </a>
-            <ul id="truncateDropdown" class="dropdown-menu" role="menu">
-                <li><a onclick="PromoteSystem({{mapsys.pk}});")>I'm sure!</a></li>
-                <li><a class="dropdown-toggle" data-toggle="dropdown")>Just Kidding!</a></li>
-            </ul>
-        </div>
-        {% endif %}
-   {% endif %}
-    </div>
-</div>
+			{% if can_edit %}
+				<li><a href="#systemOptions" onclick="GetAddSystemDialog({{mapsys.pk}});">Add System</a></li>
+	            {% if isinterest %}
+	            	<li><a href="#systemOptions" onclick="RemoveInterest({{mapsys.pk}});" >Remove Interest </a></li>
+	            {% else %}
+	            	<li><a href="#systemOptions" onclick="SetInterest({{mapsys.pk}});" >Set Interest</a></li>
+	            {% endif %}
+	            {% if mapsys.system.importance != 1 %}
+	            	<li><a href="#systemOptions" onclick="SetImportance({{mapsys.pk}}, {{mapsys.system.pk}}, 1);">Set Danger</a></li>
+	            {% else %}
+	            	<li><a href="#systemOptions" onclick="SetImportance({{mapsys.pk}}, {{mapsys.system.pk}}, 0);">Unset Danger</a></li>
+	            {% endif %}
+	            	<li><a href="#systemOptions" onclick="MarkScanned({{mapsys.pk}}, false, {{mapsys.system.pk}});">Mark Scanned</a></li>
+		        {% if mapsys.parent_wormhole.collapsed and mapsys.parent_wormhole %}
+		        	<li><a href="#systemOptions" onclick="ResurrectSystem({{mapsys.pk}});">Resurrect System</a></li>
+		        {% elif mapsys.parent_wormhole %}
+		        	<li><a href="#systemOptions" onclick="CollapseSystem({{mapsys.pk}});">Collapse System</a></li>
+		        {% endif %}
+    		{% endif %}
+    		{% if not is_igb %}
+			    <li><a href="#systemOptions" onclick="AssertLocation({{mapsys.pk}});">I'm Here</a></li>
+		    {% endif %}
+		    <li class="divider"></li>
+		    {% if can_edit and mapsys.has_siblings %}
+			    <li><a href="#systemOptions" onclick="MoveSystem({{mapsys.pk}}, 'up');">Move Up</a></li>
+	            <li><a href="#systemOptions" onclick="MoveSystem({{mapsys.pk}}, 'down');">Move Down</a></li>
+	            <li class="divider"></li>
+	        {% endif %}
+	        {% if perms.SiteTracker.can_sitetracker and not stfleets|length %}
+    			<li><a href="#systemOptions" onclick="STCreateFleet({{mapsys.system.pk}});">Start ST Fleet</a></li>
+    			<li class="divider"></li>
+    		{% endif %}
+            <li><a href="https://eveeye.com/?system={{system.name}}" target="_blank">EveEye</a></li>
+	        <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
+	        {% if system.is_kspace < 7 %}
+	        	<li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
+	        {% else %}
+	        	<li><a href="http://evemaps.dotlan.net/map/{{system.region.name.split|join:"_"}}/{{system.name.split|join:"_"}}" target="_blank">Dotlan</a></li>
+	        {% endif %}
+	        	<li><a href="http://zkillboard.com/system/{{system.pk}}" target="_blank">zKillboard</a></li>
+	        {% if system.is_wspace < 7 %}
+	        	<li><a href="http://wh.pasta.gg/{{system.name}}" target="_blank">Wormhol.es</a></li>
+	        {% endif %}
+	        {% if system.id == 31000005 %}
+	        	<li><a href="http://eve-scout.com/" target="_blank">EveScout</a></li>
+	        {% endif %}
+        </ul>

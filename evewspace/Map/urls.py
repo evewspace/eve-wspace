@@ -38,7 +38,7 @@ syspatterns = patterns(
     url(r'^edit/$', 'edit_system'),
     url(r'^destinations/$', 'destination_list'),
     url(r'^addchild/$', 'manual_add_system'),
-    url(r'^signatures/$', 'get_signature_list'),
+    url(r'^signatures/list/(?P<sys_id>\d+)/', 'get_signature_list'),
     url(r'^signatures/new/$', 'edit_signature'),
     url(r'^signatures/purge/$', 'purge_signatures'),
     url(r'^signatures/bulkadd/$', 'bulk_sig_import'),

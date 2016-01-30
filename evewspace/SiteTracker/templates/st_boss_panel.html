@@ -2,25 +2,20 @@
     <h3>Boss Controls</h3>
 </div>
 <div class="modal-body">
+	<button class="btn btn-primary btn-xs" onclick="$('#modalHolder').parent().hide();">Close Panel</button>
+    <button class="btn btn-xs btn-danger" onclick="$('#disbandConfirmDiv').show();">Disband Fleet</button>
+    <div id="disbandConfirmDiv" style="display: none;">
+        <h5>Are you sure?</h5>
+        <button class="btn btn-xs btn-primary" onclick="$('#disbandConfirmDiv').hide();">I'm so high right now.</button>
+        <button class="btn btn-xs btn-danger" onclick="STDisbandFleet({{fleet.pk}});">Disband Fleet</button>
+    </div>
     {% load sitetracker %}
-    <table class="table table-hover stBossMemberEntry">
+    <table class="table table-hover table-condensed">
         <tr>
             <th>Member</th>
             <th>Joined</th>
         </tr>
-        </table>
         {% for member in fleet.active_members.all %}
-            {% st_boss_member member %}
+            {% st_boss_member member  %}
         {% endfor %}
-    <h5>Broadcast Fleet:</h5>
-    <span class="label label-info">Coming soon(tm)!</span>
-</div>
-<div class="modal-footer">
-    <button class="btn btn-primary btn-small" onclick="$('#modalHolder').modal('hide');">Close Panel</button>
-    <button class="btn btn-small" onclick="$('#disbandConfirmDiv').toggle();">Disband Fleet</button>
-    <div id="disbandConfirmDiv" class="hide">
-        <h5>Are you sure?</h5>
-        <button class="btn btn-small btn-primary" onclick="$('#disbandConfirmDiv').toggle();">I'm so high right now.</button>
-        <button class="btn btn-small" onclick="STDisbandFleet({{fleet.pk}});">Disband Fleet</button>
-    </div>
 </div>

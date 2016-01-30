@@ -26,9 +26,9 @@
             </td>
             <td><span title="{{api_key.validation_error}}">{% if api_key.valid %} Yes {% else %} No {% endif %}</span></td>
             <td>
-                <button class="btn-small btn-danger" title="Remove key, but keep log entries."  onclick="APIAdminDeleteKey({{api_key.keyid}}, {{member.pk}});">Delete</button>
-                <button class="btn-small btn-danger" title="Remove key and all log entries for associated characters"  onclick="APIPurgeKey({{api_key.keyid}}, {{member.pk}});">Purge</button>
-                <button class="btn-small btn-success" onclick="APIAdminEditKey({{api_key.keyid}}, {{member.pk}});">Edit</button>
+                <button class="btn btn-sm btn-danger" title="Remove key, but keep log entries."  onclick="APIAdminDeleteKey({{api_key.keyid}}, {{member.pk}});">Delete</button>
+                <button class="btn btn-sm btn-danger" title="Remove key and all log entries for associated characters"  onclick="APIPurgeKey({{api_key.keyid}}, {{member.pk}});">Purge</button>
+                <button class="btn btn-sm btn-success" onclick="APIAdminEditKey({{api_key.keyid}}, {{member.pk}});">Edit</button>
             </td>
         </tr>
         {% empty %}

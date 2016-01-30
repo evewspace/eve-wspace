@@ -1,7 +1,11 @@
 {% for mapsys in map_systems %}
 <div id="sys{{mapsys.pk}}Tip" class="systemTooltip tip">
 <div class="mapSysInfo row">
-   <div class="sysClassSpan span3">
+{% if mapsys.system.pilot_list %}
+    <div class="sysClassSpan col-md-6" style="width: 300px">
+{% else %}
+	<div class="sysClassSpan col-md-12">
+{% endif %}
        <h4 class="sysFriendlySpan">{{mapsys.friendlyname}}{% if mapsys.parent_wormhole.collapsed %} - COLLAPSED{% endif %}</h4>
         <div> 
             <strong>Name: {{mapsys.system.name}} </strong>
@@ -44,23 +48,22 @@
     <br />
     {% endif %}
     {% load humanize %}
-    <span class="sysLastScanned label {% if scanwarning  %} label-important {% endif %}">
+    <span class="sysLastScanned {% if scanwarning  %} label-important {% endif %}">
         Last Scanned: {{mapsys.system.lastscanned|naturaltime}}
     </span><br />
     {% if mapsys.system.is_kspace %}
-     <span class="statsText label label-inverse"> NPC: {{mapsys.system.npckills}} Ship: {{mapsys.system.shipkills}} Pod: {{mapsys.system.podkills}} Jumps: {{mapsys.system.get_spec.jumps}}</span> 
-     <br /> 
+     <div class="statsText"> NPC: {{mapsys.system.npckills}} Ship: {{mapsys.system.shipkills}} Pod: {{mapsys.system.podkills}} Jumps: {{mapsys.system.get_spec.jumps}}</div>
      {% endif %}
-     <p class="statusText label label-success">SIG: {{mapsys.system.signatures.count}} POS: {{mapsys.system.poses.count}} Pilots: {{mapsys.system.pilot_list|length}}</p><br />
+     <div class="statusText bg-success">SIG: {{mapsys.system.signatures.count}} POS: {{mapsys.system.poses.count}} Pilots: {{mapsys.system.pilot_list|length}}</div><br />
     {% if mapsys.system.occupied %}
-    <div class="occupiedTooltip label label-important"> Occupied: <br /> {{mapsys.system.occupied|linebreaksbr}}</div>
+    <div class="occupiedTooltip bg-danger">Occupied: <br />{{mapsys.system.occupied|linebreaksbr}}</div>
     {% endif %}
     {% if mapsys.system.info %}
-    <div class="infoTooltip label label-info"> Info: <br /> {{mapsys.system.info|linebreaksbr}} </div>
+    <div class="infoTooltip bg-info">Info: <br />{{mapsys.system.info|linebreaksbr}} </div>
     {% endif %}
 </div>
 {% if mapsys.system.pilot_list %}
-    <div class="span3">
+    <div class="col-md-6" style="width: 300px">
             <table>
                 <tr>
                     <th>Pilot</th>

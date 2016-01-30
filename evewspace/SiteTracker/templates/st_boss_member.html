@@ -1,11 +1,12 @@
 {% load sitetracker %}
-<table class="table stBossMemberEntry table-hover table-bordered">
 <tr data-toggle="collapse" data-target="#member{{member.user.pk}}Holder">
     <td class="stBossMemberEntryItem">{{member.user.username}}</td>
     <td class="stBossMemberEntryItem">{{member.jointime|date:"H:i"}}</td>
 </tr>
-</table>
-<div class="stMemberDetails collapse" id="member{{member.user.pk}}Holder">
-    {% include "st_boss_member_details.html" %}
-</div>
-
+<tr>
+	<td colspan="2">
+		<div class="stMemberDetails collapse" id="member{{member.user.pk}}Holder">
+		    {% include "st_boss_member_details.html" %}
+		</div>
+	</td>
+</tr>

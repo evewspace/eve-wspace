@@ -12,55 +12,56 @@
     {% endfor %}
 </div>
 {% endif %}
-<form id="userSettingsForm" class="form-horizontal" action="/account/admin/user/{{member.pk}}/" method="POST">
+<form id="userSettingsForm" class="form-horizontal form-group" action="/account/admin/user/{{member.pk}}/" method="POST">
     {% csrf_token %}
     <div class="control-group">
         <label class="control-label" for="usernameInput">Username:</label>
         <div class="controls">
-            <input type="text" class="input-medium" name="username" value="{{member.username}}" id="usernameInput">
+            <input type="text" class="input-sm form-control input-margin" name="username" value="{{member.username}}" id="usernameInput">
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="emailInput">Email Address:</label>
         <div class="controls">
-            <input type="text" class="input-email" name="email" id="emailInput" value="{{member.email}}">
+            <input type="text" class="input-email input-sm form-control input-margin" name="email" id="emailInput" value="{{member.email}}">
         </div>
     </div>
     <div class="control-group">
         <label class="control-label" for="newPassword">Set Password:</label>
         <div class="controls">
-            <input type="password" id="newPassword" class="input-medium" name="new_password">
-            <input type="password" id="passwordConfirm" class="input-medium" name="confirm_password"><br /><br />
-            <button class="btn btn-info" onclick="SetRandomPassword();">Randomize</button>
+            <input type="password" id="newPassword" class="input-sm form-control input-margin" name="new_password">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="newPassword">Confirm Password:</label>
+    		<input type="password" id="passwordConfirm" class="input-sm form-control input-margin" name="confirm_password">
+            <button class="btn btn-info btn-sm" onclick="SetRandomPassword();">Randomize</button>
             <div>
                 <span id="randomPasswordSpan" style="display:none;" class="label label-info"></span>
             </div>
-        </div>
     </div>
             {% if member.email %}
-        <div class="control-group">
-
-            <label class="control-label" for="emailPassword">Email New Password</label>
-        <div class="controls">
-            <input type="checkbox" id="emailPassword" name="email_password">
-            </div>
+       	<div class="checkbox">
+        	<label>
+           		<input type="checkbox" id="emailPassword" name="email_password"> Email New Password 
+           	</label>
         </div>
-            {% endif %}
-    <div class="control-group">
-        <label class="control-label" for="userEnabled">Active:</label>
-        <div class="controls">
-            <input type="checkbox" id="userEnabled" name="enabled" {% if member.is_active %} checked="checked" {% endif %} {% if user == member %} disabled="disabled" {% endif %}>
+        {% endif %}
+        <div class="checkbox margin-input">
+        	<label>
+            	<input type="checkbox" id="userEnabled" name="enabled" {% if member.is_active %} checked="checked" {% endif %} {% if user == member %} disabled="disabled" {% endif %}> Active
+            </label>
+        </div>
             {% if user == member %}
-            <input type="hidden" id="userHiddenEnabled" name="enabled" value="on">
+        
+            <input type="hidden" id="userHiddenEnabled" name="enabled" value="on"> 
             {% endif %}
-        </div>
-    </div>
     <div class="control-group">
         <div class="controls">
-            <button class="btn btn-success" onclick="SaveUser({{member.pk}});" id="saveUserButton">Save User</button>
-            <button class="btn btn-danger" id="deleteUserButton" {% if user == member %} disabled="disabled" {% endif %}>Delete User</button>
-            <button class="btn btn-danger" style="display: none;" id="reallyDeleteUser">Really Delete</button>
-            <button class="btn btn-danger" style="display: none;" id="reallyReallyDeleteUser" onclick="DeleteUser({{member.pk}});">Really Really Delete</button>
+            <button class="btn btn-success btn-sm" onclick="SaveUser({{member.pk}});" id="saveUserButton">Save User</button>
+            <button class="btn btn-danger btn-sm" id="deleteUserButton" {% if user == member %} disabled="disabled" {% endif %}>Delete User</button>
+            <button class="btn btn-warning btn-sm" style="display: none;" id="reallyDeleteUser">Really Delete</button>
+            <button class="btn btn-danger btn-sm" style="display: none;" id="reallyReallyDeleteUser" onclick="DeleteUser({{member.pk}});">Really Really Delete</button>
         </div>
     </div>
 </form>

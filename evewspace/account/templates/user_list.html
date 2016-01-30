@@ -20,13 +20,13 @@
 </table>
 <div class="pagination">
     {% if member_list.number != 1 %}
-    <button class="btn btn-mini btn-danger" id="userFirstLink">first</button>
-    <button class="btn btn-mini btn-danger" id="userPreviousLink">previous</button>
+    <button class="btn btn-xs btn-danger" id="userFirstLink">first</button>
+    <button class="btn btn-xs btn-danger" id="userPreviousLink">previous</button>
     {% endif %}
     <span>Page {{member_list.number}} of {{member_list.paginator.num_pages}}</span>
     {% if member_list.has_next %}
-        <button class="btn btn-mini btn-danger" id="userNextLink">next</button>
-        <button class="btn btn-mini btn-danger" id="userLastLink">last</button>
+        <button class="btn btn-xs btn-danger" id="userNextLink">next</button>
+        <button class="btn btn-xs btn-danger" id="userLastLink">last</button>
     {% endif %}
     <script type="text/javascript">
     {% if member_list.number != 1 %}
