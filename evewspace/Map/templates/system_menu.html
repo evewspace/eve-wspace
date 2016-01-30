@@ -37,7 +37,7 @@
     			<li><a href="#systemOptions" onclick="STCreateFleet({{mapsys.system.pk}});">Start ST Fleet</a></li>
     			<li class="divider"></li>
     		{% endif %}
-            <li><a href="https://eveeye.com/?system={{system.name}}" target="_blank">EveEye</a></li>
+	        <li><a href="https://eveeye.com/?system={{system.name}}" target="_blank">EveEye</a></li>
 	        <li><a href="http://www.staticmapper.com/index.php?system={{system.name}}" target="_blank">StaticMapper</a></li>
 	        {% if system.is_kspace < 7 %}
 	        	<li><a href="http://evemaps.dotlan.net/system/{{system.name}}" target="_blank">Dotlan</a></li>
@@ -51,4 +51,5 @@
 	        {% if system.id == 31000005 %}
 	        	<li><a href="http://eve-scout.com/" target="_blank">EveScout</a></li>
 	        {% endif %}
+	        <li><a href="http://www.eveplanets.com/eve/system/index/show/{{system.name}}" target="_blank">EvePlanets</a></li>
         </ul>
