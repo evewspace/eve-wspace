@@ -44,7 +44,7 @@ class Command(NoArgsCommand):
                     newdata.save()
                     self.stdout.write('KSystem %s added' % (system.name))
                 else:
-                    newdata = WSystem(static1=None, static2=None, static3=None, sysclass=sysclass,
+                    newdata = WSystem(sysclass=sysclass,
                             lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
                             info='', occupied='')
                     for field in system._meta.fields:
@@ -69,7 +69,7 @@ class Command(NoArgsCommand):
                     lowsec.save()
                     self.stdout.write('KSystem %s updated' % (system.name))
                 else:
-                    newdata = WSystem(static1=None, static2=None, static3=None, sysclass=sysclass,
+                    newdata = WSystem(sysclass=sysclass,
                             lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
                             info='', occupied='')
                     for field in system._meta.fields:
