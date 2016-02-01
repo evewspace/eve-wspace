@@ -222,14 +222,23 @@ class KSystem(System):
 
 class WSystem(System):
     """Represents a w-space system."""
-    static1 = models.ForeignKey(WormholeType, blank=True, null=True,
-                                related_name="primary_statics")
-    static2 = models.ForeignKey(WormholeType, blank=True, null=True,
-                                related_name="secondary_statics")
-    static3 = models.ForeignKey(WormholeType, blank=True, null=True,
-                                related_name="tertiary_statics")
+    statics = models.ManyToManyField(
+                        WormholeType,
+                        blank=True,
+                        null=True,
+                        through='SystemStatic',
+                        through_fields=('system', 'static')
+                        )
     effect = models.CharField(max_length=50, blank=True, null=True)
     is_shattered = models.NullBooleanField(default=False)
+
+
+class SystemStatic(models.Model):
+    """Represents a single static of a system."""
+    system = models.ForeignKey(WSystem, blank=True, null=True)
+    static = models.ForeignKey(WormholeType, blank=True, null=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
 
 
 class Map(models.Model):
