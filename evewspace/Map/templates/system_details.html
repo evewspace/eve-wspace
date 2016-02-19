@@ -161,7 +161,7 @@
 <div id="sigsPanel" class="sigsPanel tab-pane">
 	<div id="sigAddPanel" class="sigAddPanel panel panel-default">
 		<div class="panel-heading">
-			<h4 class="center_text"> Signatures: {{mapsys.system.name}} </h4>
+            <h4 class="center_text"> Signatures: {{mapsys.system.name}} {% if mapsys.friendlyname %}({{ mapsys.friendlyname }}){% endif %} </h4>
 		</div>
 		<div class="panel-body">
     		<div style="margin-bottom: 10px; text-align: center;">
@@ -190,7 +190,7 @@
 <div id="activePlayerPanel" class="activePlayerPanel tab-pane">
     <div id="activePlayerList" class="activePlayerList panel panel-default">
     	<div class="panel-heading">
-	    	<h4>Active Pilots: {{system.name}}</h4>
+	    	<h4>Active Pilots: {{system.name}} {% if mapsys.friendlyname %}({{ mapsys.friendlyname }}){% endif %}</h4>
 	    </div>
 	    <div class="panel-body">
 	        <table class="table table-condensed table-hover">
@@ -216,7 +216,7 @@
 <div id="systemPosPanel" class="systemPosPanel tab-pane">
     <div style="text-align: center; margin-bottom: 10px;" class="panel panel-default">
     	<div class="panel-heading">
-            <h4>Starbases: {{system.name}}</h4>
+            <h4>Starbases: {{system.name}} {% if mapsys.friendlyname %}({{ mapsys.friendlyname }}){% endif %}</h4>
         </div>
         <div class="panel-body">
             {% if can_edit %}
