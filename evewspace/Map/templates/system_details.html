@@ -166,8 +166,8 @@
 		<div class="panel-body">
     		<div style="margin-bottom: 10px; text-align: center;">
     	    	{% if can_edit %}
-	            	<button id="btnPurgeSigs" class="btn btn-sm btn-danger" style="margin-top: -12px; margin-bottom: 9px;"><i class="glyphicon glyphicon-remove-circle"></i> Purge Sigs</button>
-	            	<button id="btnReallyPurgeSigs" class="btn btn-sm btn-warning" style="display: none; margin-top: -12px; margin-bottom: 9px;"  onclick="PurgeSignatures({{mapsys.pk}});"><i class="glyphicon glyphicon-remove-circle"></i> Really Purge?</button>
+	            	<button id="btnPurgeSigs" class="btn btn-sm btn-danger" style="float: right; margin-top: -12px; margin-bottom: 9px;"><i class="glyphicon glyphicon-remove-circle"></i> Purge Sigs</button>
+	            	<button id="btnReallyPurgeSigs" class="btn btn-sm btn-warning" style="float: right; display: none; margin-top: -12px; margin-bottom: 9px;"  onclick="PurgeSignatures({{mapsys.pk}});"><i class="glyphicon glyphicon-remove-circle"></i> Really Purge?</button>
 	            	<script type="text/javascript">
 	        	    	$('#btnPurgeSigs').click(function() {
 	            	    	$('#btnReallyPurgeSigs').show();
