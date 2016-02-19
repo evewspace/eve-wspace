@@ -24,16 +24,11 @@
 	<div id="sysDetails" class="tab-pane active">
 		<div class="panel panel-default">
 			<div id="sysPanelHeader" class="panel-heading center_text">
-			    <h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} System Details: {{mapsys.system.name}} &nbsp;
+			    <h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} System Details: {{mapsys.system.name}} {% if mapsys.friendlyname %}<span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %} &nbsp;
 			    	{% if system.is_kspace and is_igb %}
 			        	<button class='btn btn-xs btn-info' onclick="CCPEVE.setDestination({{system.pk}});">Set destination</button>
 			        {% endif %}
 			    </h4>
-			    {% if mapsys.friendlyname %}
-			    <div class="mapSysInfo">
-			        <h5 class="friendlyName"> Friendly Name: <small>{{mapsys.friendlyname}}</small> </h5>
-			    </div>
-			    {% endif %}
 			</div>
 			<div id="sysPanelBody" class="panel-body">
 			    <div class="sysClassSpan" class="row">
@@ -161,7 +156,7 @@
 <div id="sigsPanel" class="sigsPanel tab-pane">
 	<div id="sigAddPanel" class="sigAddPanel panel panel-default">
 		<div class="panel-heading">
-            <h4 class="center_text">{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} Signatures: {{mapsys.system.name}} {% if mapsys.friendlyname %}({{ mapsys.friendlyname }}){% endif %} </h4>
+            <h4 class="center_text">{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} Signatures: {{mapsys.system.name}} {% if mapsys.friendlyname %}<span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %} </h4>
 		</div>
 		<div class="panel-body">
     		<div style="margin-bottom: 10px; text-align: center;">
@@ -190,7 +185,7 @@
 <div id="activePlayerPanel" class="activePlayerPanel tab-pane">
     <div id="activePlayerList" class="activePlayerList panel panel-default">
     	<div class="panel-heading">
-	    	<h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} Active Pilots: {{system.name}} {% if mapsys.friendlyname %}({{ mapsys.friendlyname }}){% endif %}</h4>
+	    	<h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} Active Pilots: {{system.name}} {% if mapsys.friendlyname %}<span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %} </h4>
 	    </div>
 	    <div class="panel-body">
 	        <table class="table table-condensed table-hover">
@@ -216,7 +211,7 @@
 <div id="systemPosPanel" class="systemPosPanel tab-pane">
     <div style="text-align: center; margin-bottom: 10px;" class="panel panel-default">
     	<div class="panel-heading">
-            <h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} Starbases: {{system.name}} {% if mapsys.friendlyname %}({{ mapsys.friendlyname }}){% endif %}</h4>
+            <h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} Starbases: {{system.name}} {% if mapsys.friendlyname %}<span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %} </h4>
         </div>
         <div class="panel-body">
             {% if can_edit %}
