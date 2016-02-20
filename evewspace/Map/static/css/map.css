@@ -395,5 +395,26 @@ ul#moveDropdown li {
 .friendlyname {
     font-style: italic;
     font-size: 95%;
+    color: #eee;
+}
+.visited {
+    font-style: italic;
+    font-size: 80%;
+}
+#sysInfoDiv .panel-heading {
+    text-align: center; 
+}
+div.sysClassSpan label {
+    font-weight: normal;
+}
+#sysClass, #sysStatics, #sysEffect, #sysSov {
+    display: block;
+    font-weight: normal;
+    padding-left: 10px;
+}
+#sysOccupied {
+    display: block;
+    font-weight: bold;
+    font-style: italic;
 }
 
