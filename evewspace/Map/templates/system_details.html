@@ -53,42 +53,31 @@
 			        </strong>
 			        </div>
 			        {% endif %}
-			        {% if system.sov %}
-			        <br />
-			        Sov: {{system.sov}}
-			        {% endif %}
-			        {% if system.is_kspace %}
-			        	<table class="table-condensed">
-			        		<tr>
-			        			<td>Security</td>
-			        			<td>
-				        			{% if system.sysclass == 7 %}
-							        High Sec
-							        {% endif %}
-							        {% if system.sysclass == 8 %}
-							        Low Sec
-							        {% endif %}
-							        {% if system.sysclass == 9 %}
-							        Null Sec
-							        {% endif %}
-						        </td>
-			        		</tr>
-			        		{% if system.sov %}
-				        		<tr>
-				        			<td>Sov</td>
-				        			<td>{{system.sov}}
-				        			</td>
-				        		</tr>
-			        		{% endif %}
-			        		<tr>
-			        			<td>Region</td>
-			        			<td>{{system.region}}</td>
-			        		</tr>
-			        		<tr>
-			        			<td>Constellation</td>
-			        			<td>{{system.constellation}}</td>
-			        		</tr>
-			        	</table>
+
+                    {% if system.is_kspace %}
+                    <div id="kspacedetails">
+                        <div class="col-md-3">
+                            <label>Sec:</label> <span id="sysSec" class="{% if system.sysclass == 7 %}secHIGH{% endif %}{% if system.sysclass == 8 %}secLOW{% endif %}{% if system.sysclass == 9 %}secNULL{% endif %}">
+                                                {% if system.sysclass == 7 %}
+                                                High Sec
+                                                {% endif %}
+                                                {% if system.sysclass == 8 %}
+                                                Low Sec
+                                                {% endif %}
+                                                {% if system.sysclass == 9 %}
+                                                Null Sec
+                                                {% endif %}
+                                                </span>
+                        </div>
+                        {% if system.sov %}
+                        <div class="col-md-4">
+                            <label>Sov:</label> <span id="sysSov">{{system.sov}}</span> 
+                        </div>
+                        {% endif %}
+                        <div class="col-md-5">
+                            <label>Const/Region:</label> <span id="sysRegion">{{system.constellation}} / {{system.region}}</span> 
+                        </div>
+                    </div>
 			        {% endif %}
 			    </div>
 			    <br />
@@ -96,12 +85,13 @@
 		    <div class="row">
 		    	<div class="col-md-12">
 			    {% load humanize %}
-			    	<div class="visited center_text">First Visit: {{system.first_visited|naturaltime}} &bull; Last Visit: {{system.last_visited|naturaltime}}</div>
-			    	<div class="detailsLeft">
-			    		{% if system.occupied or system.poses.all %}
-				    	<div class="occupiedDiv bg-danger panel-textbox">
-				        	<span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|linebreaks}}
-				        	Towers:
+                <div class="visited center_text">First Visit: <em>{{system.first_visited|naturaltime}}</em> &bull; Last Visit: <em>{{system.last_visited|naturaltime}}</em></div>
+                    {% if system.occupied or system.poses.all %}
+                        <div class="detailsLeft">
+				    	 <div class="occupiedDiv bg-danger panel-textbox">
+                            <label>Occupied:</label> <span id="sysOccupied">{{system.occupied|linebreaks}}</span>
+                            <br />
+                            <label>Towers:</label>
 				        	<ul>
 					            {% for pos in system.poses.all %}
 					            <li>P:{{pos.planet}} &nbsp;M: {{pos.moon}} - {{pos.towertype.name}} - {{pos.corporation.name}} -
@@ -125,10 +115,9 @@
 					            <li>No Towers</li>
 					            {% endfor %}
 					        </ul>
-				    	</div>
-		    			{% endif %}
-		    		</div>
-		    		<br />
+				     	 </div>
+                        </div>
+                    {% endif %}
 				    {% if system.info %}
 				    	<p class="infoText bg-primary panel-textbox"><span class="infoTitle">Info:</span> <br /> {{system.info|linebreaksbr}} </p><br />
 				    {% endif %}

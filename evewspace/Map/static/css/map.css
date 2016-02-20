@@ -398,7 +398,7 @@ ul#moveDropdown li {
     color: #eee;
 }
 .visited {
-    font-style: italic;
+    text-align: center;
     font-size: 80%;
 }
 #sysInfoDiv .panel-heading {
@@ -417,4 +417,3 @@ div.sysClassSpan label {
     font-weight: bold;
     font-style: italic;
 }
-
