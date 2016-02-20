@@ -21,20 +21,20 @@
 		        <label for="massStatusReduced"><input id="massStatusReduced" type="radio" class="editWormholeInput" name="massStatus" value="1" {% if wormhole.mass_status == 1 %} checked="checked" {% endif %}> First Shrink</label> <br />
 		        <label for="massStatusCritical"><input id="massStatusCritical" type="radio" class="editWormholeInput" name="massStatus" value="2" {% if wormhole.mass_status == 2 %} checked="checked" {% endif %}> Critical</label>
 		    </div>
-		    <div style="padding-top: 30px" class="col-md-6 input-margin">
-        		<h4>Wormhole in: {{wormhole.top.system.name}}</h4>
+		    <div class="col-md-6 input-margin">
+                Wormhole in {{wormhole.top.system.name}}{% if mapsys.friendlyname %} <span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %}:
         	</div>
-        	<div style="padding-top: 30px" class="col-md-6 input-margin">
+        	<div class="col-md-6 input-margin">
 		        Type: &nbsp;
 		        <input type="text" id="topType" class="editWormholeInput wormholeAuto input-sm form-control" name="topType" value="{{wormhole.top_type.name}}">
 		        <br />
 		        Bubbled: &nbsp; <input type="radio" class="editWormholeInput" name="topBubbled" value="0" {% if not wormhole.top_bubbled %} checked="checked" {% endif %}> No &nbsp;
 		        <input type="radio" class="editWormholeInput" name="topBubbled" value="1" {% if wormhole.top_bubbled %} checked="checked" {% endif %}> Yes
 		    </div>
-		    <div style="padding-top: 30px" class="col-md-6 input-margin">
-        		<h4>Wormhole in: {{wormhole.bottom.system.name}}</h4>
+		    <div class="col-md-6 input-margin">
+                Wormhole in {{wormhole.bottom.system.name}}{% if mapsys.friendlyname %} <span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %}:
         	</div>
-        	<div style="padding-top: 30px" class="col-md-6 input-margin">
+        	<div class="col-md-6 input-margin">
 		        Type: &nbsp;
 		        <input type="text" id="bottomType" class="editWormholeInput wormholeAuto input-sm form-control" name="bottomType" value="{{wormhole.bottom_type.name}}">
 		        <br />

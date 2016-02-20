@@ -1,5 +1,5 @@
 .draggable-response-container {
-    background-color: #464545;
+    background-color: rgba(70,69,69,0.9);
     border: 1px solid #fff;
     border-radius: 5px;
     position: absolute;
@@ -39,4 +39,19 @@
 .center_text
 {
     text-align:center;
+}
+
+
+/** 
+ * override some things from bootstrap.css
+ */
+
+.modal-header {
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.modal-body {
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
