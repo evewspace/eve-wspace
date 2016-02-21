@@ -34,25 +34,25 @@
 			    <div class="sysClassSpan" class="row">
 			        {% if system.is_wspace %}
 			        <div class="col-md-3">
-			            <strong>Class: <span id="sysClass">{{system.sysclass}}</span></strong>
+                        <label>Class:</label> <span id="sysClass">{{system.sysclass}}</span>
 			        </div>
 			        <div class="col-md-4">
-			            <strong>Effect: <span id="sysEffect">{{system.effect}}</span></strong>
+                        <label>Effect:</label> <span id="sysEffect">{{system.effect}}</span>
 			        </div>
 			        <div class="col-md-5">
-			            <strong>Probable Statics:
+                        <label>Probable Statics:</label>
+                        <span id="sysStatics">
 			                {% if system.statics.all.count == 0 %}
-			                <span>Unknown</span>
+                                <span>Unknown</span>
 			                {% else %}
-                      {% for hole in system.statics.all %}
-			                <span title="Time: {{hole.lifetime}}H &nbsp Mass: {{hole.maxmass|intcomma}}kg &nbsp Jump Mass: {{hole.jumpmass|intcomma}}kg">
-			                    {{hole.name}} ({{hole.dest_string}}) &nbsp
-                      </span>
-                      {% endfor %}
-                      {% endif %}
-			        </strong>
+                                {% for hole in system.statics.all %}
+                                    <span title="Time: {{hole.lifetime}}H &nbsp Mass: {{hole.maxmass|intcomma}}kg &nbsp Jump Mass: {{hole.jumpmass|intcomma}}kg">
+                                    {{hole.name}} ({{hole.dest_string}})</span>
+                                {% endfor %}
+                            {% endif %}
+                        </span>
 			        </div>
-			        {% endif %}
+                    {% endif %}
 
                     {% if system.is_kspace %}
                     <div id="kspacedetails">
