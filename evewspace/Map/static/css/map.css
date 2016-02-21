@@ -253,6 +253,16 @@ textarea
     color: #f3b839;
 }
 
+.secHIGH {
+    color: #00ff00;
+}
+.secLOW {
+    color: #ffcc00;
+}
+.secNULL {
+    color: #ff0000;
+}
+
 #scrollmenu {
     position: fixed;
     left: 2px;
