@@ -897,7 +897,7 @@ class Signature(models.Model):
 
         if info:
             # if there is a signature info (site name) field, mark as scanned
-            if self.info != info:
+            if not self.info:
                 self.info = info
                 if action != "Created":
                     action = "Updated"
