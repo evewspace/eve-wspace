@@ -22,14 +22,23 @@ class Command(BaseCommand):
     """
     Load default settings from each application's default_settings.py file.
     """
+
+    def add_arguments(self, parser):
+        parser.add_argument('--reset',
+            action='store_true',
+            dest='reset',
+            default=False,
+            help='Reset all setting values to defaults')
+
     def handle(self, *args, **options):
+        reset = options.get('reset', False)
         if not args:
             for app in settings.INSTALLED_APPS:
                 mod = import_module(app)
                 if module_has_submodule(mod, "default_settings"):
                     try:
                         def_mod = import_module("%s.default_settings" % app)
-                        def_mod.load_defaults()
+                        def_mod.load_defaults(reset=reset, stdout=self.stdout)
                     except:
                         raise
         else:
@@ -41,6 +50,6 @@ class Command(BaseCommand):
                 if module_has_submodule(mod, "default_settings"):
                     try:
                         def_mod = import_module("%s.default_settings" % app)
-                        def_mod.load_defaults()
+                        def_mod.load_defaults(reset=reset, stdout=self.stdout)
                     except:
                         raise

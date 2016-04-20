@@ -12,10 +12,11 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from core.models import ConfigEntry
+from core.utils import load_defaults
+from functools import partial
 import random
 import string
-#defaults = [("TEST_SETTING", "BOB")]
+
 defaults = [
         ("JABBER_FROM_JID", "announce@localhost"),
         ("JABBER_FROM_PASSWORD", ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(15))),
@@ -24,8 +25,4 @@ defaults = [
         ("JABBER_LOCAL_ENABLED", "0"),
         ]
 
-def load_defaults():
-    for setting in defaults:
-        config = ConfigEntry.objects.get_or_create(name=setting[0], user=None)[0]
-        config.value = setting[1]
-        config.save()
+load_defaults = partial(load_defaults, defaults)

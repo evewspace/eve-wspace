@@ -12,8 +12,9 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-from core.models import ConfigEntry
-#defaults = [("TEST_SETTING", "BOB")]
+from core.utils import load_defaults
+from functools import partial
+
 defaults = [
     ("MAP_PVP_THRESHOLD", "0"),
     ("MAP_NPC_THRESHOLD", "10"),
@@ -35,13 +36,4 @@ defaults = [
     ("MAP_AUTODELETE_DAYS", "14"),
 ]
 
-
-def load_defaults():
-    '''
-    Loads default configuration settings.
-    '''
-    for setting in defaults:
-        config = ConfigEntry.objects.get_or_create(name=setting[0],
-                                                   user=None)[0]
-        config.value = setting[1]
-        config.save()
+load_defaults = partial(load_defaults, defaults)
