@@ -14,6 +14,7 @@
 #   limitations under the License.
 from django.db import models, transaction
 from django.conf import settings
+from django.core.exceptions import *
 from django.contrib.auth.models import Group
 from core.models import SystemData
 from django import forms
@@ -222,12 +223,78 @@ class KSystem(System):
 
 class WSystem(System):
     """Represents a w-space system."""
-    static1 = models.ForeignKey(WormholeType, blank=True, null=True,
-                                related_name="primary_statics")
-    static2 = models.ForeignKey(WormholeType, blank=True, null=True,
-                                related_name="secondary_statics")
+    statics = models.ManyToManyField(
+                        WormholeType,
+                        blank=True,
+                        null=True,
+                        through='SystemStatic',
+                        through_fields=('system', 'static')
+                        )
     effect = models.CharField(max_length=50, blank=True, null=True)
     is_shattered = models.NullBooleanField(default=False)
+
+    # Functions to easily add and remove statics
+    def add_static(self, static):
+        """
+        Custom add() function needed becasue django won't add a ManyToManyField that has a
+        custom intermediary table. Use this function instead to avoid headache.=
+        """
+        try:
+            # Take entered static value and find the wormhole type
+            if isinstance(static, WormholeType):
+                get_static = static
+            elif isinstance(static, basestring):
+                get_static = WormholeType.objects.get(name=static)
+            else:
+                raise ValueError('Argument must be a wormholetype or string.')
+            # Create the new static
+            new_static = SystemStatic(system=self, static=get_static)
+            new_static.save()
+        except WormholeType.DoesNotExist:
+            raise forms.ValidationError('No {0} wormholetype exists.'.format(static))
+        except WormholeType.MultipleObjectsReturned:
+            raise forms.ValidationError('Multiple wormholetypes named {0}! Fix your database.'.format(static))
+        except Exception as e:
+            print '{0} ({1})'.format(e.message, type(e))
+
+
+    def del_static(self, static):
+        """
+        Custom remove() function needed because django won't remove a ManyToManyField
+        that has a custom intermediary table. Use this function to avoid headache.
+        """
+        try:
+            # First confirm that the static-type exists
+            if isinstance(static, WormholeType):
+                val_static = static
+            elif isinstance(static, basestring):
+                val_static = WormholeType.objects.get(name=static)
+            else:
+                raise ValueError('Argument must be a wormholetype or string.')
+        except WormholeType.DoesNotExist:
+            raise forms.ValidationError('No {0} wormholetype exists.'.format(static))
+        except WormholeType.MultipleObjectsReturned:
+            raise forms.ValidationError('Multiple wormholetypes named {0}! Fix your database.'.format(static))
+        except Exception as e:
+            print '{0} ({1})'.format(e.message, type(e))
+
+        # Next confirm that this system currently has that static
+        try:
+            get_static = SystemStatic.objects.filter(system=self, static=val_static).first()
+            # If one of the named statics exists delete the first one
+            get_static.delete()
+        except AttributeError:
+            raise forms.ValidationError('No {0} static in system {1}'.format(static, self))
+        except Exception as e:
+            print '{0} ({1})'.format(e.message, type(e))
+
+
+class SystemStatic(models.Model):
+    """Represents a single static of a system."""
+    system = models.ForeignKey(WSystem, blank=True, null=True)
+    static = models.ForeignKey(WormholeType, blank=True, null=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
 
 
 class Map(models.Model):

@@ -42,8 +42,9 @@ class Command(NoArgsCommand):
                     newdata.npckills = 0
                     newdata.shipkills = 0
                     newdata.save()
+                    self.stdout.write('KSystem %s added' % (system.name))
                 else:
-                    newdata = WSystem(static1=None, static2=None, sysclass=sysclass,
+                    newdata = WSystem(sysclass=sysclass,
                             lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
                             info='', occupied='')
                     for field in system._meta.fields:
@@ -53,6 +54,7 @@ class Command(NoArgsCommand):
                     newdata.npckills = 0
                     newdata.shipkills = 0
                     newdata.save()
+                    self.stdout.write('WSystem %s added' % (system.name))
             except LocationWormholeClass.DoesNotExist:
                 pass
             except Exception:
@@ -65,8 +67,9 @@ class Command(NoArgsCommand):
                     lowsec = KSystem.objects.get(name=system.name)
                     lowsec.sysclass = sysclass
                     lowsec.save()
+                    self.stdout.write('KSystem %s updated' % (system.name))
                 else:
-                    newdata = WSystem(static1=None, static2=None, sysclass=sysclass,
+                    newdata = WSystem(sysclass=sysclass,
                             lastscanned=datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
                             info='', occupied='')
                     for field in system._meta.fields:
@@ -76,5 +79,6 @@ class Command(NoArgsCommand):
                     newdata.npckills = 0
                     newdata.shipkills = 0
                     newdata.save()
+                    self.stdout.write('WSystem %s updated' % (system.name))
             except LocationWormholeClass.DoesNotExist:
                 pass
