@@ -14,17 +14,9 @@
 #   limitations under the License.
 from django.conf.urls import patterns, include, url
 
-# Run the autodiscovers for various registries to fill them
-from search import registry as search_registry
-from Alerts import method_registry
-from core import admin_page_registry, nav_registry
 # Uncomment to enable django admin
 #from django.contrib import admin
 #admin.autodiscover()
-method_registry.autodiscover()
-search_registry.autodiscover()
-admin_page_registry.autodiscover()
-nav_registry.autodiscover()
 
 # Actual URL definitions
 urlpatterns = patterns('',

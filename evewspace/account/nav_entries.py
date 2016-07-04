@@ -1,3 +1,3 @@
-from core.nav_registry import registry
+from core.nav_registry import register
 
-registry.register('account_nav.html')
+register('account_nav.html', priority=100)

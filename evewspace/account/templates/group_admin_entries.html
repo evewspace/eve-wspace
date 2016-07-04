@@ -1,5 +1,5 @@
-{% for data in group_admin_registry %}
-    <li><a href="#group-admin-{{data|slugify}}" id="tab-group-admin-{{data|slugify}}" data-toggle="tab">{{data}}</a></li>
+{% for name in group_admin_entries %}
+    <li><a href="#group-admin-{{name|slugify}}" id="tab-group-admin-{{name|slugify}}" data-toggle="tab">{{name}}</a></li>
 {% endfor %}
 
 <script>

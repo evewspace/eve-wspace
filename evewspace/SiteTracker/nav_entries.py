@@ -1,3 +1,3 @@
-from core.nav_registry import registry
+from core.nav_registry import register
 
-registry.register('sitetracker_nav.html')
+register('sitetracker_nav.html')
