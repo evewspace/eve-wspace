@@ -1,5 +1,3 @@
-This project is currently unmaintained. If you would like to take over as maintainer, please open a pull request on the AUTHORS file.
---------------
 Eve W-Space
 ===========
 
