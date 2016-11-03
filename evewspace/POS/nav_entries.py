@@ -1,3 +1,3 @@
-from core.nav_registry import registry
+from core.nav_registry import register
 
-registry.register('pos_nav.html')
+register('pos_nav.html')

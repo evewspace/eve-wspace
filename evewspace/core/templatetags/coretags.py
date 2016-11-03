@@ -13,50 +13,39 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 from django import template
+from core.registry import Registry
 from core.models import Type
 from core.utils import get_config
-from core.nav_registry import registry as nav_registry
-from core.admin_page_registry import registry as admin_registry
-from account.profile_section_registry import registry as profile_registry
-
 register = template.Library()
 
 @register.simple_tag()
 def typename(typeid):
     try:
         return Type.objects.get(id=typeid).name
-    except Type.DoesNotExist:
-        return ''
-    except Type.MultipleObjectsReturned:
+    except (Type.DoesNotExist, Type.MultipleObjectsReturned):
         return ''
 
-@register.inclusion_tag('nav_entries.html', takes_context=True)
-def nav_entries(context):
-    """
-    Renders dynamic nav bar entries from nav_registry for the provided user.
-    """
-    context['nav_registry'] = nav_registry
-    return context
+def registry_tag(register, name, registry_name):
+    def tag(context):
+        registry = Registry.get_registry(registry_name)
+        context[name] = registry.get_visible(context['user'])
+        return context
+    wrapper = register.inclusion_tag(name + '.html', takes_context=True, name=name)
+    wrapper(tag)
 
-def get_active_tabs(context, registry):
-    user = context['user']
-    active_tabs = {}
-    for key, value in registry.items():
-        if not value[1]:
-            active_tabs[key] = value
-        elif user.has_perm(value[1]):
-            active_tabs[key] = value
-    return active_tabs
+def registry_names_tag(register, name, registry_name):
+    def tag(context):
+        registry = Registry.get_registry(registry_name)
+        context[name] = (k for k,v in registry.get_visible(context['user']))
+        return context
+    wrapper = register.inclusion_tag(name+'.html', takes_context=True, name=name)
+    wrapper(tag)
 
-@register.inclusion_tag('admin_entries.html', takes_context=True)
-def admin_entries(context):
-    context['admin_registry'] = get_active_tabs(context, admin_registry)
-    return context
+registry_tag(register, 'nav_entries', 'nav_entries')
 
-@register.inclusion_tag('admin_panels.html', takes_context=True)
-def admin_panels(context):
-    context['admin_registry'] = get_active_tabs(context, admin_registry)
-    return context
+registry_names_tag(register, 'admin_entries', 'admin_pages')
+
+registry_tag(register, 'admin_panels', 'admin_pages')
 
 @register.inclusion_tag('feedback_panel.html')
 def feedback_panel():

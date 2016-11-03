@@ -15,51 +15,7 @@
 """
 A registry module for registering tabs in the settings page.
 """
+from core.registry import TemplateRegistry
 
-from django.db import models
-from django.template.loader import get_template
-from django.template import TemplateDoesNotExist
-
-class NavRegistry(list):
-    """
-    List with methods for handling template registration.
-    """
-    def unregister(self, template):
-        self.remove(template)
-
-    def register(self, template):
-        """
-        Registers a method with its name and module.
-        """
-        try:
-            get_template(template)
-        except TemplateDoesNotExist:
-            raise AttributeError("Template %s does not exist!" % template)
-        self.append(template)
-
-def _autodiscover(registry):
-
-    import copy
-    from django.conf import settings
-    from importlib import import_module
-    from django.utils.module_loading import module_has_submodule
-
-    for app in settings.INSTALLED_APPS:
-        mod = import_module(app)
-        # Import alert_methods from each app
-        try:
-            before_import_registry = copy.copy(registry)
-            import_module('%s.nav_entries' % app)
-        except:
-            registry = before_import_registry
-            if module_has_submodule(mod, 'nav_entries'):
-                raise
-
-registry = NavRegistry()
-
-def autodiscover():
-    _autodiscover(registry)
-
-def register(name, template):
-    """Proxy for register method."""
-    return registry.register(template)
+registry = TemplateRegistry('nav_entries')
+register = registry.register

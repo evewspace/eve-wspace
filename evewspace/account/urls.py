@@ -14,14 +14,6 @@
 #   limitations under the License.
 from django.conf.urls import patterns, include, url
 
-import profile_section_registry
-import user_admin_section_registry
-import group_admin_section_registry
-
-profile_section_registry.autodiscover()
-group_admin_section_registry.autodiscover()
-user_admin_section_registry.autodiscover()
-
 userpatterns = patterns('account.views',
         url(r'^$', 'user_edit'),
         url(r'^profile/$', 'profile_admin'),

@@ -15,56 +15,7 @@
 """
 A registry module for registering tabs in the settings page.
 """
+from core.registry import TemplateRegistry
 
-from django.db import models
-from django.template.loader import get_template
-from django.template import TemplateDoesNotExist
-
-class AdminPageRegistry(dict):
-    """
-    Dict with methods for handling admin template registration.
-    """
-    def unregister(self, name):
-        del self[name]
-
-    def register(self, name, template, permission):
-        """
-        Registers a page with its template.
-        """
-        try:
-            get_template(template)
-        except TemplateDoesNotExist:
-            raise AttributeError("Template %s does not exist!" % template)
-        self[name] = (template, permission)
-
-def _autodiscover(registry):
-
-    import copy
-    from django.conf import settings
-    from importlib import import_module
-    from django.utils.module_loading import module_has_submodule
-
-    for app in settings.INSTALLED_APPS:
-        mod = import_module(app)
-        # Import alert_methods from each app
-        try:
-            before_import_registry = copy.copy(registry)
-            import_module('%s.admin_pages' % app)
-        except:
-            registry = before_import_registry
-            if module_has_submodule(mod, 'admin_pages'):
-                raise
-
-registry = AdminPageRegistry()
-
-def autodiscover():
-    _autodiscover(registry)
-
-def register(nae, template, permission):
-    """
-    Register a tab for the admin page.
-        name - Name of the tab in the admin panel
-        template - Template that should be rendered in that tab
-        permission - Permission requried for the tab to appear
-    """
-    return registry.register(name, template, permissoin)
+registry = TemplateRegistry('admin_pages')
+register = registry.register

@@ -16,51 +16,7 @@
 A registry module for registering sections in the group admin dialog.
 """
 
-from django.db import models
-from django.template.loader import get_template
-from django.template import TemplateDoesNotExist
+from core.registry import TemplateRegistry
 
-class GroupAdminSectionRegistry(dict):
-    """
-    Dict with methods for handling template registration.
-    """
-    def unregister(self, name):
-        method = self[name]
-        del self[name]
-
-    def register(self, name, template, permission):
-        """
-        Registers a method with its name and module.
-        """
-        try:
-            get_template(template)
-        except TemplateDoesNotExist:
-            raise AttributeError("Template %s does not exist!" % template)
-        self[name] = (template, permission)
-
-def _autodiscover(registry):
-
-    import copy
-    from django.conf import settings
-    from importlib import import_module
-    from django.utils.module_loading import module_has_submodule
-
-    for app in settings.INSTALLED_APPS:
-        mod = import_module(app)
-        # Import alert_methods from each app
-        try:
-            before_import_registry = copy.copy(registry)
-            import_module('%s.group_admin_sections' % app)
-        except:
-            registry = before_import_registry
-            if module_has_submodule(mod, 'group_admin_sections'):
-                raise
-
-registry = GroupAdminSectionRegistry()
-
-def autodiscover():
-    _autodiscover(registry)
-
-def register(name, template, permission):
-    """Proxy for register method."""
-    return registry.register(name, template, permission)
+registry = TemplateRegistry('group_admin_sections')
+register = registry.register

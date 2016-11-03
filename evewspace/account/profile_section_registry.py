@@ -15,52 +15,7 @@
 """
 A registry module for registering sections in the user profile tab.
 """
+from core.registry import TemplateRegistry
 
-from django.db import models
-from django.template.loader import get_template
-from django.template import TemplateDoesNotExist
-
-class ProfilePageRegistry(dict):
-    """
-    Dict with methods for handling template registration.
-    """
-    def unregister(self, name):
-        method = self[name]
-        del self[name]
-
-    def register(self, name, template, permission):
-        """
-        Registers a method with its name and module.
-        """
-        try:
-            get_template(template)
-        except TemplateDoesNotExist:
-            raise AttributeError("Template %s does not exist!" % template)
-        self[name] = (template, permission)
-
-def _autodiscover(registry):
-
-    import copy
-    from django.conf import settings
-    from importlib import import_module
-    from django.utils.module_loading import module_has_submodule
-
-    for app in settings.INSTALLED_APPS:
-        mod = import_module(app)
-        # Import alert_methods from each app
-        try:
-            before_import_registry = copy.copy(registry)
-            import_module('%s.profile_pages' % app)
-        except:
-            registry = before_import_registry
-            if module_has_submodule(mod, 'profile_pages'):
-                raise
-
-registry = ProfilePageRegistry()
-
-def autodiscover():
-    _autodiscover(registry)
-
-def register(name, template, permission):
-    """Proxy for register method."""
-    return registry.register(name, template, permission)
+registry = TemplateRegistry('profile_pages')
+register = registry.register

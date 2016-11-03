@@ -1,3 +1,3 @@
-from core.nav_registry import registry
+from core.nav_registry import register
 
-registry.register('map_nav.html')
+register('map_nav.html', priority=-10)

@@ -1,4 +1,4 @@
-{% for key, value in profile_registry.items %}
+{% for key, value in profile_settings %}
 <div class="panel-default panel" style="width: 700px">
 <div class="panel-heading">
     <a data-toggle="collapse" data-parent="#{{key|slugify}}" href="#{{key|slugify}}">
@@ -6,7 +6,7 @@
     </a>
 </div>
 <div id="{{key|slugify}}" class="panel-body collapse">
-    {% include value.0 %}
+    {% include value %}
 </div>
 </div>
 {% endfor %}
