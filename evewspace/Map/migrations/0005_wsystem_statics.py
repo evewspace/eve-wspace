@@ -10,7 +10,6 @@ def combine_statics(apps, schema_editor):
     into a ManyToManyField called statics. Doesn't use .add() because
     django doesn't let you do that when you have an intermediate table.
     """
-    WormholeType = apps.get_model("Map", "WormholeType")
     WSystem = apps.get_model("Map", "WSystem")
     SystemStatic = apps.get_model("Map", "SystemStatic")
     for wsystem in WSystem.objects.all():
@@ -18,18 +17,24 @@ def combine_statics(apps, schema_editor):
         hole1 = wsystem.static1
         hole2 = wsystem.static2
         # Add the wormholes to statics if the static exists
-        try:
-            static1 = WormholeType.objects.get(name=hole1)
-            sys_static1 = SystemStatic(system=wsystem, static=static1)
-            sys_static1.save()
-        except WormholeType.DoesNotExist:
-            pass        # Do nothing, no static to add
-        try:
-            static2 = WormholeType.objects.get(name=hole2)
-            sys_static2 = SystemStatic(system=wsystem, static=static2)
-            sys_static2.save()
-        except WormholeType.DoesNotExist:
-            pass        # Do nothing, no static to add
+        if hole1:
+            SystemStatic.objects.create(system=wsystem, static=hole1)
+        if hole2:
+            SystemStatic.objects.create(system=wsystem, static=hole2)
+
+
+def split_statics(apps, schema_editor):
+    WSystem = apps.get_model("Map", "WSystem")
+    SystemStatic = apps.get_model("Map", "SystemStatic")
+    for static in SystemStatic.objects.all():
+        wsystem = static.system
+        if not wsystem.static1:
+            wsystem.static1 = static.static
+        elif not wsystem.static2:
+            wsystem.static2 = static.static
+        else:
+            print("System %s has already two statics, skipping %s." % (wsystem, static))
+        wsystem.save()
 
 
 class Migration(migrations.Migration):
@@ -54,7 +59,7 @@ class Migration(migrations.Migration):
             name='statics',
             field=models.ManyToManyField(to='Map.WormholeType', null=True, through='Map.SystemStatic', blank=True),
         ),
-        migrations.RunPython(combine_statics),
+        migrations.RunPython(combine_statics, split_statics),
         migrations.RemoveField(
             model_name='wsystem',
             name='static1',
