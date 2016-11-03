@@ -245,3 +245,9 @@ except NameError:
     except ImportError:
         pass
 
+
+if not DEBUG:
+    # when not in debug mode, add cached loader on top of template loaders
+    TEMPLATE_LOADERS = (
+        ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),
+    )
