@@ -66,6 +66,8 @@ def crest_refresh_access_token(char_id):
 def crest_access_data(token, requested_url, post_data = None):
     if token.valid_until < datetime.now(pytz.utc):
         token = crest_refresh_access_token(token.char_id)
+    if settings.CREST_ENABLED == False:
+	    return None
     authorization = token.access_token
     url = 'https://'+settings.CREST_AUTH_SERVER+requested_url
     headers = {'User-Agent': settings.CREST_USER_AGENT,
