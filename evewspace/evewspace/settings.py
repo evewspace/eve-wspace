@@ -258,7 +258,7 @@ if not DEBUG:
     )
 
 #CREST
-CREST_ENABLED = True
+CREST_ENABLED = False
 CREST_SECRET_KEY = 'xxxxxx' #to be created at https://developers.eveonline.com/ for TQ
 CREST_CLIENT_ID = 'xxxxxx' #to be created at https://developers.eveonline.com/ for TQ
 CREST_BASE_URL = 'Your URL here' #do not forget the / at the end and https if the connection is secure
