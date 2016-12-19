@@ -45,7 +45,8 @@ def update_char_data():
 @task()
 def update_char_location():
     for token in CRESTRefreshToken.objects.all():
-        response = crest_access_data(token,'/characters/'+token.char_id+'/location/')
+        url = '/characters/%s/location/' % token.char_id
+        response = crest_access_data(token,url)
         
         if response: 
 	        system_pk = response["solarSystem"]["id"]
