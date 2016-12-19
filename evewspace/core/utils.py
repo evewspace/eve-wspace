@@ -28,8 +28,8 @@ def load_defaults(defaults, reset=False, stdout=None):
     if stdout is None:
         from sys import stdout
     for setting in defaults:
-        config = ConfigEntry.objects.get_or_create(name=setting[0], user=None)[0]
-        if config.pk is None or reset:
+        config, created = ConfigEntry.objects.get_or_create(name=setting[0], user=None)
+        if created or reset:
             stdout.write("Setting %s=%s" % (setting[0], setting[1]))
             config.value = setting[1]
             config.save()
