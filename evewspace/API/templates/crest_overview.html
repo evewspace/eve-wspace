@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %} Eve W-Space: CREST {% endblock %}
+{% block content%} 
+<div id="homeRow1" class="row">
+	<div class="col-md-6">
+		<a href="/api/crest/login"><img src="/static/images/EVE_SSO_Login_Buttons_Large_Black.png"></a>
+		<div><br/>&nbsp;Current pilots added:<br/><br/></div>
+		<table>
+			{% for token in tokens %}
+			<tr>
+				<td style="padding: 4px;">
+				<img src="https://image.eveonline.com/Character/{{token.CharacterID}}_64.jpg" />
+				</td>
+				<td style="padding: 4px;">
+				Name: {{token.CharacterName}}<br />
+				Scope: {{token.Scopes}}<br />
+				Valid: {% if now < token.ExpiresOn %}Yes{% else %}No{% endif %} - <a href="/api/crest/delete/{{token.CharacterID}}/">Remove</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+</div>
+{% endblock %}
