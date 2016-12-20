@@ -35,7 +35,7 @@ class APIKey(models.Model):
     vcode = models.CharField(max_length=100)
     valid = models.BooleanField(default=False)
     lastvalidated = models.DateTimeField()
-    access_mask = models.IntegerField()
+    access_mask = models.IntegerField(null=True)
     proxykey = models.CharField(max_length=100, null=True, blank=True)
     validation_error = models.CharField(max_length=255, null=True, blank=True)
 
