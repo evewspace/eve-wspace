@@ -257,13 +257,19 @@ if not DEBUG:
         ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),
     )
 
+#SSO
+SSO_ENABLED = False
+SSO_SECRET_KEY = 'xxxxxxx' #to be created at https://developers.eveonline.com/ for TQ
+SSO_CLIENT_ID = 'xxxxxxx' #to be created at https://developers.eveonline.com/ for TQ
+#callback URL is your base URL + /api/sso/login/
+SSO_BASE_URL = 'xxxxxx' #do not forget the / at the end and https if the connection is secure
+SSO_LOGIN_SERVER = 'login.eveonline.com' #check http://eveonline-third-party-documentation.readthedocs.io/en/latest/reference/reference.html for sisi
+SSO_SCOPE = 'characterLocationRead esi-location.read_location.v1 esi-location.read_ship_type.v1' #scope of authorizations requested
+SSO_USER_AGENT = 'EVE W-space Instance' #Header
+    
 #CREST
-CREST_ENABLED = False
-CREST_SECRET_KEY = 'xxxxxx' #to be created at https://developers.eveonline.com/ for TQ
-CREST_CLIENT_ID = 'xxxxxx' #to be created at https://developers.eveonline.com/ for TQ
-CREST_BASE_URL = 'Your URL here' #do not forget the / at the end and https if the connection is secure
-CREST_PUBLIC_SERVER = 'crest-tq.eveonline.com' #check http://eveonline-third-party-documentation.readthedocs.io/en/latest/reference/reference.html for sisi
-CREST_AUTH_SERVER = 'crest-tq.eveonline.com' #check http://eveonline-third-party-documentation.readthedocs.io/en/latest/reference/reference.html for sisi
-CREST_LOGIN_SERVER = 'login.eveonline.com' #check http://eveonline-third-party-documentation.readthedocs.io/en/latest/reference/reference.html for sisi
-CREST_SCOPE = 'characterLocationRead' #scope of authorizations requested
-CREST_USER_AGENT = 'EVE W-space Instance' #Header
+CREST_SERVER = 'crest-tq.eveonline.com' #check http://eveonline-third-party-documentation.readthedocs.io/en/latest/reference/reference.html for sisi
+
+#ESI - Uses same enabled/secret key/client ID/base URL/login server/scope as CREST
+ESI_SERVER = 'esi.tech.ccp.is/dev'
+ESI_SOURCE = 'tranquility' #alternative is singularity
