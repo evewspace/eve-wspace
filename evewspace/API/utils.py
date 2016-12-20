@@ -73,11 +73,11 @@ def crest_access_data(token, requested_url, post_data = None):
     if settings.SSO_ENABLED == False:
 	    return None
     authorization = token.access_token
-    url = 'https://'+settings.CREST_SERVER+requested_url
+    url = 'https://'+settings.CREST_SERVER+'/'+requested_url
+    print url
     headers = {'User-Agent': settings.SSO_USER_AGENT,
         'Host': settings.CREST_SERVER,
-        'Authorization': 'Bearer '+ authorization,
-        'Accept': 'application/json',}
+        'Authorization': 'Bearer '+ authorization,}
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     requested = urllib2.Request(url, post_data, headers)
     open_page = opener.open(requested)
@@ -127,6 +127,10 @@ def esi_access_data(token, requested_url, call_type = None, post_data = None):
     curl.perform()
     
     response = json.loads(data.getvalue())
+    
+    if 'error' in response:
+        print response
+        return None
     
     if response:
        return response
