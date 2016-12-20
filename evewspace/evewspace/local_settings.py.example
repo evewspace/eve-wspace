@@ -50,6 +50,9 @@ from celery.schedules import crontab
 CELERYBEAT_SCHEDULE = {
         'map_stats':{
                 'task': 'Map.tasks.update_system_stats',
+CELERYBEAT_SCHEDULE = {
+        'map_stats':{
+                'task': 'Map.tasks.update_system_stats',
                 'schedule': timedelta(hours=1),
                 'args': ()
             },
@@ -86,6 +89,16 @@ CELERYBEAT_SCHEDULE = {
         'cache_feeds':{
                 'task': 'core.tasks.update_feeds',
                 'schedule': timedelta(minutes=30),
+                'args': ()
+            },
+        'char_data':{
+                'task': 'API.tasks.update_char_data',
+                'schedule': timedelta(hours=1),
+                'args': ()
+            },
+        'char_location_data':{
+                'task': 'API.tasks.update_char_location',
+                'schedule': timedelta(seconds=30),
                 'args': ()
             },
         }
