@@ -21,8 +21,7 @@ import urllib2
 import json
 import base64
 import pycurl
-from io import BytesIO
-data = BytesIO()
+import StringIO
 
 
 
@@ -110,16 +109,26 @@ def sso_verify(token):
        return response
     return None
     
+    
 def esi_access_data(token, requested_url, call_type = None, post_data = None):
+    if token.valid_until < datetime.now(pytz.utc):
+        token = sso_refresh_access_token(token.char_id)
+
+    data = StringIO.StringIO()
+
     authorization = token.access_token
     url = 'https://'+ settings.ESI_SERVER + '/' + requested_url + '?datasource=' + settings.ESI_SOURCE
     curl = pycurl.Curl()
     curl.setopt(curl.URL, url)
-    curl.setopt(curl.HTTPHEADER,['Content-Type: application/json','Authorization:' 'Bearer '+ authorization])
-    curl.setopt(curl.READFUNCTION, data.write)
+    curl.setopt(curl.ENCODING, 'gzip') 
+    curl.setopt(curl.HTTPHEADER,['Accept: application/json','Authorization: Bearer '+ authorization])
+    curl.setopt(curl.WRITEFUNCTION, data.write)
     curl.setopt(curl.TIMEOUT, 5)
-    curl.setopt(curl.VERBOSE, True)
     curl.perform()
     
-    return data
+    response = json.loads(data.getvalue())
+    
+    if response:
+       return response
+    return None
 
