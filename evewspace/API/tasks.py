@@ -45,16 +45,19 @@ def update_char_data():
 @task()
 def update_char_location():
     for token in SSORefreshToken.objects.all():
-        url = '/characters/%s/location/' % token.char_id
-        response = crest_access_data(token,url)
+        url = 'characters/%s/location/' % token.char_id
+        response = esi_access_data(token,url)
         
+        url2 = 'characters/%s/ship/' % token.char_id
+        response2 = esi_access_data(token,url2)
+
         if response: 
-	        system_pk = response["solarSystem"]["id"]
+	        system_pk = response["solar_system_id"]
+	        ship_type_id = response2["ship_type_id"]
 	        char_cache_key = 'char_%s_location' % token.char_id
 	        old_location = cache.get(char_cache_key)
-	        print old_location
 	        current_system = get_object_or_404(System, pk=system_pk)
-	        print current_system
+	        current_ship = get_object_or_404(Type, pk=ship_type_id)
 	        if old_location != current_system:
 	            if old_location:
 	                old_system = get_object_or_404(System, name=old_location)
@@ -62,13 +65,13 @@ def update_char_location():
 	            token.user.update_location(
 	                current_system.pk,
 	                token.char_id, token.char_name,
-	                "CREST", "CREST")
+	                current_ship.name, response2["ship_name"])
 	        
 	        cache.set(char_cache_key, current_system, 60 * 5)
 	        # Use add_active_pilot to refresh the user's record in the global
 	        # location cache
 	        current_system.add_active_pilot(
 	            token.user, token.char_id, token.char_name,
-	            "CREST", "CREST"
+	            current_ship.name, response2["ship_name"]
 	        )
         
