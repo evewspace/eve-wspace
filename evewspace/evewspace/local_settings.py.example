@@ -80,7 +80,7 @@ CELERYBEAT_SCHEDULE = {
             },
         'cache_reddit':{
                 'task': 'core.tasks.cache_eve_reddit',
-                'schedule': timedelta(seconds=45),
+                'schedule': timedelta(minutes=45),
                 'args': ()
             },
         'cache_feeds':{
@@ -104,3 +104,13 @@ CACHES = {
         'TIMEOUT': 0
     }
 }
+
+#SSO
+SSO_ENABLED = False
+SSO_SECRET_KEY = 'x' #to be created at https://developers.eveonline.com/ for TQ
+SSO_CLIENT_ID = 'x' #to be created at https://developers.eveonline.com/ for TQ
+#callback URL is your base URL + /api/sso/login/
+SSO_BASE_URL = 'x' #do not forget the / at the end and https if the connection is secure
+#'esi-location.read_location.v1 esi-location.read_ship_type.v1' are needed for location and ship type information
+SSO_SCOPE = 'esi-location.read_location.v1 esi-location.read_ship_type.v1' #scope of authorizations requested
+SSO_USER_AGENT = 'EVE W-space Instance' #Header
