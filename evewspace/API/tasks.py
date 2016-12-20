@@ -17,7 +17,7 @@ from celery import task
 from datetime import datetime
 from API.models import APIKey, MemberAPIKey, SSORefreshToken
 from Map.models import System
-from API.utils import sso_refresh_access_token, crest_access_data
+from API.utils import sso_refresh_access_token, crest_access_data, esi_access_data
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.conf import settings
