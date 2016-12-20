@@ -6,10 +6,10 @@ key_patterns = patterns('API.views',
         url(r'^edit/$', 'edit_keys'),
         )
 
-crest_patterns = patterns('API.views',
-        url(r'^login/$', 'crest_login'),
-        url(r'^overview/$', 'crest_overview'),
-        url(r'^delete/(?P<char_id>\d+)/$', 'crest_delete'),
+sso_patterns = patterns('API.views',
+        url(r'^login/$', 'sso_login'),
+        url(r'^overview/$', 'sso_overview'),
+        url(r'^delete/(?P<char_id>\d+)/$', 'sso_delete'),
         )
         
 urlpatterns = patterns('API.views',
@@ -21,5 +21,5 @@ urlpatterns = patterns('API.views',
         url(r'^corp_key/(?P<key_id>\d+)/delete/', 'delete_corp_key'),
         url(r'^user/(?P<user_id>\d+)/$', 'api_key_admin'),
         url(r'^user/(?P<user_id>\d+)/key/(?P<key_id>\d+)/$', 'edit_keys'),
-        url(r'^crest/', include(crest_patterns)),
+        url(r'^sso/', include(sso_patterns)),
         )
