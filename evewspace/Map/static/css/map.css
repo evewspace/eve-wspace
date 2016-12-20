@@ -253,6 +253,16 @@ textarea
     color: #f3b839;
 }
 
+.secHIGH {
+    color: #00ff00;
+}
+.secLOW {
+    color: #ffcc00;
+}
+.secNULL {
+    color: #ff0000;
+}
+
 #scrollmenu {
     position: fixed;
     left: 2px;
@@ -391,5 +401,33 @@ ul#moveDropdown li {
 
 .sigAddFormDiv {
 	margin-left: 25px;	
+}
+.friendlyname {
+    font-style: italic;
+    font-size: 95%;
+    color: #eee;
+}
+.visited {
+    text-align: center;
+    font-size: 80%;
+}
+#sysInfoDiv .panel-heading {
+    text-align: center; 
+}
+div.sysClassSpan label {
+    font-weight: normal;
+}
+#sysClass, #sysStatics, #sysEffect, #sysSov {
+    display: block;
+    font-weight: normal;
+    padding-left: 10px;
+}
+#sysOccupied {
+    display: block;
+    font-weight: bold;
+    font-style: italic;
+}
+#kspacedetails {
+    width: 95%;
 }
 

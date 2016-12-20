@@ -24,76 +24,60 @@
 	<div id="sysDetails" class="tab-pane active">
 		<div class="panel panel-default">
 			<div id="sysPanelHeader" class="panel-heading center_text">
-			    <h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} System Details: {{mapsys.system.name}} &nbsp;
+			    <h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} System Details: {{mapsys.system.name}} {% if mapsys.friendlyname %}<span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %} &nbsp;
 			    	{% if system.is_kspace and is_igb %}
 			        	<button class='btn btn-xs btn-info' onclick="CCPEVE.setDestination({{system.pk}});">Set destination</button>
 			        {% endif %}
 			    </h4>
-			    {% if mapsys.friendlyname %}
-			    <div class="mapSysInfo">
-			        <h5 class="friendlyName"> Friendly Name: <small>{{mapsys.friendlyname}}</small> </h5>
-			    </div>
-			    {% endif %}
 			</div>
 			<div id="sysPanelBody" class="panel-body">
 			    <div class="sysClassSpan" class="row">
 			        {% if system.is_wspace %}
 			        <div class="col-md-3">
-			            <strong>Class: <span id="sysClass">{{system.sysclass}}</span></strong>
+                        <label>Class:</label> <span id="sysClass">{{system.sysclass}}</span>
 			        </div>
 			        <div class="col-md-4">
-			            <strong>Effect: <span id="sysEffect">{{system.effect}}</span></strong>
+                        <label>Effect:</label> <span id="sysEffect">{{system.effect}}</span>
 			        </div>
 			        <div class="col-md-5">
-			            <strong>Probable Statics:
+                        <label>Probable Statics:</label>
+                        <span id="sysStatics">
 			                {% if system.statics.all.count == 0 %}
-			                <span>Unknown</span>
+                                <span>Unknown</span>
 			                {% else %}
-                      {% for hole in system.statics.all %}
-			                <span title="Time: {{hole.lifetime}}H &nbsp Mass: {{hole.maxmass|intcomma}}kg &nbsp Jump Mass: {{hole.jumpmass|intcomma}}kg">
-			                    {{hole.name}} ({{hole.dest_string}}) &nbsp
-                      </span>
-                      {% endfor %}
-                      {% endif %}
-			        </strong>
+                                {% for hole in system.statics.all %}
+                                    <span title="Time: {{hole.lifetime}}H &nbsp Mass: {{hole.maxmass|intcomma}}kg &nbsp Jump Mass: {{hole.jumpmass|intcomma}}kg">
+                                    {{hole.name}} ({{hole.dest_string}})</span>
+                                {% endfor %}
+                            {% endif %}
+                        </span>
 			        </div>
-			        {% endif %}
-			        {% if system.sov %}
-			        <br />
-			        Sov: {{system.sov}}
-			        {% endif %}
-			        {% if system.is_kspace %}
-			        	<table class="table-condensed">
-			        		<tr>
-			        			<td>Security</td>
-			        			<td>
-				        			{% if system.sysclass == 7 %}
-							        High Sec
-							        {% endif %}
-							        {% if system.sysclass == 8 %}
-							        Low Sec
-							        {% endif %}
-							        {% if system.sysclass == 9 %}
-							        Null Sec
-							        {% endif %}
-						        </td>
-			        		</tr>
-			        		{% if system.sov %}
-				        		<tr>
-				        			<td>Sov</td>
-				        			<td>{{system.sov}}
-				        			</td>
-				        		</tr>
-			        		{% endif %}
-			        		<tr>
-			        			<td>Region</td>
-			        			<td>{{system.region}}</td>
-			        		</tr>
-			        		<tr>
-			        			<td>Constellation</td>
-			        			<td>{{system.constellation}}</td>
-			        		</tr>
-			        	</table>
+                    {% endif %}
+
+                    {% if system.is_kspace %}
+                    <div id="kspacedetails">
+                        <div class="col-md-3">
+                            <label>Sec:</label> <span id="sysSec" class="{% if system.sysclass == 7 %}secHIGH{% endif %}{% if system.sysclass == 8 %}secLOW{% endif %}{% if system.sysclass == 9 %}secNULL{% endif %}">
+                                                {% if system.sysclass == 7 %}
+                                                High Sec
+                                                {% endif %}
+                                                {% if system.sysclass == 8 %}
+                                                Low Sec
+                                                {% endif %}
+                                                {% if system.sysclass == 9 %}
+                                                Null Sec
+                                                {% endif %}
+                                                </span>
+                        </div>
+                        {% if system.sov %}
+                        <div class="col-md-4">
+                            <label>Sov:</label> <span id="sysSov">{{system.sov}}</span> 
+                        </div>
+                        {% endif %}
+                        <div class="col-md-5">
+                            <label>Const/Region:</label> <span id="sysRegion">{{system.constellation}} / {{system.region}}</span> 
+                        </div>
+                    </div>
 			        {% endif %}
 			    </div>
 			    <br />
@@ -101,12 +85,13 @@
 		    <div class="row">
 		    	<div class="col-md-12">
 			    {% load humanize %}
-			    	<div class="visited center_text">First Visit: {{system.first_visited|naturaltime}} &bull; Last Visit: {{system.last_visited|naturaltime}}</div>
-			    	<div class="detailsLeft">
-			    		{% if system.occupied or system.poses.all %}
-				    	<div class="occupiedDiv bg-danger panel-textbox">
-				        	<span class="occupiedTitle">Occupied:</span> <br /> {{system.occupied|linebreaks}}
-				        	Towers:
+                <div class="visited center_text">First Visit: <em>{{system.first_visited|naturaltime}}</em> &bull; Last Visit: <em>{{system.last_visited|naturaltime}}</em></div>
+                    {% if system.occupied or system.poses.all %}
+                        <div class="detailsLeft">
+				    	 <div class="occupiedDiv bg-danger panel-textbox">
+                            <label>Occupied:</label> <span id="sysOccupied">{{system.occupied|linebreaks}}</span>
+                            <br />
+                            <label>Towers:</label>
 				        	<ul>
 					            {% for pos in system.poses.all %}
 					            <li>P:{{pos.planet}} &nbsp;M: {{pos.moon}} - {{pos.towertype.name}} - {{pos.corporation.name}} -
@@ -130,10 +115,9 @@
 					            <li>No Towers</li>
 					            {% endfor %}
 					        </ul>
-				    	</div>
-		    			{% endif %}
-		    		</div>
-		    		<br />
+				     	 </div>
+                        </div>
+                    {% endif %}
 				    {% if system.info %}
 				    	<p class="infoText bg-primary panel-textbox"><span class="infoTitle">Info:</span> <br /> {{system.info|linebreaksbr}} </p><br />
 				    {% endif %}
@@ -161,13 +145,13 @@
 <div id="sigsPanel" class="sigsPanel tab-pane">
 	<div id="sigAddPanel" class="sigAddPanel panel panel-default">
 		<div class="panel-heading">
-			<h4 class="center_text"> Signatures: {{mapsys.system.name}} </h4>
+            <h4 class="center_text">{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} Signatures: {{mapsys.system.name}} {% if mapsys.friendlyname %}<span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %} </h4>
 		</div>
 		<div class="panel-body">
     		<div style="margin-bottom: 10px; text-align: center;">
     	    	{% if can_edit %}
-	            	<button id="btnPurgeSigs" class="btn btn-sm btn-danger" style="margin-top: -12px; margin-bottom: 9px;"><i class="glyphicon glyphicon-remove-circle"></i> Purge Sigs</button>
-	            	<button id="btnReallyPurgeSigs" class="btn btn-sm btn-warning" style="display: none; margin-top: -12px; margin-bottom: 9px;"  onclick="PurgeSignatures({{mapsys.pk}});"><i class="glyphicon glyphicon-remove-circle"></i> Really Purge?</button>
+	            	<button id="btnPurgeSigs" class="btn btn-sm btn-danger" style="float: right; margin-top: -12px; margin-bottom: 9px;"><i class="glyphicon glyphicon-remove-circle"></i> Purge Sigs</button>
+	            	<button id="btnReallyPurgeSigs" class="btn btn-sm btn-warning" style="float: right; display: none; margin-top: -12px; margin-bottom: 9px;"  onclick="PurgeSignatures({{mapsys.pk}});"><i class="glyphicon glyphicon-remove-circle"></i> Really Purge?</button>
 	            	<script type="text/javascript">
 	        	    	$('#btnPurgeSigs').click(function() {
 	            	    	$('#btnReallyPurgeSigs').show();
@@ -190,7 +174,7 @@
 <div id="activePlayerPanel" class="activePlayerPanel tab-pane">
     <div id="activePlayerList" class="activePlayerList panel panel-default">
     	<div class="panel-heading">
-	    	<h4>Active Pilots: {{system.name}}</h4>
+	    	<h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} Active Pilots: {{system.name}} {% if mapsys.friendlyname %}<span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %} </h4>
 	    </div>
 	    <div class="panel-body">
 	        <table class="table table-condensed table-hover">
@@ -216,7 +200,7 @@
 <div id="systemPosPanel" class="systemPosPanel tab-pane">
     <div style="text-align: center; margin-bottom: 10px;" class="panel panel-default">
     	<div class="panel-heading">
-            <h4>Starbases: {{system.name}}</h4>
+            <h4>{% if can_edit %}<i title="Edit Info" class="glyphicon glyphicon-pencil" onclick="GetEditSystemDialog({{mapsys.pk}});"></i>{% endif %} Starbases: {{system.name}} {% if mapsys.friendlyname %}<span class="friendlyname">({{ mapsys.friendlyname }})</span>{% endif %} </h4>
         </div>
         <div class="panel-body">
             {% if can_edit %}

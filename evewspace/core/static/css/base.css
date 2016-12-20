@@ -1,5 +1,5 @@
 .draggable-response-container {
-    background-color: #464545;
+    background-color: rgba(70,69,69,0.9);
     border: 1px solid #fff;
     border-radius: 5px;
     position: absolute;
@@ -39,4 +39,32 @@
 .center_text
 {
     text-align:center;
+}
+
+
+/** 
+ * override some things from bootstrap.css
+ */
+
+.modal-header {
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.modal-body {
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.btn-mini {
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 0px;
+    padding-left: 2px;
+    font-size: 15px;
+    line-height: 1.42857143;
+    border-radius: 4px;
+    background: #375a7f;
+    border-color: #375a7f;
 }
