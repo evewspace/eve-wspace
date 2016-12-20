@@ -87,13 +87,13 @@ def update_char_location():
                 token.user.update_location(
                     current_system.pk,
                     token.char_id, token.char_name,
-                    ship_type, ship_name)
+                    ship_name, ship_type)
             
             cache.set(char_cache_key, current_system, 60 * 5)
             # Use add_active_pilot to refresh the user's record in the global
             # location cache
             current_system.add_active_pilot(
                 token.user, token.char_id, token.char_name,
-                ship_type, ship_name
+                ship_name, ship_type 
             )
         
