@@ -248,7 +248,7 @@ SSO_CLIENT_ID = 'xxxxxxx' #to be created at https://developers.eveonline.com/ fo
 #callback URL is your base URL + /api/sso/login/
 SSO_BASE_URL = 'xxxxxx' #do not forget the / at the end and https if the connection is secure
 SSO_LOGIN_SERVER = 'login.eveonline.com' #check http://eveonline-third-party-documentation.readthedocs.io/en/latest/reference/reference.html for sisi
-#'esi-location.read_location.v1 esi-location.read_ship_type.v1' are needed for location and ship type information
+#'esi-location.read_location.v1 esi-location.read_ship_type.v1 characterLocationRead' are needed for location and ship type information
 SSO_SCOPE = 'esi-location.read_location.v1 esi-location.read_ship_type.v1 characterLocationRead' #scope of authorizations requested
 SSO_USER_AGENT = 'EVE W-space Instance' #Header
     
