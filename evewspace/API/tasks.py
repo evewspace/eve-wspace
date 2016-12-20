@@ -29,6 +29,7 @@ import json
 import base64
 import sys
 import pytz
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -51,28 +52,48 @@ def update_char_location():
         
         url2 = 'characters/%s/ship/' % token.char_id
         response2 = esi_access_data(token,url2)
-
+        
         if response: 
-	        system_pk = response["solar_system_id"]
-	        ship_type_id = response2["ship_type_id"]
-	        char_cache_key = 'char_%s_location' % token.char_id
-	        old_location = cache.get(char_cache_key)
-	        current_system = get_object_or_404(System, pk=system_pk)
-	        current_ship = get_object_or_404(Type, pk=ship_type_id)
-	        if old_location != current_system:
-	            if old_location:
-	                old_system = get_object_or_404(System, name=old_location)
-	                old_system.remove_active_pilot(token.char_id)
-	            token.user.update_location(
-	                current_system.pk,
-	                token.char_id, token.char_name,
-	                current_ship.name, response2["ship_name"])
-	        
-	        cache.set(char_cache_key, current_system, 60 * 5)
-	        # Use add_active_pilot to refresh the user's record in the global
-	        # location cache
-	        current_system.add_active_pilot(
-	            token.user, token.char_id, token.char_name,
-	            current_ship.name, response2["ship_name"]
-	        )
+            system_pk = response["solar_system_id"]
+        else:
+            url3 = 'characters/%s/location/' % token.char_id
+            response3 = crest_access_data(token,url3)
+            if response3:
+                system_pk = response3["solarSystem"]["id"]
+                    
+        
+        if response2:
+            ship_type_id = response2["ship_type_id"]
+            
+        if system_pk:
+            char_cache_key = 'char_%s_location' % token.char_id
+            old_location = cache.get(char_cache_key)
+            current_system = get_object_or_404(System, pk=system_pk)
+            
+            if response2:
+                current_ship = get_object_or_404(Type, pk=ship_type_id)
+                ship_type = current_ship.name
+                ship_name = response2["ship_name"]
+            else:
+                ship_type = 'Unknown'
+                ship_name = 'Unknown'
+                
+                
+                
+            if old_location != current_system:
+                if old_location:
+                    old_system = get_object_or_404(System, name=old_location)
+                    old_system.remove_active_pilot(token.char_id)
+                token.user.update_location(
+                    current_system.pk,
+                    token.char_id, token.char_name,
+                    ship_type, ship_name)
+            
+            cache.set(char_cache_key, current_system, 60 * 5)
+            # Use add_active_pilot to refresh the user's record in the global
+            # location cache
+            current_system.add_active_pilot(
+                token.user, token.char_id, token.char_name,
+                ship_type, ship_name
+            )
         
