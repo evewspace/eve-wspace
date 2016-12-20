@@ -372,7 +372,7 @@ class APIAccessRequirement(models.Model):
     groups_required = models.ManyToManyField(Group, null=True,
             related_name="api_requirements")
 
-class CRESTRefreshToken(models.Model):
+class SSORefreshToken(models.Model):
     char_id = models.IntegerField(primary_key=True)
     char_name = models.CharField(max_length=255)
     user = models.ForeignKey(User, related_name="crest_refresh_tokens")
