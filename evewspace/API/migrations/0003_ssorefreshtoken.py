@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='CRESTRefreshToken',
+            name='SSORefreshToken',
             fields=[
                 ('char_id', models.IntegerField(serialize=False, primary_key=True)),
                 ('char_name', models.CharField(max_length=255)),
