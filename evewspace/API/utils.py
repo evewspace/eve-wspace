@@ -129,7 +129,6 @@ def esi_access_data(token, requested_url, call_type = None, post_data = None):
     response = json.loads(data.getvalue())
     
     if 'error' in response:
-        print response
         return None
     
     if response:
