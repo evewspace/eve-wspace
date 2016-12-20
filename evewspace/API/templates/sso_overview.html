@@ -3,7 +3,7 @@
 {% block content%} 
 <div id="homeRow1" class="row">
 	<div class="col-md-6">
-		<a href="/api/crest/login"><img src="/static/images/EVE_SSO_Login_Buttons_Large_Black.png"></a>
+		<a href="/api/sso/login"><img src="/static/images/EVE_SSO_Login_Buttons_Large_Black.png"></a>
 		<div><br/>&nbsp;Current pilots added:<br/><br/></div>
 		<table>
 			{% for token in tokens %}
@@ -14,7 +14,7 @@
 				<td style="padding: 4px;">
 				Name: {{token.CharacterName}}<br />
 				Scope: {{token.Scopes}}<br />
-				Valid: {% if now < token.ExpiresOn %}Yes{% else %}No{% endif %} - <a href="/api/crest/delete/{{token.CharacterID}}/">Remove</a>
+				Valid: {% if now < token.ExpiresOn %}Yes{% else %}No{% endif %} - <a href="/api/sso/delete/{{token.CharacterID}}/">Remove</a>
 				</td>
 			</tr>
 			{% endfor %}
