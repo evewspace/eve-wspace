@@ -50,9 +50,6 @@ from celery.schedules import crontab
 CELERYBEAT_SCHEDULE = {
         'map_stats':{
                 'task': 'Map.tasks.update_system_stats',
-CELERYBEAT_SCHEDULE = {
-        'map_stats':{
-                'task': 'Map.tasks.update_system_stats',
                 'schedule': timedelta(hours=1),
                 'args': ()
             },
