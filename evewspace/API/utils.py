@@ -29,7 +29,7 @@ def sso_refresh_access_token(char_id):
     token = SSORefreshToken.objects.get(
     		char_id=char_id)
 
-    if refresh_token.valid_until < datetime.now(pytz.utc):
+    if token.valid_until < datetime.now(pytz.utc):
 	    #use code to get access & refresh token
 	    authorization = base64.urlsafe_b64encode(settings.SSO_CLIENT_ID + ':' + settings.SSO_SECRET_KEY)
 	    payload = {'grant_type': 'refresh_token', 'refresh_token': token.refresh_token}
