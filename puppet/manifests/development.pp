@@ -16,11 +16,6 @@ package {'libmysqlclient-dev':
 	ensure => present,
 	require => Exec['apt-get update']
 	}
-	
-package {'libcurl4-openssl-dev':
-	ensure => present,
-	require => Exec['apt-get update']
-	}
 
 package {'python-dev':
 	ensure => present,
