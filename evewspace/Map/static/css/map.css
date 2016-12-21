@@ -418,7 +418,7 @@ div.sysClassSpan label {
     font-weight: normal;
 }
 #sysClass, #sysStatics, #sysEffect, #sysSov {
-    display: block;
+    display: inline;
     font-weight: normal;
     padding-left: 10px;
 }
