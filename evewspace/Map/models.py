@@ -226,7 +226,6 @@ class WSystem(System):
     statics = models.ManyToManyField(
                         WormholeType,
                         blank=True,
-                        null=True,
                         through='SystemStatic',
                         through_fields=('system', 'static')
                         )
