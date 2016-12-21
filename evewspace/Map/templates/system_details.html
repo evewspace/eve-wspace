@@ -150,18 +150,18 @@
 		<div class="panel-body">
     		<div style="margin-bottom: 10px; text-align: center;">
     	    	{% if can_edit %}
-	            	<button id="btnPurgeSigs" class="btn btn-sm btn-danger" style="float: right; margin-top: -12px; margin-bottom: 9px;"><i class="glyphicon glyphicon-remove-circle"></i> Purge Sigs</button>
-	            	<button id="btnReallyPurgeSigs" class="btn btn-sm btn-warning" style="float: right; display: none; margin-top: -12px; margin-bottom: 9px;"  onclick="PurgeSignatures({{mapsys.pk}});"><i class="glyphicon glyphicon-remove-circle"></i> Really Purge?</button>
+	            	<form id="bulkSigForm" class="bulkSigForm" method="post" action="system/{{mapsys.pk}}/signatures/bulkadd/">
+	            		<textarea id="pasteField" name="paste"></textarea>
+	                	<button id="btnImport" class="btn btn-sm btn-primary" style="margin-top: -11px; margin-bottom: 9px;"><i class="glyphicon glyphicon-download"></i> Bulk Import</button>
+	            	</form>
+	            		<button id="btnPurgeSigs" class="btn btn-sm btn-danger" style="margin-top: -11px; margin-bottom: 9px;"><i class="glyphicon glyphicon-remove-circle"></i> Purge Sigs</button>
+	            		<button id="btnReallyPurgeSigs" class="btn btn-sm btn-warning" style="display: none; margin-top: -11px; margin-bottom: 9px;"  onclick="PurgeSignatures({{mapsys.pk}});"><i class="glyphicon glyphicon-remove-circle"></i> Really Purge?</button>
 	            	<script type="text/javascript">
 	        	    	$('#btnPurgeSigs').click(function() {
 	            	    	$('#btnReallyPurgeSigs').show();
 	                    	$('#btnPurgeSigs').hide();
 	                	});
-	            	</script>
-	            	<form id="bulkSigForm" class="bulkSigForm" method="post" action="system/{{mapsys.pk}}/signatures/bulkadd/">
-	            		<textarea id="pasteField" name="paste"></textarea>
-	                	<button id="btnImport" class="btn btn-sm btn-primary" style="margin-top: -11px; margin-bottom: 9px;"><i class="glyphicon glyphicon-download"></i> Bulk Import</button>
-	            	</form>
+	                </script>
             	{% endif %}
         	</div>
         	<div id="sys{{mapsys.pk}}SigAddForm">
