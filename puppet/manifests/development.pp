@@ -16,6 +16,11 @@ package {'libmysqlclient-dev':
 	ensure => present,
 	require => Exec['apt-get update']
 	}
+	
+package {'libcurl4-openssl-dev':
+	ensure => present,
+	require => Exec['apt-get update']
+	}
 
 package {'python-dev':
 	ensure => present,
@@ -92,5 +97,5 @@ exec {'create-db':
 exec {'requirements':
 	command => "/usr/bin/pip install -r /vagrant/requirements-mysql.txt",
 	timeout => 0,
-	require => [Package["python-pip"], Exec['easy_install -U distribute'], Package['libmysqlclient-dev'], Package['python-dev'] ],
+	require => [Package["python-pip"], Exec['easy_install -U distribute'], Package['libmysqlclient-dev'], Package['python-dev'], Package['libcurl4-openssl-dev']  ],
 	}

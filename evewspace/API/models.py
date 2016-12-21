@@ -371,3 +371,11 @@ class APIAccessRequirement(models.Model):
             related_name="required_by")
     groups_required = models.ManyToManyField(Group, null=True,
             related_name="api_requirements")
+
+class SSORefreshToken(models.Model):
+    char_id = models.IntegerField(primary_key=True)
+    char_name = models.CharField(max_length=255)
+    user = models.ForeignKey(User, related_name="crest_refresh_tokens")
+    refresh_token = models.CharField(max_length=255)
+    access_token = models.CharField(max_length=255)
+    valid_until = models.DateTimeField()
