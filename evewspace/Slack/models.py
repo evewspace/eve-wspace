@@ -10,7 +10,7 @@ class SlackChannel(models.Model):
     """
     channel = models.CharField(max_length=50, null=False, unique=True)
     token = models.CharField(max_length=50, null=False)
-    group = models.ForeignKey(SubscriptionGroup, related_name='slack_groups', null=False, unique=True)
+    group = models.OneToOneField(SubscriptionGroup, related_name='slack_groups', null=False)
 
 
     def __unicode__(self):
