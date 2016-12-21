@@ -20,10 +20,7 @@ import pytz
 import urllib2
 import json
 import base64
-import pycurl
-import StringIO
-
-
+import requests
 
 def timestamp_to_datetime(timestamp):
     """Converts a UNIX Timestamp (in UTC) to a python DateTime"""
@@ -114,24 +111,25 @@ def esi_access_data(token, requested_url, call_type = None, post_data = None):
     if token.valid_until < datetime.now(pytz.utc):
         token = sso_refresh_access_token(token.char_id)
 
-    data = StringIO.StringIO()
-
     authorization = token.access_token
-    url = 'https://'+ settings.ESI_SERVER + '/' + requested_url + '?datasource=' + settings.ESI_SOURCE
-    curl = pycurl.Curl()
-    curl.setopt(curl.URL, url)
-    curl.setopt(curl.ENCODING, 'gzip') 
-    curl.setopt(curl.HTTPHEADER,['Accept: application/json','Authorization: Bearer '+ authorization])
-    curl.setopt(curl.WRITEFUNCTION, data.write)
-    curl.setopt(curl.TIMEOUT, 5)
-    curl.perform()
+    url = 'https://'+ settings.ESI_SERVER + '/' + requested_url 
+    payload = {'datasource': settings.ESI_SOURCE}
+    headers = {'Accept': 'application/json','Authorization': 'Bearer '+ authorization}
+    r = requests.get(url, headers=headers, params=payload, timeout=1.000)
     
-    response = json.loads(data.getvalue())
+    print r.status_code
     
-    if 'error' in response:
-        return None
+    if r.status_code in (200, 201, 202, 203):
     
-    if response:
-       return response
+        response = r.json()
+        print response
+        if 'error' in response:
+            #should be changed later
+            return None
+        
+        if response:
+           return response
     return None
+
+
 
