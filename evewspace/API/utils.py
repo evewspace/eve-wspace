@@ -62,8 +62,9 @@ def sso_refresh_access_token(char_id):
 	    
 	            token = SSORefreshToken.objects.get(
 	                char_id=char_response['CharacterID'])
-
-                return token
+	                
+	            return token
+                
     return None
     
 def crest_access_data(token, requested_url, post_data = None):
