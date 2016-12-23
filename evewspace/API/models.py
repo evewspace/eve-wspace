@@ -376,6 +376,12 @@ class SSORefreshToken(models.Model):
     char_id = models.IntegerField(primary_key=True)
     char_name = models.CharField(max_length=255)
     user = models.ForeignKey(User, related_name="crest_refresh_tokens")
-    refresh_token = models.CharField(max_length=255)
-    access_token = models.CharField(max_length=255)
-    valid_until = models.DateTimeField()
+    refresh_token = models.CharField(max_length=255, null=True, blank=True)
+    access_token = models.CharField(max_length=255, null=True, blank=True)
+    valid_until = models.DateTimeField(null=True, blank=True)
+    
+class SSOAccessList(models.Model):
+    corp  = models.OneToOneField(Corporation,
+            related_name="access_list_corp", null=True)
+    char_id = models.IntegerField(null=True)
+    char_name = models.CharField(max_length=255)
