@@ -1,0 +1,54 @@
+<p class="text-info">
+	Corperations and Characters which can create accounts through SSO
+</p>
+<table>
+        <tr>
+            <td>Corporation:&nbsp;</td>
+            <td>
+	            <form id="ssoAccessCorpForm" class="settingsForm form-inline" action="/api/sso/accesslist/" method="post">
+	                {% csrf_token %}
+	            	<input type="text" class="input-sm form-control input-margin" name="corp"> 
+	            	<input type="submit" class="btn btn-primary btn-sm" value="Add"> 
+	            </form>
+            </td>
+        </tr>
+        {% for corp in corps %}
+            <tr>
+            	<td colspan='2'>{{corp.corp.name}} - <a class="deleteButton" id="{{corp.pk}}" href="#">Remove</a></td>
+            </tr>
+        {% endfor %}
+        <tr>
+        	<td colspan='2'><br /><br /></td>
+        </tr>
+        <tr>
+            <td>Character:&nbsp;</td>
+            <td>
+	            <form id="ssoAccessCharForm" class="settingsForm form-inline" action="/api/sso/accesslist/" method="post">
+	                {% csrf_token %}
+	            	<input type="text" class="input-sm form-control input-margin" name="char"> 
+	            	<input type="submit" class="btn btn-primary btn-sm" value="Add"> 
+	            </form>
+            </td>
+        </tr>
+        {% for char in chars %}
+            <tr>
+            	<td colspan='2'>{{char.char_name}} - <a class="deleteButton" id="{{char.pk}}" href="#">Remove</a></td>
+            </tr>
+        {% endfor %}
+</table>
+<script type="text/javascript">
+    $('#ssoAccessCorpForm').submit(function(e){
+                e.preventDefault();
+                SaveCorpAccess();
+                return false;
+            });
+    $('#ssoAccessCharForm').submit(function(e){
+                e.preventDefault();
+                SaveCharAccess();
+                return false;
+            });
+    $('.deleteButton').click(function(){
+                DeleteAccess($(this).attr("id"));
+                return false;
+            });
+</script>
