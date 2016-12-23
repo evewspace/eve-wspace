@@ -15,20 +15,24 @@
 
 from datetime import datetime
 import pytz
-import base64
-import requests
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
+from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import permission_required, login_required
 from django.conf import settings
 
-from API.models import CorpAPIKey, MemberAPIKey, APIKey, APIShipLog, APICharacter, SSORefreshToken
-from API.utils import sso_refresh_access_token, crest_access_data, sso_verify, esi_access_data
+from API.models import CorpAPIKey, MemberAPIKey, APIKey, APIShipLog, APICharacter, SSORefreshToken, SSOAccessList
+from API.utils import sso_refresh_access_token, crest_access_data, sso_verify, esi_access_data, sso_util_login
 import API.cache_handler as handler
+from core.utils import get_config
+from core.models import Corporation
+from core import tasks as core_tasks
+
+import eveapi
 
 User = get_user_model()
 
@@ -130,52 +134,34 @@ def delete_corp_key(request, key_id):
     api_key.delete()
     return HttpResponse()
 
-@login_required()
 def sso_login(request):
-    if not settings.SSO_ENABLED:
+    if not get_config("SSO_ENABLED", None).value:
         raise PermissionDenied
     if request.GET.get('code'): 
-    
-        #use code to get access & refresh token
-        authorization = base64.urlsafe_b64encode(settings.SSO_CLIENT_ID + ':' + settings.SSO_SECRET_KEY)
-        payload = { 'grant_type':'authorization_code', 'code': request.GET.get('code')}
-        url = 'https://'+settings.SSO_LOGIN_SERVER+'/oauth/token'
-        headers = {'Content-Type': 'application/x-www-form-urlencoded',
-            'Host': settings.SSO_LOGIN_SERVER,
-            'Authorization': 'Basic '+ authorization,}
-        r = requests.post(url, data=payload, headers=headers)
-        access_response = r.json()
+        if request.GET.get('state') == 'api' and request.user.is_authenticated():
+            code = request.GET.get('code')
+            sso_util_login(request, code)
+         
+            return HttpResponseRedirect('/api/sso/overview/')
+        if request.GET.get('state') == 'login' and get_config("SSO_LOGIN_ENABLED", None).value:
+            code = request.GET.get('code')
+            token = sso_util_login(request, code)
+            user = token.user
+            
+            #manually set the backend attribute to be able to login w/o password
+            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            login(request, user)
         
-        #verify validity by requesting char info
-        char_authorization = access_response['access_token']
-        char_url = 'https://'+settings.SSO_LOGIN_SERVER+'/oauth/verify'
-        char_headers = {'User-Agent': settings.SSO_USER_AGENT,
-            'Host': settings.SSO_LOGIN_SERVER,
-            'Authorization': 'Bearer '+ char_authorization,}
-        
-        r2 = requests.get(char_url, headers=char_headers)
-        char_response = r2.json()
-        
-        updated_values = {
-            'user_id': request.user.pk,
-            'refresh_token': access_response['refresh_token'],
-            'access_token': access_response['access_token'],
-            'valid_until': char_response["ExpiresOn"],
-            'char_name': char_response["CharacterName"],
-        }
-        token_info = SSORefreshToken.objects.update_or_create(
-            char_id=char_response['CharacterID'], defaults=updated_values)
-        
-        
-        return HttpResponseRedirect('/api/sso/overview/')
-    return HttpResponseRedirect('https://'+settings.SSO_LOGIN_SERVER+'/oauth/authorize/?response_type=code&redirect_uri='+settings.SSO_BASE_URL+'api/sso/login/&client_id='+ settings.SSO_CLIENT_ID +'&scope='+settings.SSO_SCOPE+'&state=') # 302
+            return HttpResponseRedirect('/')
+        return HttpResponseRedirect('/')
+    return HttpResponseRedirect('https://'+settings.SSO_LOGIN_SERVER+'/oauth/authorize/?response_type=code&redirect_uri='+get_config("SSO_BASE_URL", None).value+'api/sso/login/&client_id='+ get_config("SSO_CLIENT_ID", None).value +'&scope='+get_config("SSO_SCOPE", None).value+'&state=api') # 302
 
 @login_required()
 def sso_overview(request):
-    if not settings.SSO_ENABLED:
+    if not get_config("SSO_ENABLED", None).value:
         return TemplateResponse(request, 'sso_not_enabled.html')
     
-    tokens = SSORefreshToken.objects.filter(user=request.user).all()
+    tokens = SSORefreshToken.objects.filter(user=request.user, valid_until__gt='1900-01-01').all()
     data = []
     
     for token in tokens:
@@ -189,6 +175,130 @@ def sso_overview(request):
     
 @login_required()
 def sso_delete(request, char_id):
-    SSORefreshToken.objects.filter(user=request.user, char_id=char_id).delete()
+    token = SSORefreshToken.objects.get(user=request.user, char_id=char_id)
+    if token.char_name == token.user.username:
+        token.refresh_token = None
+        token.access_token = None
+        token.valid_until = None
+        token.save()
+    else:
+        token.delete()
     
     return HttpResponseRedirect('/api/sso/overview/')
+
+@permission_required('API.change_ssoaccesslist')
+def sso_admin(request):
+    if not request.is_ajax():
+        raise PermissionDenied
+    enabled = get_config("SSO_ENABLED", None)
+    client_id = get_config("SSO_CLIENT_ID", None)
+    secret_key = get_config("SSO_SECRET_KEY", None)
+    base_url = get_config("SSO_BASE_URL", None)
+    scope = get_config("SSO_SCOPE", None)
+    user_agent = get_config("SSO_USER_AGENT", None)
+    login_enabled = get_config("SSO_LOGIN_ENABLED", None)
+    deactivate_accounts = get_config("SSO_DEACTIVATE_ACCOUNTS", None)
+    default_group = get_config("SSO_DEFAULT_GROUP", None)
+    if request.method == "POST":
+        enabled.value = (request.POST['enabled'])
+        base_url.value = (request.POST['base_url'])
+        scope.value = (request.POST['scope'])
+        user_agent.value = (request.POST['user_agent'])
+        login_enabled.value = (request.POST['login_enabled'])
+        deactivate_accounts.value = (request.POST['deactivate_accounts'])
+        enabled.save()
+        base_url.save()
+        scope.save()
+        user_agent.save()
+        login_enabled.save()
+        deactivate_accounts.save()
+        if len(request.POST['client_id'])>1:
+            client_id.value = (request.POST['client_id'])
+            client_id.save()
+        if len(request.POST['secret_key'])>1:
+            secret_key.value = (request.POST['secret_key'])
+            secret_key.save()
+        try:
+            group = Group.objects.get(name=request.POST['default_group'])
+            default_group.value = (request.POST['default_group'])
+            default_group.save()
+        except Group.DoesNotExist:
+            group = None
+            
+    return TemplateResponse(
+        request, 'sso_settings.html',
+        {'enabled': enabled.value,
+         'base_url': base_url.value,
+         'scope': scope.value,
+         'user_agent': user_agent.value,
+         'login_enabled': login_enabled.value,
+         'deactivate_accounts': deactivate_accounts.value,
+         'default_group': default_group.value,
+         'request': request})
+
+
+@permission_required('API.change_ssoaccesslist')
+def sso_access_list(request):
+    if not request.is_ajax():
+        raise PermissionDenied
+    corp_name = request.POST.get('corp', None)
+    char_name = request.POST.get('char', None)
+    if corp_name:
+        try:
+            corp = Corporation.objects.get(name=corp_name)
+        except Corporation.DoesNotExist:
+            # Corp isn't in our DB, get its ID and add it
+            try:
+                api = eveapi.EVEAPIConnection(cacheHandler=handler)
+                corp_id = (api.eve.CharacterID(names=corp_name)
+                           .characters[0].characterID)
+                if corp_id == 0:
+                    return HttpResponse('Corp does not exist!', status=404)
+                corp = core_tasks.update_corporation(corp_id, True)
+            except:
+                # Error while talking to the EVE API
+                return HttpResponse('Could not verify Corp name. Please try again later.', status=404)                
+        else:
+            # Have the async worker update the corp so that it is up to date
+            core_tasks.update_corporation.delay(corp.id)
+            
+        if corp: 
+            SSOAccessList.objects.create(corp=corp)
+            
+    if char_name:
+        try:
+            api = eveapi.EVEAPIConnection(cacheHandler=handler)
+            char_id = (api.eve.CharacterID(names=char_name)
+                       .characters[0].characterID)
+            char_name = (api.eve.CharacterID(names=char_name)
+                       .characters[0].name)
+            if char_id == 0:
+                return HttpResponse('Char does not exist!', status=404)
+        except:
+            # Error while talking to the EVE API
+            return HttpResponse('Could not verify Char name. Please try again later.', status=404)                
+            
+        if char_id: 
+            SSOAccessList.objects.create(char_id=char_id, char_name=char_name)
+    
+    corps = SSOAccessList.objects.exclude(corp__isnull=True).all()
+    chars = SSOAccessList.objects.exclude(char_id__isnull=True).all()
+    return TemplateResponse(
+        request, 'sso_access_list.html',
+        {'corps': corps, 
+        'chars': chars}
+        )
+        
+
+@permission_required('API.change_ssoaccesslist')
+def sso_delete_access_list(request, id): 
+    if not request.is_ajax():
+        raise PermissionDenied
+    SSOAccessList.objects.get(pk=id).delete()
+    return HttpResponse()
+    
+def sso_frontpage_login(request):
+    if not get_config("SSO_ENABLED", None).value:
+        raise PermissionDenied
+
+    return HttpResponseRedirect('https://'+settings.SSO_LOGIN_SERVER+'/oauth/authorize/?response_type=code&redirect_uri='+get_config("SSO_BASE_URL", None).value+'api/sso/login/&client_id='+ get_config("SSO_CLIENT_ID", None).value +'&scope='+get_config("SSO_SCOPE", None).value+'&state=login') # 302
