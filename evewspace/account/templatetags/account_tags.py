@@ -14,6 +14,7 @@
 #   limitations under the License.
 from django import template
 from core.templatetags.coretags import registry_tag, registry_names_tag
+from core.utils import get_config 
 register = template.Library()
 
 registry_names_tag(register, 'user_admin_entries', 'user_admin_sections')
@@ -29,3 +30,8 @@ registry_tag(register, 'profile_settings', 'profile_pages')
 @register.filter
 def group_visible(groups, visible=True):
     return groups.filter(profile__visible=visible).all()
+
+@register.assignment_tag()
+def sso_enabled():
+    return get_config("SSO_LOGIN_ENABLED", None).value
+    
