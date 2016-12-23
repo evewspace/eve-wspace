@@ -1,0 +1,59 @@
+<form id="ssoSettingForm" class="settingsForm form-group" action="/api/sso/settings/" method="post">
+    <p class="text-info">
+    	Settings to enable the use of SSO/CREST/ESI<br /><br />
+               
+        Please create an application on <a href="https://developers.eveonline.com/">developers.eveonline.com</a><br /><br />
+                    
+        You probably need to know following parameters, unless you have a non-standard setup:<br />
+        Callback URL: https://{{request.get_host}}/api/sso/login/ (or http://) <br />
+        Scope: {{scope}} <br /><br />
+    </p>
+    <table>
+        <tr>
+            <td>SSO Enabled (adding EVE chars to current accounts):&nbsp;</td>
+            <td><input type="text" class="input-sm form-control input-margin" name="enabled" value="{{enabled}}"></td>
+        </tr>
+        <tr>
+            <td>Secret Key (this value is empty to avoid abuse - only overwritten when not empty):</td> 
+            <td><input type="text" class="input-sm form-control input-margin" name="secret_key" value=""></td>
+        </tr>
+        <tr>
+            <td>Client ID (this value is empty to avoid abuse - only overwritten when not empty):</td>
+            <td> <input type="text" class="input-sm form-control input-margin" name="client_id" value=""></td>
+        </tr>
+        <tr>
+            <td>Base URL (https://{{ request.get_host }}/ (or http://) is suggested based on the current URL):</td>
+            <td> <input type="text" class="input-sm form-control input-margin" name="base_url" value="{{base_url}}"></td>
+        </tr>
+        <tr>
+            <td>Scope requested:</td>
+            <td> <input type="text" class="input-sm form-control input-margin" name="scope" value="{{scope}}"></td>
+        </tr>
+        <tr>
+            <td>User Agent:</td>
+            <td> <input type="text" class="input-sm form-control input-margin" name="user_agent" value="{{user_agent}}"></td>
+        </tr>
+        <tr>
+            <td>Frontpage login and registration enabled:</td>
+            <td> <input type="text" class="input-sm form-control input-margin" name="login_enabled" value="{{login_enabled}}"></td>
+        </tr>
+        <tr>
+            <td>Default user group for new SSO accounts:</td>
+            <td><input type="text" class="input-sm form-control input-margin" name="default_group" value="{{default_group}}"></td>
+        </tr>
+        <tr>
+            <td>Deactivate accounts which are not on the access list (in corp or character exception):</td>
+            <td><input type="text" class="input-sm form-control input-margin" name="deactivate_accounts" value="{{deactivate_accounts}}"></td>
+        </tr>
+    </table>
+    <br />
+    <input type="submit" class="btn btn-primary btn-sm" value="Save Changes">
+</form>
+<script type="text/javascript">
+    $('#ssoSettingForm').submit(function(e){
+                e.preventDefault();
+                SaveSSOSettings();
+                return false;
+            });
+</script>
+
