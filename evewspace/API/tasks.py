@@ -18,7 +18,8 @@ from datetime import datetime
 from API.models import APIKey, MemberAPIKey, SSORefreshToken
 from Map.models import System
 from core.models import Type
-from API.utils import sso_refresh_access_token, crest_access_data, esi_access_data
+from core.utils import get_config
+from API.utils import sso_refresh_access_token, crest_access_data, esi_access_data, sso_access_list, api_current_corp
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -98,3 +99,20 @@ def update_char_location():
                 ship_name, ship_type 
             )
         
+
+@task()
+def update_account_status():
+    if get_config("SSO_DEACTIVATE_ACCOUNTS", None).value:
+        for account in User.objects.filter(is_active=True).all():
+            count = 0
+            for token in account.crest_refresh_tokens.all():
+                if count < 1:
+                    corp_id = api_current_corp(token.char_id)
+                    if sso_access_list(token.char_id, corp_id):
+                        count = count+1
+            if count == 0:
+                print account.username
+                account.is_active = False
+                account.save()
+            
+            
