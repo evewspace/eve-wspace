@@ -171,7 +171,7 @@ class StarbaseResourcePurpose(models.Model):
 class StarbaseResource(models.Model):
     """Core model for SDD invStarbaseResources table. Maps tower types
     to their fuel"""
-    towerType = models.ForeignKey(Type, related_name='posesfueled',
+    towerType = models.OneToOneField(Type, related_name='posesfueled',
             db_column='controlTowerTypeID', primary_key=True)
     resourceType = models.ForeignKey(Type, related_name='posfuel',
             db_column='resourceTypeID')
@@ -214,7 +214,7 @@ class Location(models.Model):
 
 class LocationWormholeClass(models.Model):
     """Core model for SDD mapLocationWormholeClasses used to generate system tables."""
-    location = models.ForeignKey(Location, primary_key=True, related_name="whclass",
+    location = models.OneToOneField(Location, primary_key=True, related_name="whclass",
             db_column='locationID')
     sysclass = models.IntegerField(null=True, blank=True, db_column='wormholeClassID')
 

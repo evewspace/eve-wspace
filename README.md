@@ -30,7 +30,6 @@ Generally, Eve W-Space requires:
 * RabbitMQ (preferred)
 * memcached (preferred)
 * An RDBMS (MariaDB, MySQL, and PostgreSQL tested)
-* PyCurl and Libcurl (for SSO/ESI support)
 
 Other required python modules are listed in requirements.txt.
 

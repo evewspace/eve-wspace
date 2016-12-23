@@ -21,13 +21,12 @@ Requirements
     * libxslt-dev
     * rabbitmq-server
     * supervisor
-    * libcurl4
 
 You can install all required packages with the following. You will be prompted for a mysql root password. You may leave this blank if you wish, but it is recommended that you set a secure password and remember it for later.::
 
     $ sudo apt-get install git-core build-essential python-dev python-pip \
       nginx bzip2 memcached libmysqlclient-dev mysql-server libxml2-dev \
-      libxslt-dev rabbitmq-server supervisor libcurl4-gnutls-dev librtmp-dev
+      libxslt-dev rabbitmq-server supervisor
 
 Note: if you want to use PostgreSQL, replace libmysqlclient-dev and mysql-server with libpq-dev and postgresql.
 

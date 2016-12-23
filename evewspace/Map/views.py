@@ -835,7 +835,7 @@ def edit_system(request, map_id, ms_id):
     if request.method == 'POST':
         if map_system.system.sysclass == 99:
             sysname = request.POST.get('systemName')
-            system = System.objects.get(name= sysname)
+            system = get_object_or_404(System, name=sysname)
             wormhole = get_object_or_404(Wormhole, bottom=ms_id)
                 
             wormhole.mass_status = int(request.POST.get('massStatus', 0))

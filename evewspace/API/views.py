@@ -15,9 +15,8 @@
 
 from datetime import datetime
 import pytz
-import urllib2
-import json
 import base64
+import requests
 
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -139,15 +138,13 @@ def sso_login(request):
     
         #use code to get access & refresh token
         authorization = base64.urlsafe_b64encode(settings.SSO_CLIENT_ID + ':' + settings.SSO_SECRET_KEY)
-        data = 'grant_type=authorization_code&code=' + request.GET.get('code')
+        payload = { 'grant_type':'authorization_code', 'code': request.GET.get('code')}
         url = 'https://'+settings.SSO_LOGIN_SERVER+'/oauth/token'
         headers = {'Content-Type': 'application/x-www-form-urlencoded',
             'Host': settings.SSO_LOGIN_SERVER,
             'Authorization': 'Basic '+ authorization,}
-        opener = urllib2.build_opener(urllib2.HTTPHandler)
-        requested = urllib2.Request(url, data, headers)
-        json_response = opener.open(requested).read()
-        access_response = json.loads(json_response)
+        r = requests.post(url, data=payload, headers=headers)
+        access_response = r.json()
         
         #verify validity by requesting char info
         char_authorization = access_response['access_token']
@@ -155,10 +152,9 @@ def sso_login(request):
         char_headers = {'User-Agent': settings.SSO_USER_AGENT,
             'Host': settings.SSO_LOGIN_SERVER,
             'Authorization': 'Bearer '+ char_authorization,}
-        char_requested = urllib2.Request(char_url, None, char_headers)
-        char_json_response = opener.open(char_requested).read()
         
-        char_response = json.loads(char_json_response)
+        r2 = requests.get(char_url, headers=char_headers)
+        char_response = r2.json()
         
         updated_values = {
             'user_id': request.user.pk,

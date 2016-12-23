@@ -17,13 +17,8 @@ from API.models import SSORefreshToken
 from django.conf import settings
 
 import pytz
-import urllib2
-import json
 import base64
-import pycurl
-import StringIO
-
-
+import requests
 
 def timestamp_to_datetime(timestamp):
     """Converts a UNIX Timestamp (in UTC) to a python DateTime"""
@@ -31,62 +26,63 @@ def timestamp_to_datetime(timestamp):
     return result
 
 def sso_refresh_access_token(char_id):
-    refresh_token = SSORefreshToken.objects.get(
-    		char_id=char_id)
-
-    if refresh_token.valid_until < datetime.now(pytz.utc):
-	    #use code to get access & refresh token
-	    authorization = base64.urlsafe_b64encode(settings.SSO_CLIENT_ID + ':' + settings.SSO_SECRET_KEY)
-	    data = 'grant_type=refresh_token&refresh_token=' + refresh_token.refresh_token
-	    url = 'https://'+settings.SSO_LOGIN_SERVER+'/oauth/token'
-	    headers = {'Content-Type': 'application/x-www-form-urlencoded',
-	        'Host': settings.SSO_LOGIN_SERVER,
-	        'Authorization': 'Basic '+ authorization,}
-	    opener = urllib2.build_opener(urllib2.HTTPHandler)
-	    requested = urllib2.Request(url, data, headers)
-	    json_response = opener.open(requested).read()
-	    access_response = json.loads(json_response)
+    token = SSORefreshToken.objects.get(
+            char_id=char_id)
+    if settings.SSO_ENABLED == False:
+        return None
+    if token.valid_until < datetime.now(pytz.utc):
+        #use code to get access & refresh token
+        authorization = base64.urlsafe_b64encode(settings.SSO_CLIENT_ID + ':' + settings.SSO_SECRET_KEY)
+        payload = {'grant_type': 'refresh_token', 'refresh_token': token.refresh_token}
+        url = 'https://'+settings.SSO_LOGIN_SERVER+'/oauth/token'
+        headers = {'Content-Type': 'application/x-www-form-urlencoded',
+            'Host': settings.SSO_LOGIN_SERVER,
+            'Authorization': 'Basic '+ authorization,}
+        
+        r = requests.post(url, data=payload, headers=headers)
+        access_response = r.json()
+        
+        if r.status_code in (200, 201, 202, 203):
+            
+            #verify validity by requesting char info
+            char_authorization = access_response['access_token']
+            char_url = 'https://'+settings.SSO_LOGIN_SERVER+'/oauth/verify'
+            char_headers = {'User-Agent': settings.SSO_USER_AGENT,
+                'Host': settings.SSO_LOGIN_SERVER,
+                'Authorization': 'Bearer '+ char_authorization,}
+            
+            r2 = requests.get(char_url, headers=char_headers)
+            char_response = r2.json()
+            
+            if r2.status_code in (200, 201, 202, 203):
+            
+	            token.access_token = access_response['access_token']
+	            token.valid_until = char_response["ExpiresOn"] 
+	            token.save()
 	    
-	    #verify validity by requesting char info
-	    char_authorization = access_response['access_token']
-	    char_url = 'https://'+settings.SSO_LOGIN_SERVER+'/oauth/verify'
-	    char_headers = {'User-Agent': settings.SSO_USER_AGENT,
-	        'Host': settings.SSO_LOGIN_SERVER,
-	        'Authorization': 'Bearer '+ char_authorization,}
-	    char_requested = urllib2.Request(char_url, None, char_headers)
-	    char_json_response = opener.open(char_requested).read()
-	     
-	    char_response = json.loads(char_json_response)
-	     
-	    refresh_token.access_token = access_response['access_token']
-	    refresh_token.valid_until = char_response["ExpiresOn"] 
-	    refresh_token.save()
-
-	    refresh_token = SSORefreshToken.objects.get(
-    		char_id=char_response['CharacterID'])
-
-    return refresh_token
+	            token = SSORefreshToken.objects.get(
+	                char_id=char_response['CharacterID'])
+	                
+	            return token
+                
+    return None
     
 def crest_access_data(token, requested_url, post_data = None):
     if token.valid_until < datetime.now(pytz.utc):
         token = sso_refresh_access_token(token.char_id)
     if settings.SSO_ENABLED == False:
-	    return None
+        return None
     authorization = token.access_token
     url = 'https://'+settings.CREST_SERVER+'/'+requested_url
-    print url
     headers = {'User-Agent': settings.SSO_USER_AGENT,
         'Host': settings.CREST_SERVER,
         'Authorization': 'Bearer '+ authorization,}
-    opener = urllib2.build_opener(urllib2.HTTPHandler)
-    requested = urllib2.Request(url, post_data, headers)
-    open_page = opener.open(requested)
-    header_response = open_page.info()
-    json_response = open_page.read()
-    response = json.loads(json_response)
+    r = requests.get(url, headers=headers)
+    response = r.json()
     
-    if response:
-       return response
+    if r.status_code in (200, 201, 202, 203):
+        if response:
+            return response
     return None
     
     
@@ -94,44 +90,41 @@ def sso_verify(token):
     if token.valid_until < datetime.now(pytz.utc):
         token = sso_refresh_access_token(token.char_id)
     
-    opener = urllib2.build_opener(urllib2.HTTPHandler)
     authorization = token.access_token
     url = 'https://'+settings.SSO_LOGIN_SERVER+'/oauth/verify'
     headers = {'User-Agent': settings.SSO_USER_AGENT,
         'Host': settings.SSO_LOGIN_SERVER,
         'Authorization': 'Bearer '+ authorization,}
-    requested = urllib2.Request(url, None, headers)
-    json_response = opener.open(requested).read()
-        
-    response = json.loads(json_response)
     
-    if response:
-       return response
+    r = requests.get(url, headers=headers)
+    response = r.json()
+    if r.status_code in (200, 201, 202, 203):
+        if response:
+            return response
     return None
     
     
 def esi_access_data(token, requested_url, call_type = None, post_data = None):
     if token.valid_until < datetime.now(pytz.utc):
         token = sso_refresh_access_token(token.char_id)
-
-    data = StringIO.StringIO()
-
-    authorization = token.access_token
-    url = 'https://'+ settings.ESI_SERVER + '/' + requested_url + '?datasource=' + settings.ESI_SOURCE
-    curl = pycurl.Curl()
-    curl.setopt(curl.URL, url)
-    curl.setopt(curl.ENCODING, 'gzip') 
-    curl.setopt(curl.HTTPHEADER,['Accept: application/json','Authorization: Bearer '+ authorization])
-    curl.setopt(curl.WRITEFUNCTION, data.write)
-    curl.setopt(curl.TIMEOUT, 5)
-    curl.perform()
-    
-    response = json.loads(data.getvalue())
-    
-    if 'error' in response:
+    if settings.SSO_ENABLED == False:
         return None
+    authorization = token.access_token
+    url = 'https://'+ settings.ESI_SERVER + '/' + requested_url 
+    payload = {'datasource': settings.ESI_SOURCE}
+    headers = {'Accept': 'application/json','Authorization': 'Bearer '+ authorization}
+    r = requests.get(url, headers=headers, params=payload, timeout=1.000)
     
-    if response:
-       return response
+    if r.status_code in (200, 201, 202, 203):
+    
+        response = r.json()
+        if 'error' in response:
+            #should be changed later
+            return None
+        
+        if response:
+           return response
     return None
+
+
 
