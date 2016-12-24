@@ -224,6 +224,9 @@ def sso_admin(request):
             default_group.save()
         except Group.DoesNotExist:
             group = None
+            if request.POST['default_group'] == '':
+                default_group.value = request.POST['default_group']
+                default_group.save()
             
     return TemplateResponse(
         request, 'sso_settings.html',
