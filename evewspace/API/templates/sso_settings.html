@@ -5,24 +5,24 @@
         Please create an application on <a href="https://developers.eveonline.com/">developers.eveonline.com</a><br /><br />
                     
         You probably need to know following parameters, unless you have a non-standard setup:<br />
-        Callback URL: https://{{request.get_host}}/api/sso/login/ (or http://) <br />
-        Scope: {{scope}} <br /><br />
+        <font size='2'>Callback URL: https://{{request.get_host}}/api/sso/login/ (or http://) <br />
+        Scope: {{scope}}</font> <br /><br />
     </p>
-    <table>
+    <table style="margin: 5px">
         <tr>
-            <td>SSO Enabled (adding EVE chars to current accounts):&nbsp;</td>
+            <td width='70%'>SSO Enabled (adding EVE chars to current accounts):&nbsp;</td>
             <td><input type="text" class="input-sm form-control input-margin" name="enabled" value="{{enabled}}"></td>
         </tr>
         <tr>
-            <td>Secret Key (this value is empty to avoid abuse - only overwritten when not empty):</td> 
+            <td>Secret Key:<br /> <font size='2'>This value is empty to avoid abuse - only overwritten when not empty</font></td> 
             <td><input type="text" class="input-sm form-control input-margin" name="secret_key" value=""></td>
         </tr>
         <tr>
-            <td>Client ID (this value is empty to avoid abuse - only overwritten when not empty):</td>
+            <td>Client ID:<br /> <font size='2'>This value is empty to avoid abuse - only overwritten when not empty</font></td>
             <td> <input type="text" class="input-sm form-control input-margin" name="client_id" value=""></td>
         </tr>
         <tr>
-            <td>Base URL (https://{{ request.get_host }}/ (or http://) is suggested based on the current URL):</td>
+            <td>Base URL:<br /><font size='2'>https://{{ request.get_host }}/ (or http://) is suggested based on the current URL</font></td>
             <td> <input type="text" class="input-sm form-control input-margin" name="base_url" value="{{base_url}}"></td>
         </tr>
         <tr>
@@ -34,7 +34,7 @@
             <td> <input type="text" class="input-sm form-control input-margin" name="user_agent" value="{{user_agent}}"></td>
         </tr>
         <tr>
-            <td>Frontpage login and registration enabled:</td>
+            <td>Frontpage login and registration enabled:<br /><font size='2'>Please add corps/chars to the access list before letting people register, otherwise they will receive a 403 Permission Denied page</font></td>
             <td> <input type="text" class="input-sm form-control input-margin" name="login_enabled" value="{{login_enabled}}"></td>
         </tr>
         <tr>
@@ -42,7 +42,7 @@
             <td><input type="text" class="input-sm form-control input-margin" name="default_group" value="{{default_group}}"></td>
         </tr>
         <tr>
-            <td>Deactivate accounts which are not on the access list (in corp or character exception):</td>
+            <td>Deactivate accounts which are not on the access list:<br/><font size='2'>This will not deactivate any users (in groups) with the change SSO access list permission to avoid accidents</font></td>
             <td><input type="text" class="input-sm form-control input-margin" name="deactivate_accounts" value="{{deactivate_accounts}}"></td>
         </tr>
     </table>
