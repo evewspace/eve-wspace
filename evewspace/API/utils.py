@@ -47,7 +47,15 @@ def sso_refresh_access_token(char_id):
             'Host': settings.SSO_LOGIN_SERVER,
             'Authorization': 'Basic '+ authorization,}
         
-        r = requests.post(url, data=payload, headers=headers)
+        try:
+            r = requests.post(url, data=payload, headers=headers)
+        except requests.exceptions.Timeout:
+            return None
+        except requests.exceptions.ConnectionError:
+            return None
+        except requests.exceptions.HTTPError:
+            return None
+            
         access_response = r.json()
         
         if r.status_code in (200, 201, 202, 203):
@@ -59,20 +67,26 @@ def sso_refresh_access_token(char_id):
                 'Host': settings.SSO_LOGIN_SERVER,
                 'Authorization': 'Bearer '+ char_authorization,}
             
-            r2 = requests.get(char_url, headers=char_headers)
+            try: 
+                r2 = requests.get(char_url, headers=char_headers)
+            except requests.exceptions.Timeout:
+                return None
+            except requests.exceptions.ConnectionError:
+                return None
             char_response = r2.json()
             
             if r2.status_code in (200, 201, 202, 203):
             
-	            token.access_token = access_response['access_token']
-	            token.valid_until = char_response["ExpiresOn"] 
-	            token.save()
-	    
-	            token = SSORefreshToken.objects.get(
-	                char_id=char_response['CharacterID'])
-	                
-	            return token
-                
+                token.access_token = access_response['access_token']
+                token.valid_until = char_response["ExpiresOn"] 
+                token.save()
+        
+                token = SSORefreshToken.objects.get(
+                    char_id=char_response['CharacterID'])
+                    
+                return token
+        elif r.status_code in (404, 500):
+            return sso_refresh_access_token(char_id)
     return None
     
 def crest_access_data(token, requested_url, post_data = None):
@@ -85,7 +99,16 @@ def crest_access_data(token, requested_url, post_data = None):
     headers = {'User-Agent': get_config("SSO_USER_AGENT", None).value,
         'Host': settings.CREST_SERVER,
         'Authorization': 'Bearer '+ authorization,}
-    r = requests.get(url, headers=headers)
+    
+    try:
+        r = requests.get(url, headers=headers, timeout=1.000)
+    except requests.exceptions.Timeout:
+        return None
+    except requests.exceptions.ConnectionError:
+        return None
+    except requests.exceptions.HTTPError:
+        return None
+    
     response = r.json()
     
     if r.status_code in (200, 201, 202, 203):
@@ -105,8 +128,16 @@ def sso_verify(token, headers=None):
         headers = {'User-Agent': get_config("SSO_USER_AGENT", None).value,
             'Host': settings.SSO_LOGIN_SERVER,
             'Authorization': 'Bearer '+ authorization,}
+            
+    try:
+        r = requests.get(url, headers=headers, timeout=5.000)
+    except requests.exceptions.Timeout:
+        return None
+    except requests.exceptions.ConnectionError:
+        return None
+    except requests.exceptions.HTTPError:
+        return None
     
-    r = requests.get(url, headers=headers)
     response = r.json()
     if r.status_code in (200, 201, 202, 203):
         if response:
@@ -123,11 +154,19 @@ def esi_access_data(token, requested_url, call_type = None, post_data = None):
     url = 'https://'+ settings.ESI_SERVER + '/' + requested_url 
     payload = {'datasource': settings.ESI_SOURCE}
     headers = {'Accept': 'application/json','Authorization': 'Bearer '+ authorization}
-    r = requests.get(url, headers=headers, params=payload, timeout=1.000)
+    try:
+        r = requests.get(url, headers=headers, params=payload, timeout=1.000)
+    except requests.exceptions.Timeout:
+        return None
+    except requests.exceptions.ConnectionError:
+        return None
+    except requests.exceptions.HTTPError:
+        return None
     
     if r.status_code in (200, 201, 202, 203):
     
         response = r.json()
+        response["token"] = token
         if 'error' in response:
             #should be changed later
             return None
@@ -142,8 +181,15 @@ def esi_public_data(requested_url):
     url = 'https://'+ settings.ESI_SERVER + '/' + requested_url 
     payload = {'datasource': settings.ESI_SOURCE}
     headers = {'Accept': 'application/json'}
-    r = requests.get(url, headers=headers, params=payload, timeout=1.000)
-
+    try:
+        r = requests.get(url, headers=headers, params=payload, timeout=1.000)
+    except requests.exceptions.Timeout:
+        return None
+    except requests.exceptions.ConnectionError:
+        return None
+    except requests.exceptions.HTTPError:
+        return None 
+    
     if r.status_code in (200, 201, 202, 203):
     
         response = r.json()
@@ -164,7 +210,14 @@ def sso_util_login(request, code):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',
         'Host': settings.SSO_LOGIN_SERVER,
         'Authorization': 'Basic '+ authorization,}
-    r = requests.post(url, data=payload, headers=headers)
+    try:
+        r = requests.post(url, data=payload, headers=headers, timeout=5.000)
+    except requests.exceptions.Timeout:
+        return None
+    except requests.exceptions.ConnectionError:
+        return None
+    except requests.exceptions.HTTPError:
+        return None 
     access_response = r.json()
     
     #verify validity by requesting char info
@@ -173,8 +226,15 @@ def sso_util_login(request, code):
     char_headers = {'User-Agent': get_config("SSO_USER_AGENT", None).value,
         'Host': settings.SSO_LOGIN_SERVER,
         'Authorization': 'Bearer '+ char_authorization,}
-     
-    r2 = requests.get(char_url, headers=char_headers)
+    
+    try: 
+        r2 = requests.get(char_url, headers=char_headers, timeout=5.000)
+    except requests.exceptions.Timeout:
+        return None
+    except requests.exceptions.ConnectionError:
+        return None
+    except requests.exceptions.HTTPError:
+        return None 
     char_response = r2.json()
     
     if request.GET.get('state') == 'login':
@@ -199,8 +259,9 @@ def sso_util_login(request, code):
                                  email='sso@eveonline.com',
                                  password=password)
             token = SSORefreshToken.objects.create(user=user, char_id=char_response['CharacterID'], char_name=char_response["CharacterName"])
-            group = Group.objects.get(name=get_config("SSO_DEFAULT_GROUP", None).value) 
-            group.user_set.add(user)
+            if not get_config("SSO_DEFAULT_GROUP", None).value is null and not get_config("SSO_DEFAULT_GROUP", None).value == '':
+                group = Group.objects.get(name=get_config("SSO_DEFAULT_GROUP", None).value) 
+                group.user_set.add(user)
         token.refresh_token = access_response['refresh_token']
         token.access_token = access_response['access_token']
         token.valid_until = char_response["ExpiresOn"]
