@@ -24,6 +24,8 @@ from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
+
 
 import urllib2
 import json
@@ -47,12 +49,12 @@ def update_char_data():
 
 @task()
 def update_char_location():
-    for token in SSORefreshToken.objects.all():
+    for token in SSORefreshToken.objects.exclude(refresh_token__isnull=True).exclude(refresh_token__exact='').all():
         url = 'characters/%s/location/' % token.char_id
         response = esi_access_data(token,url)
         
         url2 = 'characters/%s/ship/' % token.char_id
-        response2 = esi_access_data(token,url2)
+        response2 = esi_access_data(response["token"],url2)
         
         if response: 
             system_pk = response["solar_system_id"]
@@ -103,15 +105,14 @@ def update_char_location():
 @task()
 def update_account_status():
     if get_config("SSO_DEACTIVATE_ACCOUNTS", None).value:
-        for account in User.objects.filter(is_active=True).all():
+        for account in User.objects.filter(is_active=True).exclude(Q(is_superuser=True) | Q(user_permissions__codename='change_ssoaccesslist') | Q(groups__permissions__codename='change_ssoaccesslist')).all():
             count = 0
-            for token in account.crest_refresh_tokens.all():
+            for token in account.crest_refresh_tokens.exclude(refresh_token__isnull=True).exclude(refresh_token__exact='').all():
                 if count < 1:
                     corp_id = api_current_corp(token.char_id)
                     if sso_access_list(token.char_id, corp_id):
                         count = count+1
             if count == 0:
-                print account.username
                 account.is_active = False
                 account.save()
             
