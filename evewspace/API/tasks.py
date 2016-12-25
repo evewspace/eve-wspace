@@ -69,7 +69,7 @@ def update_char_location():
             ship_type_id = response2["ship_type_id"]
         
         #change "not 'structure_id' in response" when online check can be executed in ESI
-        if system_pk and not 'structure_id' in response:
+        if system_pk and not 'structure_id' in response and not 'station_id' in response:
             char_cache_key = 'char_%s_location' % token.char_id
             old_location = cache.get(char_cache_key)
             current_system = get_object_or_404(System, pk=system_pk)
