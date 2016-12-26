@@ -18,6 +18,15 @@ from functools import partial
 defaults = [
         ("API_ALLOW_CHARACTER_KEY", "0"),
         ("API_ALLOW_EXPIRING_KEY", "0"),
+        ("SSO_ENABLED", "False"),
+        ("SSO_SECRET_KEY", ""),
+        ("SSO_CLIENT_ID", ""),
+        ("SSO_BASE_URL", ""),
+        ("SSO_SCOPE", "esi-location.read_location.v1 esi-location.read_ship_type.v1 characterLocationRead"),
+        ("SSO_USER_AGENT", "EVE W-space Instance"),
+        ("SSO_LOGIN_ENABLED", "False"),
+        ("SSO_DEACTIVATE_ACCOUNTS", "False"),
+        ("SSO_DEFAULT_GROUP", ""),
         ]
 
 load_defaults = partial(load_defaults, defaults)

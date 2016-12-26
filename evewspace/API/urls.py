@@ -10,6 +10,10 @@ sso_patterns = patterns('API.views',
         url(r'^login/$', 'sso_login'),
         url(r'^overview/$', 'sso_overview'),
         url(r'^delete/(?P<char_id>\d+)/$', 'sso_delete'),
+        url(r'^frontpage/login/$', 'sso_frontpage_login'),
+        url(r'^settings/$', 'sso_admin'),
+        url(r'^accesslist/$', 'sso_access_list'),
+        url(r'^removeaccesslist/(?P<id>\d+)/$', 'sso_delete_access_list'),
         )
         
 urlpatterns = patterns('API.views',

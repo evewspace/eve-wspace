@@ -33,7 +33,13 @@
     <input class="btn btn-primary" type="submit" value="Log In" />
     <a class="btn btn-info" href="{% url 'register' %}">Register</a>
     <input type="hidden" name="next" value="{{ next }}" />
+    <br /><br />
 </form>
+    {% load account_tags %}
+    {% sso_enabled as sso %}
+    {% if sso %}
+    <div style="margin-left: -15px;"><a href="/api/sso/frontpage/login"><img src="/static/images/EVE_SSO_Login_Buttons_Large_Black.png" /></a></div>
+    {% endif %}
 </div>
 
-		{% endblock %}
+{% endblock %}

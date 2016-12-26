@@ -1,0 +1,36 @@
+<h3>SSO</h3>
+
+{% block scripts %}
+	<link rel="stylesheet" href="{{STATIC_URL}}css/jquery-ui.css" type="text/css" />
+	<link rel="stylesheet" href="{{STATIC_URL}}css/slider.css" type="text/css" />
+{% endblock %}
+<div id="sso_accordion">
+    {% load static %}
+    <div class="panel panel-default" style="width: 700px">
+        <div class="panel-heading">
+            <a class="panel-toggle" data-toggle="collapse" data-target="#ssoSettings" href="#ssoSettings">
+                SSO Settings
+            </a>
+        </div>
+        <div id="ssoSettings" class="panel-body collapse">
+            <div class="panel-inner">
+                <div id="SSOSettingsDiv">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default" style="width: 700px">
+        <div class="panel-heading">
+            <a class="panel-toggle" data-toggle="collapse" data-target="#ssoAccessList" href="#ssoAccessList">
+                SSO Access List
+            </a>
+        </div>
+        <div id="ssoAccessList" class="panel-body collapse">
+            <div class="panel-inner">
+                <div id="SSOAccessList">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="{{STATIC_URL}}js/sso_admin.js"></script>
