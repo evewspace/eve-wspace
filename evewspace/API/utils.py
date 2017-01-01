@@ -258,7 +258,7 @@ def sso_util_login(request, code):
                 user = User.objects.create_user(username=username,
                                  password=password)
             token = SSORefreshToken.objects.create(user=user, char_id=char_response['CharacterID'], char_name=char_response["CharacterName"])
-            if not get_config("SSO_DEFAULT_GROUP", None).value is null and not get_config("SSO_DEFAULT_GROUP", None).value == '':
+            if not get_config("SSO_DEFAULT_GROUP", None).value is None and not get_config("SSO_DEFAULT_GROUP", None).value == '':
                 group = Group.objects.get(name=get_config("SSO_DEFAULT_GROUP", None).value) 
                 group.user_set.add(user)
         token.refresh_token = access_response['refresh_token']
