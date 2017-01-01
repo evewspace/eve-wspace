@@ -112,7 +112,7 @@ def map_refresh(request, map_id):
         raise PermissionDenied
     current_map = get_object_or_404(Map, pk=map_id)
     key = str(request.user.pk) + '_online'
-    cache.set(key, 'Yes', 900)
+    cache.set(key, 'Yes', 60 * 15)
     result = [
         datetime.now(pytz.utc).strftime("%Y-%m-%d %H:%M:%S.%f"),
         utils.MapJSONGenerator(current_map, request.user).get_systems_json(),
