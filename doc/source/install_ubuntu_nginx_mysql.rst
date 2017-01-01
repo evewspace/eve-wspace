@@ -168,8 +168,7 @@ Initializing Eve W-Space
 Next you will need to run several commands to set up the Eve W-Space tables and preload them with data. If you encounter errors here, they are most likely caused by bad settings in *local_settings.py*, not having the virtual environment activated, or permissions.::
 
     (eve-wspace)$ cd /home/maptool/eve-wspace/evewspace
-    (eve-wspace)$ ./manage.py syncdb --all --noinput
-    (eve-wspace)$ ./manage.py migrate --fake
+    (eve-wspace)$ ./manage.py migrate
     (eve-wspace)$ ./manage.py buildsystemdata
     Note:This will take a while (~5-10min)
     (eve-wspace)$ ./manage.py loaddata */fixtures/*.json
