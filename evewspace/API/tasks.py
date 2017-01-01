@@ -50,56 +50,59 @@ def update_char_data():
 @task()
 def update_char_location():
     for token in SSORefreshToken.objects.exclude(refresh_token__isnull=True).exclude(refresh_token__exact='').all():
-        url = 'characters/%s/location/' % token.char_id
-        response = esi_access_data(token,url)
-        
-        url2 = 'characters/%s/ship/' % token.char_id
-        response2 = esi_access_data(response["token"],url2)
-        
-        if response: 
-            system_pk = response["solar_system_id"]
-        else:
-            url3 = 'characters/%s/location/' % token.char_id
-            response3 = crest_access_data(token,url3)
-            if response3:
-                system_pk = response3["solarSystem"]["id"]
-                    
-        
-        if response2:
-            ship_type_id = response2["ship_type_id"]
-        
-        #change "not 'structure_id' in response" when online check can be executed in ESI
-        if system_pk and not 'structure_id' in response and not 'station_id' in response:
-            char_cache_key = 'char_%s_location' % token.char_id
-            old_location = cache.get(char_cache_key)
-            current_system = get_object_or_404(System, pk=system_pk)
+        key = str(token.user_id) + '_online'
+        online = cache.get(key)
+        if online == "Yes":
+            url = 'characters/%s/location/' % token.char_id
+            response = esi_access_data(token,url)
+            
+            url2 = 'characters/%s/ship/' % token.char_id
+            response2 = esi_access_data(response["token"],url2)
+            
+            if response: 
+                system_pk = response["solar_system_id"]
+            else:
+                url3 = 'characters/%s/location/' % token.char_id
+                response3 = crest_access_data(token,url3)
+                if response3:
+                    system_pk = response3["solarSystem"]["id"]
+                        
             
             if response2:
-                current_ship = get_object_or_404(Type, pk=ship_type_id)
-                ship_type = current_ship.name
-                ship_name = response2["ship_name"]
-            else:
-                ship_type = 'Unknown'
-                ship_name = 'Unknown'
-                
-                
-                
-            if old_location != current_system:
-                if old_location:
-                    old_system = get_object_or_404(System, name=old_location)
-                    old_system.remove_active_pilot(token.char_id)
-                token.user.update_location(
-                    current_system.pk,
-                    token.char_id, token.char_name,
-                    ship_name, ship_type)
+                ship_type_id = response2["ship_type_id"]
             
-            cache.set(char_cache_key, current_system, 60 * 5)
-            # Use add_active_pilot to refresh the user's record in the global
-            # location cache
-            current_system.add_active_pilot(
-                token.user, token.char_id, token.char_name,
-                ship_name, ship_type 
-            )
+            #change "not 'structure_id' in response" when online check can be executed in ESI
+            if system_pk and not 'structure_id' in response:
+                char_cache_key = 'char_%s_location' % token.char_id
+                old_location = cache.get(char_cache_key)
+                current_system = get_object_or_404(System, pk=system_pk)
+                
+                if response2:
+                    current_ship = get_object_or_404(Type, pk=ship_type_id)
+                    ship_type = current_ship.name
+                    ship_name = response2["ship_name"]
+                else:
+                    ship_type = 'Unknown'
+                    ship_name = 'Unknown'
+                    
+                    
+                    
+                if old_location != current_system:
+                    if old_location:
+                        old_system = get_object_or_404(System, name=old_location)
+                        old_system.remove_active_pilot(token.char_id)
+                    token.user.update_location(
+                        current_system.pk,
+                        token.char_id, token.char_name,
+                        ship_name, ship_type)
+                
+                cache.set(char_cache_key, current_system, 60 * 5)
+                # Use add_active_pilot to refresh the user's record in the global
+                # location cache
+                current_system.add_active_pilot(
+                    token.user, token.char_id, token.char_name,
+                    ship_name, ship_type 
+                )
         
 
 @task()
