@@ -256,7 +256,6 @@ def sso_util_login(request, code):
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
                 user = User.objects.create_user(username=username,
-                                 email='sso@eveonline.com',
                                  password=password)
             token = SSORefreshToken.objects.create(user=user, char_id=char_response['CharacterID'], char_name=char_response["CharacterName"])
             if not get_config("SSO_DEFAULT_GROUP", None).value is null and not get_config("SSO_DEFAULT_GROUP", None).value == '':
