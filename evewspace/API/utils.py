@@ -238,17 +238,17 @@ def sso_util_login(request, code):
     char_response = r2.json()
     
     if request.GET.get('state') == 'login':
+        #check whether they are on the access list    
+        corp_id = api_current_corp(char_response['CharacterID'])
+        
+        #access list cross check
+        if not (sso_access_list(char_response['CharacterID'], corp_id)):
+            raise PermissionDenied
+        
         try:
             token = SSORefreshToken.objects.get(char_id=char_response['CharacterID'])
             user = token.user
         except SSORefreshToken.DoesNotExist:
-            #check whether they are on the access list    
-            corp_id = api_current_corp(char_response['CharacterID'])
-            
-            #access list cross check
-            if not (sso_access_list(char_response['CharacterID'], corp_id)):
-                raise PermissionDenied
-                           
             #register new user through SSO
             password = User.objects.make_random_password()
             username = char_response["CharacterName"]
